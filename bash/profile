@@ -1,0 +1,26 @@
+# source bashrc if it exists
+if [ -f ~/.bashrc ]; then
+    echo ".profile is sourcing " ~/.bashrc
+    source ~/.bashrc
+fi
+
+###############################
+# My personal variables
+###############################
+
+# sourcing asdf extendable package manager
+. $HOME/.asdf/asdf.sh
+. $HOME/.asdf/completions/asdf.bash
+
+# sourcing node version manager
+source /usr/share/nvm/init-nvm.sh
+
+
+# Defining default Unix text editor and command line text viewr
+export EDITOR=/usr/bin/vim
+export PAGER=/usr/bin/less
+
+# Dont remember what those do...
+export QT_QPA_PLATFORMTHEME="qt5ct"
+export GTK2_RC_FILES="$HOME/.gtkrc-2.0"
+
