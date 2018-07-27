@@ -59,8 +59,13 @@ ZSH_THEME="robbyrussell"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-  git
-)
+    zsh-syntax-highlighting
+    zsh-auto-suggestions
+    git
+    ruby
+    java
+    )
+
 
 source $ZSH/oh-my-zsh.sh
 
@@ -90,6 +95,27 @@ source $ZSH/oh-my-zsh.sh
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
+alias zshconfig="vim ~/.zshrc"
+alias ohmyzsh="vim ~/.oh-my-zsh"
+
+# Sourcing Plugins:
 source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+# source ./zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+
+# Set VI mode for normal mode vim keybindings (incredibly usefull)
+bindkey -v
+
+
+. $HOME/.asdf/completions/asdf.bash
+
+. $HOME/.asdf/asdf.sh
+
+. $HOME/.asdf/completions/asdf.bash
+
+. $HOME/.asdf/asdf.sh
+
+
+# Load powerline for zsh
+powerline-daemon -q
+. /usr/lib/python3.6/site-packages/powerline/bindings/zsh/powerline.zsh

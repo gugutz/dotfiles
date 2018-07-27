@@ -13,7 +13,7 @@ fi
 . $HOME/.asdf/completions/asdf.bash
 
 # sourcing node version manager
-source /usr/share/nvm/init-nvm.sh
+# source /usr/share/nvm/init-nvm.sh
 
 
 # Defining default Unix text editor and command line text viewr
@@ -24,3 +24,8 @@ export PAGER=/usr/bin/less
 export QT_QPA_PLATFORMTHEME="qt5ct"
 export GTK2_RC_FILES="$HOME/.gtkrc-2.0"
 
+# Exporting PATH for Gradle
+export PATH=$PATH:/opt/gradle/gradle-4.8/bin
+
+# Setting xterm to use 256 colors
+# export TERM=xterm-256color
