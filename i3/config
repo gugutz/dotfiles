@@ -1,0 +1,527 @@
+################################################
+#         gugutz i3-gaps config file           #
+#          http://github.com/gugutz            #
+#                                              #
+#        place it under ~/.config/i3/          #
+################################################
+
+################################################
+# SET FIRST AND SECOND MONITORS
+# this must be run before the rest of the script
+################################################
+
+# name of first and second monitors
+# find out yours with the commands:
+# xrandr --current OR xrandr --listmonitors
+# set $primary_monitor     HDMI-
+set $primary_monitor   DVI-I-2
+set $secondary_monitor   DVI-I-1
+
+exec_always --no-startup-id xrandr --output $primary_monitor --primary
+
+
+################################################
+# GLOBAL VARIABLE SETUP
+################################################
+
+#power and wm options
+set $shutdown sudo shutdown -h now
+set $reboot sudo reboot now
+set $netrefresh --no-startup-id sudo systemctl restart NetworkManager
+set $hibernate sudo systemctl suspend
+
+# define default browser
+set $browser firefox
+
+# define default text editor
+set $editor vim
+
+
+# define main terminal as st in tmux (suckless terminal)
+set $terminal st
+set $tmux tmux
+set $i3_terminal i3-sensible-terminal -e tmux new-session -A -s main-session
+
+## define modifier key to Super (aka Winkey)
+set $mod Mod4
+
+# define variable to use alt in keybindings
+set $alt mod1
+
+# define Conky path
+set $conky_start ~/dotfiles/conky/scripts/conky-start.sh
+
+exec_always python /usr/lib/python3.6/powerline/bindings/lemonbar/powerline-lemonbar.py –i3
+
+
+################################################
+# POWER OPTIONS AND WINDOWS MANAGER
+################################################
+
+# reload the configuration file
+bindsym $mod+Shift+c            reload
+
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Shift+r            restart
+bindsym $mod+Shift+BackSpace	exec prompt "Are you sure you want to reboot?" "$reboot"
+
+# hibernate
+bindsym $mod+f4		        exec --no-startup-id $hibernate
+bindsym Control+Shift+$mod+h	exec --no-startup-id $hibernate
+
+# exit i3 (logs you out of your X session)
+bindsym $mod+Shift+e            exec "i3-nagbar -t warning -m 'Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+bindsym $mod+Shift+Escape 	exec prompt "Are you sure you want to leave i3?" "i3-msg exit"
+
+# shutdown computer
+# XF86 special key for shutting down
+bindsym $alt+q	        exec prompt "Are you sure you want to shutdown?" "$shutdown"
+bindsym XF86PowerOff		exec prompt "Are you sure you want to shutdown?" "$shutdown"
+
+################################################
+# I3 APPEARANCE AND BASIC SETTINGS
+################################################
+
+# Disable window titlebars entirely
+for_window [class="^.*"] border pixel 2
+
+# Set inner/outer gaps
+gaps inner 15
+gaps outer 15
+
+# Smart gaps (gaps used if only more than one container on the workspace)
+# smart_gaps on
+
+
+
+################################################
+# BASIC I3 WM CONTROL BINDINGS
+################################################
+
+# kill focused window
+bindsym $mod+q        kill
+bindsym $mod+Shift+q  kill
+
+
+#################################################
+# COMPOSITOR MANAGER AND TRANSPARENCY SETUP
+################################################
+
+# start compton composition manager
+exec_always --no-startup-id compton
+#  A
+#  exec --no-startup-id compton --xrender-sync-fence
+
+
+################################################
+# WALLPAPER SETUP
+################################################
+
+# set $wallpapers_path ~/Pictures/Wallpapers
+# set $wallpaper1 ~/img/wallpapers/how-winter-should-look.jpg
+# set $wallpaper2 ~/img/wallpapers/stars1.jpg
+
+# 2 different wallapers for 2 monitors
+# exec_always --no-startup-id feh --bg-fill  $wallpaper1 $wallpaper2
+
+# to stretch a single image across monitors, using half image for each monitor
+# exec_always --no-startup-id feh --bg-scale --no-xinerama $wallpaper1
+
+# tell feh to look recursively on a specific directory and randomize the background
+#exec_always --no-startup-id feh --recursive --randomize --bg-fill $wallpapers_path
+
+# set background to solid color
+# xsetroot doesnt work with compton enabled, so using hsetroot (from aur) instead   
+exec_always --no-startup-id hsetroot -solid "#00000a"  #darkgrey
+
+# start conky
+exec_always --no-startup-id $conky_start
+
+# fonts
+#font pango:monospace 8
+# font pango:DejaVu Sans Mono 8
+font pango:Hack 9
+
+# Use Mouse+$mod to drag floating windows to their wanted position
+floating_modifier $mod
+ 
+################################################
+# SCREENSHOTS SETUP
+################################################
+
+# take scrCloses equivalent do VS Code Ctrl + Deenshot of the entire screen (root window)
+bindsym Print exec ~/dotfiles/scripts/i3-take-screenshot.sh root
+
+# take screenshot of the active window
+bindsym Shift+Print exec ~/dotfiles/scripts/i3-take-screenshot.sh active
+
+# Select an area to screen shot
+bindsym --release $mod+Print exec --no-startup-id import ~/img/screenshots/last-screenshot.png
+
+# scrot & gimp - select window or rectangle
+bindsym $alt+Print exec scrot ~/img/screenshots/last-scrot.png -s -e 'mv $f /tmp/ && pinta /tmp/$f'
+
+################################################
+# i3 BAR SETTINGS
+################################################
+
+# Start i3bar to display a workspace bar (plus the system information i3status
+# finds out, if available)
+bar {
+	# status_command i3status
+    
+    # Powerline
+    #
+
+    # status_command /usr/lib/python3.6/site-packages/powerline/bindings/i3/powerline-i3.py 
+ 	font pango:Hack Nerd Font Mono 11
+    # i3blocks
+    status_command i3blocks -c ~/dotfiles/i3/i3blocks.conf
+    i3bar_command i3bar -t
+    separator_symbol "■" 
+   
+	position bottom
+	# mode dock
+	# modifier None
+    height 21
+ 	# font pango:Source Sans Pro-10 10
+    colors {
+        separator #268bd2
+        background #000000
+        statusline #839496
+        focused_workspace #fdf6e3 #6c71c4 #fdf6e3
+        active_workspace #fdf6e3 #6c71c4 #fdf6e3
+        inactive_workspace #002b36 #586e75 #002b36
+        urgent_workspace #d33682 #d33682 #fdf6e3
+    }
+}
+
+################################################
+# SCRATCHPAD SETTINGS
+################################################
+
+# Runs the tmuxinit script, which searches for an earlier tmux instance,
+# otherwise starts a new one (to prevent multiple dropdown sessions).
+exec --no-startup-id st -n dropdown
+# Runs neofetch on first tmux screen if installed.
+exec_always --no-startup-id "tmux send-keys -t 0:0 'clear && neofetch 2>/dev/null' Enter"
+
+# Terminal scratchpad
+for_window [instance="dropdown"] floating enable
+for_window [instance="dropdown"] resize set 1000 700
+for_window [instance="dropdown"] move scratchpad
+for_window [instance="dropdown"] border pixel 5
+
+
+bindsym $mod+z [instance="dropdown"] scratchpad show; [instance="dropdown"] move position center
+
+
+################################################
+# ROFI TASK SWITCHER SETTINGS
+################################################
+
+# rofi task switcher - dmenu replacement
+bindsym $mod+Tab \
+  exec rofi \
+  -show window -terminal urxvtc -hide-scrollbar true  \
+  -line-margin 0 -lines 20 -eh 1 -width 35 -bw 3 \
+  -kb-mode-next      Alt+Tab \
+  -kb-mode-previous  Alt+Control+Tab \
+  -bg        "#222222"  -fg        "#2ECC71" \
+  -hlbg      "#2ECC71"  -hlfg      "#222222" \
+  -bg-active "#222222"  -fg-active "#2288DD" \
+  -font      "Roboto Slab 11"   -opactiy 80
+
+
+################################################
+# BINDINGS FOR EDITING SEVERAL CONFIG AND
+# DOT FILES IN VIM
+################################################
+
+# open i3 config file
+bindsym $mod+$alt+i    exec --no-startup-id $terminal -e $editor ~/.i3/config
+
+# open vim config file
+bindsym $mod+$alt+e    exec --no-startup-id $terminal -e $editor ~/.vimrc
+
+# open tmux config file
+bindsym $mod+$alt+t    exec --no-startup-id $terminal -e $editor ~/.tmux.conf
+
+# open vim config file
+bindsym $mod+$alt+b    exec --no-startup-id $terminal -e $editor ~/.bashrc
+
+# open vim config file
+bindsym $mod+$alt+p    exec --no-startup-id $terminal -e $editor ~/.profile
+
+# open ranger config file
+bindsym $mod+$alt+r    exec --no-startup-id $terminal -e $editor ~/.config/ranger/rc.conf
+
+
+################################################
+# BINDINGS FOR EDITING MY SCRIPT FILES
+################################################
+
+# open my dev-environment setup shell script
+bindsym $mod+$alt+Control+d    exec --no-startup-id $terminal -e $editor ~/scripts/system/manjaro-dev-env-setup.sh
+
+# open my libs setup shell script
+bindsym $mod+$alt+Control+l    exec --no-startup-id $terminal -e $editor ~/scripts/system/manjaro-dev-libs-setup.sh
+
+
+# open my libs setup shell script
+bindsym $mod+$alt+Control+b    exec --no-startup-id $terminal -e $editor ~/scripts/system/manjaro-basic-software.sh
+
+
+################################################
+# APPLICATION KEY BINDINGS
+################################################
+
+# start dmenu (a program launcher)
+bindsym $mod+d exec dmenu_run
+
+# start a st terminal instance
+bindsym $mod+Return       exec --no-startup-id $terminal -e tmux  & i3-msg
+for_window[class="^st"] focus
+# assign [class="st"]          → $ws10
+
+# start a transparent i3-sensible-terminal
+bindsym $mod+Control+$alt+Return       exec --no-startup-id $i3_terminal
+
+# start secondary terminal
+bindsym $mod+Control+Return       exec --no-startup-id emacs
+
+# start vim
+bindsym $mod+Shift+Return exec --no-startup-id $terminal -e vim
+
+# VSCode
+# assign [class="Code"] → $ws5
+
+# start IntelliJ Idea
+bindsym Control+Shift+i 	exec $terminal -e idea
+assign [class="jetbains-idea-ce"] → $ws5
+
+
+# start ranger file manager
+bindsym $alt+e                exec --no-startup-id $terminal -e ranger
+bindsym $mod+Control+r	      exec $terminal -e sudo ranger /
+
+# start ranger file manager
+bindsym Control+Shift+r                exec --no-startup-id pcmanfm
+
+# Telegram Desktop
+# assign [class="TelegramDesktop"] → $ws9
+
+
+# Slack
+# assign [class="Slack"]  → $ws9
+
+# htop
+bindsym $mod+p            exec $terminal -e htop
+
+# firefox
+bindsym Control+Shift+f		exec $terminal -e firefox
+# assigning firefox to workspace 7
+# assign [class="Firefox"] → $ws7
+
+# libreoffice
+bindsym Control+Shift+l	  exec $terminal -e libreoffice
+
+# peek screen gif recorder
+# bindsym Control+Shift+p 	exec $terminal -e peek
+
+# peek screen gif recorder
+bindsym Control+Shift+t 	exec telegram-desktop
+
+
+
+# Wine settings (mostly for some games)
+assign [class="Wine"] → $ws6
+for_window [class="Wine"] floating enable
+for_window [class="Peek"] floating enable
+for_window [class="Main"] floating enable
+
+################################################
+# WINDOW SETTINGS
+################################################
+
+# increase and decrease inner gaps
+bindsym Control+plus  gaps inner current plus 5
+bindsym Control+minus gaps inner current minus 5
+bindsym Control+0     gaps inner current set 0
+
+bindsym Control+Shift+plus  gaps inner all plus 5
+bindsym Control+Shift+minus gaps inner all minus 5
+bindsym Control+Shift+0     gaps inner all set 0
+
+# increase and decrease inner gaps
+bindsym $alt+plus  gaps outer current plus 5
+bindsym $alt+minus gaps outer current minus 5
+bindsym $alt+0     gaps outer current set 0
+
+bindsym $alt+Shift+plus  gaps outer all plus 5
+bindsym $alt+Shift+minus gaps outer all minus 5
+bindsym $alt+Shift+0     gaps outer all set 0
+
+# resizing windows
+bindsym $mod+Shift+y		resize shrink width 10 px or 10ppt
+bindsym $mod+Shift+i		resize grow height 10 px or 10 ppt
+bindsym $mod+Shift+u		resize shrink height 10 px or 10 ppt
+bindsym $mod+Shift+o		resize grow width 10 px or 10 ppt
+
+# change window focus (vim-like bindings)
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+# change window focus using the arrow (cursor) keys
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# move focused window (vim-like bindings)
+bindsym $mod+Shift+j move left
+bindsym $mod+Shift+k move down
+bindsym $mod+Shift+l move up
+bindsym $mod+Shift+ccedilla move right
+# move focused window using the arrow (cursor) keys
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+# split in horizontal orientation
+bindsym $mod+Shift+h split h
+
+# split in vertical orientation
+bindsym $mod+Shift+v split v
+
+# enter fullscreen mode for the focused container
+bindsym $mod+f fullscreen toggle
+
+# change container layout (stacked, tabbed, toggle split)
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+
+# toggle tiling / floating
+bindsym $mod+Shift+space floating toggle
+
+# change focus between tiling / floating windows
+bindsym $mod+space focus mode_toggle
+
+# focus the parent container
+bindsym $mod+a focus parent
+
+# focus the child container
+#bindsym $mod+d focus child
+
+
+################################################
+# WORKSPACES SETUP
+################################################
+
+# setting variables to hold the workspaces names
+set $ws1 "1: IDE"
+set $ws2 "2: Server"
+set $ws3 "3: Ranger"
+set $ws4 "4: ranger"
+set $ws5 "5: IDEs"
+set $ws6 "6: wine"
+set $ws7 "7: internet"
+set $ws8 "8: messaging"
+set $ws9 "9: terminal"
+set $ws10 "10: ssh"
+
+# workspaces settings
+workspace $ws1 gaps outer 1
+workspace $ws3 gaps outer 1
+workspace $ws5 gaps outer 0
+
+
+# switch to workspace
+bindsym $mod+1 workspace $ws1
+bindsym $mod+2 workspace $ws2
+bindsym $mod+3 workspace $ws3
+bindsym $mod+4 workspace $ws4
+bindsym $mod+5 workspace $ws5
+bindsym $mod+6 workspace $ws6
+bindsym $mod+7 workspace $ws7
+bindsym $mod+8 workspace $ws8
+bindsym $mod+9 workspace $ws9
+bindsym $mod+0 workspace $ws10
+
+# move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace $ws1
+bindsym $mod+Shift+2 move container to workspace $ws2
+bindsym $mod+Shift+3 move container to workspace $ws3
+bindsym $mod+Shift+4 move container to workspace $ws4
+bindsym $mod+Shift+5 move container to workspace $ws5
+bindsym $mod+Shift+6 move container to workspace $ws6
+bindsym $mod+Shift+7 move container to workspace $ws7
+bindsym $mod+Shift+8 move container to workspace $ws8
+bindsym $mod+Shift+9 move container to workspace $ws9
+bindsym $mod+Shift+0 move container to workspace $ws10
+
+# move current workspace between monitors
+bindsym $mod+Control+h move workspace to output left
+bindsym $mod+Control+j move workspace to output down
+bindsym $mod+Control+k move workspace to output up
+bindsym $mod+Control+l move workspace to output right
+
+
+################################################
+# MULTI-MONITORS WORKSPACES SETUP
+################################################
+
+# distribution of workspaces between monitors
+workspace $ws1 output $primary_monitor
+workspace $ws2 output $primary_monitor
+workspace $ws3 output $primary_monitor
+workspace $ws4 output $primary_monitor
+workspace $ws5 output $primary_monitor
+workspace $ws6 output $primary_monitor
+workspace $ws7 output $primary_monitor
+workspace $ws8 output $secondary_monitor
+workspace $ws9 output $secondary_monitor
+workspace $ws10 output $secondary_monitor
+
+
+################################################
+# RESIZE SETTINGS
+################################################
+
+# resize window (you can also use the mouse for that)
+mode "resize" {
+        # These bindings trigger as soon as you enter the resize mode
+
+        # Pressing left will shrink the window’s width.
+        # Pressing right will grow the window’s width.
+        # Pressing up will shrink the window’s height.
+        # Pressing down will grow the window’s height.
+        bindsym h resize shrink width 10 px or 10 ppt
+        bindsym j resize grow height 10 px or 10 ppt
+        bindsym k resize shrink height 10 px or 10 ppt
+        bindsym l resize grow width 10 px or 10 ppt
+
+        # same bindings, but for the arrow keys
+        bindsym Left resize shrink width 10 px or 10 ppt
+        bindsym Down resize grow height 10 px or 10 ppt
+        bindsym Up resize shrink height 10 px or 10 ppt
+        bindsym Right resize grow width 10 px or 10 ppt
+
+        # back to normal: Enter or Escape or $mod+r
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+        bindsym $mod+r mode "default"
+}
+
+bindsym $mod+r mode "resize"
+
+
+################################################
+# General and mixed purpose configs
+# ##############################################
+# set 'App' window_class as floating windows
+# this makes my java build and runs float on top of the idea, and not divide the screen with another window
+for_window [instance="App"] floating enable
