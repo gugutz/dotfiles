@@ -107,13 +107,10 @@ source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 bindkey -v
 
 
-. $HOME/.asdf/completions/asdf.bash
-
+# source asdf
 . $HOME/.asdf/asdf.sh
-
+# source asdf zsh completions
 . $HOME/.asdf/completions/asdf.bash
-
-. $HOME/.asdf/asdf.sh
 
 
 # Load powerline for zsh

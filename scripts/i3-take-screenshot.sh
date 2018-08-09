@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #Script copied from https://faq.i3wm.org/question/202/what-do-you-guys-use-for-printscreen.1.html
-mkdir -p ~/screenshots
-SCREEN_DIR=~/screenshots/
+mkdir -p ~/img/screenshots
+SCREEN_DIR=~/img/screenshots/
 SCREEN_PROMPT=1
 
 window='root'
