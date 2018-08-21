@@ -505,12 +505,17 @@ Plug 'pangloss/vim-javascript'
 Plug 'xojs/vim-xo'                       " Install vim-xo for xo linting support
 Plug 'mxw/vim-jsx'                       " JSX syntax colors and indent support. Depends on vim-javascript
 
-" Ruby!
+" Ruby
 Plug 'tpope/vim-rake'
 Plug 'tpope/vim-bundler'
 Plug 'vim-ruby/vim-ruby'
 Plug 'tpope/vim-rails'
 Plug 'sunaku/vim-ruby-minitest'
+
+" Elixir
+Plug 'elixir-editors/vim-elixir'
+" elixir module and function completions, mix and iex integration, ...
+Plug 'slashmili/alchemist.vim'
 
 " PHP
 Plug 'shawncplus/phpcomplete.vim'       " better php omnicompletion
@@ -576,18 +581,19 @@ colorscheme codedark
 " The following mapping will change the behavior of the <Enter> key when the popup menu is visible. In that case the Enter key will simply select the highlighted menu item, just as <C-Y> does. 
 :inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 
+" Navigate through suggestions with C-j and C-k
+inoremap <expr> <C-j> pumvisible() ? "\<C-N>" : "\<C-j>"
+inoremap <expr> <C-k> pumvisible() ? "\<C-P>" : "\<C-k>"
 
 " autocmd FileType python set omnifunc=pythoncomplete#Complete
 " autocmd FileType javascript set omnifunc=javascriptcomplete#CompleteJS
 " autocmd FileType html set omnifunc=htmlcomplete#CompleteTags
 " autocmd FileType css set omnifunc=csscomplete#CompleteCSS
 
-
 """""""""""""""""""""""""""""""""""""""
 " UltSnips Snippets settings
-
 " Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
-let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsExpandTrigger="<S-tab>"
 let g:UltiSnipsJumpForwardTrigger="<c-b>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
@@ -612,7 +618,7 @@ let g:airline_powerline_fonts=1                     " needed by devicons
 " NERDTREE SETTINGS
 
 " Toogle NERDTree
-map <C-o> :NERDTreeToggle<CR>
+map <leader>e :NERDTreeToggle<CR>
 
 " Open NerdTree on Vim startup
 autocmd VimEnter * NERDTree
@@ -634,12 +640,10 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
 
 """""""""""""""""""""""""""""""""""""""
 " EMMET SETTINGS
-
 " Use TAB to expand emmet snippets (equivalent to <C-y>,
 " let g:user_emmet_expandabbr_key = '<S-tab>'
-
 " Create another binding for emmet, because the default is not great
-map <S-tab> <c-y>,
+map <C-Space> <c-y>,
 
 " navigate to edit points
 inoremap <C->> <c-y>n<CR>

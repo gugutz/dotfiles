@@ -1,5 +1,5 @@
 # usign -A argument makes new-session behaves like attach-session if session name already exists
-tmux new-session -A -s ruby-ide
+tmux new-session -A -s "vim-ide"
 
 # first split the window vertically for bottom terminal
 tmux split-window -v

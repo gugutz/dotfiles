@@ -8,12 +8,16 @@ fi
 # My personal variables
 ###############################
 
+
+# sourcing NVM init script
+source /usr/share/nvm/init-nvm.sh
+
 # sourcing asdf extendable package manager
 . $HOME/.asdf/asdf.sh
 . $HOME/.asdf/completions/asdf.bash
 
 # sourcing node version manager
-# source /usr/share/nvm/init-nvm.sh
+source /usr/share/nvm/init-nvm.sh
 
 
 # Defining default Unix text editor and command line text viewr
@@ -29,3 +33,50 @@ export PATH=$PATH:/opt/gradle/gradle-4.8/bin
 
 # Setting xterm to use 256 colors
 # export TERM=xterm-256color
+
+
+###################################
+# MY ALIASES
+###################################
+
+# reboot / halt / poweroff
+alias reboot='sudo reboot now'
+alias shutdown='sudo shutdown now'
+alias suspend='systemctl suspend'
+# create parent directories on demand with mkdir
+alias mkdir='mkdir -pv'
+alias ll='ls -lAbhc'
+alias l='ls -lBohc'
+#History search (use: hs sometext)
+# $1 is the first paremeter passed to hs
+alias hs='history | grep $1'
+#Sudo vim
+alias svim='sudo vim'
+#Add extra protection against mistakes
+alias rm='rm -v -I'
+# Confirmation When Copying, Linking, or Deleting
+alias cp='cp -v -i'
+alias ln='ln -v -i'
+alias mv='mv -v -i'
+#Unrar alias
+alias unrar='rar e'
+# get rid of command not found by mistakengly typing cd..
+alias cd..='cd ..'
+## Colorize the ls output ##
+alias ls='ls --color=auto'
+## Use a long listing format ##
+alias ll='ls -la'
+## Show hidden files ##
+alias l.='ls -d .* --color=auto'
+
+## Date / Time aliases
+alias path='echo -e ${PATH//:/\\n}'
+alias shell='exec $SHELL'
+# removed now alias due to conflicting with now-cli for deploy
+# alias now='date +"%T"'
+alias nowtime=now
+alias nowdate='date +"%d-%m-%Y"'
+
+## resume wget downloads by default
+alias wget='wget -c'
+

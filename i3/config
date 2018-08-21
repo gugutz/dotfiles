@@ -33,14 +33,16 @@ set $hibernate sudo systemctl suspend
 # define default browser
 set $browser firefox
 
-# define default text editor
-set $editor vim
-
-
 # define main terminal as st in tmux (suckless terminal)
-set $terminal st
-set $tmux tmux
-set $i3_terminal i3-sensible-terminal -e tmux new-session -A -s main-session
+# this make tmux use a main session and doenst spawn multiple unused sessions
+# set $terminal st -e tmux new-session -A -s "main-session"
+set $terminal       st -e tmux new-session
+
+# define default text editor
+# set $editor st -e tmux new-session -A -s "emacs-session" emacsclient -c -t
+set $editor         st -e tmux new-session emacsclient -c -t
+set $codemacs       st -e codemacs
+ 
 
 ## define modifier key to Super (aka Winkey)
 set $mod Mod4
@@ -51,7 +53,6 @@ set $alt mod1
 # define Conky path
 set $conky_start ~/dotfiles/conky/scripts/conky-start.sh
 
-exec_always python /usr/lib/python3.6/powerline/bindings/lemonbar/powerline-lemonbar.py –i3
 
 
 ################################################
@@ -178,7 +179,7 @@ bar {
     # i3blocks
     status_command i3blocks -c ~/dotfiles/i3/i3blocks.conf
     i3bar_command i3bar -t
-    separator_symbol "■" 
+    separator_symbol "|" 
    
 	position bottom
 	# mode dock
@@ -239,22 +240,28 @@ bindsym $mod+Tab \
 ################################################
 
 # open i3 config file
-bindsym $mod+$alt+i    exec --no-startup-id $terminal -e $editor ~/.i3/config
+bindsym $mod+$alt+i    exec --no-startup-id $editor ~/.i3/config
 
 # open vim config file
-bindsym $mod+$alt+e    exec --no-startup-id $terminal -e $editor ~/.vimrc
+bindsym $mod+$alt+v    exec --no-startup-id $editor ~/.vimrc
+
+# open emacs config file
+bindsym $mod+$alt+e    exec --no-startup-id $editor ~/.emacs
 
 # open tmux config file
-bindsym $mod+$alt+t    exec --no-startup-id $terminal -e $editor ~/.tmux.conf
+bindsym $mod+$alt+t    exec --no-startup-id $editor ~/.tmux.conf
 
-# open vim config file
-bindsym $mod+$alt+b    exec --no-startup-id $terminal -e $editor ~/.bashrc
+# open bashrc config file
+bindsym $mod+$alt+b    exec --no-startup-id $editor ~/.bashrc
 
-# open vim config file
-bindsym $mod+$alt+p    exec --no-startup-id $terminal -e $editor ~/.profile
+# open profile file
+bindsym $mod+$alt+p    exec --no-startup-id $editor ~/.profile
+
+# open zsh config file
+bindsym $mod+$alt+z    exec --no-startup-id $editor ~/.zshrc
 
 # open ranger config file
-bindsym $mod+$alt+r    exec --no-startup-id $terminal -e $editor ~/.config/ranger/rc.conf
+bindsym $mod+$alt+r    exec --no-startup-id $editor ~/.config/ranger/rc.conf
 
 
 ################################################
@@ -262,51 +269,50 @@ bindsym $mod+$alt+r    exec --no-startup-id $terminal -e $editor ~/.config/range
 ################################################
 
 # open my dev-environment setup shell script
-bindsym $mod+$alt+Control+d    exec --no-startup-id $terminal -e $editor ~/scripts/system/manjaro-dev-env-setup.sh
+bindsym $mod+$alt+Control+d    exec --no-startup-id $editor ~/scripts/system/manjaro-dev-env-setup.sh
 
 # open my libs setup shell script
-bindsym $mod+$alt+Control+l    exec --no-startup-id $terminal -e $editor ~/scripts/system/manjaro-dev-libs-setup.sh
+bindsym $mod+$alt+Control+l    exec --no-startup-id $editor ~/scripts/system/manjaro-dev-libs-setup.sh
 
 
 # open my libs setup shell script
-bindsym $mod+$alt+Control+b    exec --no-startup-id $terminal -e $editor ~/scripts/system/manjaro-basic-software.sh
+bindsym $mod+$alt+Control+b    exec --no-startup-id $editor ~/scripts/system/manjaro-basic-software.sh
 
 
 ################################################
 # APPLICATION KEY BINDINGS
 ################################################
 
+# start emacs IDE
+bindsym $mod+F9                   exec --no-startup-id $codemacs
 # start dmenu (a program launcher)
-bindsym $mod+d exec dmenu_run
+bindsym $mod+d                    exec dmenu_run
 
 # start a st terminal instance
-bindsym $mod+Return       exec --no-startup-id $terminal -e tmux  & i3-msg
+bindsym $mod+Return               exec --no-startup-id $terminal
 for_window[class="^st"] focus
 # assign [class="st"]          → $ws10
 
-# start a transparent i3-sensible-terminal
-bindsym $mod+Control+$alt+Return       exec --no-startup-id $i3_terminal
-
-# start secondary terminal
-bindsym $mod+Control+Return       exec --no-startup-id emacs
+# start emacs
+bindsym $mod+Control+Return       exec --no-startup-id $editor
 
 # start vim
-bindsym $mod+Shift+Return exec --no-startup-id $terminal -e vim
+bindsym $mod+Shift+Return         exec --no-startup-id st -e tmux new-session vim
 
 # VSCode
 # assign [class="Code"] → $ws5
 
 # start IntelliJ Idea
-bindsym Control+Shift+i 	exec $terminal -e idea
+bindsym Control+Shift+i   	  exec $terminal -e idea
 assign [class="jetbains-idea-ce"] → $ws5
 
 
 # start ranger file manager
-bindsym $alt+e                exec --no-startup-id $terminal -e ranger
-bindsym $mod+Control+r	      exec $terminal -e sudo ranger /
+bindsym $alt+e                    exec --no-startup-id $terminal -e ranger
+bindsym $mod+Control+r	          exec $terminal -e sudo ranger /
 
 # start ranger file manager
-bindsym Control+Shift+r                exec --no-startup-id pcmanfm
+bindsym Control+Shift+r           exec --no-startup-id pcmanfm
 
 # Telegram Desktop
 # assign [class="TelegramDesktop"] → $ws9
