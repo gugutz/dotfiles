@@ -1,13 +1,52 @@
 ; -*- mode: elisp -*-
 
-;********************************************
-; general emacs customizations
-;********************************************
-
 ; allow access from emacsclient
 (require 'server)
 (unless (server-running-p)
   (server-start))
+
+;;********************************************
+;; adding package repositories
+;;********************************************
+
+(require 'package)
+; add melpa stable emacs package repository
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(package-initialize)
+
+;;********************************************
+;; Requiring my packages
+;;********************************************
+
+(require 'org)
+
+(require 'web-mode)
+
+; vim related packages
+(require 'neotree)
+(require 'evil)
+(require 'evil-surround)
+(require 'evil-commentary)
+(require 'evil-matchit)
+(require 'evil-org)
+(require 'evil-org-agenda)
+
+(require 'auto-complete)
+(require 'all-the-icons)
+
+;********************************************
+; major modes
+;********************************************
+
+; Enable Org mode
+
+; enable Evil mode
+(evil-mode 1)
+
+;********************************************
+; enviroment setup
+;********************************************
+
 
 
 ; add the folder 'config' to emacs load-path
@@ -21,34 +60,140 @@
       (xterm-mouse-mode t))
 
 ;********************************************
-; Package repositories
+; general text editing customizations
 ;********************************************
 
-(require 'package)
+; show line numbers
+(when (version<= "26.0.50" emacs-version )
+  (global-display-line-numbers-mode))
 
-; add melpa stable emacs package repository
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+;********************************************
+; general code editing customizations
+;********************************************
+
+; parentheses
+(show-paren-mode t)
+
+; indentation
+(setq-default indent-tabs-mode nil)
+(setq-default c-basic-offset 4)
+
+;#######################################
+; APPEARANCE
+;#######################################
+
+(add-to-list 'custom-theme-load-path "themes")
+
+(setq my-theme 'dracula)
+(defun load-my-theme (frame)
+  (select-frame frame)
+  (load-theme my-theme t))
+
+; make emacs load the theme after loading the frame
+; resolves issue with the theme not loading properly in terminal mode on emacsclient
+(if (or (daemonp) (server-running-p))
+  (add-hook 'after-make-frame-functions #'load-my-theme)
+  (load-theme my-theme t))
+
+;********************************************
+; Customizing the mode line
+;********************************************
+;this must be BEFORE (sml/setup)
+(setq sml/theme 'dark)
+;load smart-mode-line
+(sml/setup)
+
+;********************************************
+; General text editing settings
+;********************************************
+
+(defconst *spell-check-support-enabled* t) ;; Enable with t if you prefer
 
 
-(package-initialize)
+;#######################################
+; MINOR MODES
+;#######################################
+
+;; js2-refactor
+
+(add-hook 'js2-mode-hook #'js2-refactor-mode)
+; choose js2-refactor keybinding scheme (this can be changed easily)
+(js2r-add-keybindings-with-prefix "C-c C-m")
+
+
+;#######################################
+; FILE ASSOCIATIONS
+;#######################################
+
+(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+
+; template engines filetypes
+(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
 
 
 ;********************************************
-; Packages specific settings
+; magit
 ;********************************************
 
-;  To enable evil-commentary permanently, add
+; define global keybing to magit-status
+(global-set-key (kbd "C-x g") 'magit-status)
 
-(evil-commentary-mode)
-;;;; Neotree
+
+;********************************************
+; multiple cursors
+;********************************************
+
+(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+
+
+;********************************************
+; evil mode bindings
+;********************************************
+
+; imitate vim multiple selection behavior with multiple-cursors package
+(define-key evil-normal-state-map (kbd "C-n") 'mc/mark-next-like-this)
+(define-key evil-normal-state-map (kbd "M-N") 'mc/mark-previous-like-this)
+
+; evil-leader <leader> key package for Evil Mode
+(global-evil-leader-mode)
+(evil-leader/set-leader ",")
+(evil-leader/set-key
+  "e" 'find-file
+  "q" 'evil-quit
+  "w" 'save-buffer
+  "k" 'kill-buffer
+  "b" 'switch-to-buffer
+  "-" 'split-window-bellow
+  "|" 'split-window-right)
+
+; window navigation with vim-like bindings
+(define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
+(define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
+(define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
+(define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
+
+;********************************************
+; neotree
+;********************************************
+
 ;; use neotree (NERDTree for emacs) and toggle with F8
-(require 'neotree)
 (global-set-key [f8] 'neotree-toggle)
+
 ; neotree 'icons' theme, which supports filetype icons
 (unless (display-graphic-p)
   (setq neo-theme 'icons))
 (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
-
 ; make neotree window open and go the file currently opened
 (setq neo-smart-open t)
 
@@ -86,140 +231,42 @@
     ; (evil-define-key 'normal neotree-mode-map (kbd "C") 'neotree-change-root)
     ; (evil-define-key 'normal neotree-mode-map (kbd "H") 'neotree-refresh)
 
-
 ;********************************************
-; Emacs Appearance settings
-;********************************************
-
-; all the icons plugins
-(require 'all-the-icons)
-
-(add-to-list 'custom-theme-load-path "themes")
-; make emacs load the theme after loading the frame
-; to avoid not loading the theme in terminal mode on emacsclient
-(setq my-theme 'dracula)
-(defun load-my-theme (frame)
-  (select-frame frame)
-  (load-theme my-theme t))
-
-; if daemon is running or running in server-mode, load theme after frame creation
-; resolves issues with theme in emacsclient
-(if (or (daemonp) (server-running-p))
-  (add-hook 'after-make-frame-functions #'load-my-theme)
-  (load-theme my-theme t))
-
-;********************************************
-; Customizing the mode line
-;********************************************
-;this must be BEFORE (sml/setup)
-; (setq sml/theme 'dark)
-;load smart-mode-line
-; (sml/setup)
-
-;********************************************
-; General text editing settings
-;********************************************
-
-(defconst *spell-check-support-enabled* t) ;; Enable with t if you prefer
-
-
-;********************************************
-; Require and use packages
-;********************************************
-
-
-;; Enable Org mode
-(require 'org)
-;; Make Org mode work with files ending in .org
-(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-
-
-; enable Evil mode
-(require 'evil)
-(evil-mode 1)
-
-; define global keybing to magit-status
-(global-set-key (kbd "C-x g") 'magit-status)
-
-; emacs multiple cursors keybindings
-(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-(global-set-key (kbd "C->") 'mc/mark-next-like-this)
-(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-
-
-;********************************************
-; Vim-Like bindings
-;********************************************
-
-; imitate vim multiple selection behavior with multiple-cursors package
-(define-key evil-normal-state-map (kbd "C-n") 'mc/mark-next-like-this)
-(define-key evil-normal-state-map (kbd "M-N") 'mc/mark-previous-like-this)
-
-; evil-leader <leader> key package for Evil Mode
-(global-evil-leader-mode)
-(evil-leader/set-leader ",")
-(evil-leader/set-key
-  "e" 'find-file
-  "q" 'evil-quit
-  "w" 'save-buffer
-  "k" 'kill-buffer
-  "b" 'switch-to-buffer
-  "-" 'split-window-bellow
-  "|" 'split-window-right)
-
-; window navigation with vim-like bindings
-(define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
-(define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
-(define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
-(define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
-
-;********************************************
-; Vim plugins
+; Vim plugins definitions
 ;********************************************
 
 ; Vim Surround
-(require 'evil-surround)
 (global-evil-surround-mode 1)
 
+;  To enable evil-commentary permanently, add
+(evil-commentary-mode)
+
 ; Vim Commentary
-(require 'evil-commentary)
 (evil-commentary-mode)
 
 ; Evil-Matchit
-(require 'evil-matchit)
 (global-evil-matchit-mode 1)
 
+; Evil-ORG (extra evil bindings for ORG mode compatibility)
+(add-hook 'org-mode-hook 'evil-org-mode)
+(evil-org-set-key-theme '(navigation insert textobjects additional calendar))
+(evil-org-agenda-set-keys)
 
 
-
-;********************************************
-; Dev settings
-;********************************************
-
-; show line numbers
-(when (version<= "26.0.50" emacs-version )
-  (global-display-line-numbers-mode))
 ; FlyCheck linter
 (add-hook 'after-init-hook #'global-flycheck-mode)
 
-; indentation
-(setq-default indent-tabs-mode nil)
-(setq-default c-basic-offset 4)
 
-; parentheses
-(show-paren-mode t)
 
-; enable autocomplation engine
-(require 'auto-complete)
+; enable autocompletion engine
 (global-auto-complete-mode t)
 
 ;********************************************
 ; Languages specific settings
 ;********************************************
 
-; html
-;; (require-package 'htmlize)
+;; html
+(require-package 'htmlize)
 
 
 ; Ruby mode
@@ -260,7 +307,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-server org))))
+    (js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-server org))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

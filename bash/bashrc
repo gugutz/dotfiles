@@ -1,8 +1,37 @@
-#
-# ~/.bashrc
-#
+#################################################
+# my bashrc
+#################################################
 
+# Enable history appending instead of overwriting.  #139609
+shopt -s histappend
+
+## resume wget downloads by default
+alias wget='wget -c'
+
+set -o vi
 [[ $- != *i* ]] && return
+
+# Change the window title of X terminals
+case ${TERM} in
+	xterm*|rxvt*|Eterm*|aterm|kterm|gnome*|interix|konsole*)
+		PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/\~}\007"'
+		;;
+	screen*)
+		PROMPT_COMMAND='echo -ne "\033_${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/\~}\033\\"'
+		;;
+esac
+
+
+#################################################
+# my shell aliases
+#################################################
+
+[[ -f $HOME/.aliases ]] && . $HOME/.aliases
+
+
+#################################################
+# appearance
+#################################################
 
 colors() {
 	local fgc bgc vals seq0
@@ -31,18 +60,26 @@ colors() {
 	done
 }
 
-[ -r /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion
 
-# Change the window title of X terminals
-case ${TERM} in
-	xterm*|rxvt*|Eterm*|aterm|kterm|gnome*|interix|konsole*)
-		PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/\~}\007"'
-		;;
-	screen*)
-		PROMPT_COMMAND='echo -ne "\033_${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/\~}\033\\"'
-		;;
-esac
+# add powerline to bash
+powerline-daemon -q
+POWERLINE_BASH_CONTINUATION=1
+POWERLINE_BASH_SELECT=1
 
+# source powerline only if exists
+[[ -f /usr/lib/python3.6/site-packages/powerline/bindings/bash/powerline.sh ]] && \
+    . /usr/lib/python3.6/site-packages/powerline/bindings/bash/powerline.sh
+
+#################################################
+# extensions and complements to bash
+#################################################
+
+# Use bash-completion, if available
+[[ $PS1 && -f /usr/share/bash-completion/bash_completion ]] && \
+        . /usr/share/bash-completion/bash_completion
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# Colorize bash
 use_color=true
 
 # Set colorful PS1 only on colorful terminals.
@@ -89,12 +126,8 @@ else
 fi
 
 unset use_color safe_term match_lhs sh
+#--------------------------------------------------
 
-alias cp="cp -i"                          # confirm before overwriting something
-alias df='df -h'                          # human-readable sizes
-alias free='free -m'                      # show sizes in MB
-alias np='nano -w PKGBUILD'
-alias more=less
 
 xhost +local:root > /dev/null 2>&1
 
@@ -111,12 +144,15 @@ shopt -s expand_aliases
 
 # export QT_SELECT=4
 
-# Enable history appending instead of overwriting.  #139609
-shopt -s histappend
 
-#
-# # ex - archive extractor
-# # usage: ex <file>
+
+
+#################################################
+# helper functions
+#################################################
+
+# ex() - archive extractor function
+# usage: ex <file>
 ex ()
 {
   if [ -f $1 ] ; then
@@ -139,59 +175,15 @@ ex ()
   fi
 }
 
-###################################
-# MY ALIASES
-###################################
-
-# reboot / halt / poweroff
-alias reboot='sudo reboot now'
-alias shutdown='sudo shutdown now'
-alias suspend='systemctl suspend'
-# create parent directories on demand with mkdir
-alias mkdir='mkdir -pv'
-alias ll='ls -lAbhc'
-alias l='ls -lBohc'
-#History search (use: hs sometext)
-alias hs='history | grep $1'
-#Sudo vim
-alias svim='sudo vim'
-#Add extra protection against mistakes
-alias rm='rm -I'
-# Confirmation When Copying, Linking, or Deleting
-alias cp='cp -i'
-alias ln='ln -i'
-alias mv='mv -i'
-#Unrar alias
-alias unrar='rar e'
-# get rid of command not found by mistakengly typing cd..
-alias cd..='cd ..'
-## Colorize the ls output ##
-alias ls='ls --color=auto'
-## Use a long listing format ##
-alias ll='ls -la'
-## Show hidden files ##
-alias l.='ls -d .* --color=auto'
-
-## Date / Time aliases
-alias path='echo -e ${PATH//:/\\n}'
-alias now='date +"%T"'
-alias nowtime=now
-alias nowdate='date +"%d-%m-%Y"'
-
-## resume wget downloads by default
-alias wget='wget -c'
-
-set -o vi
+################################################
+# source asdf and enable its completions, it available
+[[ -f $HOME/asdf/asdf.sh ]] && . $HOME/asdf/asdf.sh
+[[ -f $HOME/asdf/completions/asdf.bash ]] && . $HOME/.asdf/completions/asdf.bash
+# . $HOME/.asdf/asdf.sh
+# . $HOME/.asdf/completions/asdf.bash
 
 
-. $HOME/.asdf/completions/asdf.bash
-. $HOME/.asdf/asdf.sh
-. $HOME/.asdf/completions/asdf.bash
-. $HOME/.asdf/asdf.sh
 
-
-# add powerline to bash
-powerline-daemon -q
-POWERLINE_BASH_CONTINUATION=1
-POWERLINE_BASH_SELECT=1
-. /usr/lib/python3.6/site-packages/powerline/bindings/bash/powerline.sh
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
