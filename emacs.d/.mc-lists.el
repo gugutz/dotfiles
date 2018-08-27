@@ -3,6 +3,8 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+        evil-change
+        evil-normal-state
         ))
 
 (setq mc/cmds-to-run-once
