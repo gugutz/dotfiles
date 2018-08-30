@@ -36,7 +36,7 @@
  '(fci-rule-color "#3E4451")
  '(package-selected-packages
    (quote
-    (ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
+    (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -74,6 +74,23 @@
         `((".*" ,emacs-tmp-dir t)))
     (setq auto-save-list-file-prefix
         emacs-tmp-dir)
+        
+
+(defun /eshell/new-window ()
+    "Opens up a new shell in the directory associated with the current buffer's file. The eshell is renamed to match that directory to make multiple eshell windows easier."
+    (interactive)
+    (let* ((parent (if (buffer-file-name)
+                       (file-name-directory (buffer-file-name))
+                     default-directory))
+           (height (/ (window-total-height) 3))
+           (name   (car (last (split-string parent "/" t)))))
+      (split-window-vertically (- height))
+      (other-window 1)
+      (eshell "new")
+      (rename-buffer (concat "*eshell: " name "*"))
+
+      (insert (concat "ls"))
+      (eshell-send-input)))
 
 ;################################################
 ;;; PACKAGES
@@ -83,7 +100,6 @@
 ;;********************************************
 ;; Requiring my packages
 ;;********************************************
-
 
 (require 'web-mode)
 (require 'auto-complete)
@@ -249,6 +265,19 @@
 ;M-' to replace all symbols in the buffer matching the one under point
 ;C-u M-' to replace symbols in your current defun only (as used by narrow-to-defun.)
 (smartscan-mode 1)
+
+;; PDF Tools
+(pdf-tools-install)
+
+; Make buffer refresh every 1 second to PDF-tools updates the changed pdf
+(setq auto-revert-interval 0.5)
+
+; PDF tools evil keybindings
+(evil-define-key 'normal pdf-view-mode-map
+  "h" 'pdf-view-previous-page-command
+  "j" (lambda () (interactive) (pdf-view-next-line-or-next-page 5))
+  "k" (lambda () (interactive) (pdf-view-previous-line-or-previous-page 5))
+  "l" 'pdf-view-next-page-command)
 
 ;################################################
 ;; MINOR MODES

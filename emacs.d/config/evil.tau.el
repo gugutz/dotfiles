@@ -93,6 +93,11 @@
 (define-key evil-insert-state-map "\C-r" 'search-backward)
 
 
+; Pull eshell in a new bottom window
+(define-key evil-normal-state-map (kbd "!") #'/eshell/new-window)
+(define-key evil-visual-state-map (kbd "!") #'/eshell/new-window)
+(define-key evil-motion-state-map (kbd "!") #'/eshell/new-window)
+
 ;********************************************
 ; multiple cursors
 ;********************************************
