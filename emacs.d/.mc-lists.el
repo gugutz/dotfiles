@@ -9,5 +9,7 @@
 
 (setq mc/cmds-to-run-once
       '(
+        evil-delete-backward-char-and-join
         evil-search-previous
+        org-self-insert-command
         ))

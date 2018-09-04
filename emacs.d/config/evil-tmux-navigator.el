@@ -25,7 +25,8 @@
   :group 'evil)
 
 ; Without unsetting C-h this is useless
-(global-unset-key (kbd "C-h"))
+; DONT UNSETLE C-h, ITS EMACS DEFAULT HELP COMMAND
+;; (global-unset-key (kbd "C-h"))
 
 ; This requires windmove commands
 (when (fboundp 'windmove-default-keybindings)
@@ -48,26 +49,26 @@
   (upcase
     (substring direction 0 1)))
 
-(define-key evil-normal-state-map
-            (kbd "C-h")
-            (lambda ()
-              (interactive)
-              (tmux-navigate "left")))
-(define-key evil-normal-state-map
-            (kbd "C-j")
-            (lambda ()
-              (interactive)
-              (tmux-navigate "down")))
-(define-key evil-normal-state-map
-            (kbd "C-k")
-            (lambda ()
-              (interactive)
-              (tmux-navigate "up")))
-(define-key evil-normal-state-map
-            (kbd "C-l")
-            (lambda ()
-              (interactive)
-              (tmux-navigate "right")))
+;; (define-key evil-normal-state-map
+;;             (kbd "M-H")
+;;             (lambda ()
+;;               (interactive)
+;;               (tmux-navigate "left")))
+;; (define-key evil-normal-state-map
+;;             (kbd "M-J")
+;;             (lambda ()
+;;               (interactive)
+;;               (tmux-navigate "down")))
+;; (define-key evil-normal-state-map
+;;             (kbd "M-K")
+;;             (lambda ()
+;;               (interactive)
+;;               (tmux-navigate "up")))
+;; (define-key evil-normal-state-map
+;;             (kbd "M-L")
+;;             (lambda ()
+;;               (interactive)
+;;               (tmux-navigate "right")))
 
 (provide 'evil-tmux-navigator)
 

@@ -4,11 +4,11 @@
 
 ;;; Code:
 
-(add-auto-mode 'ruby-mode
-               "Rakefile\\'" "\\.rake\\'" "\\.rxml\\'"
-               "\\.rjs\\'" "\\.irbrc\\'" "\\.pryrc\\'" "\\.builder\\'" "\\.ru\\'"
-               "\\.gemspec\\'" "Gemfile\\'" "Kirkfile\\'")
-(add-auto-mode 'conf-mode "Gemfile\\.lock\\'")
+;; (add-auto-mode 'ruby-mode
+;;                "Rakefile\\'" "\\.rake\\'" "\\.rxml\\'"
+;;                "\\.rjs\\'" "\\.irbrc\\'" "\\.pryrc\\'" "\\.builder\\'" "\\.ru\\'"
+;;                "\\.gemspec\\'" "Gemfile\\'" "Kirkfile\\'")
+;; (add-auto-mode 'conf-mode "Gemfile\\.lock\\'")
 
 (setq-default
   ruby-use-encoding-map nil
@@ -29,10 +29,10 @@
 
 (require-package 'rspec-mode)
 
-(define-derived-mode brewfile-mode ruby-mode "Brewfile"
-                     "A major mode for Brewfiles, used by homebrew-bundle on MacOS.")
+;; (define-derived-mode brewfile-mode ruby-mode "Brewfile"
+;;                      "A major mode for Brewfiles, used by homebrew-bundle on MacOS.")
 
-(add-auto-mode 'brewfile-mode "Brewfile\\'")
+;; (add-auto-mode 'brewfile-mode "Brewfile\\'")
 
 ;;; Inferior ruby
 (require-package 'inf-ruby)
@@ -51,19 +51,19 @@
 
 
 ;;; Robe
-(when (maybe-require-package 'robe)
-  (after-load 'ruby-mode
-              (add-hook 'ruby-mode-hook 'robe-mode))
-  (after-load 'company
-              (dolist (hook (mapcar 'derived-mode-hook-name '(ruby-mode inf-ruby-mode html-erb-mode haml-mode)))
-                (add-hook hook
-                          (lambda () (sanityinc/local-push-company-backend 'company-robe))))))
+;; (when (maybe-require-package 'robe)
+;;   (after-load 'ruby-mode
+;;               (add-hook 'ruby-mode-hook 'robe-mode))
+;;   (after-load 'company
+;;               (dolist (hook (mapcar 'derived-mode-hook-name '(ruby-mode inf-ruby-mode html-erb-mode haml-mode)))
+;;                 (add-hook hook
+;;                           (lambda () (sanityinc/local-push-company-backend 'company-robe))))))
 
 
 
 ;;; ri support
-(require-package 'yari)
-(defalias 'ri 'yari)
+;; (require-package 'yari)
+;; (defalias 'ri 'yari)
 
 
 

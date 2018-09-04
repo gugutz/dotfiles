@@ -1,35 +1,22 @@
-;;; package -- Summary
-;############################################
-;; evil
-
-;############################################
-;;; Commentary:
-
-;; these are the bindings i eventually got to
-;; while trying to resolve conflicts
-;; with evil disabling native Emacs bindings
-
-;############################################
-;;; Code:
-
-
-; require Evil related packages
 (require 'evil)
-(require 'neotree)
-(require 'evil-leader)
-(require 'evil-surround)
-(require 'evil-commentary)
-(require 'evil-matchit)
-(require 'evil-org)
-(require 'evil-org-agenda)
-
-
 (evil-mode 1)
-;********************************************
-;; Simulate Vim behaviour and some bindings
-;********************************************
 
-;; make esc quit or cancel everything in Emacs
+; (setq evil-esc-delay 0)
+
+(setq evil-search-module 'isearch-regexp)
+(setq evil-magic 'very-magic)
+(setq evil-shift-width (symbol-value 'tab-width))
+(setq evil-regexp-search t)
+(setq evil-search-wrap t)
+;; (setq evil-want-C-i-jump t)
+(setq evil-want-C-u-scroll t)
+(setq evil-want-fine-undo nil)
+(setq evil-want-integration nil)
+;; (setq evil-want-abbrev-on-insert-exit nil)
+(setq evil-want-abbrev-expand-on-insert-exit nil)
+;; move evil tag to beginning of modeline
+(setq evil-mode-line-format '(before . mode-line-front-space))
+
 (define-key evil-normal-state-map [escape] 'keyboard-quit)
 (define-key evil-visual-state-map [escape] 'keyboard-quit)
 (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
@@ -38,15 +25,8 @@
 (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
 (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
 
-
-;; @see https://bitbucket.org/lyro/evil/issue/342/evil-default-cursor-setting-should-default
-;; Cursor is alway black because of evil.
-;; Here is the workaround
 (setq evil-default-cursor t)
 
-
-;; recover native emacs commands that are overriden by evil
-;; this gives priority to native emacs behaviour rathen than Vim's
 (define-key evil-normal-state-map (kbd "SPC") 'ace-jump-mode)
 (define-key evil-insert-state-map (kbd "C-e") 'move-end-of-line)
 (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
@@ -92,15 +72,18 @@
 (define-key evil-insert-state-map "\C-e" 'end-of-line)
 (define-key evil-insert-state-map "\C-r" 'search-backward)
 
+;; (define-key evil-window-map "\C-h" 'evil-window-left)
+;; (define-key evil-window-map "\C-j" 'evil-window-down)
+;; (define-key evil-window-map "\C-k" 'evil-window-up)
+;; (define-key evil-window-map "\C-l" 'evil-window-right)
 
-; Pull eshell in a new bottom window
-(define-key evil-normal-state-map (kbd "!") #'/eshell/new-window)
-(define-key evil-visual-state-map (kbd "!") #'/eshell/new-window)
-(define-key evil-motion-state-map (kbd "!") #'/eshell/new-window)
-
-;********************************************
-; multiple cursors
-;********************************************
+(setq evil-emacs-state-cursor '("#ff0000" box))
+(setq evil-motion-state-cursor '("#FFFFFF" box))
+(setq evil-normal-state-cursor '("#00ff00" box))
+(setq evil-visual-state-cursor '("#abcdef" box))
+(setq evil-insert-state-cursor '("#e2f00f" bar))
+(setq evil-replace-state-cursor '("red" hbar))
+(setq evil-operator-state-cursor '("red" hollow))
 
 ;; step 1, select thing in visual-mode (OPTIONAL)
 ;; step 2, `mc/mark-all-like-dwim' or `mc/mark-all-like-this-in-defun'
@@ -113,15 +96,10 @@
 (define-key evil-visual-state-map (kbd "mm") 'ace-mc-add-multiple-cursors)
 (define-key evil-visual-state-map (kbd "ms") 'ace-mc-add-single-cursor)
 
-; imitate vim multiple selection behavior with multiple-cursors package
 ;; (define-key evil-normal-state-map (kbd "C-n") 'mc/mark-next-like-this)
 ;; (define-key evil-normal-state-map (kbd "M-N") 'mc/mark-previous-like-this)
 
-
-
-;********************************************
-; evil-leader
-;********************************************
+(require 'evil-leader)
 
 (global-evil-leader-mode)
 (evil-leader/set-leader ",")
@@ -131,14 +109,10 @@
   "w" 'save-buffer
   "k" 'kill-buffer
   "b" 'switch-to-buffer
-  "-" 'split-window-bellow
+  "-" 'split-windowellow
   "|" 'split-window-right)
 
-;********************************************
-;; Evil Surround
-;; {{ @see https://github.com/timcharper/evil-surround for tutorial
-;********************************************
-
+(require 'evil-surround)
 (global-evil-surround-mode 1)
 
 (defun evil-surround-prog-mode-hook-setup ()
@@ -169,25 +143,20 @@
   (push '(?= . ("=" . "=")) evil-surround-pairs-alist))
 (add-hook 'org-mode-hook 'evil-surround-org-mode-hook-setup)
 
+(require 'neotree)
 
-;********************************************
-; Neotree
-;********************************************
+(setq neo-window-width 30)
 
-;; set NeoTree default window width
-(setq neo-window-width 29)
-
-;; use neotree (NERDTree for emacs) and toggle with F8
 (global-set-key [f8] 'neotree-toggle)
 
-; neotree 'icons' theme, which supports filetype icons
+(add-hook 'after-init-hook #'neotree-toggle)
+
 (unless (display-graphic-p)
   (setq neo-theme 'icons))
 (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
-; make neotree window open and go the file currently opened
+
 (setq neo-smart-open t)
 
-; solve keybinding conflicts between neotree with evil mode
 (add-hook 'neotree-mode-hook
           (lambda ()
             ; default Neotree bindings
@@ -208,30 +177,53 @@
             (define-key evil-normal-state-local-map (kbd "C") 'neotree-change-root)
             (define-key evil-normal-state-local-map (kbd "c") 'neotree-create-node)))
 
-
-;********************************************
-; Vim plugins definitions
-;********************************************
-
-;  To enable evil-commentary permanently, add
+(require 'evil-commentary)
 (evil-commentary-mode)
 
-; Vim Commentary
 (evil-commentary-mode)
 
-; Evil-Matchit
+(require 'evil-matchit)
 (global-evil-matchit-mode 1)
 
-;********************************************
-; Evil-ORG for ORG mode compatibility
-;********************************************
+;(require 'evil-org)
+(require 'evil-org-agenda)
 
-(add-hook 'org-mode-hook 'evil-org-mode)
-(evil-org-set-key-theme '(navigation insert textobjects additional calendar))
-(evil-org-agenda-set-keys)
+(after 'org
+  (require 'evil-org)
+  (add-hook 'org-mode-hook #'evil-org-mode)
+  (add-hook 'evil-org-mode-hook
+            (lambda ()
+              (evil-org-set-key-theme))))
 
+;; (add-hook 'org-mode-hook 'evil-org-mode)
+;; (evil-org-set-key-theme '(navigation insert textobjects additional calendar))
+;; (evil-org-agenda-set-keys)
 
-;############################################
+(defvar my-leader-map (make-sparse-keymap)
+   "Keymap for \"leader key\" shortcuts.")
+
+ ;; binding "SPC" to the keymap
+(define-key evil-normal-state-map (kbd "M-SPC") my-leader-map)
+
+ ;; binding using SPC leader
+ (define-key my-leader-map "b" 'list-buffers)
+ (define-key my-leader-map "w" 'evil-save)
+ (define-key my-leader-map "SPC" ":noh")
+
+(require 'key-chord)
+ (key-chord-mode 1)
+ (key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
+ (key-chord-define evil-insert-state-map "kj" 'evil-normal-state)
+
 (provide 'evil.tau)
-;;; evil.tau.el ends here
+;;; evil.tau.el ends here...
 
+(add-hook 'org-mode-hook                                                                      
+          (lambda ()                                                                          
+        (define-key evil-normal-state-map (kbd "TAB") 'org-cycle))) 
+
+;; (setq evil-want-C-i-jump nil)
+
+(after 'magit
+  (require 'evil-magit)
+  (evil-magit-init))

@@ -76,21 +76,9 @@
         emacs-tmp-dir)
         
 
-(defun /eshell/new-window ()
-    "Opens up a new shell in the directory associated with the current buffer's file. The eshell is renamed to match that directory to make multiple eshell windows easier."
-    (interactive)
-    (let* ((parent (if (buffer-file-name)
-                       (file-name-directory (buffer-file-name))
-                     default-directory))
-           (height (/ (window-total-height) 3))
-           (name   (car (last (split-string parent "/" t)))))
-      (split-window-vertically (- height))
-      (other-window 1)
-      (eshell "new")
-      (rename-buffer (concat "*eshell: " name "*"))
-
-      (insert (concat "ls"))
-      (eshell-send-input)))
+      
+; disable the annoying Emacs bell ring (beep)
+(setq ring-bell-function 'ignore)
 
 ;################################################
 ;;; PACKAGES
@@ -112,9 +100,11 @@
 ; so i can require stuff from there
 (add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
 
+(require 'eshell.tau)
 (require 'evil.tau)
 (require 'org.tau)
 (require 'latex.tau)
+;; (require 'ruby.tau)
 
 
 ;########################################################
@@ -182,7 +172,7 @@
 
 
 (add-to-list 'custom-theme-load-path "~/dotfiles/emacs.d/themes/")
-
+(require 'base16-theme)
 ; theme options:
 ; atom-one-dark (doenst work well with emacsclient, ugly blue bg)
 ; dracula
@@ -191,6 +181,7 @@
 ; gruvbox-dark-light
 ; gruvbox-dark-medium
 ; base16-default-dark <-- this one is good
+
 (setq my-theme 'dracula)
 
 (load-theme my-theme t)
