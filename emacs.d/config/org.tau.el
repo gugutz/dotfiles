@@ -1,5 +1,11 @@
 (require 'org)
 
+(add-hook 'org-mode-hook                                                                      
+          (lambda ()                                                                          
+        (define-key evil-normal-state-map (kbd "TAB") 'org-cycle))) 
+
+;; (setq evil-want-C-i-jump nil)
+
 (defun toggle-org-html-export-on-save ()
   "Make Emacs auto-export to HTML when org file is saved.
 Enable calling this function from the file with <M-x>."
@@ -46,9 +52,3 @@ Generates outputs in these formats:
 
 (provide 'org.tau)
 ;;; org.tau.el ends here...
-
-
-
-
-
-

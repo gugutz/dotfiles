@@ -1,8 +1,20 @@
+(defun /util/tangle-init ()
+  (interactive)
+  "If the current buffer is init.org' the code-blocks are
+tangled, and the tangled file is compiled."
+  (when (equal (buffer-file-name)
+               (expand-file-name (concat user-emacs-directory "emacs.org")))
+    ;; Avoid running hooks when tangling.
+    (let ((prog-mode-hook nil))
+      (org-babel-tangle)
+      (byte-compile-file (concat user-emacs-directory "init.el")))))
+
+(add-hook 'after-save-hook #'/util/tangle-init)
+
 (require 'package)
-; add melpa stable emacs package repository
+;; add melpa stable emacs package repository
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
-;; (add-to-list 'package-archives '("marmalade" . "https://marmalade-repo.org/packages/"))
 (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t) ; Org-mode's repository
 
 (package-initialize)
@@ -25,13 +37,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
-
-(require 'which-key)
-(setq which-key-idle-delay 0.2)
-(setq which-key-min-display-lines 3)
-(setq which-key-max-description-length 20)
-(setq which-key-max-display-columns 6)
-(which-key-mode)
 
 (defmacro /bindings/define-prefix-keys (keymap prefix &rest body)
   (declare (indent defun))
@@ -57,19 +62,6 @@
   (declare (indent defun))
   `(/bindings/define-prefix-keys ,keymap nil
      (,sequence ,binding ,description)))
-
-(defun /util/tangle-init ()
-  (interactive)
-  "If the current buffer is init.org' the code-blocks are
-tangled, and the tangled file is compiled."
-  (when (equal (buffer-file-name)
-               (expand-file-name (concat user-emacs-directory "emacs.org")))
-    ;; Avoid running hooks when tangling.
-    (let ((prog-mode-hook nil))
-      (org-babel-tangle)
-      (byte-compile-file (concat user-emacs-directory "init.el")))))
-
-(add-hook 'after-save-hook #'/util/tangle-init)
 
 (require 'server)
 (unless (or (daemonp) (server-running-p))
@@ -123,8 +115,15 @@ FEATURE may be any one of:
 
 (add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
 
-(require 'org.tau)
-(require 'evil.tau)
+;(after 'evil
+;  (require 'evil.tau))
+
+  (require 'evil.tau)
+
+;(after 'org
+;  (require 'org.tau))
+
+  (require 'org.tau)
 
 (defun /eshell/new-window ()
     "Opens up a new shell in the directory associated with the current buffer's file.  The eshell is renamed to match that directory to make multiple eshell windows easier."
@@ -177,6 +176,37 @@ FEATURE may be any one of:
 (global-set-key [remap find-file] #'helm-find-files)
 (helm-mode t))
 
+(after 'helm
+  (require 'helm-config)
+  (global-set-key (kbd "C-c h") #'helm-command-prefix)
+  (global-unset-key (kbd "C-x c"))
+  (global-set-key (kbd "C-h a") #'helm-apropos)
+  (global-set-key (kbd "C-x b") #'helm-buffers-list)
+  (global-set-key (kbd "C-x C-b") #'helm-mini)
+  (global-set-key (kbd "C-x C-f") #'helm-find-files)
+  (global-set-key (kbd "C-x r b") #'helm-bookmarks)
+  (global-set-key (kbd "M-x") #'helm-M-x)
+  (global-set-key (kbd "M-y") #'helm-show-kill-ring)
+  (global-set-key (kbd "M-:") #'helm-eval-expression-with-eldoc)
+  (define-key helm-map (kbd "<tab>") #'helm-execute-persistent-action)
+  (define-key helm-map (kbd "C-z") #'helm-select-action)
+)
+
+(after 'dired
+  (require 'dired-k)
+  (setq dired-k-style 'git)
+  (setq dired-k-human-readable t)
+  (add-hook 'dired-initial-position-hook #'dired-k))
+
+(global-set-key (kbd "C-x g") 'magit-status)
+
+(require 'which-key)
+(setq which-key-idle-delay 0.2)
+(setq which-key-min-display-lines 3)
+(setq which-key-max-description-length 20)
+(setq which-key-max-display-columns 6)
+(which-key-mode)
+
 (when (version<= "26.0.50" emacs-version )
   (global-display-line-numbers-mode))
 
@@ -219,7 +249,7 @@ FEATURE may be any one of:
 
 (global-set-key (kbd "C-+") #'text-scale-increase)
 (global-set-key (kbd "C-_") #'text-scale-decrease)
-(global-set-key (kbd "C-)") #'text-scale-adjust)
+;; (global-set-key (kbd "C-)") #'text-scale-adjust)
 
 (defconst *spell-check-support-enabled* t) ;; Enable with t if you prefer
 
@@ -227,7 +257,10 @@ FEATURE may be any one of:
 
 (smartscan-mode 1)
 
-(setq auto-revert-interval 0.5)
+;; (global-auto-revert-mode 1)
+;; (setq auto-revert-interval 0.5)
+;; (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+(add-hook 'pdf-view-mode-hook 'auto-revert-mode)
 
 (evil-define-key 'normal pdf-view-mode-map
   "h" 'pdf-view-previous-page-command
@@ -262,21 +295,19 @@ FEATURE may be any one of:
 
 (load-theme my-theme t)
 
-(defun load-my-theme (frame)
-   "Function to load the theme in current FRAME.
-   sed in conjunction
-   with bellow snippet to load theme after the frame is loaded
-   to avoid terminal breaking theme."
-   (select-frame frame)
-   (load-theme my-theme t))
-
- ; make emacs load the theme after loading the frame
- ; resolves issue with the theme not loading properly in terminal mode on emacsclient
-
- ;; this if was breaking my emacs!!!!!
-;; (if (or (daemonp) (server-running-p))
-;;   (add-hook 'after-make-frame-functions #'load-my-theme)
+;; (defun load-my-theme (frame)
+;;   "Function to load the theme in current FRAME.
+;;   sed in conjunction
+;;   with bellow snippet to load theme after the frame is loaded
+;;   to avoid terminal breaking theme."
+;;   (select-frame frame)
 ;;   (load-theme my-theme t))
+
+;; ; make emacs load the theme after loading the frame
+;; ; resolves issue with the theme not loading properly in terminal mode on emacsclient
+
+;; ;; this if was breaking my emacs!!!!!
+;;  (add-hook 'after-make-frame-functions #'load-my-theme)
 
 (require 'smart-mode-line)
 (if (require 'smart-mode-line nil 'noerror)
@@ -320,8 +351,6 @@ FEATURE may be any one of:
 
 (require 'web-mode)
 
-(global-set-key (kbd "C-x g") 'magit-status)
-
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
@@ -357,11 +386,16 @@ FEATURE may be any one of:
 
 (add-hook 'after-init-hook 'global-company-mode)
 
-; (add-hook 'after-init-hook 'global-company-mode)
+(add-hook 'after-init-hook 'global-company-mode)
 
 ; (after "company-autoloads"
 ;    (define-key evil-insert-state-map (kbd "TAB")
 ;      #'company-indent-or-complete-common))
+
+;; (add-to-list 'load-path
+;;               "~/.emacs.d/plugins/yasnippet")
+(require 'yasnippet)
+(yas-global-mode 1)
 
 ;(require 'ruby.tau)
 ;(add-to-list 'auto-mode-alist '("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode))
@@ -389,9 +423,10 @@ FEATURE may be any one of:
 
 (require 'tex)
 
-(setq exec-path (append exec-path '("/usr/texbin")))
+(setq exec-path (append exec-path '("/usr/bin/tex")))
 
-(load "auctex.el" nil t t)
+;; (load "auctex.el" nil t t)
+;; (load "preview-latex.el" nil t t)
 
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -447,31 +482,33 @@ FEATURE may be any one of:
                "\\)}.*\n?")
       (0 'your-face append))))
 
+(setq org-export-with-smart-quotes t)
+
+(setq org-latex-remove-logfiles nil)
+
 (defun copy-to-clipboard ()
   "Make F8 and F9 Copy and Paste to/from OS Clipboard.  Super usefull."
   (interactive)
   (if (display-graphic-p)
       (progn
-        (message "Yanked region to x-clipboard!")
-        (call-interactively 'clipboard-kill-ring-save)
-        )
+	(message "Yanked region to x-clipboard!")
+	(call-interactively 'clipboard-kill-ring-save)
+	)
     (if (region-active-p)
-        (progn
-          (shell-command-on-region (region-beginning) (region-end) "xsel -i -b")
-          (message "Yanked region to clipboard!")
-          (deactivate-mark))
+	(progn
+	  (shell-command-on-region (region-beginning) (region-end) "xsel -i -b")
+	  (message "Yanked region to clipboard!")
+	  (deactivate-mark))
       (message "No region active; can't yank to clipboard!")))
   )
 
 (evil-define-command paste-from-clipboard()
   (if (display-graphic-p)
       (progn
-        (clipboard-yank)
-        (message "graphics active")
-        )
-    (insert (shell-command-to-string "xsel -o -b"))
-    )
-  )
+	(clipboard-yank)
+	(message "graphics active")
+	)
+    (insert (shell-command-to-string "xsel -o -b")) ) )
 
 (global-set-key [f9] 'copy-to-clipboard)
 (global-set-key [f10] 'paste-from-clipboard)
@@ -479,8 +516,7 @@ FEATURE may be any one of:
 (defun my-save ()
   "Save file when leaving insert mode in Evil."
   (if (buffer-file-name)
-      (evil-save))
-  )
+      (evil-save)))
 
 (add-hook 'evil-insert-state-exit-hook 'my-save)
 
@@ -490,5 +526,5 @@ FEATURE may be any one of:
 ;; End:
 
 
-(provide 'emacs)
+(provide 'init)
 ;;; .emacs ends here

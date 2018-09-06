@@ -177,19 +177,17 @@
             (define-key evil-normal-state-local-map (kbd "C") 'neotree-change-root)
             (define-key evil-normal-state-local-map (kbd "c") 'neotree-create-node)))
 
-(require 'evil-commentary)
 (evil-commentary-mode)
 
+(require 'evil-commentary)
 (evil-commentary-mode)
 
 (require 'evil-matchit)
 (global-evil-matchit-mode 1)
 
-;(require 'evil-org)
-(require 'evil-org-agenda)
-
 (after 'org
   (require 'evil-org)
+  (require 'evil-org-agenda)
   (add-hook 'org-mode-hook #'evil-org-mode)
   (add-hook 'evil-org-mode-hook
             (lambda ()
@@ -210,20 +208,9 @@
  (define-key my-leader-map "w" 'evil-save)
  (define-key my-leader-map "SPC" ":noh")
 
-(require 'key-chord)
- (key-chord-mode 1)
- (key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
- (key-chord-define evil-insert-state-map "kj" 'evil-normal-state)
-
-(provide 'evil.tau)
-;;; evil.tau.el ends here...
-
-(add-hook 'org-mode-hook                                                                      
-          (lambda ()                                                                          
-        (define-key evil-normal-state-map (kbd "TAB") 'org-cycle))) 
-
-;; (setq evil-want-C-i-jump nil)
-
 (after 'magit
   (require 'evil-magit)
   (evil-magit-init))
+
+(provide 'evil.tau)
+;;; evil.tau.el ends here...
