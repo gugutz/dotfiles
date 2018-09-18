@@ -669,7 +669,7 @@ is customized, please consider the following settings in your init file"
   (setq org-pandoc-options-for-docx '((standalone . nil)))
   ;; special settings for beamer-pdf and latex-pdf exporters
   (setq org-pandoc-options-for-beamer-pdf '((pdf-engine . "xelatex")))
-  (setq org-pandoc-options-for-latex-pdf '((pdf-engine . "pdflatex")))
+  (setq org-pandoc-options-for-latex-pdf '((pdf-engine . "luatex")))
   ;; special extensions for markdown_github output
   (setq org-pandoc-format-extensions '(markdown_github+pipe_tables+raw_html))
 #+END_SRC
@@ -914,6 +914,12 @@ Then create the keybindings
 
 * General text editing settings
 
+** Turn on auto-revert mode (auto updates files changed on disk)
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (global-auto-revert-mode 1)
+  (setq auto-revert-interval 0.5)
+#+END_SRC
+
   
 ** Spellchecking
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -939,13 +945,17 @@ I recommend adding this to your .emacs, as it makes C-n insert newlines if the p
 
 ** PDF Tools
 
+*** Install pdf-tools if its not already installed
+#+BEGIN_SRC emacs-lisp :tangle init.el
+   (pdf-tools-install)
+#+END_SRC
+
 
 *** Make buffer refresh every 1 second to PDF-tools updates the changed pdf
 #+BEGIN_SRC emacs-lisp :tangle init.el
-  ;; (global-auto-revert-mode 1)
-  ;; (setq auto-revert-interval 0.5)
-  ;; (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
-  (add-hook 'pdf-view-mode-hook 'auto-revert-mode) 
+  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+  ;; (add-hook 'pdf-view-mode-hook 'auto-revert-mode) 
+  ;; (add-hook 'doc-view-mode-hook 'auto-revert-mode) 
 #+END_SRC
 
 
@@ -1078,6 +1088,43 @@ Load the theme
 #+END_SRC
 
  
+* PrettierJS
+
+   
+Require first so i can actually use it
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (require 'prettier-js)
+#+END_SRC
+  
+** add prettier to js2 and rjsx minor modes
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (add-hook 'js2-mode-hook 'prettier-js-mode)
+  (add-hook 'web-mode-hook 'prettier-js-mode)
+  (add-hook 'rjsx-mode-hook 'prettier-js-mode)
+#+END_SRC
+
+** Add prettier to Web-Mode
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(defun enable-minor-mode (my-pair)
+  "Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
+  (if (buffer-file-name)
+      (if (string-match (car my-pair) buffer-file-name)
+      (funcall (cdr my-pair)))))
+#+END_SRC
+
+And then hook to web-mode like this:
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(add-hook 'web-mode-hook #'(lambda ()
+                            (enable-minor-mode
+                             '("\\.js?\\'" . prettier-js-mode)
+                             '("\\.jsx?\\'" . prettier-js-mode)
+                             '("\\.css?\\'" . prettier-js-mode))))
+#+END_SRC
+
+
 * Minor modes
 
   
@@ -1095,17 +1142,6 @@ Load the theme
 #+END_SRC
 
 
-*** add prettier to js2, web and rjsx minor modes
-#+BEGIN_SRC emacs-lisp :tangle init.el
-  (require 'prettier-js)
-  (add-hook 'js2-mode-hook 'prettier-js-mode)
-  (add-hook 'web-mode-hook 'prettier-js-mode)
-  ;; (add-hook 'rjsx-mode-hook 'prettier-js-mode)
-#+END_SRC
-
-
-
-
 ** web-mode
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -1118,6 +1154,7 @@ Load the theme
 #+BEGIN_SRC emacs-lisp :tangle init.el
   (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
   (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.css?\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 #+END_SRC
 
@@ -1134,8 +1171,6 @@ Load the theme
  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
 #+END_SRC
 
-
-
 ** use rjsx mode for js files in React folder structure
    
 better support for JSX and React and GatsbyJs
@@ -1146,14 +1181,11 @@ better support for JSX and React and GatsbyJs
 #+END_SRC
 
 
-
-
-** FlyCheck linter
+* FlyCheck linter
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (add-hook 'after-init-hook #'global-flycheck-mode)
 #+END_SRC
-
 
 
 * Autocompletion and Snippets
@@ -1333,38 +1365,73 @@ Three steps are required (as according to ORG official docs) to setup AucTex wit
 
 
 
-** Add the beamer class to org so i can export to beamer presentations
+** Latex Classes
+*** Add the beamer presentation class template to org
+ #+BEGIN_SRC emacs-lisp :tangle init.el
+  (add-to-list 'org-latex-classes
+	       '("beamer"
+	         "\\documentclass\[presentation\]\{beamer\}"
+	         ("\\section\{%s\}" . "\\section*\{%s\}")
+	         ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
+	         ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")))
+ #+END_SRC
+
+
+*** Add the memoir class template to org
+    
+The Sections and Heading Levels gets configured as follows: 
+
+    | Division       | <c>Level | <c>org-equivalent |
+    | \book          |       -2 | *                 |
+    | \part          |       -1 | **                |
+    | \chapter       |        0 | ***               |
+    | \section       |        1 | ****              |
+    | \subsection    |        2 | *****             |
+    | \subsubsection |        3 | ******            |
+    | \paragraph     |        4 | *******           |
+    | \subparagraph  |        5 | ********          |
+
+    
 #+BEGIN_SRC emacs-lisp :tangle init.el
- (add-to-list 'org-latex-classes
-	      '("beamer"
-	        "\\documentclass\[presentation\]\{beamer\}"
-	        ("\\section\{%s\}" . "\\section*\{%s\}")
-	        ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
-	        ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")))
+   (add-to-list 'org-latex-classes
+                '("memoir"
+                  "\\documentclass\[a4paper\]\{memoir\}"
+                  ("\\book\{%s\}" . "\\book*\{%s\}")
+                  ("\\part\{%s\}" . "\\part*\{%s\}")
+                  ("\\chapter\{%s\}" . "\\chapter*\{%s\}")
+                  ("\\section\{%s\}" . "\\section*\{%s\}")
+                  ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
+                  ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")))
 #+END_SRC
 
-** Add abntex2 class to org list of latex classes
+*** Add abntex2 class to org list of latex classes
+This class is based on the Memoir class
+The Sections and Heading Levels gets configured as follows: 
+
+    | Division       | <c>Level | <c>org-equivalent |
+    | \part          |       -1 | *                 |
+    | \chapter       |        0 | **                |
+    | \section       |        1 | ***               |
+    | \subsection    |        2 | ****              |
+    | \subsubsection |        3 | *****             |
+    | \paragraph     |        4 | ******            |
+    | \subparagraph  |        5 | *******           |
 #+BEGIN_SRC emacs-lisp :tangle init.el
-  (add-to-list 'org-latex-classes
-               '("abntex2"
-                 "\\documentclass\[a4paper,oneside,12pt\]\{abntex2\}\\input{/home/tau/latex/abntex2.tex}"
-                 ("\\part\{%s\}" . "\\part*\{%s\}")
-                 ("\\chapter\{%s\}" . "\\chapter*\{%s\}")
-                 ("\\section\{%s\}" . "\\section*\{%s\}")
-                 ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
-                 ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")))
-  ;; (with-eval-after-load 'ox-latex
-  ;;   (append-to-list
-  ;;    'org-latex-classes
-  ;;    '(("abntex2"
-  ;;       "\\documentclass[a4paper,oneside,12pt]{abntex2}
-  ;;      \\input{/home/tau/latex/abntex2.tex}"
-  ;;       ("\\part{%s}" . "\\part*{%s}")
-  ;;       ("\\chapter{%s}" . "\\chapter*{%s}")
-  ;;       ("\\section{%s}" . "\\section*{%s}")
-  ;;       ("\\subsection{%s}" . "\\subsection*{%s}")))))
+   (add-to-list 'org-latex-classes
+             '("abntex2"
+               "\\documentclass{abntex2}"
+               ("\\part{%s}" . "\\part*{%s}")
+               ("\\chapter{%s}" . "\\chapter*{%s}")
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\subsubsubsection{%s}" . "\\subsubsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}"))
+             ) 
 #+END_SRC
-       
+
+ 
+** Enable latex-preview-pane
 #+BEGIN_SRC emacs-lisp :tangle init.el
    (latex-preview-pane-enable)
 #+END_SRC

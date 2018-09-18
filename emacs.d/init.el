@@ -251,16 +251,20 @@ FEATURE may be any one of:
 (global-set-key (kbd "C-_") #'text-scale-decrease)
 ;; (global-set-key (kbd "C-)") #'text-scale-adjust)
 
+(global-auto-revert-mode 1)
+(setq auto-revert-interval 0.5)
+
 (defconst *spell-check-support-enabled* t) ;; Enable with t if you prefer
 
 (setq next-line-add-newlines t)
 
 (smartscan-mode 1)
 
-;; (global-auto-revert-mode 1)
-;; (setq auto-revert-interval 0.5)
-;; (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
-(add-hook 'pdf-view-mode-hook 'auto-revert-mode)
+(pdf-tools-install)
+
+(add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+;; (add-hook 'pdf-view-mode-hook 'auto-revert-mode) 
+;; (add-hook 'doc-view-mode-hook 'auto-revert-mode)
 
 (evil-define-key 'normal pdf-view-mode-map
   "h" 'pdf-view-previous-page-command
@@ -340,14 +344,27 @@ FEATURE may be any one of:
       (add-to-list 'sml/replacer-regexp-list
                    '("^~/Projects/" ":CODE:"))))
 
+(require 'prettier-js)
+
+(add-hook 'js2-mode-hook 'prettier-js-mode)
+(add-hook 'web-mode-hook 'prettier-js-mode)
+(add-hook 'rjsx-mode-hook 'prettier-js-mode)
+
+(defun enable-minor-mode (my-pair)
+  "Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
+  (if (buffer-file-name)
+      (if (string-match (car my-pair) buffer-file-name)
+      (funcall (cdr my-pair)))))
+
+(add-hook 'web-mode-hook #'(lambda ()
+                            (enable-minor-mode
+                             '("\\.js?\\'" . prettier-js-mode)
+                             '("\\.jsx?\\'" . prettier-js-mode)
+                             '("\\.css?\\'" . prettier-js-mode))))
+
 (add-hook 'js2-mode-hook #'js2-refactor-mode)
 
 (js2r-add-keybindings-with-prefix "C-c C-m")
-
-(require 'prettier-js)
-(add-hook 'js2-mode-hook 'prettier-js-mode)
-(add-hook 'web-mode-hook 'prettier-js-mode)
-;; (add-hook 'rjsx-mode-hook 'prettier-js-mode)
 
 (require 'web-mode)
 
@@ -396,6 +413,15 @@ FEATURE may be any one of:
 ;;               "~/.emacs.d/plugins/yasnippet")
 (require 'yasnippet)
 (yas-global-mode 1)
+
+(setq yas-snippet-dirs
+      '("~/.emacs.d/snippets"                 ;; personal snippets
+        ))
+
+(add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
+(add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.
+
+(setq emmet-expand-jsx-className? t) ;; default nil
 
 ;(require 'ruby.tau)
 ;(add-to-list 'auto-mode-alist '("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode))
@@ -448,23 +474,26 @@ FEATURE may be any one of:
 	       ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")))
 
 (add-to-list 'org-latex-classes
-             '("abntex2"
-               "\\documentclass\[a4paper,oneside,12pt\]\{abntex2\}\\input{/home/tau/latex/abntex2.tex}"
+             '("memoir"
+               "\\documentclass\[a4paper\]\{memoir\}"
+               ("\\book\{%s\}" . "\\book*\{%s\}")
                ("\\part\{%s\}" . "\\part*\{%s\}")
                ("\\chapter\{%s\}" . "\\chapter*\{%s\}")
                ("\\section\{%s\}" . "\\section*\{%s\}")
                ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
                ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")))
-;; (with-eval-after-load 'ox-latex
-;;   (append-to-list
-;;    'org-latex-classes
-;;    '(("abntex2"
-;;       "\\documentclass[a4paper,oneside,12pt]{abntex2}
-;;      \\input{/home/tau/latex/abntex2.tex}"
-;;       ("\\part{%s}" . "\\part*{%s}")
-;;       ("\\chapter{%s}" . "\\chapter*{%s}")
-;;       ("\\section{%s}" . "\\section*{%s}")
-;;       ("\\subsection{%s}" . "\\subsection*{%s}")))))
+
+(add-to-list 'org-latex-classes
+          '("abntex2"
+            "\\documentclass{abntex2}"
+            ("\\part{%s}" . "\\part*{%s}")
+            ("\\chapter{%s}" . "\\chapter*{%s}")
+            ("\\section{%s}" . "\\section*{%s}")
+            ("\\subsection{%s}" . "\\subsection*{%s}")
+            ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+            ("\\subsubsubsection{%s}" . "\\subsubsubsection*{%s}")
+            ("\\paragraph{%s}" . "\\paragraph*{%s}"))
+          )
 
 (latex-preview-pane-enable)
 

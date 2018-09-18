@@ -1,0 +1,1115 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018/Arch Linux) (preloaded format=pdflatex 2018.8.4)  9 SEP 2018 18:15
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**emacs.tex
+(.//emacs.tex
+LaTeX2e <2018-04-01> patch level 2
+Babel <3.18> and hyphenation patterns for 84 language(s) loaded.
+(/usr/share/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
+(/usr/share/texmf-dist/tex/latex/base/size11.clo
+File: size11.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
+)
+\c@part=\count80
+\c@section=\count81
+\c@subsection=\count82
+\c@subsubsection=\count83
+\c@paragraph=\count84
+\c@subparagraph=\count85
+\c@figure=\count86
+\c@table=\count87
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+(/usr/share/texmf-dist/tex/latex/base/inputenc.sty
+Package: inputenc 2018/04/06 v1.3b Input encoding file
+\inpenc@prehook=\toks14
+\inpenc@posthook=\toks15
+)
+(/usr/share/texmf-dist/tex/latex/base/fontenc.sty
+Package: fontenc 2017/04/05 v2.0i Standard LaTeX package
+
+(/usr/share/texmf-dist/tex/latex/base/t1enc.def
+File: t1enc.def 2017/04/05 v2.0i Standard LaTeX file
+LaTeX Font Info:    Redeclaring font encoding T1 on input line 48.
+))
+(/usr/share/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2017/06/01 v1.1a Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks16
+)
+(/usr/share/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2017/06/25 v1.2c Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+(/usr/share/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 99.
+
+(/usr/share/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2018/01/08 v1.0l Graphics/color driver for pdftex
+))
+\Gin@req@height=\dimen103
+\Gin@req@width=\dimen104
+)
+(/usr/share/texmf-dist/tex/latex/oberdiek/grffile.sty
+Package: grffile 2017/06/30 v1.18 Extended file name support for graphics (HO)
+
+(/usr/share/texmf-dist/tex/generic/oberdiek/ifpdf.sty
+Package: ifpdf 2017/03/15 v3.2 Provides the ifpdf switch
+)
+(/usr/share/texmf-dist/tex/generic/ifxetex/ifxetex.sty
+Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
+)
+(/usr/share/texmf-dist/tex/latex/oberdiek/kvoptions.sty
+Package: kvoptions 2016/05/16 v3.12 Key value format for package options (HO)
+
+(/usr/share/texmf-dist/tex/generic/oberdiek/ltxcmds.sty
+Package: ltxcmds 2016/05/16 v1.23 LaTeX kernel commands for general use (HO)
+)
+(/usr/share/texmf-dist/tex/generic/oberdiek/kvsetkeys.sty
+Package: kvsetkeys 2016/05/16 v1.17 Key value parser (HO)
+
+(/usr/share/texmf-dist/tex/generic/oberdiek/infwarerr.sty
+Package: infwarerr 2016/05/16 v1.4 Providing info/warning/error messages (HO)
+)
+(/usr/share/texmf-dist/tex/generic/oberdiek/etexcmds.sty
+Package: etexcmds 2016/05/16 v1.6 Avoid name clashes with e-TeX commands (HO)
+
+(/usr/share/texmf-dist/tex/generic/oberdiek/ifluatex.sty
+Package: ifluatex 2016/05/16 v1.4 Provides the ifluatex switch (HO)
+Package ifluatex Info: LuaTeX not detected.
+)
+Package etexcmds Info: Could not find \expanded.
+(etexcmds)             That can mean that you are not using pdfTeX 1.50 or
+(etexcmds)             that some package has redefined \expanded.
+(etexcmds)             In the latter case, load this package earlier.
+)))
+(/usr/share/texmf-dist/tex/generic/oberdiek/pdftexcmds.sty
+Package: pdftexcmds 2018/01/30 v0.27 Utility functions of pdfTeX for LuaTeX (HO
+)
+Package pdftexcmds Info: LuaTeX not detected.
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+)
+Package grffile Info: Option `multidot' is set to `true'.
+Package grffile Info: Option `extendedchars' is set to `false'.
+Package grffile Info: Option `space' is set to `true'.
+Package grffile Info: \Gin@ii of package `graphicx' fixed on input line 494.
+)
+(/usr/share/texmf-dist/tex/latex/tools/longtable.sty
+Package: longtable 2014/10/28 v4.11 Multi-page Table package (DPC)
+\LTleft=\skip43
+\LTright=\skip44
+\LTpre=\skip45
+\LTpost=\skip46
+\LTchunksize=\count88
+\LTcapwidth=\dimen105
+\LT@head=\box26
+\LT@firsthead=\box27
+\LT@foot=\box28
+\LT@lastfoot=\box29
+\LT@cols=\count89
+\LT@rows=\count90
+\c@LT@tables=\count91
+\c@LT@chunks=\count92
+\LT@p@ftn=\toks17
+)
+(/usr/share/texmf-dist/tex/latex/wrapfig/wrapfig.sty
+\wrapoverhang=\dimen106
+\WF@size=\dimen107
+\c@WF@wrappedlines=\count93
+\WF@box=\box30
+\WF@everypar=\toks18
+Package: wrapfig 2003/01/31  v 3.6
+)
+(/usr/share/texmf-dist/tex/latex/graphics/rotating.sty
+Package: rotating 2016/08/11 v2.16d rotated objects in LaTeX
+
+(/usr/share/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
+)
+\c@r@tfl@t=\count94
+\rotFPtop=\skip47
+\rotFPbot=\skip48
+\rot@float@box=\box31
+\rot@mess@toks=\toks19
+)
+(/usr/share/texmf-dist/tex/generic/ulem/ulem.sty
+\UL@box=\box32
+\UL@hyphenbox=\box33
+\UL@skip=\skip49
+\UL@hook=\toks20
+\UL@height=\dimen108
+\UL@pe=\count95
+\UL@pixel=\dimen109
+\ULC@box=\box34
+Package: ulem 2012/05/18
+\ULdepth=\dimen110
+)
+(/usr/share/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2017/09/02 v2.17a AMS math features
+\@mathmargin=\skip50
+
+For additional information on amsmath, use the `?' option.
+(/usr/share/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2000/06/29 v2.01 AMS text
+
+(/usr/share/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks21
+\ex@=\dimen111
+))
+(/usr/share/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen112
+)
+(/usr/share/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 2016/03/08 v2.02 operator names
+)
+\inf@bad=\count96
+LaTeX Info: Redefining \frac on input line 213.
+\uproot@=\count97
+\leftroot@=\count98
+LaTeX Info: Redefining \overline on input line 375.
+\classnum@=\count99
+\DOTSCASE@=\count100
+LaTeX Info: Redefining \ldots on input line 472.
+LaTeX Info: Redefining \dots on input line 475.
+LaTeX Info: Redefining \cdots on input line 596.
+\Mathstrutbox@=\box35
+\strutbox@=\box36
+\big@size=\dimen113
+LaTeX Font Info:    Redeclaring font encoding OML on input line 712.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 713.
+\macc@depth=\count101
+\c@MaxMatrixCols=\count102
+\dotsspace@=\muskip10
+\c@parentequation=\count103
+\dspbrk@lvl=\count104
+\tag@help=\toks22
+\row@=\count105
+\column@=\count106
+\maxfields@=\count107
+\andhelp@=\toks23
+\eqnshift@=\dimen114
+\alignsep@=\dimen115
+\tagshift@=\dimen116
+\tagwidth@=\dimen117
+\totwidth@=\dimen118
+\lineht@=\dimen119
+\@envbody=\toks24
+\multlinegap=\skip51
+\multlinetaggap=\skip52
+\mathdisplay@stack=\toks25
+LaTeX Info: Redefining \[ on input line 2817.
+LaTeX Info: Redefining \] on input line 2818.
+)
+(/usr/share/texmf-dist/tex/latex/base/textcomp.sty
+Package: textcomp 2017/04/05 v2.0i Standard LaTeX package
+Package textcomp Info: Sub-encoding information:
+(textcomp)               5 = only ISO-Adobe without \textcurrency
+(textcomp)               4 = 5 + \texteuro
+(textcomp)               3 = 4 + \textohm
+(textcomp)               2 = 3 + \textestimated + \textcurrency
+(textcomp)               1 = TS1 - \textcircled - \t
+(textcomp)               0 = TS1 (full)
+(textcomp)             Font families with sub-encoding setting implement
+(textcomp)             only a restricted character set as indicated.
+(textcomp)             Family '?' is the default used for unknown fonts.
+(textcomp)             See the documentation for details.
+Package textcomp Info: Setting ? sub-encoding to TS1/1 on input line 79.
+
+(/usr/share/texmf-dist/tex/latex/base/ts1enc.def
+File: ts1enc.def 2001/06/05 v3.0e (jk/car/fm) Standard LaTeX file
+Now handling font encoding TS1 ...
+... processing UTF-8 mapping file for font encoding TS1
+
+(/usr/share/texmf-dist/tex/latex/base/ts1enc.dfu
+File: ts1enc.dfu 2018/04/05 v1.2c UTF-8 support for inputenc
+   defining Unicode char U+00A2 (decimal 162)
+   defining Unicode char U+00A3 (decimal 163)
+   defining Unicode char U+00A4 (decimal 164)
+   defining Unicode char U+00A5 (decimal 165)
+   defining Unicode char U+00A6 (decimal 166)
+   defining Unicode char U+00A7 (decimal 167)
+   defining Unicode char U+00A8 (decimal 168)
+   defining Unicode char U+00A9 (decimal 169)
+   defining Unicode char U+00AA (decimal 170)
+   defining Unicode char U+00AC (decimal 172)
+   defining Unicode char U+00AE (decimal 174)
+   defining Unicode char U+00AF (decimal 175)
+   defining Unicode char U+00B0 (decimal 176)
+   defining Unicode char U+00B1 (decimal 177)
+   defining Unicode char U+00B2 (decimal 178)
+   defining Unicode char U+00B3 (decimal 179)
+   defining Unicode char U+00B4 (decimal 180)
+   defining Unicode char U+00B5 (decimal 181)
+   defining Unicode char U+00B6 (decimal 182)
+   defining Unicode char U+00B7 (decimal 183)
+   defining Unicode char U+00B9 (decimal 185)
+   defining Unicode char U+00BA (decimal 186)
+   defining Unicode char U+00BC (decimal 188)
+   defining Unicode char U+00BD (decimal 189)
+   defining Unicode char U+00BE (decimal 190)
+   defining Unicode char U+00D7 (decimal 215)
+   defining Unicode char U+00F7 (decimal 247)
+   defining Unicode char U+0192 (decimal 402)
+   defining Unicode char U+02C7 (decimal 711)
+   defining Unicode char U+02D8 (decimal 728)
+   defining Unicode char U+02DD (decimal 733)
+   defining Unicode char U+0E3F (decimal 3647)
+   defining Unicode char U+2016 (decimal 8214)
+   defining Unicode char U+2020 (decimal 8224)
+   defining Unicode char U+2021 (decimal 8225)
+   defining Unicode char U+2022 (decimal 8226)
+   defining Unicode char U+2030 (decimal 8240)
+   defining Unicode char U+2031 (decimal 8241)
+   defining Unicode char U+203B (decimal 8251)
+   defining Unicode char U+203D (decimal 8253)
+   defining Unicode char U+2044 (decimal 8260)
+   defining Unicode char U+204E (decimal 8270)
+   defining Unicode char U+2052 (decimal 8274)
+   defining Unicode char U+20A1 (decimal 8353)
+   defining Unicode char U+20A4 (decimal 8356)
+   defining Unicode char U+20A6 (decimal 8358)
+   defining Unicode char U+20A9 (decimal 8361)
+   defining Unicode char U+20AB (decimal 8363)
+   defining Unicode char U+20AC (decimal 8364)
+   defining Unicode char U+20B1 (decimal 8369)
+   defining Unicode char U+2103 (decimal 8451)
+   defining Unicode char U+2116 (decimal 8470)
+   defining Unicode char U+2117 (decimal 8471)
+   defining Unicode char U+211E (decimal 8478)
+   defining Unicode char U+2120 (decimal 8480)
+   defining Unicode char U+2122 (decimal 8482)
+   defining Unicode char U+2126 (decimal 8486)
+   defining Unicode char U+2127 (decimal 8487)
+   defining Unicode char U+212E (decimal 8494)
+   defining Unicode char U+2190 (decimal 8592)
+   defining Unicode char U+2191 (decimal 8593)
+   defining Unicode char U+2192 (decimal 8594)
+   defining Unicode char U+2193 (decimal 8595)
+   defining Unicode char U+2329 (decimal 9001)
+   defining Unicode char U+232A (decimal 9002)
+   defining Unicode char U+2422 (decimal 9250)
+   defining Unicode char U+25E6 (decimal 9702)
+   defining Unicode char U+25EF (decimal 9711)
+   defining Unicode char U+266A (decimal 9834)
+   defining Unicode char U+FEFF (decimal 65279)
+))
+LaTeX Info: Redefining \oldstylenums on input line 334.
+Package textcomp Info: Setting cmr sub-encoding to TS1/0 on input line 349.
+Package textcomp Info: Setting cmss sub-encoding to TS1/0 on input line 350.
+Package textcomp Info: Setting cmtt sub-encoding to TS1/0 on input line 351.
+Package textcomp Info: Setting cmvtt sub-encoding to TS1/0 on input line 352.
+Package textcomp Info: Setting cmbr sub-encoding to TS1/0 on input line 353.
+Package textcomp Info: Setting cmtl sub-encoding to TS1/0 on input line 354.
+Package textcomp Info: Setting ccr sub-encoding to TS1/0 on input line 355.
+Package textcomp Info: Setting ptm sub-encoding to TS1/4 on input line 356.
+Package textcomp Info: Setting pcr sub-encoding to TS1/4 on input line 357.
+Package textcomp Info: Setting phv sub-encoding to TS1/4 on input line 358.
+Package textcomp Info: Setting ppl sub-encoding to TS1/3 on input line 359.
+Package textcomp Info: Setting pag sub-encoding to TS1/4 on input line 360.
+Package textcomp Info: Setting pbk sub-encoding to TS1/4 on input line 361.
+Package textcomp Info: Setting pnc sub-encoding to TS1/4 on input line 362.
+Package textcomp Info: Setting pzc sub-encoding to TS1/4 on input line 363.
+Package textcomp Info: Setting bch sub-encoding to TS1/4 on input line 364.
+Package textcomp Info: Setting put sub-encoding to TS1/5 on input line 365.
+Package textcomp Info: Setting uag sub-encoding to TS1/5 on input line 366.
+Package textcomp Info: Setting ugq sub-encoding to TS1/5 on input line 367.
+Package textcomp Info: Setting ul8 sub-encoding to TS1/4 on input line 368.
+Package textcomp Info: Setting ul9 sub-encoding to TS1/4 on input line 369.
+Package textcomp Info: Setting augie sub-encoding to TS1/5 on input line 370.
+Package textcomp Info: Setting dayrom sub-encoding to TS1/3 on input line 371.
+Package textcomp Info: Setting dayroms sub-encoding to TS1/3 on input line 372.
+
+Package textcomp Info: Setting pxr sub-encoding to TS1/0 on input line 373.
+Package textcomp Info: Setting pxss sub-encoding to TS1/0 on input line 374.
+Package textcomp Info: Setting pxtt sub-encoding to TS1/0 on input line 375.
+Package textcomp Info: Setting txr sub-encoding to TS1/0 on input line 376.
+Package textcomp Info: Setting txss sub-encoding to TS1/0 on input line 377.
+Package textcomp Info: Setting txtt sub-encoding to TS1/0 on input line 378.
+Package textcomp Info: Setting lmr sub-encoding to TS1/0 on input line 379.
+Package textcomp Info: Setting lmdh sub-encoding to TS1/0 on input line 380.
+Package textcomp Info: Setting lmss sub-encoding to TS1/0 on input line 381.
+Package textcomp Info: Setting lmssq sub-encoding to TS1/0 on input line 382.
+Package textcomp Info: Setting lmvtt sub-encoding to TS1/0 on input line 383.
+Package textcomp Info: Setting lmtt sub-encoding to TS1/0 on input line 384.
+Package textcomp Info: Setting qhv sub-encoding to TS1/0 on input line 385.
+Package textcomp Info: Setting qag sub-encoding to TS1/0 on input line 386.
+Package textcomp Info: Setting qbk sub-encoding to TS1/0 on input line 387.
+Package textcomp Info: Setting qcr sub-encoding to TS1/0 on input line 388.
+Package textcomp Info: Setting qcs sub-encoding to TS1/0 on input line 389.
+Package textcomp Info: Setting qpl sub-encoding to TS1/0 on input line 390.
+Package textcomp Info: Setting qtm sub-encoding to TS1/0 on input line 391.
+Package textcomp Info: Setting qzc sub-encoding to TS1/0 on input line 392.
+Package textcomp Info: Setting qhvc sub-encoding to TS1/0 on input line 393.
+Package textcomp Info: Setting futs sub-encoding to TS1/4 on input line 394.
+Package textcomp Info: Setting futx sub-encoding to TS1/4 on input line 395.
+Package textcomp Info: Setting futj sub-encoding to TS1/4 on input line 396.
+Package textcomp Info: Setting hlh sub-encoding to TS1/3 on input line 397.
+Package textcomp Info: Setting hls sub-encoding to TS1/3 on input line 398.
+Package textcomp Info: Setting hlst sub-encoding to TS1/3 on input line 399.
+Package textcomp Info: Setting hlct sub-encoding to TS1/5 on input line 400.
+Package textcomp Info: Setting hlx sub-encoding to TS1/5 on input line 401.
+Package textcomp Info: Setting hlce sub-encoding to TS1/5 on input line 402.
+Package textcomp Info: Setting hlcn sub-encoding to TS1/5 on input line 403.
+Package textcomp Info: Setting hlcw sub-encoding to TS1/5 on input line 404.
+Package textcomp Info: Setting hlcf sub-encoding to TS1/5 on input line 405.
+Package textcomp Info: Setting pplx sub-encoding to TS1/3 on input line 406.
+Package textcomp Info: Setting pplj sub-encoding to TS1/3 on input line 407.
+Package textcomp Info: Setting ptmx sub-encoding to TS1/4 on input line 408.
+Package textcomp Info: Setting ptmj sub-encoding to TS1/4 on input line 409.
+)
+(/usr/share/texmf-dist/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+
+(/usr/share/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+))
+(/usr/share/texmf-dist/tex/latex/capt-of/capt-of.sty
+Package: capt-of 2009/12/29 v0.2 standard captions outside of floats
+)
+(/usr/share/texmf-dist/tex/latex/hyperref/hyperref.sty
+Package: hyperref 2018/02/06 v6.86b Hypertext links for LaTeX
+
+(/usr/share/texmf-dist/tex/generic/oberdiek/hobsub-hyperref.sty
+Package: hobsub-hyperref 2016/05/16 v1.14 Bundle oberdiek, subset hyperref (HO)
+
+
+(/usr/share/texmf-dist/tex/generic/oberdiek/hobsub-generic.sty
+Package: hobsub-generic 2016/05/16 v1.14 Bundle oberdiek, subset generic (HO)
+Package: hobsub 2016/05/16 v1.14 Construct package bundles (HO)
+Package hobsub Info: Skipping package `infwarerr' (already loaded).
+Package hobsub Info: Skipping package `ltxcmds' (already loaded).
+Package hobsub Info: Skipping package `ifluatex' (already loaded).
+Package: ifvtex 2016/05/16 v1.6 Detect VTeX and its facilities (HO)
+Package ifvtex Info: VTeX not detected.
+Package: intcalc 2016/05/16 v1.2 Expandable calculations with integers (HO)
+Package hobsub Info: Skipping package `ifpdf' (already loaded).
+Package hobsub Info: Skipping package `etexcmds' (already loaded).
+Package hobsub Info: Skipping package `kvsetkeys' (already loaded).
+Package: kvdefinekeys 2016/05/16 v1.4 Define keys (HO)
+Package hobsub Info: Skipping package `pdftexcmds' (already loaded).
+Package: pdfescape 2016/05/16 v1.14 Implements pdfTeX's escape features (HO)
+Package: bigintcalc 2016/05/16 v1.4 Expandable calculations on big integers (HO
+)
+Package: bitset 2016/05/16 v1.2 Handle bit-vector datatype (HO)
+Package: uniquecounter 2016/05/16 v1.3 Provide unlimited unique counter (HO)
+)
+Package hobsub Info: Skipping package `hobsub' (already loaded).
+Package: letltxmacro 2016/05/16 v1.5 Let assignment for LaTeX macros (HO)
+Package: hopatch 2016/05/16 v1.3 Wrapper for package hooks (HO)
+Package: xcolor-patch 2016/05/16 xcolor patch
+Package: atveryend 2016/05/16 v1.9 Hooks at the very end of document (HO)
+Package atveryend Info: \enddocument detected (standard20110627).
+Package: atbegshi 2016/06/09 v1.18 At begin shipout hook (HO)
+Package: refcount 2016/05/16 v3.5 Data extraction from label references (HO)
+Package: hycolor 2016/05/16 v1.8 Color options for hyperref/bookmark (HO)
+)
+(/usr/share/texmf-dist/tex/latex/oberdiek/auxhook.sty
+Package: auxhook 2016/05/16 v1.4 Hooks for auxiliary files (HO)
+)
+\@linkdim=\dimen120
+\Hy@linkcounter=\count108
+\Hy@pagecounter=\count109
+
+(/usr/share/texmf-dist/tex/latex/hyperref/pd1enc.def
+File: pd1enc.def 2018/02/06 v6.86b Hyperref: PDFDocEncoding definition (HO)
+Now handling font encoding PD1 ...
+... no UTF-8 mapping file for font encoding PD1
+)
+\Hy@SavedSpaceFactor=\count110
+
+(/usr/share/texmf-dist/tex/latex/latexconfig/hyperref.cfg
+File: hyperref.cfg 2002/06/06 v1.2 hyperref configuration of TeXLive
+)
+Package hyperref Info: Hyper figures OFF on input line 4509.
+Package hyperref Info: Link nesting OFF on input line 4514.
+Package hyperref Info: Hyper index ON on input line 4517.
+Package hyperref Info: Plain pages OFF on input line 4524.
+Package hyperref Info: Backreferencing OFF on input line 4529.
+Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
+Package hyperref Info: Bookmarks ON on input line 4762.
+\c@Hy@tempcnt=\count111
+
+(/usr/share/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip11
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+LaTeX Info: Redefining \url on input line 5115.
+\XeTeXLinkMargin=\dimen121
+\Fld@menulength=\count112
+\Field@Width=\dimen122
+\Fld@charsize=\dimen123
+Package hyperref Info: Hyper figures OFF on input line 6369.
+Package hyperref Info: Link nesting OFF on input line 6374.
+Package hyperref Info: Hyper index ON on input line 6377.
+Package hyperref Info: backreferencing OFF on input line 6384.
+Package hyperref Info: Link coloring OFF on input line 6389.
+Package hyperref Info: Link coloring with OCG OFF on input line 6394.
+Package hyperref Info: PDF/A mode OFF on input line 6399.
+LaTeX Info: Redefining \ref on input line 6439.
+LaTeX Info: Redefining \pageref on input line 6443.
+\Hy@abspage=\count113
+\c@Item=\count114
+\c@Hfootnote=\count115
+)
+Package hyperref Info: Driver (autodetected): hpdftex.
+
+(/usr/share/texmf-dist/tex/latex/hyperref/hpdftex.def
+File: hpdftex.def 2018/02/06 v6.86b Hyperref driver for pdfTeX
+\Fld@listcount=\count116
+\c@bookmark@seq@number=\count117
+
+(/usr/share/texmf-dist/tex/latex/oberdiek/rerunfilecheck.sty
+Package: rerunfilecheck 2016/05/16 v1.8 Rerun checks for auxiliary files (HO)
+Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
+82.
+)
+\Hy@SectionHShift=\skip53
+)
+No file emacs.aux.
+\openout1 = `emacs.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 28.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 28.
+(/usr/share/texmf-dist/tex/latex/base/ts1cmr.fd
+File: ts1cmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+
+(/usr/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count118
+\scratchdimen=\dimen124
+\scratchbox=\box37
+\nofMPsegments=\count119
+\nofMParguments=\count120
+\everyMPshowfont=\toks26
+\MPscratchCnt=\count121
+\MPscratchDim=\dimen125
+\MPnumerator=\count122
+\makeMPintoPDFobject=\count123
+\everyMPtoPDFconversion=\toks27
+) (/usr/share/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
+Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
+
+(/usr/share/texmf-dist/tex/latex/oberdiek/grfext.sty
+Package: grfext 2016/05/16 v1.2 Manage graphics extensions (HO)
+)
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+38.
+Package grfext Info: Graphics extension search list:
+(grfext)             [.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPE
+G,.JBIG2,.JB2,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 456.
+
+(/usr/share/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
+\AtBeginShipoutBox=\box38
+Package hyperref Info: Link coloring OFF on input line 28.
+
+(/usr/share/texmf-dist/tex/latex/hyperref/nameref.sty
+Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
+
+(/usr/share/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
+Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
+)
+\c@section@level=\count124
+)
+LaTeX Info: Redefining \ref on input line 28.
+LaTeX Info: Redefining \pageref on input line 28.
+LaTeX Info: Redefining \nameref on input line 28.
+\@outlinefile=\write3
+\openout3 = `emacs.out'.
+
+LaTeX Font Info:    Try loading font information for U+msa on input line 31.
+
+(/usr/share/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Try loading font information for U+msb on input line 31.
+
+(/usr/share/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+\tf@toc=\write4
+\openout4 = `emacs.toc'.
+
+
+Overfull \hbox (1.29716pt too wide) in paragraph at lines 35--35
+[][]\T1/cmr/bx/n/14.4 Recompile init.el ev-ery-time emacs.org is changed and
+ []
+
+LaTeX Font Info:    Try loading font information for T1+cmtt on input line 42.
+(/usr/share/texmf-dist/tex/latex/base/t1cmtt.fd
+File: t1cmtt.fd 2014/09/29 v2.5h Standard LaTeX font definitions
+)
+Overfull \hbox (70.0362pt too wide) in paragraph at lines 53--53
+[]               \T1/cmtt/m/n/10.95 (expand-file-name (concat user-emacs-direct
+ory "emacs.org")))[] 
+ []
+
+
+Overfull \hbox (24.76923pt too wide) in paragraph at lines 53--53
+[]      \T1/cmtt/m/n/10.95 (byte-compile-file (concat user-emacs-directory "ini
+t.el")))))[] 
+ []
+
+
+Overfull \hbox (58.71945pt too wide) in paragraph at lines 69--69
+[]\T1/cmtt/m/n/10.95 (add-to-list 'package-archives '("melpa" . "https://melpa.
+org/packages/"))[] 
+ []
+
+
+Overfull \hbox (64.37782pt too wide) in paragraph at lines 69--69
+[]\T1/cmtt/m/n/10.95 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu
+.org/packages/"))[] 
+ []
+
+[1
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+Overfull \hbox (177.54524pt too wide) in paragraph at lines 69--69
+[]\T1/cmtt/m/n/10.95 (add-to-list 'package-archives '("org" . "http://orgmode.o
+rg/elpa/") t) ; Org-mode's repository[] 
+ []
+
+
+Overfull \hbox (2.13574pt too wide) in paragraph at lines 100--100
+[] \T1/cmtt/m/n/10.95 ;; If you edit it by hand, you could mess it up, so be ca
+reful.[] 
+ []
+
+
+Overfull \hbox (862.20813pt too wide) in paragraph at lines 100--100
+[]    \T1/cmtt/m/n/10.95 ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484
+d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0
+" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
+[] 
+ []
+
+
+Overfull \hbox (1880.7149pt too wide) in paragraph at lines 100--100
+[]    \T1/cmtt/m/n/10.95 (pdf-tools ox-pandoc ox-reveal org-preview-html latex-
+preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktoo
+th-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx
+-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line 
+## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mo
+de web-serverx org))))[] 
+ []
+
+
+Overfull \hbox (2.13574pt too wide) in paragraph at lines 100--100
+[] \T1/cmtt/m/n/10.95 ;; If you edit it by hand, you could mess it up, so be ca
+reful.[] 
+ []
+
+
+Overfull \hbox (7.79411pt too wide) in paragraph at lines 134--134
+[]\T1/cmtt/m/n/10.95 (defmacro /bindings/define-prefix-keys (keymap prefix &res
+t body)[] 
+ []
+
+[2]
+Overfull \hbox (81.35294pt too wide) in paragraph at lines 134--134
+[]\T1/cmtt/m/n/10.95 (defmacro /bindings/define-key (keymap sequence binding &o
+ptional description)[] 
+ []
+
+[3]
+Overfull \hbox (194.52036pt too wide) in paragraph at lines 188--188
+[]\T1/cmtt/m/n/10.95 (defconst emacs-tmp-dir (expand-file-name (format "emacs%d
+" (user-uid)) temporary-file-directory))[] 
+ []
+
+
+Overfull \hbox (47.40271pt too wide) in paragraph at lines 237--237
+[]    \T1/cmtt/m/n/10.95 \"evil-autoloads\" => (with-eval-after-load \"evil-aut
+olaods\" BODY)[] 
+ []
+
+[4]
+Overfull \hbox (24.76923pt too wide) in paragraph at lines 237--237
+[]                 \T1/cmtt/m/n/10.95 (setq prog (append '(with-eval-after-load
+) prog))))[] 
+ []
+
+
+Overfull \hbox (53.06108pt too wide) in paragraph at lines 249--249
+[]\T1/cmtt/m/n/10.95 (add-to-list 'load-path (expand-file-name "config" user-em
+acs-directory))[] 
+ []
+
+
+Overfull \hbox (41.74434pt too wide) in paragraph at lines 274--274
+[]\T1/cmtt/m/n/10.95 All Evil settings are meant to be isolates in a separate f
+ile evil.tau.[] 
+ []
+
+[5]
+Overfull \hbox (24.76923pt too wide) in paragraph at lines 332--332
+[]\T1/cmtt/m/n/10.95 (define-key minibuffer-local-map [escape] 'minibuffer-keyb
+oard-quit)[] 
+ []
+
+
+Overfull \hbox (41.74434pt too wide) in paragraph at lines 332--332
+[]\T1/cmtt/m/n/10.95 (define-key minibuffer-local-ns-map [escape] 'minibuffer-k
+eyboard-quit)[] 
+ []
+
+
+Overfull \hbox (87.0113pt too wide) in paragraph at lines 332--332
+[]\T1/cmtt/m/n/10.95 (define-key minibuffer-local-completion-map [escape] 'mini
+buffer-keyboard-quit)[] 
+ []
+
+
+Overfull \hbox (87.0113pt too wide) in paragraph at lines 332--332
+[]\T1/cmtt/m/n/10.95 (define-key minibuffer-local-must-match-map [escape] 'mini
+buffer-keyboard-quit)[] 
+ []
+
+
+Overfull \hbox (70.0362pt too wide) in paragraph at lines 332--332
+[]\T1/cmtt/m/n/10.95 (define-key minibuffer-local-isearch-map [escape] 'minibuf
+fer-keyboard-quit)[] 
+ []
+
+[6]
+Overfull \hbox (154.91176pt too wide) in paragraph at lines 343--343
+[]\T1/cmtt/m/n/10.95 (@see https://bitbucket.org/lyro/evil/issue/342/evil-defau
+lt-cursor-setting-should-default)[] 
+ []
+
+
+Overfull \hbox (2.13574pt too wide) in paragraph at lines 401--401
+[]\T1/cmtt/m/n/10.95 (define-key evil-insert-state-map (kbd "C-e") 'move-end-of
+-line)[] 
+ []
+
+
+Overfull \hbox (2.13574pt too wide) in paragraph at lines 401--401
+[]\T1/cmtt/m/n/10.95 (define-key evil-visual-state-map (kbd "C-e") 'move-end-of
+-line)[] 
+ []
+
+
+Overfull \hbox (2.13574pt too wide) in paragraph at lines 401--401
+[]\T1/cmtt/m/n/10.95 (define-key evil-normal-state-map (kbd "C-e") 'move-end-of
+-line)[] 
+ []
+
+[7]
+Overfull \hbox (36.08597pt too wide) in paragraph at lines 440--440
+[]\T1/cmtt/m/n/10.95 ;; step 2, `mc/mark-all-like-dwim' or `mc/mark-all-like-th
+is-in-defun'[] 
+ []
+
+
+Overfull \hbox (87.0113pt too wide) in paragraph at lines 440--440
+[]\T1/cmtt/m/n/10.95 ;; step 3, `ace-mc-add-multiple-cursors' to remove cursor,
+ press RET to confirm[] 
+ []
+
+
+Overfull \hbox (30.4276pt too wide) in paragraph at lines 440--440
+[]\T1/cmtt/m/n/10.95 (define-key evil-visual-state-map (kbd "mn") 'mc/mark-next
+-like-this)[] 
+ []
+
+
+Overfull \hbox (53.06108pt too wide) in paragraph at lines 440--440
+[]\T1/cmtt/m/n/10.95 (define-key evil-visual-state-map (kbd "ma") 'mc/mark-all-
+like-this-dwim)[] 
+ []
+
+
+Overfull \hbox (75.69456pt too wide) in paragraph at lines 440--440
+[]\T1/cmtt/m/n/10.95 (define-key evil-visual-state-map (kbd "md") 'mc/mark-all-
+like-this-in-defun)[] 
+ []
+
+
+Overfull \hbox (58.71945pt too wide) in paragraph at lines 440--440
+[]\T1/cmtt/m/n/10.95 (define-key evil-visual-state-map (kbd "mm") 'ace-mc-add-m
+ultiple-cursors)[] 
+ []
+
+
+Overfull \hbox (41.74434pt too wide) in paragraph at lines 440--440
+[]\T1/cmtt/m/n/10.95 (define-key evil-visual-state-map (kbd "ms") 'ace-mc-add-s
+ingle-cursor)[] 
+ []
+
+[8]
+Overfull \hbox (53.06108pt too wide) in paragraph at lines 447--447
+[]\T1/cmtt/m/n/10.95 ;; (define-key evil-normal-state-map (kbd "C-n") 'mc/mark-
+next-like-this)[] 
+ []
+
+
+Overfull \hbox (75.69456pt too wide) in paragraph at lines 447--447
+[]\T1/cmtt/m/n/10.95 ;; (define-key evil-normal-state-map (kbd "M-N") 'mc/mark-
+previous-like-this)[] 
+ []
+
+
+Overfull \hbox (7.79411pt too wide) in paragraph at lines 502--502
+[]  \T1/cmtt/m/n/10.95 "ES6." ;  <-- this is a documentation string, a feature 
+in Lisp[] 
+ []
+
+[9]
+Overfull \hbox (7.79411pt too wide) in paragraph at lines 502--502
+[]  \T1/cmtt/m/n/10.95 (push '(?3 . ("classNames(" . ")")) evil-surround-pairs-
+alist))[] 
+ []
+
+
+Overfull \hbox (58.71945pt too wide) in paragraph at lines 513--513
+[]\T1/cmtt/m/n/10.95 (add-hook 'emacs-lisp-mode-hook 'evil-surround-emacs-lisp-
+mode-hook-setup)[] 
+ []
+
+[10]
+Overfull \hbox (87.0113pt too wide) in paragraph at lines 584--584
+[]            \T1/cmtt/m/n/10.95 (define-key evil-normal-state-local-map (kbd "
+TAB") 'neotree-enter)[] 
+ []
+
+
+Overfull \hbox (115.30316pt too wide) in paragraph at lines 584--584
+[]            \T1/cmtt/m/n/10.95 (define-key evil-normal-state-local-map (kbd "
+SPC") 'neotree-quick-look)[] 
+ []
+
+
+Overfull \hbox (70.0362pt too wide) in paragraph at lines 584--584
+[]            \T1/cmtt/m/n/10.95 (define-key evil-normal-state-local-map (kbd "
+q") 'neotree-hide)[] 
+ []
+
+
+Overfull \hbox (87.0113pt too wide) in paragraph at lines 584--584
+[]            \T1/cmtt/m/n/10.95 (define-key evil-normal-state-local-map (kbd "
+RET") 'neotree-enter)[] 
+ []
+
+
+Overfull \hbox (87.0113pt too wide) in paragraph at lines 584--584
+[]            \T1/cmtt/m/n/10.95 (define-key evil-normal-state-local-map (kbd "
+g") 'neotree-refresh)[] 
+ []
+
+
+Overfull \hbox (98.32805pt too wide) in paragraph at lines 584--584
+[]            \T1/cmtt/m/n/10.95 (define-key evil-normal-state-local-map (kbd "
+n") 'neotree-next-line)[] 
+ []
+
+
+Overfull \hbox (120.96153pt too wide) in paragraph at lines 584--584
+[]            \T1/cmtt/m/n/10.95 (define-key evil-normal-state-local-map (kbd "
+p") 'neotree-previous-line)[] 
+ []
+
+
+Overfull \hbox (126.6199pt too wide) in paragraph at lines 584--584
+[]            \T1/cmtt/m/n/10.95 (define-key evil-normal-state-local-map (kbd "
+A") 'neotree-stretch-toggle)[] 
+ []
+
+
+Overfull \hbox (149.25339pt too wide) in paragraph at lines 584--584
+[]            \T1/cmtt/m/n/10.95 (define-key evil-normal-state-local-map (kbd "
+H") 'neotree-hidden-file-toggle)[] 
+ []
+
+
+Overfull \hbox (160.57013pt too wide) in paragraph at lines 584--584
+[]            \T1/cmtt/m/n/10.95 (define-key evil-normal-state-local-map (kbd "
+|") 'neotree-enter-vertical-split)[] 
+ []
+
+
+Overfull \hbox (171.88687pt too wide) in paragraph at lines 584--584
+[]            \T1/cmtt/m/n/10.95 (define-key evil-normal-state-local-map (kbd "
+-") 'neotree-enter-horizontal-split)[] 
+ []
+
+
+Overfull \hbox (87.0113pt too wide) in paragraph at lines 584--584
+[]            \T1/cmtt/m/n/10.95 (define-key evil-normal-state-local-map (kbd "
+R") 'neotree-refresh)[] 
+ []
+
+
+Overfull \hbox (87.0113pt too wide) in paragraph at lines 584--584
+[]            \T1/cmtt/m/n/10.95 (define-key evil-normal-state-local-map (kbd "
+u") 'neotree-refresh)[] 
+ []
+
+
+Overfull \hbox (109.64479pt too wide) in paragraph at lines 584--584
+[]            \T1/cmtt/m/n/10.95 (define-key evil-normal-state-local-map (kbd "
+C") 'neotree-change-root)[] 
+ []
+
+
+Overfull \hbox (120.96153pt too wide) in paragraph at lines 584--584
+[]            \T1/cmtt/m/n/10.95 (define-key evil-normal-state-local-map (kbd "
+c") 'neotree-create-node)))[] 
+ []
+
+[11]
+Overfull \hbox (19.11086pt too wide) in paragraph at lines 638--638
+[]        \T1/cmtt/m/n/10.95 (define-key evil-normal-state-map (kbd "TAB") 'org
+-cycle)))[] 
+ []
+
+
+Overfull \hbox (7.79411pt too wide) in paragraph at lines 657--657
+[]        \T1/cmtt/m/n/10.95 (remove-hook 'after-save-hook 'org-html-export-to-
+html t)[] 
+ []
+
+
+Overfull \hbox (64.37782pt too wide) in paragraph at lines 657--657
+[]        \T1/cmtt/m/n/10.95 (message "Disabled org html export on save for cur
+rent buffer..."))[] 
+ []
+
+
+Overfull \hbox (41.74434pt too wide) in paragraph at lines 657--657
+[]    \T1/cmtt/m/n/10.95 (message "Enabled org html export on save for current 
+buffer...")))[] 
+ []
+
+
+Overfull \hbox (7.79411pt too wide) in paragraph at lines 676--676
+[]  \T1/cmtt/m/n/10.95 "This exports to diffenent outputs everytime the file is
+ saved.[] 
+ []
+
+
+Overfull \hbox (41.74434pt too wide) in paragraph at lines 676--676
+[]\T1/cmtt/m/n/10.95 This will be added to org-mode-hook, so it only activates 
+on ORG files.[] 
+ []
+
+[12]
+Overfull \hbox (92.66968pt too wide) in paragraph at lines 697--697
+[]\T1/cmtt/m/n/10.95 ;; (evil-org-set-key-theme '(navigation insert textobjects
+ additional calendar))[] 
+ []
+
+[13]
+Overfull \hbox (24.76923pt too wide) in paragraph at lines 748--748
+[]\T1/cmtt/m/n/10.95 (setq org-pandoc-options-for-beamer-pdf '((pdf-engine . "x
+elatex")))[] 
+ []
+
+
+Overfull \hbox (13.45248pt too wide) in paragraph at lines 748--748
+[]\T1/cmtt/m/n/10.95 (setq org-pandoc-options-for-latex-pdf '((pdf-engine . "lu
+atex")))[] 
+ []
+
+
+Overfull \hbox (64.37782pt too wide) in paragraph at lines 748--748
+[]\T1/cmtt/m/n/10.95 (setq org-pandoc-format-extensions '(markdown_github+pipe_
+tables+raw_html))[] 
+ []
+
+
+Overfull \hbox (137.93665pt too wide) in paragraph at lines 755--755
+[]\T1/cmtt/m/n/10.95 This delay makes the options to export to RevealJS appear 
+on the exporter menu (C-c C-e)[] 
+ []
+
+
+Overfull \hbox (618.89818pt too wide) in paragraph at lines 795--795
+[]    \T1/cmtt/m/n/10.95 "Opens up a new shell in the directory associated with
+ the current buffer's file.  The eshell is renamed to match that directory to m
+ake multiple eshell windows easier."[] 
+ []
+
+[14]
+Overfull \hbox (7.79411pt too wide) in paragraph at lines 795--795
+[]\T1/cmtt/m/n/10.95 (define-key evil-normal-state-map (kbd "!") #'/eshell/new-
+window)[] 
+ []
+
+
+Overfull \hbox (7.79411pt too wide) in paragraph at lines 795--795
+[]\T1/cmtt/m/n/10.95 (define-key evil-visual-state-map (kbd "!") #'/eshell/new-
+window)[] 
+ []
+
+
+Overfull \hbox (7.79411pt too wide) in paragraph at lines 795--795
+[]\T1/cmtt/m/n/10.95 (define-key evil-motion-state-map (kbd "!") #'/eshell/new-
+window)[] 
+ []
+
+[15]
+Overfull \hbox (2.13574pt too wide) in paragraph at lines 862--862
+[]  \T1/cmtt/m/n/10.95 (global-set-key (kbd "M-:") #'helm-eval-expression-with-
+eldoc)[] 
+ []
+
+
+Overfull \hbox (36.08597pt too wide) in paragraph at lines 862--862
+[]  \T1/cmtt/m/n/10.95 (define-key helm-map (kbd "<tab>") #'helm-execute-persis
+tent-action)[] 
+ []
+
+[16]
+Overfull \hbox (160.57013pt too wide) in paragraph at lines 954--954
+[]\T1/cmtt/m/n/10.95 ;; for some readon the bellow lines should be the default 
+native way for navigation on emacs[] 
+ []
+
+[17]
+Overfull \hbox (53.06108pt too wide) in paragraph at lines 1022--1022
+[]\T1/cmtt/m/n/10.95 (defconst *spell-check-support-enabled* t) ;; Enable with 
+t if you prefer[] 
+ []
+
+[18]
+Overfull \hbox (30.4276pt too wide) in paragraph at lines 1037--1037
+[]\T1/cmtt/m/n/10.95 M-' to replace all symbols in the buffer matching the one 
+under point[] 
+ []
+
+
+Overfull \hbox (109.64479pt too wide) in paragraph at lines 1037--1037
+[]\T1/cmtt/m/n/10.95 C-u M-' to replace symbols in your current defun only (as 
+used by narrow-to-defun.)[] 
+ []
+
+
+Overfull \hbox (98.32805pt too wide) in paragraph at lines 1060--1060
+[]\T1/cmtt/m/n/10.95 (add-hook 'TeX-after-compilation-finished-functions #'TeX-
+revert-document-buffer)[] 
+ []
+
+
+Overfull \hbox (19.11086pt too wide) in paragraph at lines 1071--1071
+[]  \T1/cmtt/m/n/10.95 "j" (lambda () (interactive) (pdf-view-next-line-or-next
+-page 5))[] 
+ []
+
+
+Overfull \hbox (64.37782pt too wide) in paragraph at lines 1071--1071
+[]  \T1/cmtt/m/n/10.95 "k" (lambda () (interactive) (pdf-view-previous-line-or-
+previous-page 5))[] 
+ []
+
+[19]
+Overfull \hbox (13.45248pt too wide) in paragraph at lines 1135--1135
+[]\T1/cmtt/m/n/10.95 (add-to-list 'custom-theme-load-path "~/dotfiles/emacs.d/t
+hemes/")[] 
+ []
+
+
+Overfull \hbox (7.79411pt too wide) in paragraph at lines 1135--1135
+[]\T1/cmtt/m/n/10.95 ; atom-one-dark (doenst work well with emacsclient, ugly b
+lue bg)[] 
+ []
+
+[20]
+Overfull \hbox (2.13574pt too wide) in paragraph at lines 1159--1159
+[]\T1/cmtt/m/n/10.95 ;;   with bellow snippet to load theme after the frame is 
+loaded[] 
+ []
+
+
+Overfull \hbox (132.27827pt too wide) in paragraph at lines 1159--1159
+[]\T1/cmtt/m/n/10.95 ;; ; resolves issue with the theme not loading properly in
+ terminal mode on emacsclient[] 
+ []
+
+[21]
+Overfull \hbox (30.4276pt too wide) in paragraph at lines 1197--1197
+[]      \T1/cmtt/m/n/10.95 (add-to-list 'sml/replacer-regexp-list '("^~/Dropbox
+/" ":DB:"))[] 
+ []
+
+[22]
+Overfull \hbox (41.74434pt too wide) in paragraph at lines 1273--1273
+[]\T1/cmtt/m/n/10.95 (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" 
+. rjsx-mode))[] 
+ []
+
+
+Overfull \hbox (13.45248pt too wide) in paragraph at lines 1273--1273
+[]\T1/cmtt/m/n/10.95 (add-to-list 'auto-mode-alist '("pages\\/.*\\.js\\'" . rjs
+x-mode))[] 
+ []
+
+
+Overfull \hbox (58.71945pt too wide) in paragraph at lines 1318--1318
+[]\T1/cmtt/m/n/10.95 (setq company-tooltip-limit 20)                      ; big
+ger popup window[] 
+ []
+
+
+Overfull \hbox (160.57013pt too wide) in paragraph at lines 1318--1318
+[]\T1/cmtt/m/n/10.95 (setq company-minimum-prefix-length 1)               ; sta
+rt completing after 1st char typed[] 
+ []
+
+
+Overfull \hbox (222.81221pt too wide) in paragraph at lines 1318--1318
+[]\T1/cmtt/m/n/10.95 (setq company-idle-delay .1)                         ; dec
+rease delay before autocompletion popup shows[] 
+ []
+
+
+Overfull \hbox (87.0113pt too wide) in paragraph at lines 1318--1318
+[]\T1/cmtt/m/n/10.95 (setq company-echo-delay 0)                          ; rem
+ove annoying blinking[] 
+ []
+
+
+Overfull \hbox (166.2285pt too wide) in paragraph at lines 1318--1318
+[]\T1/cmtt/m/n/10.95 (setq company-begin-commands '(self-insert-command)) ; sta
+rt autocompletion only after typing[] 
+ []
+
+
+Overfull \hbox (103.98642pt too wide) in paragraph 
