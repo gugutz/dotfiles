@@ -69,9 +69,9 @@ exec --no-startup-id compton --xrender-sync-fence
 
 exec --no-startup-id volumeicon
 bindsym $mod+Ctrl+m exec terminal -e 'alsamixer'
-#exec --no-startup-id pulseaudio
-#exec --no-startup-id pa-applet
-bindsym $mod+Ctrl+Shift+m exec pavucontrol
+# exec --no-startup-id pulseaudio
+# exec --no-startup-id pa-applet
+# bindsym $mod+Ctrl+Shift+m exec pavucontrol
 
 
 ################################################
@@ -124,7 +124,8 @@ set $terminal       st -e tmux new-session
 
 # define default text editor
 # set $editor st -e tmux new-session -A -s "emacs-session" emacs -t -nw
-set $editor         st -e tmux new-session emacsclient -c -t 
+set $editorterm         st -e tmux new-session emacsclient -c -t
+set $editorgui         st -e tmux new-session emacsclient -c -n
 set $codemacs       st -e codemacs
  
 
@@ -133,9 +134,6 @@ set $mod Mod4
 
 # define variable to use alt in keybindings
 set $alt mod1
-
-# define Conky path
-set $conky_start ~/dotfiles/conky/scripts/conky-start.sh
 
 
 #############################
@@ -250,9 +248,12 @@ exec --no-startup-id xautolock -time 10 -locker blurlock
 # Autostart applications
 ################################################
 
+# Conky
+exec_always --no-startup-id ~/dotfiles/conky/scripts/conky-start.sh
+
+# these were in the default manjaro i3 config, not sure what they do yet
 exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 exec --no-startup-id nitrogen --restore; sleep 1; compton -b
-#exec --no-startup-id manjaro-hello
 
 # start NetworkManager tray applet
 exec --no-startup-id nm-applet
@@ -267,7 +268,7 @@ exec --no-startup-id pamac-tray
 exec --no-startup-id clipit
 
 # start blueman bluetooth manager tray applet
-exec --no-startup-id blueman-applet
+# exec --no-startup-id blueman-applet
 
 # exec_always --no-startup-id sbxkb
 exec_always --no-startup-id ff-theme-util
@@ -404,7 +405,7 @@ bindsym $mod+Shift+minus move scratchpad
 
 # Show the next scratchpad window or hide the focused scratchpad window.
 # If there are multiple scratchpad windows, this command cycles through them.
-bindsym $mod+minus scratchpad show
+bindsym $mod+minus scratchpad show; [instance="dropdown"] move position center
 
 ################################################
 # ROFI TASK SWITCHER SETTINGS
@@ -429,28 +430,28 @@ bindsym $mod+Tab \
 ################################################
 
 # open i3 config file
-bindsym $mod+$alt+i    exec --no-startup-id $editor ~/.i3/config
+bindsym $mod+$alt+i    exec --no-startup-id $editorterm ~/.i3/config
 
 # open vim config file
-bindsym $mod+$alt+v    exec --no-startup-id $editor ~/.vimrc
+bindsym $mod+$alt+v    exec --no-startup-id $editorterm ~/.vimrc
 
 # open emacs config file
-bindsym $mod+$alt+e    exec --no-startup-id $editor ~/.emacs
+bindsym $mod+$alt+e    exec --no-startup-id $editorterm ~/.emacs
 
 # open tmux config file
-bindsym $mod+$alt+t    exec --no-startup-id $editor ~/.tmux.conf
+bindsym $mod+$alt+t    exec --no-startup-id $editorterm ~/.tmux.conf
 
 # open bashrc config file
-bindsym $mod+$alt+b    exec --no-startup-id $editor ~/.bashrc
+bindsym $mod+$alt+b    exec --no-startup-id $editorterm ~/.bashrc
 
 # open profile file
-bindsym $mod+$alt+p    exec --no-startup-id $editor ~/.profile
+bindsym $mod+$alt+p    exec --no-startup-id $editorterm ~/.profile
 
 # open zsh config file
-bindsym $mod+$alt+z    exec --no-startup-id $editor ~/.zshrc
+bindsym $mod+$alt+z    exec --no-startup-id $editorterm ~/.zshrc
 
 # open ranger config file
-bindsym $mod+$alt+r    exec --no-startup-id $editor ~/.config/ranger/rc.conf
+bindsym $mod+$alt+r    exec --no-startup-id $editorterm ~/.config/ranger/rc.conf
 
 
 ################################################
@@ -458,13 +459,13 @@ bindsym $mod+$alt+r    exec --no-startup-id $editor ~/.config/ranger/rc.conf
 ################################################
 
 # open my dev-environment setup shell script
-bindsym $mod+$alt+Control+d    exec --no-startup-id $editor ~/scripts/system/manjaro-dev-env-setup.sh
+bindsym $mod+$alt+Control+d    exec --no-startup-id $editorterm ~/scripts/system/manjaro-dev-env-setup.sh
 
 # open my libs setup shell script
-bindsym $mod+$alt+Control+l    exec --no-startup-id $editor ~/scripts/system/manjaro-dev-libs-setup.sh
+bindsym $mod+$alt+Control+l    exec --no-startup-id $editorterm ~/scripts/system/manjaro-dev-libs-setup.sh
 
 # open my libs setup shell script
-bindsym $mod+$alt+Control+b    exec --no-startup-id $editor ~/scripts/system/manjaro-basic-software.sh
+bindsym $mod+$alt+Control+b    exec --no-startup-id $editorterm ~/scripts/system/manjaro-basic-software.sh
 
 
 ################################################
@@ -505,11 +506,14 @@ bindsym $mod+Return               exec --no-startup-id $terminal
 for_window[class="^st"] focus
 # assign [class="st"]          → $ws10
 
-# start emacs
-bindsym $mod+Control+Return       exec --no-startup-id $editor
+# start emacsclient on terminal mode
+bindsym $mod+Shift+Return       exec --no-startup-id $editorterm
+
+# start emacsclient on gui mode
+bindsym $mod+Control+Shift+Return       exec --no-startup-id $editorgui
 
 # start vim
-bindsym $mod+Shift+Return         exec --no-startup-id st -e tmux new-session vim
+bindsym $mod+Control+Return         exec --no-startup-id st -e tmux new-session vim
 
 # VSCode
 # assign [class="Code"] → $ws5
