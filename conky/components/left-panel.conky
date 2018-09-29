@@ -1,0 +1,432 @@
+-- vim: ts=4 sw=4 noet ai cindent syntax=lua
+
+--[[
+http://github.com/gugutz
+
+This is my conky-setup
+
+]]
+
+conky.config = {
+# Manjaro left panel settings
+	alignment = 'bottom_left',
+	background = true,
+	color2 = '5D7B86',
+	cpu_avg_samples = 2,
+	default_color = 'F9FAF9',
+	double_buffer = true,
+	font = 'Bitstream Vera Sans:size=8',
+	draw_shades = false,
+	gap_x = 25,
+	gap_y = 45,
+	minimum_width = 200,
+	no_buffers = true,
+	own_window = true,
+	own_window_type = 'override',
+	own_window_transparent = true,
+	update_interval = 2.0,
+	use_xft = true,
+
+
+# Conky settings
+	background = false,
+	update_interval = 1.0,
+	double_buffer = true,
+	no_buffers = true,
+	imlib_cache_size = 10,
+    extra_newline = false,
+    out_to_console = false,
+    out_to_stderr = false,
+
+
+# window window geometry
+    alignment = 'top_left',
+	gap_x = 10,
+	gap_y = 32,
+    minimum_width = 268, 
+    minimum_height = 1000,
+	maximum_width = 268,
+# window specifications
+    own_window  = true,
+    own_window_transparent = true,
+    own_window_type = 'override',
+    own_window_hints = 'undecorated,below,sticky,skip_taskbar,skip_pager',
+
+# window decoration
+	border_inner_margin = 0,
+    border_outer_margin = 0,
+    stippled_borders = 0,
+
+    cpu_avg_samples = 2,
+    net_avg_samples = 2,
+
+# display settings 
+# Daemonize Conky, aka 'fork to background'.
+    background = false,
+# transparency value 
+    border_width = 1,
+    draw_shades = false,
+    draw_outline = false,
+    default_color = 'white',
+    default_shade_color = 'white',
+    default_outline_color = 'white',
+    draw_borders = false,
+
+# graphs settings
+
+    draw_graph_borders = false,
+    default_graph_width = 26, 
+    default_graph_height = 80,
+    show_graph_scale = false,
+    show_graph_range = false,
+
+# text settings
+    use_xft = true,
+    font = 'Droid Sans:size=10',
+	text_buffer_size = 256,
+    xftalpha = 1,
+	override_utf8_locale = true,
+    uppercase = false,
+    use_spacer = 'none'
+
+}
+
+conky.text = [[
+#
+#
+${color2}open new terminal - ${color}mod+Enter
+${color2}open browser - ${color}mod+F2
+${color2}toggle split direction - ${color}mod+q
+${color2}dmenu - ${color}mod+d
+${color2}bmenu - ${color}mod+Ctrl+b
+${color2}morc_menu - ${color}mod+z
+${color2}navigate workspaces - ${color}mod+Ctrl+arrowkeys
+${color2}exit - ${color}mod+0
+${color2}help - ${color}mod+Shift+h
+#
+# separator (hr bar)
+$color2$hr
+#
+###############################################################
+## Disk Temperatures
+#
+${color0}${font Inconsolata :bold:size=12}Disk Temperatures:\
+${color0}
+#
+#
+## /dev/sda
+#
+${goto 10}${font Inconsolata :size=10}/dev/sda:\
+${alignr}\
+${offset -63}\
+${if_match ${execpi 5 hddtemp /dev/sda | cut -31-33} <= 59}${color green}${execpi 5 hddtemp /dev/sda | cut -c31-33}\
+${else}\
+${if_match ${execi 5 hddtemp /dev/sda | cut -c31-33}  <= 79}${color yellow}${execi 5 hddtemp /dev/sda}\
+${else}\
+${if_match ${execi 5 hddtemp /dev/sda| cut -c31-33} <= 89}${color orange}${execi 5 hddtemp /dev/sda}\
+${else}\
+${color red}${nvidia temp} ${color grey60}°C
+${endif}\
+${endif}\
+${endif}\
+#
+#
+## /dev/sdb
+#
+${goto 10}${font Inconsolata :size=10}/dev/sdb:\
+${alignr}\
+${offset -63}\
+${if_match ${execpi 5 hddtemp /dev/sdb} <= 59}${color green}${execpi 5 hddtemp /dev/sdb | cut -c31-33}\
+${else}\
+${if_match ${execi 5 hddtemp /dev/sdb} <= 79}${color yellow}${execi 5 hddtemp /dev/sdb}\
+${else}\
+${if_match ${execi 5 hddtemp /dev/sdb} <= 89}${color orange}${execi 5 hddtemp /dev/sdb}\
+${else}\
+${color red}${nvidia temp} ${color grey60}°C
+${endif}
+${endif}
+${endif}
+#
+#
+## /dev/sdc
+#
+${goto 10}${font Inconsolata :size=10}/dev/sdc:\
+${alignr}\
+${offset -63}\
+${if_match ${execpi 5 hddtemp /dev/sdc} <= 59}${color green}${execpi 5 hddtemp /dev/sdc | cut -c31-33}\
+${else}\
+${if_match ${execi 5 hddtemp /dev/sdc} <= 79}${color yellow}${execi 5 hddtemp /dev/sdc}\
+${else}\
+${if_match ${execi 5 hddtemp /dev/sdc} <= 89}${color orange}${execi 5 hddtemp /dev/sdc}\
+${else}\
+${color red}${nvidia temp} ${color grey60}°C
+${endif}
+${endif}
+${endif}
+#
+#
+#
+# separator (hr bar)
+$color2$hr
+#
+###############################################################
+#
+## System Temperatura Summary
+#
+${color0}${font Inconsolata :bold:size=12}System Temperatures:\
+${color0}\
+${goto 10}
+#
+#
+# separator (hr bar)
+$color2$hr
+#
+###############################################################
+#
+## GPU Details
+#
+${goto 10}${font Inconsolata :size=10}GTS-450:\
+${alignr}\
+${offset -48}\
+${if_match ${nvidia temp} <= 59}${color green}${nvidia temp}\
+${else}\
+${if_match ${nvidia temp} <= 79}${color yellow}${nvidia temp}\
+${else}\
+${if_match ${nvidia temp} <= 89}${color orange}${nvidia temp}\
+${else}\
+${color red}${nvidia temp}\
+${endif}\
+${endif}\
+${endif}\
+${color grey60}°C
+#
+#
+#
+# separator (hr bar)
+$color2$hr
+#
+###############################################################
+## CPU Temperature
+#
+${color0}${goto 10}${font Inconsolata :size=10}i5-2500:\
+${alignr}\
+${offset -48}\
+${if_match ${hwmon 0 temp 1} <= 49}${color green}${hwmon 0 temp 1}\
+${else}\
+${if_match ${hwmon 0 temp 1} <= 59}${color yellow}${hwmon 0 temp 1}\
+${else}\
+${if_match ${hwmon 0 temp 1} <= 74}${color orange}${hwmon 0 temp 1}\
+${else}${color red}${hwmon 0 temp 1}\
+${endif}\
+${endif}\
+${endif}\
+${color grey60}°C
+#
+## Chipset North Bridge
+#
+${color0}${goto 10}${font Inconsolata :size=10}System: ${alignr}${offset -48}\
+${if_match ${hwmon 1 temp 1} <= 49}${color green}${hwmon 1 temp 1}\
+${else}\
+${if_match ${hwmon 1 temp 1} <= 59}${color yellow}${hwmon 1 temp 1}\
+${else}\
+${if_match ${hwmon 1 temp 1} <= 79}${color orange}${hwmon 1 temp 1}\
+${else}\
+${color red}${hwmon 1 temp 1}\
+${endif}\
+${endif}\
+${endif}\
+${color grey60}°C
+#
+## Chipset North Bridge
+#
+${color0}${goto 10}${font Inconsolata :size=10}N. Bridge:${alignr}${offset -48}\
+${if_match ${hwmon 1 temp 2} <= 59}${color green}${hwmon 1 temp 2}\
+${else}\
+${if_match ${hwmon 1 temp 2} <= 59}${color yellow}${hwmon 1 temp 2}\
+${else}\
+${if_match ${hwmon 1 temp 2} <= 79}${color orange}${hwmon 1 temp 2}\
+${else}${color red}${hwmon 1 temp 2}\
+${endif}\
+${endif}\
+${endif}\
+${color grey60}°C
+#
+## Chipset South Bridge
+#
+${color0}${goto 10}${font Inconsolata :size=10}S. Bridge:\
+${alignr}\
+${offset -48}\
+${if_match ${hwmon 1 temp 3} <= 49}${color green}${hwmon 1 temp 3}\
+${else}\
+${if_match ${hwmon 1 temp 3} <= 59}${color yellow}${hwmon 1 temp 3}\
+${else}\
+${if_match ${hwmon 1 temp 3} <= 69}${color orange}${hwmon 1 temp 3}\
+${else}\
+${color red}${hwmon 1 temp 3}\
+${endif}\
+${endif}\
+${endif}\
+${color grey60}°C
+#
+#
+## Fan Speeds
+#
+${color0}${font Inconsolata :bold:size=12}Fan Speeds: 
+${color0}${goto 10}${font Inconsolata :size=10}CPU Fan:\
+${alignr}\
+${offset -20}\
+${if_match ${hwmon 1 fan 1} >= 1}\
+    ${color green}${hwmon 1 fan 1}\
+${else}\
+    ${color red}\
+${hwmon 1 fan 1}\
+${endif}\
+${color grey60} [rpm]
+${color0}${goto 10}${font Inconsolata :size=10}GPU Fan:\
+${alignr}\
+${offset -20}${color green}\
+${texeci 10 nvidia-smi -a | grep -i fan | awk '{print $4}' | xargs -n 1 expr 32 \*}\
+${color grey60} [rpm]
+${color0}${goto 10}${font Inconsolata :size=10}SYS Fan 1:\
+${alignr}\
+${offset -20}\
+${if_match ${hwmon 1 fan 2} >= 1}\
+    ${color green}${hwmon 1 fan 2}\
+${else}\
+    ${color red}${hwmon 1 fan 2}\
+${endif}\
+${color grey60} [rpm]
+## System doenst have second Fan. Un-comment if you do have one.
+# ${color0}${goto 10}${font Inconsolata :size=10}SYS Fan 2:${alignr}${offset -20}${if_match ${hwmon 1 fan 3} >= 1}${color green}${hwmon 1 fan 3}${else}${color red}${hwmon 1 fan 3}${endif}${color grey60} [rpm]
+#
+#
+## Voltages
+#
+${color0}${font Inconsolata :bold:size=12}Voltages:
+${color0}${goto 10}\
+${font Inconsolata :size=10}Vcore:\
+${alignr}\
+${offset -54}\
+${if_match ${hwmon 1 vol 1} <= 49}${color green}${hwmon 1 vol 1}\
+${else}\
+${if_match ${hwmon 1 vol 1} <= 59}${color yellow}${hwmon 1 vol 1}\
+${if_match ${hwmon 1 vol 1} <= 69}${color orange}${hwmon 1 vol 1}\
+${else}\
+${color red}${hwmon 1 vol 1}\
+${endif}\
+${endif}\
+${endif}\
+${color grey60}V
+${color0}${goto 10}${font Inconsolata :size=10}+3.3V:\
+${alignr}\
+${offset -54}\
+${if_match ${hwmon 1 vol 0 2.0 0.0} >= 3.2}\
+${if_match ${hwmon 1 vol 0 2.0 0.0} <= 3.4}${color green}${hwmon 1 vol 0 2.0 0.0}\
+${else}\
+${color red}${hwmon 1 vol 0 2.0 0.0}\
+${endif}\
+${endif}\
+${color grey60}V
+${color0}${goto 10}${font Inconsolata :size=10}+5V:${alignr}${offset -54}${if_match ${hwmon 1 vol 4} >= 5.5}\
+${if_match ${hwmon 1 vol 4} <= 4.5}${color green}${hwmon 1 vol 4}\
+${else}${color red}${hwmon 1 vol 4}\
+${endif}\
+${color grey60}V
+${color0}${goto 10}${font Inconsolata :size=10}+12V:${alignr}${offset -54}\
+${if_match ${hwmon 1 vol 5} >= 11}\
+${if_match ${hwmon 1 vol 5} >= 13}\
+${color green}${hwmon 1 vol 5}\
+${else}${color red}${hwmon 1 vol 5}\
+${endif}\
+${color grey60}V
+#
+#
+# separator (hr bar)
+$color2$hr
+#
+###############################################################
+## GPU Details Panel
+#
+${color0}${font Inconsolata :bold:size=12}GPU Details:\
+${color0}\
+${goto 10}
+#
+#
+${goto 10}${font Inconsolata :size=10}Frequency:\
+${alignr}\
+${offset -48}\
+${color green}${nvidia gpufreq}
+#
+${color grey60} GHz
+${goto 10}${font Inconsolata :size=10}Memory Frequency:\
+${alignr}\
+${offset -48}\
+${color green}${nvidia memfreq}
+#
+${color grey60} MHz
+${goto 10}${font Inconsolata :size=10}Treeshold:\
+${alignr}\
+${offset -48}\
+${color green}${nvidia threshold}
+#
+${color grey60}°C
+${goto 10}${font Inconsolata :size=10}Surrounding Air Temperature:\
+${alignr}\
+${offset -48}\
+${color green}${nvidia ambienttemp}
+#
+${color grey60}°C
+${goto 10}${font Inconsolata :size=10}Image Quality Options:\
+${alignr}\
+${offset -48}\
+${color green}${nvidia imagequality}
+#
+${color grey60}°C
+${goto 10}${font Inconsolata :size=10}GPU Utilization:\
+${alignr}\
+${offset -48}\
+${color green}${nvidia gpuutil
+}
+#
+${color grey60}%
+${goto 10}${font Inconsolata :size=10}GPU RAM:\
+${alignr}\
+${offset -48}\
+${color green}${nvidia membwutil}
+#
+${color grey60}°C
+${goto 10}${font Inconsolata :size=10}GPU Video Utilization:\
+${alignr}\
+${offset -48}\
+${color green}${nvidia videoutil}\
+${color grey60}°C
+${goto 10}${font Inconsolata :size=10}Memory Used:\
+${alignr}\
+${offset -48}\
+${color green}${nvidia memused}mb (${nvidia memperc}%)\
+${color grey60}°C
+#
+${goto 10}${font Inconsolata :size=10}PCIe Utilization:\
+${alignr}\
+${offset -48}\
+${color green}${nvidia pcieutil}\
+${color grey60}°C
+${goto 10}${font Inconsolata :size=10}Total memory:\
+${alignr}\
+${offset -48}\
+${color green}${nvidia memtotal}\
+${color grey60}°C
+${goto 10}${font Inconsolata :size=10}Available Memory:\
+${alignr}\
+${offset -48}\
+${color green}${nvidia memfree}\
+${color grey60}°C
+${goto 10}${font Inconsolata :size=10}Fan Speed:\
+${alignr}\
+${offset -48}\
+${color green}${nvidia fanspeed}\
+${color grey60}°C
+
+]]
+
+

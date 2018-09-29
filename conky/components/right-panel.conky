@@ -1,0 +1,280 @@
+-- vim: ts=4 sw=4 noet ai cindent syntax=lua
+
+--[[
+http://github.com/gugutz
+
+This is my conky-setup
+
+]]
+
+conky.config = {
+
+--# Manjaro settings for its default right panel
+	alignment = 'top_right',
+	background = true,
+	color2 = '5D7B86',
+	cpu_avg_samples = 2,
+	default_color = 'F9FAF9',
+	double_buffer = true,
+	font = 'Bitstream Vera Sans:size=8',
+	draw_shades = false,
+	gap_x = 25,
+	gap_y = 13,
+	minimum_width = 200,
+	no_buffers = true,
+	own_window = true,
+	own_window_type = 'override',
+	own_window_transparent = true,
+	update_interval = 1.0,
+	use_xft = true,
+
+
+    --# Conky settings #
+	background = true,
+	update_interval = 1.0,
+    no_buffers = true,
+    double_buffer = true,
+	imlib_cache_size = 10,
+    extra_newline = false,
+    out_to_console = false,
+    out_to_stderr = false,
+
+--# window geometry
+    alignment = 'top_right',
+	gap_x = 10,
+	gap_y = 32,
+    minimum_width = 268, 
+    minimum_height = 1000,
+	maximum_width = 268,
+        
+--# window specifications
+    own_window  = true,
+    own_window_transparent = true,
+    own_window_type = 'override',
+    own_window_hints = 'undecorated,below,sticky,skip_taskbar,skip_pager',
+
+--# window decoration
+	border_inner_margin = 0,
+    border_outer_margin = 0,
+    stippled_borders = 0,
+    
+    cpu_avg_samples = 2,
+    net_avg_samples = 2,
+
+--# display settings
+    background = false,
+    border_width = 1,
+    draw_shades = false,
+    draw_outline = false,
+    default_color = 'white',
+    default_shade_color = 'white',
+    default_outline_color = 'white',
+    draw_borders = false,
+
+--# graphs settings #
+
+    draw_graph_borders = false,
+    default_graph_width = 26, 
+    default_graph_height = 80,
+    show_graph_scale = false,
+    show_graph_range = false,
+
+--# Text settings #
+    use_xft = true,
+    font = 'Droid Sans:size=10',
+	text_buffer_size = 256,
+    xftalpha = 1,
+	override_utf8_locale = true,
+    uppercase = false,
+    use_spacer = 'none'
+
+}
+
+conky.text = [[
+###############################################################
+#
+# Date and Time
+${voffset 2}$color2${font Bitstream Vera Sans:size=16}${time %A}$font\
+${voffset -8}$alignr$color${font Bitstream Vera Sans:size=38}${time %e}$font
+$color${voffset -30}$color${font Bitstream Vera Sans:size=18}${time %b}$font\
+${voffset -3} $color${font Bitstream Vera Sans:size=20}${time %Y}$font$color2$hr
+#
+###############################################################
+#
+# CPU
+${voffset 15}${goto 20}${color}CPU${font Bitstream Vera Sans:bold:size=8}$alignr$cpu%
+#
+# CPU usage graph
+${voffset -33}${goto 70}${cpugraph 26,150 FFFFFF FFFFFF -l}
+#
+# Top CPU processes
+${voffset 5}${goto 20}$font$color2${top name 1}$alignr$color${top cpu 1}%
+${goto 20}$color2${top name 2}$alignr$color${top cpu 2}%
+${goto 20}$color2${top name 3}$alignr$color${top cpu 3}%
+${goto 20}$color2${top name 4}$alignr$color${top cpu 4}%
+#${goto 20}$color2${top name 5}$alignr$color${top cpu 5}%
+#${goto 20}$color2${top name 6}$alignr$color${top cpu 6}%
+#
+# Individual CPU core graphs
+#
+# Core 1 and 2 graphs
+${voffset 10}${goto 10}${font Ubuntu:size=10}${color3}Core 1${goto 150}Core 2
+# frequencies
+${voffset -16}${goto 90}${font Ubuntu:size=8}${color3}${freq_g (1)}GHz${goto 220}${freq_g (2)}GHz
+# graph
+${voffset -20}${goto 32}${cpugraph cpu1 30,100}${goto 155}${cpugraph cpu2 30,100}
+#
+# Core 3 and 4 graphs
+${voffset 10}${goto 10}${font Ubuntu:size=10}${color3}Core 3${goto 150}Core 4
+# frequencies
+${voffset -16}${goto 90}${font Ubuntu:size=8}${color3}${freq_g (3)}GHz${goto 220}${freq_g (4)}GHz
+# graph
+${voffset -20}${goto 32}${cpugraph cpu3 30,100}${goto 155}${cpugraph cpu4 30,100}
+#
+# separator (hr bar)
+$color2$hr
+#
+###############################################################
+#
+# RAM usage
+${voffset 10}${goto 20}${color}RAM${font Bitstream Vera Sans:bold:size=8}$alignr$mem/$memmax$font
+# RAM usage graph
+${voffset -53}${offset -10}${memgraph 40,170}
+# Swap usage
+${voffset 10}${goto 20}${color}Swap${font Bitstream Vera Sans:bold:size=8}$alignr${swap}/ ${swapfree}
+#
+${goto 20}${voffset 5}$color2${top_mem name 1}$alignr$color${top_mem mem_res 1}
+${goto 20}$color2${top_mem name 2}$alignr$color${top_mem mem_res 2}
+${goto 20}$color2${top_mem name 3}$alignr$color${top_mem mem_res 3}
+${goto 20}$color2${top_mem name 4}$alignr$color${top_mem mem_res 4}
+#${goto 20}$color2${top_mem name 5}$alignr$color${top_mem mem_res 5}
+#${goto 20}$color2${top_mem name 6}$alignr$color${top_mem mem_res 6}
+#
+# separator (hr bar)
+$color2$hr
+#
+###############################################################
+#
+${voffset 12}${color}Disk Usage:
+#
+# disk i/o graph
+${voffset -20}${goto 40}${diskiograph 16,130 FFFFFF FFFFFF -l}
+#
+# root /
+${voffset 5}${color2} / \
+${alignr}${offset -95}$color${fs_used /} / ${fs_size /}\
+${alignr}${offset -70}${fs_bar 7 /}
+#
+# /srv
+${color2} /srv \
+${alignr}${offset -95}$color${fs_used /srv} / ${fs_size /srv}\
+${alignr}${offset -70}${fs_bar 7 /srv}
+#
+# usr/local
+${color2} /usr/local \
+${alignr}${offset -95}$color${fs_used /usr/local} / ${fs_size /usr/local}\
+${alignr}${offset -70}${fs_bar 7 /usr/local}
+#
+# /opt
+${color2} /opt \
+${alignr}${offset -95}$color${fs_used /opt} / ${fs_size /opt}\
+${alignr}${offset -70}${fs_bar 7 /opt}
+#
+# /home
+${color2} /home/tau \
+${alignr}${offset -95}$color${fs_used /home/tau} / ${fs_size /home}\
+${alignr}${offset -70}${fs_bar 7 /home/tau}
+#
+# ${font Hack:size=9}${color0}${execpi 300 DJS=`date +%_d`; ncal -b -h|sed '1,8!d'| sed '/./!d' | sed 's/^/${goto 120} /'| sed 's/$/ /' | sed 's/^/ /' | sed /" $DJS "/s/" $DJS "/" "'${font Hack=Bold:size=10}${voffset -1}${color red} '"$DJS"'${color}${font Hack:size=9}'" "/}${voffset -1}
+#
+# separator (hr bar)
+$color2$hr
+#
+###############################################################
+#
+# System Information
+#
+# distro name
+${voffset 15}$font$alignr${execi 10000 awk -F= '/TION/ {print $2}' /etc/lsb-release |sed 's/"//g'} \
+${execi 10000 awk -F= '/EASE=/ {printf $2" "} /NAME/ {print $2}' /etc/lsb-release}
+#
+# Processes
+${voffset 5}${goto 106}${color}Processes: $processes Running: $running_processes
+#
+# whoami
+${voffset 5}${color2}${alignr}${execi 1200 whoami}@${nodename}
+#
+# uptime
+${alignr}${color2}${font Bitstream Vera Sans:size=10}uptime: ${color}${uptime_short}
+#
+# kernel name
+${voffset 3}${color2}${font Bitstream Vera Sans:size=10}${alignr}kernel: ${color}${kernel}
+#
+# machine name
+${voffset 3}${alignr}${color2}${font Bitstream Vera Sans:size=10}machine: ${color}${machine}
+# diskio
+${voffset 3}${alignr}${color2}${font Bitstream Vera Sans:size=10}disk i/o: ${color}${diskio}
+#
+# 
+# separator (hr bar)
+$color2$hr
+#
+###############################################################
+#
+# Network Panel
+#
+${color0}${font Inconsolata :bold:size=12}Network:
+#
+${voffset -18}${alignr}${color LightGreen}${font Inconsolata :bold:size=10}Up: ${upspeed enp3s0} ${color grey} - ${color yellow}Down:${downspeed enp3s0}
+#
+# WLAN
+#
+${if_existing /proc/net/route wlan0}
+#
+# Download
+${color green}${goto 10}${font Inconsolata :size=10}Download \
+${goto 70}${downspeedf wlan0} KiB/s
+${voffset 0}${offset -10}${downspeedgraph wlan0 20,140}
+#
+## Upload
+${voffset -50}${color yellow}${goto 150}${font Inconsolata :size=10}Upload \
+${upspeedf enp3s0} KiB/s 
+${voffset 0}${offset 120}${upspeedgraph wlan0 20,140}
+#
+# graph for wlan
+${goto 40}${upspeedgraph wlan0 26,80 FFFFFF FFFFFF}${goto 150}${downspeedgraph wlan0 26,80 FFFFFF FFFFFF}
+${goto 40}${color5}Up: ${color2}${upspeed wlan0}${color5}${goto 150}Down: ${color2}${downspeed wlan0}
+${goto 40}${color5}Sent: ${color2}${totalup wlan0}${color5}${goto 150}Received: ${color2}${totaldown wlan0}
+${endif}
+#
+# LAN
+#
+${if_existing /proc/net/route enp3s0}
+#
+# Download
+${color green}${goto 10}${font Inconsolata :size=10}Download \
+${goto 70}${downspeedf enp3s0} KiB/s
+${voffset 0}${offset -10}${downspeedgraph enp3s0 20,140}
+#
+## Upload
+${voffset -50}${color yellow}${goto 150}${font Inconsolata :size=10}Upload \
+${upspeedf enp3s0} KiB/s 
+${voffset 0}${offset 120}${upspeedgraph enp3s0 20,140}
+#
+# Local IP
+${color2}Local IP\
+${color0}${alignr}${addrs}
+#
+# External IP
+${color2}Public IP\
+${color0}\
+${alignr}${execi 3600 wget -q -O /dev/stdout http://checkip.dyndns.org/ | cut -d : -f 2- | cut -d \< -f -1}
+${goto 40}${upspeedgraph enp3s0 26,80 FFFFFF FFFFFF}${goto 150}${downspeedgraph eth0 26,80 FFFFFF FFFFFF}
+${goto 40}${color5}Up: ${color2}${upspeed enp3s0}${color5}${goto 150}Down: ${color2}${downspeed enp3s0}
+${goto 40}${color5}Sent: ${color2}${totalup enp3s0}${color5}${goto 150}Received: ${color2}${totaldown enp3s0}
+${endif}
+${hr 2}
+#
+]]
+
+

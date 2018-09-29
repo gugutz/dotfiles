@@ -45,3 +45,7 @@ flycheck_*.el
 
 # directory configuration
 .dir-locals.el
+
+# bash and zsh command history
+.zsh_history
+.bash_history
