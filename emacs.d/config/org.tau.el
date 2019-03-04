@@ -6,6 +6,10 @@
 
 ;; (setq evil-want-C-i-jump nil)
 
+(setq org-log-done 'time)
+
+(setq org-log-done 'note)
+
 (defun toggle-org-html-export-on-save ()
   "Make Emacs auto-export to HTML when org file is saved.
 Enable calling this function from the file with <M-x>."
@@ -44,6 +48,8 @@ Generates outputs in these formats:
 (setq org-pandoc-options-for-latex-pdf '((pdf-engine . "luatex")))
 ;; special extensions for markdown_github output
 (setq org-pandoc-format-extensions '(markdown_github+pipe_tables+raw_html))
+
+(setq org-enable-bootstrap-support t)
 
 (with-eval-after-load 'ox
   (require 'ox-reveal))

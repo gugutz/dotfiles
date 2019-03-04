@@ -36,6 +36,12 @@
 ;; Add all the faces to the theme
 (base16-theme-define 'base16-default-dark base16-default-dark-colors)
 
+;;;###autoload
+(when load-file-name
+  (add-to-list 'custom-theme-load-path
+               (file-name-as-directory (file-name-directory load-file-name))))
+
+
 ;; Mark the theme as provided
 (provide-theme 'base16-default-dark)
 

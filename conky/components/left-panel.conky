@@ -8,62 +8,41 @@ This is my conky-setup
 ]]
 
 conky.config = {
-# Manjaro left panel settings
-	alignment = 'bottom_left',
-	background = true,
-	color2 = '5D7B86',
-	cpu_avg_samples = 2,
-	default_color = 'F9FAF9',
-	double_buffer = true,
-	font = 'Bitstream Vera Sans:size=8',
-	draw_shades = false,
-	gap_x = 25,
-	gap_y = 45,
-	minimum_width = 200,
-	no_buffers = true,
-	own_window = true,
-	own_window_type = 'override',
-	own_window_transparent = true,
-	update_interval = 2.0,
-	use_xft = true,
 
-
-# Conky settings
-	background = false,
-	update_interval = 1.0,
-	double_buffer = true,
-	no_buffers = true,
-	imlib_cache_size = 10,
+    --# Conky settings
+    --# Daemonize Conky, aka 'fork to background'.
+    background = true,
+    update_interval = 1.0,
+    double_buffer = true,
+    no_buffers = true,
+    imlib_cache_size = 10,
     extra_newline = false,
     out_to_console = false,
     out_to_stderr = false,
-
-
-# window window geometry
+    cpu_avg_samples = 2,
+    net_avg_samples = 2,
+    
+    --# window geometry
     alignment = 'top_left',
-	gap_x = 10,
-	gap_y = 32,
+    gap_x = 15,
+    gap_y = 35,
     minimum_width = 268, 
     minimum_height = 1000,
-	maximum_width = 268,
-# window specifications
+    maximum_width = 268,
+    
+    --# window specifications
     own_window  = true,
     own_window_transparent = true,
     own_window_type = 'override',
     own_window_hints = 'undecorated,below,sticky,skip_taskbar,skip_pager',
 
-# window decoration
-	border_inner_margin = 0,
+    --# window decoration
+    border_inner_margin = 0,
     border_outer_margin = 0,
     stippled_borders = 0,
 
-    cpu_avg_samples = 2,
-    net_avg_samples = 2,
-
-# display settings 
-# Daemonize Conky, aka 'fork to background'.
-    background = false,
-# transparency value 
+    --# display settings 
+    --# transparency value 
     border_width = 1,
     draw_shades = false,
     draw_outline = false,
@@ -72,20 +51,24 @@ conky.config = {
     default_outline_color = 'white',
     draw_borders = false,
 
-# graphs settings
-
+    --# graphs settings
     draw_graph_borders = false,
     default_graph_width = 26, 
     default_graph_height = 80,
     show_graph_scale = false,
     show_graph_range = false,
 
-# text settings
+    --# Color variables
+    default_color = 'F9FAF9',
+    color2 = '5D7B86',
+    
+    --# text settings
     use_xft = true,
-    font = 'Droid Sans:size=10',
-	text_buffer_size = 256,
+    --#font = 'Droid Sans:size=10',
+    font = 'Bitstream Vera Sans:size=8',
+    text_buffer_size = 256,
     xftalpha = 1,
-	override_utf8_locale = true,
+    override_utf8_locale = true,
     uppercase = false,
     use_spacer = 'none'
 

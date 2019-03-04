@@ -30,7 +30,7 @@ tangled, and the tangled file is compiled."
  '(fci-rule-color "#3E4451")
  '(package-selected-packages
    (quote
-    (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
+    (projectile-rails projectile robe pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -114,19 +114,34 @@ FEATURE may be any one of:
     `(with-eval-after-load ,feature ,@body))))
 
 (add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
+;; (add-to-list 'load-path "~/dotfiles/emacs.d/config")
 
-;(after 'evil
-;  (require 'evil.tau))
+(require 'evil.tau)
+(require 'org.tau)
 
-  (require 'evil.tau)
+(defun /shell/new-window ()
+    "Opens up a new shell in the directory associated with the current buffer's file." 
+    (interactive)
+    (let* ((parent (if (buffer-file-name)
+		       (file-name-directory (buffer-file-name))
+		     default-directory))
+	   (height (/ (window-total-height) 3))
+	   (name   (car (last (split-string parent "/" t)))))
+      (split-window-vertically (- height))
+      (other-window 1)
+      (shell "new")
+      (rename-buffer (concat "*shell: " name "*"))
 
-;(after 'org
-;  (require 'org.tau))
+      (insert (concat "ls"))
+      ))
 
-  (require 'org.tau)
+; Pull system shell in a new bottom window
+;; (define-key evil-normal-state-map (kbd "\"") #'/shell/new-window)
+;; (define-key evil-visual-state-map (kbd "\"") #'/shell/new-window)
+;; (define-key evil-motion-state-map (kbd "\"") #'/shell/new-window)
 
 (defun /eshell/new-window ()
-    "Opens up a new shell in the directory associated with the current buffer's file.  The eshell is renamed to match that directory to make multiple eshell windows easier."
+    "Opens up a new eshell in the directory associated with the current buffer's file.  The eshell is renamed to match that directory to make multiple eshell windows easier."
     (interactive)
     (let* ((parent (if (buffer-file-name)
                        (file-name-directory (buffer-file-name))
@@ -198,6 +213,8 @@ FEATURE may be any one of:
   (setq dired-k-human-readable t)
   (add-hook 'dired-initial-position-hook #'dired-k))
 
+(setq dired-dwin-target t)
+
 (global-set-key (kbd "C-x g") 'magit-status)
 
 (require 'which-key)
@@ -236,10 +253,10 @@ FEATURE may be any one of:
 (define-key evil-motion-state-map "\M-w" 'evil-window-map)
 
 ;; (/bindings/define-keys evil-normal-state-map
-;;   ("C-w h" #'evil-window-left)
-;;   ("C-w j" #'evil-window-down)
-;;   ("C-w k" #'evil-window-up)
-;;   ("C-w l" #'evil-window-right))
+  ;; ("C-w h" #'evil-window-left)
+  ;; ("C-w j" #'evil-window-down)
+  ;; ("C-w k" #'evil-window-up)
+  ;; ("C-w l" #'evil-window-right))
 
 ;; (/bindings/define-keys evil-normal-state-map
 ;;   ("C-w h" #'evil-window-left)
@@ -293,7 +310,7 @@ FEATURE may be any one of:
 ; gruvbox-dark-hard
 ; gruvbox-dark-light
 ; gruvbox-dark-medium
-; base16-default-dark <-- this one is good
+; base16-default-dark-theme <-- this one is good
 
 (setq my-theme 'dracula)
 
@@ -344,33 +361,22 @@ FEATURE may be any one of:
       (add-to-list 'sml/replacer-regexp-list
                    '("^~/Projects/" ":CODE:"))))
 
-(require 'prettier-js)
-
-(add-hook 'js2-mode-hook 'prettier-js-mode)
-(add-hook 'web-mode-hook 'prettier-js-mode)
-(add-hook 'rjsx-mode-hook 'prettier-js-mode)
-
-(defun enable-minor-mode (my-pair)
-  "Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
-  (if (buffer-file-name)
-      (if (string-match (car my-pair) buffer-file-name)
-      (funcall (cdr my-pair)))))
-
-(add-hook 'web-mode-hook #'(lambda ()
-                            (enable-minor-mode
-                             '("\\.js?\\'" . prettier-js-mode)
-                             '("\\.jsx?\\'" . prettier-js-mode)
-                             '("\\.css?\\'" . prettier-js-mode))))
-
 (add-hook 'js2-mode-hook #'js2-refactor-mode)
 
 (js2r-add-keybindings-with-prefix "C-c C-m")
 
 (require 'web-mode)
 
-(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+(setq web-mode-markup-indent-offset 2)
+
+(setq web-mode-css-indent-offset 2)
+
+(setq web-mode-code-indent-offset 2)
+
+(require 'smartparens-config)
+(add-hook 'prog-mode-hook #'smartparens-mode)
+
+(add-hook 'smartparens-enabled-hook #'evil-smartparens-mode)
 
 (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
@@ -380,10 +386,24 @@ FEATURE may be any one of:
 (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
 
-(add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
-(add-to-list 'auto-mode-alist '("pages\\/.*\\.js\\'" . rjsx-mode))
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.php?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.css?\\'" . web-mode))
 
 (add-hook 'after-init-hook #'global-flycheck-mode)
+
+(with-eval-after-load 'flycheck
+  (global-flycheck-inline-mode))
+;; (with-eval-after-load 'flycheck
+;;   (add-hook 'flycheck-mode-hook #'turn-on-flycheck-inline))
+
+(add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
+(add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.
+
+(setq emmet-expand-jsx-className? t) ;; default nil
+
+;; (define-key ac-completing-map [return] nil)
+;; (define-key ac-completing-map "\r" nil)
 
 (require 'auto-complete)
 (global-auto-complete-mode t)
@@ -405,9 +425,9 @@ FEATURE may be any one of:
 
 (add-hook 'after-init-hook 'global-company-mode)
 
-; (after "company-autoloads"
-;    (define-key evil-insert-state-map (kbd "TAB")
-;      #'company-indent-or-complete-common))
+(after "company-autoloads"
+   (define-key evil-insert-state-map (kbd "TAB")
+     #'company-indent-or-complete-common))
 
 ;; (add-to-list 'load-path
 ;;               "~/.emacs.d/plugins/yasnippet")
@@ -418,23 +438,56 @@ FEATURE may be any one of:
       '("~/.emacs.d/snippets"                 ;; personal snippets
         ))
 
-(add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
-(add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.
+(require 'prettier-js)
 
-(setq emmet-expand-jsx-className? t) ;; default nil
+(add-hook 'js2-mode-hook 'prettier-js-mode)
+(add-hook 'web-mode-hook 'prettier-js-mode)
+(add-hook 'rjsx-mode-hook 'prettier-js-mode)
 
-;(require 'ruby.tau)
-;(add-to-list 'auto-mode-alist '("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode))
+(defun enable-minor-mode (my-pair)
+  "Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
+  (if (buffer-file-name)
+      (if (string-match (car my-pair) buffer-file-name)
+      (funcall (cdr my-pair)))))
 
-(autoload 'php-mode "php-mode" "Major mode for editing PHP code." t)
-(add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
-(add-to-list 'auto-mode-alist '("\\.inc$" . php-mode))
+(add-hook 'web-mode-hook #'(lambda ()
+                            (enable-minor-mode
+                             '("\\.js?\\'" . prettier-js-mode)
+                             '("\\.jsx?\\'" . prettier-js-mode)
+                             '("\\.css?\\'" . prettier-js-mode))))
+
+;; (require 'ruby.tau)
+(add-to-list 'auto-mode-alist '("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode))
+
+(require 'yaml-mode)
+(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+
+(add-hook 'yaml-mode-hook
+  '(lambda ()
+    (define-key yaml-mode-map "\C-m" 'newline-and-indent)))
+
+(unless (package-installed-p 'elixir-mode)
+(package-install 'elixir-mode))
+
+(require 'elixir-mode)
+
+(add-to-list 'auto-mode-alist '("\\.ex\\'" . elixir-mode))
+(add-to-list 'auto-mode-alist '("\\.exs\\'" . elixir-mode))
+;; Use web-mode for elixir template files (eex)
+(add-to-list 'auto-mode-alist '("\\.eex\\'" . web-mode))
+
+(add-hook 'elixir-mode-hook
+          (lambda () (add-hook 'before-save-hook 'elixir-format nil t)))
+
+;; (autoload 'php-mode "php-mode" "Major mode for editing PHP code." t)
+;; (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
+;; (add-to-list 'auto-mode-alist '("\\.inc$" . php-mode))
 
 ; (autoload 'go-mode "go-mode" "Major mode for editing Go code." t)
 ; (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
 
-; (autoload 'mardown-mode "markdown-mode")
-; (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+(autoload 'mardown-mode "markdown-mode")
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 
 ; ; (require 'haskell-interactive-mode)
 ; (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
@@ -547,7 +600,7 @@ FEATURE may be any one of:
   (if (buffer-file-name)
       (evil-save)))
 
-(add-hook 'evil-insert-state-exit-hook 'my-save)
+;; (add-hook 'evil-insert-state-exit-hook 'my-save)
 
 ;; Local Variables:
 ;; coding: utf-8

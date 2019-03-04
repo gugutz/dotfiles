@@ -1,20 +1,15 @@
-;;; Basic ruby setup
 (require 'ruby-mode)
 
+(add-to-list 'auto-mode-alist
+             '("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode))
 
-;;; Code:
-
-;; (add-auto-mode 'ruby-mode
-;;                "Rakefile\\'" "\\.rake\\'" "\\.rxml\\'"
-;;                "\\.rjs\\'" "\\.irbrc\\'" "\\.pryrc\\'" "\\.builder\\'" "\\.ru\\'"
-;;                "\\.gemspec\\'" "Gemfile\\'" "Kirkfile\\'")
-;; (add-auto-mode 'conf-mode "Gemfile\\.lock\\'")
+(setq enh-ruby-program "~/.rbenv/shims/ruby") ; so that still works if ruby points to ruby1.8
 
 (setq-default
   ruby-use-encoding-map nil
   ruby-insert-encoding-magic-comment nil)
 
-(after-load 'ruby-mode
+(after 'enh-ruby-mode
             ;; Stupidly the non-bundled ruby-mode isn't a derived mode of
             ;; prog-mode: we run the latter's hooks anyway in that case.
             (add-hook 'ruby-mode-hook
@@ -22,65 +17,50 @@
                         (unless (derived-mode-p 'prog-mode)
                           (run-hooks 'prog-mode-hook)))))
 
-(add-hook 'ruby-mode-hook 'subword-mode)
+(add-hook 'enh-ruby-mode-hook 'subword-mode)
 
-(after-load 'page-break-lines
+(remove-hook 'enh-ruby-mode-hook 'erm-define-faces)
+
+(after 'page-break-lines
             (push 'ruby-mode page-break-lines-modes))
 
-(require-package 'rspec-mode)
+(require 'rspec-mode)
 
-;; (define-derived-mode brewfile-mode ruby-mode "Brewfile"
-;;                      "A major mode for Brewfiles, used by homebrew-bundle on MacOS.")
+(require 'inf-ruby)
 
-;; (add-auto-mode 'brewfile-mode "Brewfile\\'")
+(require 'ruby-compilation)
 
-;;; Inferior ruby
-(require-package 'inf-ruby)
-
-
-;;; Ruby compilation
-(require-package 'ruby-compilation)
-
-(after-load 'ruby-mode
+(after 'enh-ruby-mode
             (let ((m ruby-mode-map))
               (define-key m [S-f7] 'ruby-compilation-this-buffer)
               (define-key m [f7] 'ruby-compilation-this-test)))
 
-(after-load 'ruby-compilation
+(after 'ruby-compilation
             (defalias 'rake 'ruby-compilation-rake))
 
+(add-hook 'ruby-mode-hook 'robe-mode)
+(add-hook 'enh-ruby-mode-hook 'robe-mode)
 
-;;; Robe
-;; (when (maybe-require-package 'robe)
-;;   (after-load 'ruby-mode
-;;               (add-hook 'ruby-mode-hook 'robe-mode))
-;;   (after-load 'company
-;;               (dolist (hook (mapcar 'derived-mode-hook-name '(ruby-mode inf-ruby-mode html-erb-mode haml-mode)))
-;;                 (add-hook hook
-;;                           (lambda () (sanityinc/local-push-company-backend 'company-robe))))))
+(eval-after 'company
+  '(push 'company-robe company-backends))
 
+(add-hook 'robe-mode-hook 'ac-robe-setup)
 
-
-;;; ri support
-;; (require-package 'yari)
+;; (require 'yari)
 ;; (defalias 'ri 'yari)
 
+(require 'goto-gem)
 
+(require 'bundler)
 
-(require-package 'goto-gem)
-
-
-(require-package 'bundler)
-
-
-(when (maybe-require-package 'yard-mode)
+(when (maybe-require 'yard-mode)
   (add-hook 'ruby-mode-hook 'yard-mode)
-  (after-load 'yard-mode
+  (add-hook 'enh-ruby-mode-hook 'yard-mode)
+  (after 'yard-mode
               (diminish 'yard-mode)))
 
-
 ;;; ERB
-(require-package 'mmm-mode)
+(require 'mmm-mode)
 (defun sanityinc/ensure-mmm-erb-loaded ()
   (require 'mmm-erb))
 
@@ -110,15 +90,14 @@
 (dolist (mode (list 'js-mode 'js2-mode 'js3-mode))
   (mmm-add-mode-ext-class mode "\\.js\\.erb\\'" 'erb))
 
-
 ;;----------------------------------------------------------------------------
 ;; Ruby - my convention for heredocs containing SQL
 ;;----------------------------------------------------------------------------
 
 ;; Needs to run after rinari to avoid clobbering font-lock-keywords?
 
-;; (require-package 'mmm-mode)
-;; (eval-after-load 'mmm-mode
+;; (require 'mmm-mode)
+;; (eval-after 'mmm-mode
 ;;   '(progn
 ;;      (mmm-add-classes
 ;;       '((ruby-heredoc-sql
@@ -132,7 +111,7 @@
 
 ;(add-to-list 'mmm-set-file-name-for-modes 'ruby-mode)
 
-
-
 (provide 'ruby.tau)
 ;;; ruby.tau ends here
+
+(require 'rubocop)

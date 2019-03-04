@@ -1,7 +1,7 @@
 (require 'evil)
 (evil-mode 1)
 
-; (setq evil-esc-delay 0)
+(setq evil-esc-delay 0)
 
 (setq evil-search-module 'isearch-regexp)
 (setq evil-magic 'very-magic)
@@ -109,7 +109,7 @@
   "w" 'save-buffer
   "k" 'kill-buffer
   "b" 'switch-to-buffer
-  "-" 'split-windowellow
+  "-" 'split-window-bellow
   "|" 'split-window-right)
 
 (require 'evil-surround)
@@ -143,42 +143,6 @@
   (push '(?= . ("=" . "=")) evil-surround-pairs-alist))
 (add-hook 'org-mode-hook 'evil-surround-org-mode-hook-setup)
 
-(require 'neotree)
-
-(setq neo-window-width 30)
-
-(global-set-key [f8] 'neotree-toggle)
-
-(add-hook 'after-init-hook #'neotree-toggle)
-
-(unless (display-graphic-p)
-  (setq neo-theme 'icons))
-(setq neo-theme (if (display-graphic-p) 'icons 'arrow))
-
-(setq neo-smart-open t)
-
-(add-hook 'neotree-mode-hook
-          (lambda ()
-            ; default Neotree bindings
-            (define-key evil-normal-state-local-map (kbd "TAB") 'neotree-enter)
-            (define-key evil-normal-state-local-map (kbd "SPC") 'neotree-quick-look)
-            (define-key evil-normal-state-local-map (kbd "q") 'neotree-hide)
-            (define-key evil-normal-state-local-map (kbd "RET") 'neotree-enter)
-            (define-key evil-normal-state-local-map (kbd "g") 'neotree-refresh)
-            (define-key evil-normal-state-local-map (kbd "n") 'neotree-next-line)
-            (define-key evil-normal-state-local-map (kbd "p") 'neotree-previous-line)
-            (define-key evil-normal-state-local-map (kbd "A") 'neotree-stretch-toggle)
-            (define-key evil-normal-state-local-map (kbd "H") 'neotree-hidden-file-toggle)
-            (define-key evil-normal-state-local-map (kbd "|") 'neotree-enter-vertical-split)
-            (define-key evil-normal-state-local-map (kbd "-") 'neotree-enter-horizontal-split)
-            ; simulating NERDTree bindings in Neotree
-            (define-key evil-normal-state-local-map (kbd "R") 'neotree-refresh)
-            (define-key evil-normal-state-local-map (kbd "u") 'neotree-refresh)
-            (define-key evil-normal-state-local-map (kbd "C") 'neotree-change-root)
-            (define-key evil-normal-state-local-map (kbd "c") 'neotree-create-node)))
-
-(evil-commentary-mode)
-
 (require 'evil-commentary)
 (evil-commentary-mode)
 
@@ -207,6 +171,42 @@
  (define-key my-leader-map "b" 'list-buffers)
  (define-key my-leader-map "w" 'evil-save)
  (define-key my-leader-map "SPC" ":noh")
+
+(require 'neotree)
+
+;; (after 'neotree
+;; (setq neo-theme (if (display-graphic-p) 'icons))
+
+  (setq neo-theme 'icons)
+
+(setq neo-window-width 32)
+
+(global-set-key [f8] 'neotree-toggle)
+
+(add-hook 'after-init-hook #'neotree-toggle)
+
+(setq neo-smart-open t)
+
+(add-hook 'neotree-mode-hook
+          (lambda ()
+            ; default Neotree bindings
+            (define-key evil-normal-state-local-map (kbd "TAB") 'neotree-enter)
+            (define-key evil-normal-state-local-map (kbd "SPC") 'neotree-quick-look)
+            (define-key evil-normal-state-local-map (kbd "q") 'neotree-hide)
+            (define-key evil-normal-state-local-map (kbd "RET") 'neotree-enter)
+            (define-key evil-normal-state-local-map (kbd "g") 'neotree-refresh)
+            (define-key evil-normal-state-local-map (kbd "n") 'neotree-next-line)
+            (define-key evil-normal-state-local-map (kbd "p") 'neotree-previous-line)
+            (define-key evil-normal-state-local-map (kbd "A") 'neotree-stretch-toggle)
+            (define-key evil-normal-state-local-map (kbd "H") 'neotree-hidden-file-toggle)
+            (define-key evil-normal-state-local-map (kbd "|") 'neotree-enter-vertical-split)
+            (define-key evil-normal-state-local-map (kbd "-") 'neotree-enter-horizontal-split)
+            ; simulating NERDTree bindings in Neotree
+            (define-key evil-normal-state-local-map (kbd "R") 'neotree-refresh)
+            (define-key evil-normal-state-local-map (kbd "r") 'neotree-refresh)
+            (define-key evil-normal-state-local-map (kbd "u") 'neotree-refresh)
+            (define-key evil-normal-state-local-map (kbd "C") 'neotree-change-root)
+            (define-key evil-normal-state-local-map (kbd "c") 'neotree-create-node)))
 
 (after 'magit
   (require 'evil-magit)

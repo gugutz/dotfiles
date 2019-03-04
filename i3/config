@@ -20,7 +20,7 @@ set $secondary_monitor   DVI-I-1
 exec_always --no-startup-id xrandr --output $primary_monitor --primary
 
 ################################################
-# GENERAL I3 SETTINGS # 
+# GENERAL I3 SETTINGS #
 ################################################
 
 # set default desktop layout (default is tiling)
@@ -68,7 +68,7 @@ exec --no-startup-id compton --xrender-sync-fence
 ################################################
 
 exec --no-startup-id volumeicon
-bindsym $mod+Ctrl+m exec terminal -e 'alsamixer'
+bindsym $mod+Ctrl+m exec $terminal -e 'alsamixer'
 # exec --no-startup-id pulseaudio
 # exec --no-startup-id pa-applet
 # bindsym $mod+Ctrl+Shift+m exec pavucontrol
@@ -107,7 +107,7 @@ bindsym $mod+Ctrl+x --release exec --no-startup-id xkill
 #power and wm options
 set $shutdown sudo shutdown -h now
 set $reboot sudo reboot now
-set $netrefresh --no-startup-id sudo systemctl restart NetworkManager
+set $netrefresh sudo systemctl restart NetworkManager
 set $hibernate sudo systemctl suspend
 
 # define default file managers (terminal and gui)
@@ -127,7 +127,7 @@ set $terminal       st -e tmux new-session
 set $editorterm         st -e tmux new-session emacsclient -c -t
 set $editorgui         st -e tmux new-session emacsclient -c -n
 set $codemacs       st -e codemacs
- 
+
 
 ## define modifier key to Super (aka Winkey)
 set $mod Mod4
@@ -152,7 +152,7 @@ gaps outer -2
 # Smart gaps (gaps used if only more than one container on the workspace)
 smart_gaps on
 
-# Smart borders (draw borders around container only if it is not the only container on this workspace) 
+# Smart borders (draw borders around container only if it is not the only container on this workspace)
 # on|no_gaps (on=always activate and no_gaps=only activate if the gap size to the edge of the screen is 0)
 smart_borders on
 
@@ -248,6 +248,25 @@ exec --no-startup-id xautolock -time 10 -locker blurlock
 # Autostart applications
 ################################################
 
+# emacsclient
+exec_always --no-startup-id $editorgui 
+
+# Discord
+exec discord
+assign [class="discord"] → $ws8
+
+# Slack
+assign [class="Slack"]  → $ws8
+
+
+# firefox
+exec firefox
+assign [class="Firefox"]  → $ws3
+
+# Telegram Desktop
+exec telegram-desktop
+assign [class="TelegramDesktop"] → $ws9
+
 # Conky
 exec_always --no-startup-id ~/dotfiles/conky/scripts/conky-start.sh
 
@@ -292,11 +311,11 @@ exec_always --no-startup-id fix_xcursor
 #exec_always --no-startup-id feh --recursive --randomize --bg-fill $wallpapers_path
 
 # set background to solid color
-# xsetroot doesnt work with compton enabled, so using hsetroot (from aur) instead   
+# xsetroot doesnt work with compton enabled, so using hsetroot (from aur) instead
 exec_always --no-startup-id hsetroot -solid "#00000a"  #darkgrey
 
 
- 
+
 ################################################
 # SCREENSHOTS SETUP
 ################################################
@@ -330,7 +349,7 @@ bar {
         status_command i3blocks -c ~/dotfiles/i3/i3blocks.conf
 	# status_command i3status
 	position bottom
-        separator_symbol "|" 
+        separator_symbol "|"
 
 ## please set your primary output first. Example: 'xrandr --output eDP1 --primary'
 	tray_output $primary_monitor
@@ -346,14 +365,14 @@ bar {
         background #222D31
         statusline #F9FAF9
         separator  #454947
-        
+
         #                    border  backgr. text
         focused_workspace  #F9FAF9 #16a085 #292F34
         active_workspace   #595B5B #353836 #FDF6E3
         inactive_workspace #595B5B #222D31 #EEE8D5
         binding_mode       #16a085 #2C2C2C #F9FAF9
         urgent_workspace   #16a085 #FDF6E3 #E5201D
-        
+
 
         # My previouw theme
         # separator #268bd2
@@ -375,10 +394,10 @@ bindsym $mod+m bar mode toggle
   client.focused_inactive #2F3D44 #2F3D44 #1ABC9C #454948
   client.unfocused        #2F3D44 #2F3D44 #1ABC9C #454948
   client.urgent           #CB4B16 #FDF6E3 #1ABC9C #268BD2
-  client.placeholder      #000000 #0c0c0c #ffffff #000000 
+  client.placeholder      #000000 #0c0c0c #ffffff #000000
 
   client.background       #2B2C2B
-  
+
 
 ################################################
 # SCRATCHPAD SETTINGS
@@ -436,7 +455,7 @@ bindsym $mod+$alt+i    exec --no-startup-id $editorterm ~/.i3/config
 bindsym $mod+$alt+v    exec --no-startup-id $editorterm ~/.vimrc
 
 # open emacs config file
-bindsym $mod+$alt+e    exec --no-startup-id $editorterm ~/.emacs
+bindsym $mod+$alt+e    exec --no-startup-id $editorterm ~/dotfiles/emacs.d/emacs.org
 
 # open tmux config file
 bindsym $mod+$alt+t    exec --no-startup-id $editorterm ~/.tmux.conf
@@ -457,6 +476,9 @@ bindsym $mod+$alt+r    exec --no-startup-id $editorterm ~/.config/ranger/rc.conf
 ################################################
 # BINDINGS FOR EDITING MY SCRIPT FILES
 ################################################
+
+# open my dev-environment setup shell script
+bindsym $mod+$alt+Control+t    exec --no-startup-id $editorterm ~/scripts/system/manjaro-terminal-tools.sh
 
 # open my dev-environment setup shell script
 bindsym $mod+$alt+Control+d    exec --no-startup-id $editorterm ~/scripts/system/manjaro-dev-env-setup.sh
@@ -482,6 +504,11 @@ bindsym $mod+Ctrl+b exec terminal -e 'bmenu'
 # launch categorized menu
 bindsym $mod+Shift+z exec --no-startup-id morc_menu
 
+# firefox
+bindsym Control+Shift+f		exec $terminal -e firefox
+
+# htop
+bindsym $mod+p            exec $terminal -e htop
 
 # start emacs ide
 bindsym $mod+F9                   exec --no-startup-id $codemacs
@@ -515,34 +542,11 @@ bindsym $mod+Control+Shift+Return       exec --no-startup-id $editorgui
 # start vim
 bindsym $mod+Control+Return         exec --no-startup-id st -e tmux new-session vim
 
-# VSCode
-# assign [class="Code"] → $ws5
-
 # start Music on Console app
 bindsym $mod+F5 exec terminal -e 'mocp'
 
 
-# start IntelliJ Idea
-bindsym Control+Shift+i   	  exec $terminal -e idea
-assign [class="jetbains-idea-ce"] → $ws5
 
-
-
-# Telegram Desktop
-assign [class="TelegramDesktop"] → $ws9
-
-# Discord
-assign [class="discord"] → $ws8
-
-# Slack
-assign [class="Slack"]  → $ws8
-
-# htop
-bindsym $mod+p            exec $terminal -e htop
-
-# firefox
-bindsym Control+Shift+f		exec $terminal -e firefox
-# assign [class="Firefox"] → $ws7
 
 # libreoffice
 # this conflicted with emacs/tmux/vim navigation (C-HJKL)
@@ -644,16 +648,16 @@ for_window [urgent=latest] focus
 ################################################
 
 # setting variables to hold the workspaces names
-set $ws1 "1: IDE"
-set $ws2 "2: Server"
-set $ws3 "3: Ranger"
+set $ws1 "1: emacs"
+set $ws2 "2: terminal"
+set $ws3 "3: firefox"
 set $ws4 "4: ranger"
-set $ws5 "5: IDEs"
+set $ws5 "5: extra"
 set $ws6 "6: wine"
-set $ws7 "7: internet"
-set $ws8 "8: messaging"
-set $ws9 "9: terminal"
-set $ws10 "10: ssh"
+set $ws7 "7: browser"
+set $ws8 "8: social"
+set $ws9 "9: temp"
+set $ws10 "10: terminal"
 
 # workspaces settings
 workspace $ws1 gaps outer 1
@@ -707,7 +711,7 @@ workspace $ws3 output $primary_monitor
 workspace $ws4 output $primary_monitor
 workspace $ws5 output $primary_monitor
 workspace $ws6 output $primary_monitor
-workspace $ws7 output $primary_monitor
+workspace $ws7 output $secondary_monitor
 workspace $ws8 output $secondary_monitor
 workspace $ws9 output $secondary_monitor
 workspace $ws10 output $secondary_monitor

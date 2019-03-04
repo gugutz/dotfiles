@@ -1,10 +1,10 @@
 # -*- mode: org -*-
-#+OPTIONS: toc:0 num:nil
+//#+OPTIONS: toc:0 num:nil
 # #######################################################################
 #+TITLE:     emacs configuration file
 #+SUBTITLE:  ORGfied configuration for Emacs
-#+AUTHOR:    gugutz
-# #+EMAIL:     gustavo.pb1984@aluno.ifsc.edu.br
+#+AUTHOR:    Gustavo P Borges
+#+EMAIL:     gustavo.pb1984@aluno.ifsc.edu.br
 #+DESCRIPTION: This file is compiled to init.el automatically on every save
 # #######################################################################
 
@@ -30,7 +30,6 @@ tangled, and the tangled file is compiled."
 #+BEGIN_SRC emacs-lisp :tangle init.el
   (add-hook 'after-save-hook #'/util/tangle-init)
 #+END_SRC
-
 
 * Package Repositories
 
@@ -63,7 +62,7 @@ emacs asks 2 annoying confirmations on every startup before actually starting
  '(fci-rule-color "#3E4451")
  '(package-selected-packages
    (quote
-    (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
+   (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -71,7 +70,6 @@ emacs asks 2 annoying confirmations on every startup before actually starting
  ;; If there is more than one, they won't work right.
  )
 #+END_SRC
-
 
 * Bindings
 
@@ -104,7 +102,6 @@ These macros are to help me remap keys.
   `(/bindings/define-prefix-keys ,keymap nil
      (,sequence ,binding ,description)))
 #+END_SRC
-
 
 * Environment setup
 
@@ -200,28 +197,22 @@ FEATURE may be any one of:
     `(with-eval-after-load ,feature ,@body))))
 #+END_SRC
 
-
 * Packages
    
-** Add the folder 'config' to emacs load-path
-so i can require stuff from there
+** Add the folder 'config' to emacs load-path so i can require stuff from there
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
   (add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
+  ;; (add-to-list 'load-path "~/dotfiles/emacs.d/config")
+
 #+END_SRC
 
 
 
 ** Require needed packages
 #+BEGIN_SRC emacs-lisp :tangle init.el
-  ;(after 'evil
-  ;  (require 'evil.tau))
 
     (require 'evil.tau)
-    
-  ;(after 'org
-  ;  (require 'org.tau))
-
     (require 'org.tau)
 
 #+END_SRC
@@ -229,7 +220,7 @@ so i can require stuff from there
 
 * Evil
 
-: All Evil settings are meant to be isolates in a separate file evil.tau.
+: All Evil settings are meant to be isolated in a separate file evil.tau.
 
 ** Require Evil related packages
 
@@ -242,7 +233,7 @@ so i can require stuff from there
 
 ** Don't wait for any other keys after escape is pressed.
 #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-; (setq evil-esc-delay 0)
+  (setq evil-esc-delay 0)
 #+END_SRC
 
 
@@ -404,7 +395,7 @@ so i can require stuff from there
     "w" 'save-buffer
     "k" 'kill-buffer
     "b" 'switch-to-buffer
-    "-" 'split-windowellow
+    "-" 'split-window-bellow
     "|" 'split-window-right)
 #+END_SRC
 
@@ -453,76 +444,9 @@ so i can require stuff from there
 
 
 
-** Neotree
-
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-(require 'neotree)
-#+END_SRC
-
-
-*** set NeoTree default window width
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-(setq neo-window-width 30)
-#+END_SRC
-
-*** toggle neotree with F8
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-(global-set-key [f8] 'neotree-toggle)
-#+END_SRC
-
-
-*** make nerdtree open on emacs startup
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-(add-hook 'after-init-hook #'neotree-toggle)
-#+END_SRC
-
-
-*** neotree 'icons' theme, which supports filetype icons
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-(unless (display-graphic-p)
-  (setq neo-theme 'icons))
-(setq neo-theme (if (display-graphic-p) 'icons 'arrow))
-#+END_SRC
-
-
-*** make neotree window open and go the file currently opened
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-(setq neo-smart-open t)
-#+END_SRC
-
-
-*** solve keybinding conflicts between neotree with evil mode
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-  (add-hook 'neotree-mode-hook
-            (lambda ()
-              ; default Neotree bindings
-              (define-key evil-normal-state-local-map (kbd "TAB") 'neotree-enter)
-              (define-key evil-normal-state-local-map (kbd "SPC") 'neotree-quick-look)
-              (define-key evil-normal-state-local-map (kbd "q") 'neotree-hide)
-              (define-key evil-normal-state-local-map (kbd "RET") 'neotree-enter)
-              (define-key evil-normal-state-local-map (kbd "g") 'neotree-refresh)
-              (define-key evil-normal-state-local-map (kbd "n") 'neotree-next-line)
-              (define-key evil-normal-state-local-map (kbd "p") 'neotree-previous-line)
-              (define-key evil-normal-state-local-map (kbd "A") 'neotree-stretch-toggle)
-              (define-key evil-normal-state-local-map (kbd "H") 'neotree-hidden-file-toggle)
-              (define-key evil-normal-state-local-map (kbd "|") 'neotree-enter-vertical-split)
-              (define-key evil-normal-state-local-map (kbd "-") 'neotree-enter-horizontal-split)
-              ; simulating NERDTree bindings in Neotree
-              (define-key evil-normal-state-local-map (kbd "R") 'neotree-refresh)
-              (define-key evil-normal-state-local-map (kbd "u") 'neotree-refresh)
-              (define-key evil-normal-state-local-map (kbd "C") 'neotree-change-root)
-              (define-key evil-normal-state-local-map (kbd "c") 'neotree-create-node)))
-#+END_SRC
-
-
 
 ** Vim plugins definitions
 
-***  To enable evil-commentary permanently, add
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-
-(evil-commentary-mode)
-#+END_SRC
 
 *** Vim Commentary
 #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
@@ -535,7 +459,6 @@ so i can require stuff from there
 (require 'evil-matchit)
 (global-evil-matchit-mode 1)
 #+END_SRC
-
 
 
 
@@ -563,6 +486,23 @@ so i can require stuff from there
  
 
 
+
+** Show CLOSED tag line in closed TODO items
+   
+#+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
+(setq org-log-done 'time)
+#+END_SRC
+
+** Prompt to leave a note when closing an item
+#+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
+(setq org-log-done 'note)
+#+END_SRC
+
+#+BEGIN_NOTE 
+Also achievable on a per file basis with: #+STARTUP: logdone
+#+STARTUP: logdone
+#+STARTUP: lognotedone.
+#+END_NOTE
 
 ** Function to activate export-on-save in org mode
 
@@ -675,6 +615,12 @@ is customized, please consider the following settings in your init file"
 #+END_SRC
 
 
+** ox-twbs (exporter to twitter bootstrap html)
+#+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
+   (setq org-enable-bootstrap-support t)
+#+END_SRC
+   
+
 ** ReveaJS org-reveal:
 : This delay makes the options to export to RevealJS appear on the exporter menu (C-c C-e)
 
@@ -689,33 +635,130 @@ is customized, please consider the following settings in your init file"
 
 
 
-* Eshell
+** UTF8 pretty bullets in org mode
+(require 'org-bullets)
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
-** Make eshell open in a split-window buffer at the bottom of the screen
-   
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(defun /eshell/new-window ()
-    "Opens up a new shell in the directory associated with the current buffer's file.  The eshell is renamed to match that directory to make multiple eshell windows easier."
-    (interactive)
-    (let* ((parent (if (buffer-file-name)
-                       (file-name-directory (buffer-file-name))
-                     default-directory))
-           (height (/ (window-total-height) 3))
-           (name   (car (last (split-string parent "/" t)))))
-      (split-window-vertically (- height))
-      (other-window 1)
-      (eshell "new")
-      (rename-buffer (concat "*eshell: " name "*"))
 
-      (insert (concat "ls"))
-      (eshell-send-input)))
+* Neotree
 
-; Pull eshell in a new bottom window
-(define-key evil-normal-state-map (kbd "!") #'/eshell/new-window)
-(define-key evil-visual-state-map (kbd "!") #'/eshell/new-window)
-(define-key evil-motion-state-map (kbd "!") #'/eshell/new-window)
+#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+(require 'neotree)
 #+END_SRC
 
+** neotree 'icons' theme, which supports filetype icons
+#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+    ;; (after 'neotree
+  ;; (setq neo-theme (if (display-graphic-p) 'icons))
+
+    (setq neo-theme 'icons)
+#+END_SRC
+
+
+** set NeoTree default window width
+#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+(setq neo-window-width 32)
+#+END_SRC
+
+** toggle neotree with F8
+#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+(global-set-key [f8] 'neotree-toggle)
+#+END_SRC
+
+
+** make nerdtree open on emacs startup
+#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+(add-hook 'after-init-hook #'neotree-toggle)
+#+END_SRC
+
+
+
+
+** make neotree window open and go the file currently opened
+#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+(setq neo-smart-open t)
+#+END_SRC
+
+
+** solve keybinding conflicts between neotree with evil mode
+#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+  (add-hook 'neotree-mode-hook
+            (lambda ()
+              ; default Neotree bindings
+              (define-key evil-normal-state-local-map (kbd "TAB") 'neotree-enter)
+              (define-key evil-normal-state-local-map (kbd "SPC") 'neotree-quick-look)
+              (define-key evil-normal-state-local-map (kbd "q") 'neotree-hide)
+              (define-key evil-normal-state-local-map (kbd "RET") 'neotree-enter)
+              (define-key evil-normal-state-local-map (kbd "g") 'neotree-refresh)
+              (define-key evil-normal-state-local-map (kbd "n") 'neotree-next-line)
+              (define-key evil-normal-state-local-map (kbd "p") 'neotree-previous-line)
+              (define-key evil-normal-state-local-map (kbd "A") 'neotree-stretch-toggle)
+              (define-key evil-normal-state-local-map (kbd "H") 'neotree-hidden-file-toggle)
+              (define-key evil-normal-state-local-map (kbd "|") 'neotree-enter-vertical-split)
+              (define-key evil-normal-state-local-map (kbd "-") 'neotree-enter-horizontal-split)
+              ; simulating NERDTree bindings in Neotree
+              (define-key evil-normal-state-local-map (kbd "R") 'neotree-refresh)
+              (define-key evil-normal-state-local-map (kbd "r") 'neotree-refresh)
+              (define-key evil-normal-state-local-map (kbd "u") 'neotree-refresh)
+              (define-key evil-normal-state-local-map (kbd "C") 'neotree-change-root)
+              (define-key evil-normal-state-local-map (kbd "c") 'neotree-create-node)))
+#+END_SRC
+
+* Shell
+  
+** System Shell
+*** Make system shell open in a split-window buffer at the bottom of the screen
+   
+ #+BEGIN_SRC emacs-lisp :tangle init.el
+   (defun /shell/new-window ()
+       "Opens up a new shell in the directory associated with the current buffer's file." 
+       (interactive)
+       (let* ((parent (if (buffer-file-name)
+			  (file-name-directory (buffer-file-name))
+			default-directory))
+	      (height (/ (window-total-height) 3))
+	      (name   (car (last (split-string parent "/" t)))))
+	 (split-window-vertically (- height))
+	 (other-window 1)
+	 (shell "new")
+	 (rename-buffer (concat "*shell: " name "*"))
+
+	 (insert (concat "ls"))
+	 ))
+
+   ; Pull system shell in a new bottom window
+   ;; (define-key evil-normal-state-map (kbd "\"") #'/shell/new-window)
+   ;; (define-key evil-visual-state-map (kbd "\"") #'/shell/new-window)
+   ;; (define-key evil-motion-state-map (kbd "\"") #'/shell/new-window)
+ #+END_SRC
+
+  
+** Eshell
+
+*** Make eshell open in a split-window buffer at the bottom of the screen
+   
+ #+BEGIN_SRC emacs-lisp :tangle init.el
+ (defun /eshell/new-window ()
+     "Opens up a new eshell in the directory associated with the current buffer's file.  The eshell is renamed to match that directory to make multiple eshell windows easier."
+     (interactive)
+     (let* ((parent (if (buffer-file-name)
+                        (file-name-directory (buffer-file-name))
+                      default-directory))
+            (height (/ (window-total-height) 3))
+            (name   (car (last (split-string parent "/" t)))))
+       (split-window-vertically (- height))
+       (other-window 1)
+       (eshell "new")
+       (rename-buffer (concat "*eshell: " name "*"))
+
+       (insert (concat "ls"))
+       (eshell-send-input)))
+
+ ; Pull eshell in a new bottom window
+ (define-key evil-normal-state-map (kbd "!") #'/eshell/new-window)
+ (define-key evil-visual-state-map (kbd "!") #'/eshell/new-window)
+ (define-key evil-motion-state-map (kbd "!") #'/eshell/new-window)
+ #+END_SRC
 
 * Helm
 
@@ -780,7 +823,6 @@ Make helm replace the default Find-File and M-x
 )
 #+END_SRC
 
-
 * Dired
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -791,6 +833,9 @@ Make helm replace the default Find-File and M-x
     (add-hook 'dired-initial-position-hook #'dired-k))
 #+END_SRC
 
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(setq dired-dwin-target t)
+#+END_SRC
 
 * Magit
 
@@ -809,7 +854,6 @@ Make helm replace the default Find-File and M-x
   (global-set-key (kbd "C-x g") 'magit-status)
 #+END_SRC
    
-
 * which-key
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -820,7 +864,6 @@ Make helm replace the default Find-File and M-x
   (setq which-key-max-display-columns 6)
   (which-key-mode)
 #+END_SRC
-
 
 * General editor configuration
   
@@ -887,10 +930,10 @@ Then create the keybindings
     
 #+BEGIN_SRC emacs-lisp :tangle init.el
   ;; (/bindings/define-keys evil-normal-state-map
-  ;;   ("C-w h" #'evil-window-left)
-  ;;   ("C-w j" #'evil-window-down)
-  ;;   ("C-w k" #'evil-window-up)
-  ;;   ("C-w l" #'evil-window-right))
+    ;; ("C-w h" #'evil-window-left)
+    ;; ("C-w j" #'evil-window-down)
+    ;; ("C-w k" #'evil-window-up)
+    ;; ("C-w l" #'evil-window-right))
 #+END_SRC
 
 
@@ -911,7 +954,6 @@ Then create the keybindings
   ;; (global-set-key (kbd "C-)") #'text-scale-adjust)
 #+END_SRC
 
-
 * General text editing settings
 
 ** Turn on auto-revert mode (auto updates files changed on disk)
@@ -926,7 +968,7 @@ Then create the keybindings
 (defconst *spell-check-support-enabled* t) ;; Enable with t if you prefer
 #+END_SRC
 
-I recommend adding this to your .emacs, as it makes C-n insert newlines if the point is at the end of the buffer. Useful, as it means you won’t have to reach for the return key to add newlines!
+*** I recommend adding this to your .emacs, as it makes C-n insert newlines if the point is at the end of the buffer. Useful, as it means you won’t have to reach for the return key to add newlines!
 #+BEGIN_SRC emacs-lisp :tangle init.el
   (setq next-line-add-newlines t)
 #+END_SRC
@@ -968,16 +1010,14 @@ I recommend adding this to your .emacs, as it makes C-n insert newlines if the p
     "l" 'pdf-view-next-page-command)
 #+END_SRC
 
-
-
 * Development environment customizations
   
   
   
-** show mathing parenthesis
+** Show matching parenthesis
 #+BEGIN_SRC emacs-lisp :tangle init.el
-; parentheses
-(show-paren-mode t)
+  ; parentheses
+  (show-paren-mode t)
 #+END_SRC
 
 
@@ -987,7 +1027,6 @@ I recommend adding this to your .emacs, as it makes C-n insert newlines if the p
   (setq-default indent-tabs-mode nil)
   (setq-default c-basic-offset 2)
 #+END_SRC
-
 
 
 ** enable rainbow-mode on relevant filetypes
@@ -1002,8 +1041,6 @@ Colorize hex, rgb and named color codes
   (add-hook 'web-mode-hook 'rainbow-mode)
   (add-hook 'js2-mode-hook 'rainbow-mode)
 #+END_SRC
-
-
 
 * Appearance
 
@@ -1020,7 +1057,7 @@ Colorize hex, rgb and named color codes
   ; gruvbox-dark-hard
   ; gruvbox-dark-light
   ; gruvbox-dark-medium
-  ; base16-default-dark <-- this one is good
+  ; base16-default-dark-theme <-- this one is good
 
   (setq my-theme 'dracula)
   
@@ -1087,44 +1124,6 @@ Load the theme
                     '("^~/Projects/" ":CODE:"))))
 #+END_SRC
 
- 
-* PrettierJS
-
-   
-Require first so i can actually use it
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-  (require 'prettier-js)
-#+END_SRC
-  
-** add prettier to js2 and rjsx minor modes
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-  (add-hook 'js2-mode-hook 'prettier-js-mode)
-  (add-hook 'web-mode-hook 'prettier-js-mode)
-  (add-hook 'rjsx-mode-hook 'prettier-js-mode)
-#+END_SRC
-
-** Add prettier to Web-Mode
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(defun enable-minor-mode (my-pair)
-  "Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
-  (if (buffer-file-name)
-      (if (string-match (car my-pair) buffer-file-name)
-      (funcall (cdr my-pair)))))
-#+END_SRC
-
-And then hook to web-mode like this:
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(add-hook 'web-mode-hook #'(lambda ()
-                            (enable-minor-mode
-                             '("\\.js?\\'" . prettier-js-mode)
-                             '("\\.jsx?\\'" . prettier-js-mode)
-                             '("\\.css?\\'" . prettier-js-mode))))
-#+END_SRC
-
-
 * Minor modes
 
   
@@ -1143,43 +1142,65 @@ And then hook to web-mode like this:
 
 
 ** web-mode
-
+   
+*** Require Web-Mode
 #+BEGIN_SRC emacs-lisp :tangle init.el
   (require 'web-mode)
 #+END_SRC
 
+*** HTML element offset indentation
+ #+BEGIN_SRC emacs-lisp :tangle init.el
+ (setq web-mode-markup-indent-offset 2)
+ #+END_SRC
+
+*** CSS offset indentation
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(setq web-mode-css-indent-offset 2)
+#+END_SRC
+
+*** Script/code offset indentation (for JavaScript, Java, PHP, Ruby, Go, VBScript, Python, etc.)
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(setq web-mode-code-indent-offset 2)
+#+END_SRC
+
+
+** diff-hl (highlights uncommited diffs in bar aside from the line numbers)
+(global-diff-hl-mode)
+
+** smartparens
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(require 'smartparens-config)
+(add-hook 'prog-mode-hook #'smartparens-mode)
+#+END_SRC
+
+*** evil-smartparens helps avoid conflicts between evil and smartparens
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(add-hook 'smartparens-enabled-hook #'evil-smartparens-mode)
+#+END_SRC
+
+
 
 * File associations
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
-  (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.css?\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
-#+END_SRC
-
-
-** template engines filetypes
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
- (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
- (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
- (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
- (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
- (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
- (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
- (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-#+END_SRC
-
-** use rjsx mode for js files in React folder structure
    
-better support for JSX and React and GatsbyJs
-
+** Languages File Types (this type of association only works with Major Modes)
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
-(add-to-list 'auto-mode-alist '("pages\\/.*\\.js\\'" . rjsx-mode))
+  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
 #+END_SRC
 
+** Using web-mode for editing plain HTML files can be done this way
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.php?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.css?\\'" . web-mode))
+#+END_SRC
 
 * FlyCheck linter
 
@@ -1187,11 +1208,39 @@ better support for JSX and React and GatsbyJs
 (add-hook 'after-init-hook #'global-flycheck-mode)
 #+END_SRC
 
+** Turn flycheck inline extension after flycheck starts
+   
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (with-eval-after-load 'flycheck
+    (global-flycheck-inline-mode))
+  ;; (with-eval-after-load 'flycheck
+  ;;   (add-hook 'flycheck-mode-hook #'turn-on-flycheck-inline))
+#+END_SRC
+
+* Emmets
+    
+    
+** Add hook to any markup file to load emmet-mode
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
+  (add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation. 
+#+END_SRC
+
+** Use emmet with JSX markup
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (setq emmet-expand-jsx-className? t) ;; default nil
+#+END_SRC
 
 * Autocompletion and Snippets
   
-** enable autocompletion engine
+** Disable <RET> for autocomplete and leave on TAB
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  ;; (define-key ac-completing-map [return] nil)
+  ;; (define-key ac-completing-map "\r" nil)
+#+END_SRC
+  
 
+** enable autocompletion engine
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (require 'auto-complete)
 (global-auto-complete-mode t)
@@ -1199,7 +1248,6 @@ better support for JSX and React and GatsbyJs
 
 
 ** Company mode (Complete Anything)
-   
    
 *** Basic settings for company-mode
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -1217,7 +1265,6 @@ better support for JSX and React and GatsbyJs
   (setq company-auto-complete 'company-explicit-action-p)
 #+END_SRC
 
-
 *** Enable company-mode in all buffers
 #+BEGIN_SRC emacs-lisp :tangle init.el
   (add-hook 'after-init-hook 'global-company-mode)
@@ -1228,9 +1275,9 @@ better support for JSX and React and GatsbyJs
 #+BEGIN_SRC emacs-lisp :tangle init.el
   (add-hook 'after-init-hook 'global-company-mode)
 
-  ; (after "company-autoloads"
-  ;    (define-key evil-insert-state-map (kbd "TAB")
-  ;      #'company-indent-or-complete-common))
+  (after "company-autoloads"
+     (define-key evil-insert-state-map (kbd "TAB")
+       #'company-indent-or-complete-common))
 #+END_SRC
 
 
@@ -1250,55 +1297,270 @@ better support for JSX and React and GatsbyJs
 #+END_SRC
 
 
-* Languages specific settings
-
-** HTML
+* JavaScript
    
-*** Emmet
+** PrettierJS
+
+   
+*** Require first so i can actually use it
+
+ #+BEGIN_SRC emacs-lisp :tangle init.el
+   (require 'prettier-js)
+ #+END_SRC
+  
+*** add prettier to js2 and rjsx minor modes
+
+ #+BEGIN_SRC emacs-lisp :tangle init.el
+   (add-hook 'js2-mode-hook 'prettier-js-mode)
+   (add-hook 'web-mode-hook 'prettier-js-mode)
+   (add-hook 'rjsx-mode-hook 'prettier-js-mode)
+ #+END_SRC
+
+*** Add prettier to Web-Mode
+ #+BEGIN_SRC emacs-lisp :tangle init.el
+ (defun enable-minor-mode (my-pair)
+   "Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
+   (if (buffer-file-name)
+       (if (string-match (car my-pair) buffer-file-name)
+       (funcall (cdr my-pair)))))
+ #+END_SRC
+
+**** And then hook to web-mode like this:
+
+ #+BEGIN_SRC emacs-lisp :tangle init.el
+ (add-hook 'web-mode-hook #'(lambda ()
+                             (enable-minor-mode
+                              '("\\.js?\\'" . prettier-js-mode)
+                              '("\\.jsx?\\'" . prettier-js-mode)
+                              '("\\.css?\\'" . prettier-js-mode))))
+ #+END_SRC
+
+ #+BEGIN_SRC emacs-lisp :tangle init.el
+   ;; (require 'ruby.tau)
+   (add-to-list 'auto-mode-alist '("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode))
+ #+END_SRC
+
+ 
+* HTML
+   
+  
+* YAML Mode
+  
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (require 'yaml-mode)
+  (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+#+END_SRC
+
+
+** Unlike python-mode, this mode follows the Emacs convention of not binding the ENTER key to `newline-and-indent'.  To get this behavior, add the key definition to `yaml-mode-hook':
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+    (add-hook 'yaml-mode-hook
+      '(lambda ()
+        (define-key yaml-mode-map "\C-m" 'newline-and-indent))) 
+#+END_SRC
+
+* Elixir
+   
+** Install elixir-mode if not already installed
     
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (unless (package-installed-p 'elixir-mode)
+  (package-install 'elixir-mode))  
+#+END_SRC
+
+** Require elixir-mode
     
-Add hook to any markup file to load emmet-mode
 #+BEGIN_SRC emacs-lisp :tangle init.el
-  (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
-  (add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation. 
+(require 'elixir-mode)
 #+END_SRC
 
-Use emmet with JSX markup
-
+** Enable elixir-mode for appropriate file extensions
 #+BEGIN_SRC emacs-lisp :tangle init.el
-  (setq emmet-expand-jsx-className? t) ;; default nil
+(add-to-list 'auto-mode-alist '("\\.ex\\'" . elixir-mode))
+(add-to-list 'auto-mode-alist '("\\.exs\\'" . elixir-mode))
+;; Use web-mode for elixir template files (eex)
+(add-to-list 'auto-mode-alist '("\\.eex\\'" . web-mode))
 #+END_SRC
 
-** Ruby mode
+** Create a buffer-local hook to run elixir-format on save, only when we enable elixir-mode.
+   
 #+BEGIN_SRC emacs-lisp :tangle init.el
-;(require 'ruby.tau)
-;(add-to-list 'auto-mode-alist '("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode))
+ (add-hook 'elixir-mode-hook
+           (lambda () (add-hook 'before-save-hook 'elixir-format nil t)))
+#+END_SRC
+          
+ 
+* Ruby
+  
+
+This Ruby part of the config compiles to a separate file, inside the config folder, called `ruby.tau.el`
+
+#+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
+  (require 'ruby-mode)
 #+END_SRC
 
 
-** PHP mode
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(autoload 'php-mode "php-mode" "Major mode for editing PHP code." t)
-(add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
-(add-to-list 'auto-mode-alist '("\\.inc$" . php-mode))
+
+** auto load enh ruby mode for all common ruby files
+#+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
+(add-to-list 'auto-mode-alist
+             '("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode))
+#+END_SRC
+
+** this bellow is optional, i only use it because it complains about not finding ruby in /usr/local/bin
+"This is also easily solvable by creating a symbolic link to the ruby shim to /usr/local/bin/ruby
+#+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
+(setq enh-ruby-program "~/.rbenv/shims/ruby") ; so that still works if ruby points to ruby1.8
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
+(setq-default
+  ruby-use-encoding-map nil
+  ruby-insert-encoding-magic-comment nil)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
+(after 'enh-ruby-mode
+            ;; Stupidly the non-bundled ruby-mode isn't a derived mode of
+            ;; prog-mode: we run the latter's hooks anyway in that case.
+            (add-hook 'ruby-mode-hook
+                      (lambda ()
+                        (unless (derived-mode-p 'prog-mode)
+                          (run-hooks 'prog-mode-hook)))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
+(add-hook 'enh-ruby-mode-hook 'subword-mode)
 #+END_SRC
 
 
-** Go mode
+** Enhanced Ruby Mode defines its own specific faces with the hook erm-define-faces. If your theme is already defining those faces, to not overwrite them, just remove the hook with:
+#+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
+(remove-hook 'enh-ruby-mode-hook 'erm-define-faces)
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
+(after 'page-break-lines
+            (push 'ruby-mode page-break-lines-modes))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
+(require 'rspec-mode)
+#+END_SRC
+
+
+** Inferior ruby
+#+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
+(require 'inf-ruby)
+(add-hook 'enh-ruby-mode-hook 'inf-ruby-minor-mode)
+#+END_SRC
+
+
+** Ruby compilation
+#+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
+(require 'ruby-compilation)
+
+(after 'enh-ruby-mode
+            (let ((m ruby-mode-map))
+              (define-key m [S-f7] 'ruby-compilation-this-buffer)
+              (define-key m [f7] 'ruby-compilation-this-test)))
+
+(after 'ruby-compilation
+            (defalias 'rake 'ruby-compilation-rake))
+#+END_SRC
+
+
+** Robe mode
+Dependencies:   
+- opry
+- pry-doc >= 0.6.0 (on MRI)
+- method_source >= 0.8.2 (for compatibility with the latest Rubinius)
+
+/Note that if your project is using Bundler, the dependencies have to be added to the Gemfile./
+*** Enable robe-mode upon enh-ruby-mode
+#+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
+(add-hook 'enh-ruby-mode-hook 'robe-mode)   
+#+END_SRC
+
+*** Company completion for Robe
+#+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
+(eval-after-load 'company
+  '(push 'company-robe company-backends))
+#+END_SRC
+
+*** native autocomplete with robe
+#+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
+(add-hook 'robe-mode-hook 'ac-robe-setup)
+#+END_SRC
+
+
+** ri support
+#+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
+;; (require 'yari)
+;; (defalias 'ri 'yari)
+#+END_SRC
+
+
+
+#+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
+(require 'goto-gem)
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
+(require 'bundler)
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
+(when (maybe-require 'yard-mode)
+  (add-hook 'ruby-mode-hook 'yard-mode)
+  (add-hook 'enh-ruby-mode-hook 'yard-mode)
+  (after 'yard-mode
+              (diminish 'yard-mode)))
+#+END_SRC
+
+*** Rubocop
+ #+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
+ (require 'rubocop)
+ #+END_SRC
+
+
+
+#+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
+(provide 'ruby.tau)
+;;; ruby.tau ends here
+#+END_SRC
+
+
+
+
+* PHP
+  
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  ;; (autoload 'php-mode "php-mode" "Major mode for editing PHP code." t)
+  ;; (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
+  ;; (add-to-list 'auto-mode-alist '("\\.inc$" . php-mode))
+#+END_SRC
+
+
+* Go
 #+BEGIN_SRC emacs-lisp :tangle init.el
 ; (autoload 'go-mode "go-mode" "Major mode for editing Go code." t)
 ; (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
 #+END_SRC
 
 
-** markdown-mode
+* Markdown
 #+BEGIN_SRC emacs-lisp :tangle init.el
-; (autoload 'mardown-mode "markdown-mode")
-; (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+  (autoload 'mardown-mode "markdown-mode")
+  (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 #+END_SRC
 
 
-** haskell-mode
+* Haskell
 #+BEGIN_SRC emacs-lisp :tangle init.el
 ; ; (require 'haskell-interactive-mode)
 ; (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
@@ -1309,9 +1571,6 @@ Use emmet with JSX markup
 ; (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
 ; (add-hook 'haskell-mode-hook (lambda () (global-set-key (kbd "<f5>") 'haskell-process-cabal-build)))
 #+END_SRC
-
-
-
 
 * LaTeX
 
@@ -1529,8 +1788,9 @@ The Sections and Heading Levels gets configured as follows:
 	(evil-save)))
 #+END_SRC
 
+*** This hook to the above function was breaking the evil-esc-delay 0
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(add-hook 'evil-insert-state-exit-hook 'my-save)
+  ;; (add-hook 'evil-insert-state-exit-hook 'my-save)
 #+END_SRC
 
 
@@ -1547,21 +1807,32 @@ The Sections and Heading Levels gets configured as follows:
 
 #+END_SRC
 
-
-
-
-
 * Provide packages in separate files
 
+  
 ** Provide the evil.tau.el file
+   
 #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-(provide 'evil.tau)
-;;; evil.tau.el ends here...
+  (provide 'evil.tau)
+  ;;; evil.tau.el ends here...
 #+END_SRC
 
 ** Provide the org.tau.el file
 
 #+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
-(provide 'org.tau)
-;;; org.tau.el ends here...
+  (provide 'org.tau)
+  ;;; org.tau.el ends here...
 #+END_SRC
+
+
+
+
+
+
+
+
+
+
+
+
+

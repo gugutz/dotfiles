@@ -1,5 +1,6 @@
 # -*- mode: gitignore; -*-
 
+###########################
 # EMACS Stuff
 *~
 \#*\#
@@ -22,13 +23,10 @@ tramp
 /eshell/lastdir
 
 # elpa packages
-/elpa/
+/emacs.d/elpa/
 
-# reftex files
-*.rel
-
-# AUCTeX auto folder
-/auto/
+# config packages
+/emacs.d/config/
 
 # cask packages
 .cask/
@@ -46,6 +44,27 @@ flycheck_*.el
 # directory configuration
 .dir-locals.el
 
+###########################
+# VIM
+
+# vim-plug plugins
+/vim/plugged
+
+
+###########################
+# LaTeX
+
+# reftex files
+*.rel
+
+# AUCTeX auto folder
+/auto/
+
+###########################
+# Shells (bash, zsh, fish)
+
 # bash and zsh command history
+/zsh/zsh_history
 .zsh_history
+/bash/bash_history
 .bash_history
