@@ -1,2 +1,0 @@
-;;; -*- no-byte-compile: t -*-
-(define-package "ac-php" "20171201.934" "auto-completion source for php" '((ac-php-core "1") (auto-complete "1.4.0") (yasnippet "0.8.0")) :commit "fac22638f957abf404bbee4e16d9d7b67fcd42d2" :keywords '("completion" "convenience" "intellisense") :authors '((nil . "xcwenn@qq.com [https://github.com/xcwen]")) :maintainer '(nil . "xcwenn@qq.com [https://github.com/xcwen]") :url "https://github.com/xcwen/ac-php")

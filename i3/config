@@ -312,7 +312,7 @@ exec_always --no-startup-id fix_xcursor
 
 # set background to solid color
 # xsetroot doesnt work with compton enabled, so using hsetroot (from aur) instead
-exec_always --no-startup-id hsetroot -solid "#00000a"  #darkgrey
+exec_always --no-startup-id hsetroot -solid "#000"  #darkgrey
 
 
 
@@ -449,28 +449,28 @@ bindsym $mod+Tab \
 ################################################
 
 # open i3 config file
-bindsym $mod+$alt+i    exec --no-startup-id $editorterm ~/.i3/config
+bindsym $mod+$alt+i    exec --no-startup-id $editorgui ~/.i3/config
 
 # open vim config file
-bindsym $mod+$alt+v    exec --no-startup-id $editorterm ~/.vimrc
+bindsym $mod+$alt+v    exec --no-startup-id $editorgui ~/.vimrc
 
 # open emacs config file
-bindsym $mod+$alt+e    exec --no-startup-id $editorterm ~/dotfiles/emacs.d/emacs.org
+bindsym $mod+$alt+e    exec --no-startup-id $editorgui ~/dotfiles/emacs.d/emacs.org
 
 # open tmux config file
-bindsym $mod+$alt+t    exec --no-startup-id $editorterm ~/.tmux.conf
+bindsym $mod+$alt+t    exec --no-startup-id $editorgui ~/.tmux.conf
 
 # open bashrc config file
-bindsym $mod+$alt+b    exec --no-startup-id $editorterm ~/.bashrc
+bindsym $mod+$alt+b    exec --no-startup-id $editorgui ~/.bashrc
 
 # open profile file
-bindsym $mod+$alt+p    exec --no-startup-id $editorterm ~/.profile
+bindsym $mod+$alt+p    exec --no-startup-id $editorgui ~/.profile
 
 # open zsh config file
-bindsym $mod+$alt+z    exec --no-startup-id $editorterm ~/.zshrc
+bindsym $mod+$alt+z    exec --no-startup-id $editorgui ~/.zshrc
 
 # open ranger config file
-bindsym $mod+$alt+r    exec --no-startup-id $editorterm ~/.config/ranger/rc.conf
+bindsym $mod+$alt+r    exec --no-startup-id $editorgui ~/.config/ranger/rc.conf
 
 
 ################################################
@@ -517,7 +517,7 @@ bindsym $mod+F9                   exec --no-startup-id $codemacs
 bindsym $mod+F2 exec $browser
 
 # start ranger file manager
-bindsym $mod+F3 exec $file_manager
+bindsym $mod+F3                   exec $terminal -e $file_manager
 bindsym $mod+Shift+F3	          exec $terminal -e sudo $file_manager /
 bindsym $alt+e                    exec --no-startup-id $terminal -e $file_manager
 bindsym $mod+Control+r	          exec $terminal -e sudo $file_manager /

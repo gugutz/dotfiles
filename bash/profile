@@ -37,7 +37,7 @@ PATH="$HOME/.node_modules/bin:$PATH"
 export PATH=$PATH:/opt/gradle/gradle-4.8/bin
 
 # Load rbenv automatically
-eval "$(rbenv init -)"
+# eval "$(rbenv init -)"
 
 # Load pyenv automatically
 export PATH="/home/tau/.pyenv/bin:$PATH"

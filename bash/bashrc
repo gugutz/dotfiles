@@ -189,15 +189,10 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 
-. $HOME/.asdf/completions/asdf.bash
+# asdf
 . $HOME/.asdf/asdf.sh
-export PATH=$PATH:~/.yarn/bin
-
 . $HOME/.asdf/completions/asdf.bash
 
-. $HOME/.asdf/asdf.sh
-export PATH=$PATH:~/.yarn/bin
+# tmuxinator
+source ~/.bin/tmuxinator.bash
 
-. $HOME/.asdf/completions/asdf.bash
-
-. $HOME/.asdf/asdf.sh
