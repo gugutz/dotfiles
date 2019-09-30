@@ -1,8 +1,5 @@
 # -*- mode: gitignore; -*-
 
-###########################
-# Emacs Stuff
-
 *~
 \#*\#
 /.emacs.desktop
@@ -62,23 +59,3 @@ ac-comphist.dat
 emacs.html
 /config/*.el
 emacs.log
-
-###########################
-# VIM
-
-# vim-plug plugins
-/vim/plugged
-
-###########################
-# Tmux
-
-
-###########################
-# Shells (bash, zsh, fish)
-
-# bash and zsh command history
-/zsh/zsh_history
-.zsh_history
-/bash/bash_history
-.bash_history
-

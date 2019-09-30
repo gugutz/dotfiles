@@ -321,7 +321,7 @@ exec_always --no-startup-id hsetroot -solid "#000"  #darkgrey
 ################################################
 
 # take scrCloses equivalent do VS Code Ctrl + Deenshot of the entire screen (root window)
-bindsym Print exec ~/dotfiles/scripts/i3-take-screenshot.sh root
+bindsym Print exec ~/dotfiles/i3/scripts/i3-take-screenshot.sh root
 # bindsym Print exec --no-startup-id i3-scrot
 
 # take screenshot of the active window
@@ -329,7 +329,7 @@ bindsym Print exec ~/dotfiles/scripts/i3-take-screenshot.sh root
 bindsym $mod+Print --release exec --no-startup-id i3-scrot -w
 
 # Select an area to screen shot
-bindsym  $mod+Shift+Print --release exec --no-startup-id import ~/img/screenshots/last-screenshot.png
+bindsym  $mod+Shift+Print --release exec --no-startup-id import ~/sync/img/screenshots/last-screenshot.png
 # bindsym $mod+Shift+Print --release exec --no-startup-id i3-scrot -s
 
 # scrot & gimp - select window or rectangle
@@ -455,7 +455,7 @@ bindsym $mod+$alt+i    exec --no-startup-id $editorgui ~/.i3/config
 bindsym $mod+$alt+v    exec --no-startup-id $editorgui ~/.vimrc
 
 # open emacs config file
-bindsym $mod+$alt+e    exec --no-startup-id $editorgui ~/dotfiles/emacs.d/emacs.org
+bindsym $mod+$alt+e    exec --no-startup-id $editorgui ~/.emacs.d/emacs.org
 
 # open tmux config file
 bindsym $mod+$alt+t    exec --no-startup-id $editorgui ~/.tmux.conf
@@ -478,16 +478,16 @@ bindsym $mod+$alt+r    exec --no-startup-id $editorgui ~/.config/ranger/rc.conf
 ################################################
 
 # open my dev-environment setup shell script
-bindsym $mod+$alt+Control+t    exec --no-startup-id $editorterm ~/scripts/system/manjaro-terminal-tools.sh
+bindsym $mod+$alt+Control+t    exec --no-startup-id $editorterm ~/sync/scripts/system/manjaro-terminal-tools.sh
 
 # open my dev-environment setup shell script
-bindsym $mod+$alt+Control+d    exec --no-startup-id $editorterm ~/scripts/system/manjaro-dev-env-setup.sh
+bindsym $mod+$alt+Control+d    exec --no-startup-id $editorterm ~/sync/scripts/system/manjaro-dev-env-setup.sh
 
 # open my libs setup shell script
-bindsym $mod+$alt+Control+l    exec --no-startup-id $editorterm ~/scripts/system/manjaro-dev-libs-setup.sh
+bindsym $mod+$alt+Control+l    exec --no-startup-id $editorterm ~/sync/scripts/system/manjaro-dev-libs-setup.sh
 
 # open my libs setup shell script
-bindsym $mod+$alt+Control+b    exec --no-startup-id $editorterm ~/scripts/system/manjaro-basic-software.sh
+bindsym $mod+$alt+Control+b    exec --no-startup-id $editorterm ~/sync/scripts/system/manjaro-basic-software.sh
 
 
 ################################################

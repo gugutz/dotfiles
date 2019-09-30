@@ -1,5 +1,5 @@
 
-# Tonky, My personal Conky setup
+# My personal Conky setup
 
 This are my scripts and config files for Conky. It is intended to serve as a backup for my configuration, but it should work on any system, so if you like it, feel free to use it as you will.
 

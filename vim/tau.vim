@@ -19,7 +19,6 @@ set history=500
 " Set to auto read when a file is changed from the outside
 set autoread
 
-
 " Use Unix as the standard file type
 set ffs=unix,dos,mac
 
@@ -417,7 +416,6 @@ set laststatus=2
 
 "##############################################################
 "#--- PLUGINS                                                 #
-"##############################################################
 
 " avoid using standard Vim directory names like 'plugin'
 " remember to use single quotes
@@ -428,15 +426,12 @@ call plug#begin('~/.vim/plugged')
 " APPEARANCE
 
 Plug 'tomasiser/vim-code-dark'
-" Plug 'powerline/powerline', {'rtp': 'powerline/bindings/vim/'}
-"
 Plug 'vim-airline/vim-airline'           " Vim Airline statusbar
 Plug 'vim-airline/vim-airline-themes'
 Plug 'mkitt/tabline.vim'                 " Cleaner tabs
 Plug 'kien/rainbow_parentheses.vim'      " Colour matched brackets
 Plug 'ryanoasis/vim-devicons'            " Icons for dev file types
 " Plug 'tiagofumo/vim-nerdtree-syntax-highlight'  " coloured icons for vim-devicons
-
 
 "-------------------------------
 " CODE EDITING PLUGINS
@@ -531,7 +526,19 @@ Plug 'vim-pandoc/vim-pandoc'             " Pandoc for vim
 Plug 'vim-pandoc/vim-pandoc-syntax'      " Syntax colors for pandoc-markdown files
 
 
-
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+Plug 'tpope/vim-sensible'
+Plug 'vim-airline/vim-airline'
+Plug 'terryma/vim-multiple-cursors'
+Plug 'editorconfig/editorconfig-vim'
+Plug 'airblade/vim-gitgutter'
+Plug 'tpope/vim-eunuch'
+Plug 'ntpeters/vim-better-whitespace'
+Plug 'sheerun/vim-polyglot'
+Plug 'mhinz/vim-mix-format'
+Plug 'vim-scripts/vim-auto-save'
+Plug 'nathanaelkane/vim-indent-guides'
 " Initialize plugin system
 call plug#end()
 
