@@ -326,6 +326,22 @@ emacs asks 2 annoying confirmations on every startup before actually starting
 
 
 
+** require use-package
+
+*** Install use-package if not already installed
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+#+END_SRC
+
+*** load use-package
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(eval-when-compile
+  (require 'use-package))
+#+END_SRC
+
+
 * Require my personal packages
 #+BEGIN_SRC emacs-lisp :tangle init.el
 
@@ -701,6 +717,12 @@ Enable calling this function from the file with <M-x>."
 
 ** add suport for the ignore tag (ignores a headline without ignoring its content)
 #+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
+(use-package org
+  :ensure org-plus-contrib
+  :config
+  (require 'ox-extra)
+  (ox-extras-activate '(ignore-headlines)))
+
 (require 'ox-extra)
 (ox-extras-activate '(ignore-headlines))
 #+END_SRC
@@ -1537,11 +1559,35 @@ To display a marker indicating that a buffer has been modified (atom-style)
 
 * Minor modes
   
-** Highlighting stuff in code (numbers, operators and escape sequences)
+** Highlighting numbers
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(add-hook 'prog-mode-hook 'highlight-numbers-mode)
-(add-hook 'prog-mode-hook 'highlight-operators-mode)
-(add-hook 'prog-mode-hook 'hes-mode)    ;; highlight escape sequences
+  (use-package highlight-numbers
+    :ensure t
+    :hook prog-mode)
+#+END_SRC
+** Highlighting operators
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (use-package highlight-operators
+    :ensure t
+    :hook prog-mode)
+#+END_SRC
+** Highlighting escape sequences
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (use-package highlight-escape-sequences
+    :ensure t
+    :hook prog-mode)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (use-package highlight-parentheses
+    :ensure t
+    :hook prog-mode)
+#+END_SRC
+
+** DELETE THESE LINES (USES PACKAGE.EL)
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  ;; (add-hook 'prog-mode-hook 'highlight-numbers-mode)
+  ;; (add-hook 'prog-mode-hook 'highlight-operators-mode)
+  ;; (add-hook 'prog-mode-hook 'hes-mode)    ;; highlight escape sequences
 #+END_SRC
 
 ** which-key
@@ -1578,14 +1624,14 @@ To display a marker indicating that a buffer has been modified (atom-style)
 
 : Colorize hex, rgb and named color codes
    
- #+BEGIN_SRC emacs-lisp :tangle init.el
+#+BEGIN_SRC emacs-lisp :tangle init.el
    (add-hook 'org-mode-hook 'rainbow-mode)
    (add-hook 'css-mode-hook 'rainbow-mode)
    (add-hook 'php-mode-hook 'rainbow-mode)
    (add-hook 'html-mode-hook 'rainbow-mode)
    (add-hook 'web-mode-hook 'rainbow-mode)
    (add-hook 'js2-mode-hook 'rainbow-mode)
- #+END_SRC
+#+END_SRC
 
 ** Emmet
     
@@ -1621,6 +1667,16 @@ To display a marker indicating that a buffer has been modified (atom-style)
 #+BEGIN_SRC emacs-lisp :tangle init.el
   (smartscan-mode 1)
 #+END_SRC 
+
+** editorconfig
+   
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package editorconfig
+  :ensure t
+  :config
+  (editorconfig-mode 1))
+#+END_SRC 
+
 
 * FlyCheck linter
 
@@ -1976,7 +2032,7 @@ To display a marker indicating that a buffer has been modified (atom-style)
 *** AucTex settings
 
  #+BEGIN_SRC emacs-lisp :tangle init.el
- (require 'tex)
+   ;; (require 'tex)
  #+END_SRC
 
  Three steps are required (as according to ORG official docs) to setup AucTex with Emacs:
@@ -2097,7 +2153,7 @@ To display a marker indicating that a buffer has been modified (atom-style)
 **** If it doesn’t work, try this :
 
  #+BEGIN_SRC emacs-lisp :tangle init.el
-      (TeX-global-PDF-mode t)
+   ;; (TeX-global-PDF-mode t)
  #+END_SRC
 
 

@@ -148,7 +148,7 @@ FEATURE may be any one of:
  '(fci-rule-color "#3E4451")
  '(package-selected-packages
    (quote
-    (vimrc-mode docker-compose-mode company-restclient pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
+    (highlight-parentheses pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -158,6 +158,13 @@ FEATURE may be any one of:
 
 (add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
 ;; (add-to-list 'load-path "~/dotfiles/emacs.d/config")
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+(eval-when-compile
+  (require 'use-package))
 
 (require 'evil.tau)
 (require 'org.tau)
@@ -539,9 +546,25 @@ parrot-num-rotations
 (define-key evil-normal-state-map (kbd "g t") 'centaur-tabs-forward)
 (define-key evil-normal-state-map (kbd "g T") 'centaur-tabs-backward)
 
-(add-hook 'prog-mode-hook 'highlight-numbers-mode)
-(add-hook 'prog-mode-hook 'highlight-operators-mode)
-(add-hook 'prog-mode-hook 'hes-mode)    ;; highlight escape sequences
+(use-package highlight-numbers
+  :ensure t
+  :hook prog-mode)
+
+(use-package highlight-operators
+  :ensure t
+  :hook prog-mode)
+
+(use-package highlight-escape-sequences
+  :ensure t
+  :hook prog-mode)
+
+(use-package highlight-parentheses
+  :ensure t
+  :hook prog-mode)
+
+;; (add-hook 'prog-mode-hook 'highlight-numbers-mode)
+;; (add-hook 'prog-mode-hook 'highlight-operators-mode)
+;; (add-hook 'prog-mode-hook 'hes-mode)    ;; highlight escape sequences
 
 (require 'which-key)
 (setq which-key-idle-delay 0.2)
@@ -576,6 +599,11 @@ parrot-num-rotations
 (setq emmet-expand-jsx-className? t) ;; default nil
 
 (smartscan-mode 1)
+
+(use-package editorconfig
+  :ensure t
+  :config
+  (editorconfig-mode 1))
 
 (add-hook 'after-init-hook #'global-flycheck-mode)
 
@@ -656,7 +684,7 @@ parrot-num-rotations
 
 (require 'ox-latex)
 
-(require 'tex)
+;; (require 'tex)
 
 (setq exec-path (append exec-path '("/usr/bin/tex")))
 
@@ -706,7 +734,7 @@ parrot-num-rotations
 
 (setq TeX-PDF-mode t)
 
-(TeX-global-PDF-mode t)
+;; (TeX-global-PDF-mode t)
 
 (font-lock-add-keywords
    'latex-mode
