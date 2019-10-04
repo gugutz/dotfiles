@@ -1,1 +1,1 @@
-("~/dotfiles/" "~/code/pep/" "~/dotfiles/tmux/themes/" "~/dotfiles/emacs.d/" "~/")
+("~/code/pep/" "~/dotfiles/" "~/code/floripa-tech-companies/" "~/dotfiles/tmux/themes/" "~/dotfiles/emacs.d/" "~/")

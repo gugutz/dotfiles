@@ -3,17 +3,21 @@
 #+TITLE:     gugutz emacs config
 #+SUBTITLE:  ORGfied configuration for Emacs
 #+AUTHOR:    Gustavo P Borges
-#+EMAIL:     gustavo.pb1984@aluno.ifsc.edu.br
+#+EMAIL:     gugutz@gmail.com
 #+DESCRIPTION: This file is compiled to init.el automatically on every save
 # #######################################################################
 
-* Recompile init.el everytime emacs.org is changed and saved
-  
-: Moved this to beggining of the file to avoid it not being parsed when theres an error in the middle of the file
-: It was being recompiled without this function so i had to manually re-copy first-init.el to make it compile first time again and again
-
-
 #+BEGIN_SRC emacs-lisp :tangle init.el
+(setq user-full-name "Gustavo P Borges")
+(setq user-mail-address "gugutz@gmail.com")
+#+END_SRC
+* Recompile init.el everytime emacs.org is changed and saved
+
+  : Moved this to beggining of the file to avoid it not being parsed when theres an error in the middle of the file
+  : It was being recompiled without this function so i had to manually re-copy first-init.el to make it compile first time again and again
+
+
+  #+BEGIN_SRC emacs-lisp :tangle init.el
 (defun /util/tangle-init ()
   (interactive)
   "If the current buffer is init.org' the code-blocks are
@@ -24,160 +28,205 @@ tangled, and the tangled file is compiled."
     (let ((prog-mode-hook nil))
       (org-babel-tangle)
       (byte-compile-file (concat user-emacs-directory "init.el")))))
-#+END_SRC
+  #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+  #+BEGIN_SRC emacs-lisp :tangle init.el
   (add-hook 'after-save-hook #'/util/tangle-init)
+  #+END_SRC
+
+
+* General editor settings
+
+** Emacs Server
+Allow access from emacsclient
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  ;; (use-package server
+  ;;   :ensure nil
+  ;;   :init
+  ;;   (unless (or (daemonp) (server-running-p))
+  ;;     (server-start))
+  ;;   :hook (after-init . server-mode))
 #+END_SRC
 
-
-* General editor settings 
-  
-** Allow access from emacsclient
-   
 #+BEGIN_SRC emacs-lisp :tangle init.el
   (require 'server)
   (unless (or (daemonp) (server-running-p))
     (server-start))
 #+END_SRC
 
-** Prevent emacs to create lockfiles (.#files#). 
-   
-PS: this also stops preventing editing colisions, so watch out
+** Prevent emacs to create lockfiles (.#files#).
 
+PS: this also stops preventing editing colisions, so watch out
 #+BEGIN_SRC emacs-lisp :tangle init.el
-  (setq create-lockfiles nil)
+(setq create-lockfiles nil)
 #+END_SRC
 
 ** Use the system clipboard
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
 (setq x-select-enable-clipboard t)
-#+END_SRC
+   #+END_SRC
 
 ** Always follow symbolic links to edit the 'actual' file it points to
-   
-#+BEGIN_SRC emacs-lisp :tangle init.el
-  (setq vc-follow-symlinks t)
-#+END_SRC
 
-** Enable mouse support in terminal mode
-   
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(when (eq window-system nil)
-  (xterm-mouse-mode 1))
+(setq vc-follow-symlinks t)
 #+END_SRC
 
 ** Save all tempfiles in $TMPDIR/emacs$UID/
-   
+
 #+BEGIN_SRC emacs-lisp :tangle init.el
-    (defconst emacs-tmp-dir (expand-file-name (format "emacs%d" (user-uid)) temporary-file-directory))
-    (setq backup-directory-alist
-        `((".*" . ,emacs-tmp-dir)))
-    (setq auto-save-file-name-transforms
-        `((".*" ,emacs-tmp-dir t)))
-    (setq auto-save-list-file-prefix
-        emacs-tmp-dir)
+(defconst emacs-tmp-dir (expand-file-name (format "emacs%d" (user-uid)) temporary-file-directory))
+(setq backup-directory-alist
+    `((".*" . ,emacs-tmp-dir)))
+(setq auto-save-file-name-transforms
+    `((".*" ,emacs-tmp-dir t)))
+(setq auto-save-list-file-prefix
+    emacs-tmp-dir)
 #+END_SRC
-        
+
 ** Disable the annoying Emacs bell ring (beep)
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-  (setq ring-bell-function 'ignore)
+(setq ring-bell-function 'ignore)
 #+END_SRC
 
 ** Disable initial scratch message
+
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (setq initial-scratch-message nil)
 #+END_SRC
 ** Create alias to yes-or-no anwsers (y-or-n-p
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
 (defalias 'yes-or-no-p 'y-or-n-p)
-(fset 'yes-or-no-p 'y-or-n-p) 
-#+END_SRC
+(fset 'yes-or-no-p 'y-or-n-p)
+   #+END_SRC
 
-
-** show matching parenthesis
+** Use unix-conf-mode for .*rc files
 #+BEGIN_SRC emacs-lisp :tangle init.el
+(add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode))
+#+END_SRC
+** show matching parenthesis
+   #+BEGIN_SRC emacs-lisp :tangle init.el
   ; parentheses
   (show-paren-mode t)
-#+END_SRC
+   #+END_SRC
 
 ** default indentation
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
   (setq-default indent-tabs-mode nil)
   (setq-default c-basic-offset 2)
-#+END_SRC
+   #+END_SRC
 
 ** show line numbers
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
   (when (version<= "26.0.50" emacs-version )
     (global-display-line-numbers-mode))
-#+END_SRC
+   #+END_SRC
 
 ** line number : pretty format
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
 (setq linum-format " %d ")
-#+END_SRC
+   #+END_SRC
 
 ** superword-mode and subword-modes
-: Alt+x subword-mode. It change all cursor movement/edit commands to stop in-between the “camelCase” words.
-: Alt+x superword-mode (emacs 24.4) is similar. It treats text like “x_y” as one word. Useful for “snake_case”.
-: subword-mode and superword-mode are mutally exclusive. Turning one on turns off the other.
+   : Alt+x subword-mode. It change all cursor movement/edit commands to stop in-between the “camelCase” words.
+   : Alt+x superword-mode (emacs 24.4) is similar. It treats text like “x_y” as one word. Useful for “snake_case”.
+   : subword-mode and superword-mode are mutally exclusive. Turning one on turns off the other.
 
-: Enable global subword-mode (disabled - its enable per file according to language)
+   : Enable global subword-mode (disabled - its enable per file according to language)
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
   ;; (global-subword-mode 1)
-#+END_SRC
- 
+   #+END_SRC
+
 ** Turn on auto-revert mode (auto updates files changed on disk)
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
   (global-auto-revert-mode 1)
   (setq auto-revert-interval 0.5)
-#+END_SRC
+   #+END_SRC
 
 ** Spellchecking
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
 (defconst *spell-check-support-enabled* t) ;; Enable with t if you prefer
-#+END_SRC
+   #+END_SRC
 
-** C-n insert newlines if the point is at the end of the buffer. 
-: Useful, as it means you won’t have to reach for the return key to add newlines!
-#+BEGIN_SRC emacs-lisp :tangle init.el
+** C-n insert newlines if the point is at the end of the buffer.
+   : Useful, as it means you won’t have to reach for the return key to add newlines!
+   #+BEGIN_SRC emacs-lisp :tangle init.el
   (setq next-line-add-newlines t)
+   #+END_SRC
+
+** Remove the ^M characters from files that contains Unix and DOS line endings
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(defun remove-dos-eol ()
+  "Do not show ^M in files containing mixed UNIX and DOS line endings."
+  (interactive)
+  (setq buffer-display-table (make-display-table))
+  (aset buffer-display-table ?\^M []))
 #+END_SRC
 
-
+*** Hook it to text-mode and prog-mode
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(add-hook 'text-mode-hook 'remove-dos-eol)
+(add-hook 'prog-mode-hook 'remove-dos-eol)
+#+END_SRC
 
 ** Increase, decrease and adjust font size
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
   (global-set-key (kbd "C-+") #'text-scale-increase)
   (global-set-key (kbd "C-_") #'text-scale-decrease)
   ;; (global-set-key (kbd "C-)") #'text-scale-adjust)
-#+END_SRC
+   #+END_SRC
 
 ** expand-region
- #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-   ;; (require 'expand-region)
-   (global-set-key (kbd "C-TAB") 'er/expand-region)
- #+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+;; (require 'expand-region)
+(global-set-key (kbd "C-TAB") 'er/expand-region)
+#+END_SRC
 
 ** hippie-expand (native emacs expand function)
-
- #+BEGIN_SRC emacs-lisp :tangle init.el
+#+BEGIN_SRC emacs-lisp :tangle init.el
  (global-set-key "\M- " 'hippie-expand)
- #+END_SRC
+#+END_SRC
 
- 
+
+* Text editing settings
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(defun upcase-backward-word (arg)
+  (interactive "p")
+  (upcase-word (- arg)))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(defun downcase-backward-word (arg)
+  (interactive "p")
+  (downcase-word (- arg)))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(defun capitalize-backward-word (arg)
+  (interactive "p")
+  (capitalize-word (- arg)))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(global-set-key (kbd "C-M-u")	 'upcase-backward-word)
+(global-set-key (kbd "C-M-l")	 'downcase-backward-word)
+;; this replaces native capitlize word!
+(global-set-key (kbd "M-c")	 'capitalize-backward-word)
+#+END_SRC
+
 * Macros and helper functions
-  
+
 ** Bindings
 
 
- : These macros are to help me remap keys.
+   : These macros are to help me remap keys.
 
- #+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
  (defmacro /bindings/define-prefix-keys (keymap prefix &rest body)
    (declare (indent defun))
    `(progn
@@ -202,18 +251,18 @@ PS: this also stops preventing editing colisions, so watch out
    (declare (indent defun))
    `(/bindings/define-prefix-keys ,keymap nil
       (,sequence ,binding ,description)))
- #+END_SRC
+   #+END_SRC
 
 
-** After 
+** After
 
- : with-eval-after-load is a function that lets you defer execution of code until after a feature has been loaded.
- : It is very useful to only load some packages when they’re, and because of that it is extensively used in this setup. 
- : So of course there is a macro to make it simpler. It can also run code if a package has been installed by using “pkgname-autoloads” or only if multiple packages have been loaded.
- : This also avoids loading config for packages that haven’t been loaded yet, resulting in void variables of function definitions. 
- : This was take from milkypostman (along with some other things).
+   : with-eval-after-load is a function that lets you defer execution of code until after a feature has been loaded.
+   : It is very useful to only load some packages when they’re, and because of that it is extensively used in this setup.
+   : So of course there is a macro to make it simpler. It can also run code if a package has been installed by using “pkgname-autoloads” or only if multiple packages have been loaded.
+   : This also avoids loading config for packages that haven’t been loaded yet, resulting in void variables of function definitions.
+   : This was take from milkypostman (along with some other things).
 
- #+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
  ;; examples
  ;; after [evil magit] (
    ;; execute after evil and magit have been loaded
@@ -242,54 +291,55 @@ PS: this also stops preventing editing colisions, so watch out
        prog))
     (t
      `(with-eval-after-load ,feature ,@body))))
- #+END_SRC
+   #+END_SRC
 
 
 ** Auto save function
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
   (defun my-save ()
     "Save file when leaving insert mode in Evil."
     (if (buffer-file-name)
-	(evil-save)))
-#+END_SRC
+        (evil-save)))
+   #+END_SRC
 
 *** This hook to the above function was breaking the evil-esc-delay 0
-#+BEGIN_SRC emacs-lisp :tangle init.el
+    #+BEGIN_SRC emacs-lisp :tangle init.el
   ;; (add-hook 'evil-insert-state-exit-hook 'my-save)
-#+END_SRC
+    #+END_SRC
 
 
 
 * GPG Encryption
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+  #+BEGIN_SRC emacs-lisp :tangle init.el
 (require 'epa-file)
 (epa-file-enable)
-#+END_SRC
+  #+END_SRC
 
 
 * Packages
+
 ** package repositories
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
   (require 'package)
   ;; add melpa stable emacs package repository
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
   (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
   (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t) ; Org-mode's repository
-#+END_SRC
+   #+END_SRC
 
 ** initialize packages
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
   (package-initialize)
-#+END_SRC
+   #+END_SRC
 
-moved this part to beggining of the file because if the
-custom-safe-themes variable is not set before smart-mode-line (sml) activates
-emacs asks 2 annoying confirmations on every startup before actually starting
+   moved this part to beggining of the file because if the
+   custom-safe-themes variable is not set before smart-mode-line (sml) activates
+   emacs asks 2 annoying confirmations on every startup before actually starting
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -308,17 +358,15 @@ emacs asks 2 annoying confirmations on every startup before actually starting
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
-#+END_SRC
+   #+END_SRC
 
 ** Add the folder 'config' to emacs load-path so i can require stuff from there
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
   (add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
   ;; (add-to-list 'load-path "~/dotfiles/emacs.d/config")
 
-#+END_SRC
-
-
+   #+END_SRC
 
 
 
@@ -329,50 +377,88 @@ emacs asks 2 annoying confirmations on every startup before actually starting
 ** require use-package
 
 *** Install use-package if not already installed
-#+BEGIN_SRC emacs-lisp :tangle init.el
+    #+BEGIN_SRC emacs-lisp :tangle init.el
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
-#+END_SRC
+    #+END_SRC
 
 *** load use-package
-#+BEGIN_SRC emacs-lisp :tangle init.el
+    #+BEGIN_SRC emacs-lisp :tangle init.el
 (eval-when-compile
   (require 'use-package))
-#+END_SRC
+    #+END_SRC
 
 
 * Require my personal packages
-#+BEGIN_SRC emacs-lisp :tangle init.el
+  #+BEGIN_SRC emacs-lisp :tangle init.el
 
     (require 'evil.tau)
     (require 'org.tau)
     (require 'ruby.tau)
     (require 'elixir.tau)
-    
+
+  #+END_SRC
+
+
+* Mouse configuration
+** Enable mouse support in terminal mode
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(when (eq window-system nil)
+  (xterm-mouse-mode 1))
 #+END_SRC
 
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  ;; (use-package mouse3
+  ;;     :config
+  ;; (global-set-key (kbd "<mouse-3>") 'mouse3-popup-menu))
+#+END_SRC
+
+** right-click-context-menu
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package right-click-context
+  :ensure t
+  :config
+  (global-set-key (kbd "<menu>") 'right-click-context-menu)
+  (global-set-key (kbd "<mouse-3>") 'right-click-context-menu)
+  (bind-key "C-c <mouse-3>" 'right-click-context-menu)
+
+  ;; (setq right-click-context-mode-lighter "🐭")
+
+  ;; customize the right-click-context-menu
+  (let ((right-click-context-local-menu-tree
+       (append right-click-context-global-menu-tree
+             '(("Insert"
+                ("Go to definition" :call (lsp-goto-type-definition)
+                ("FooBar" :call (insert "FooBar"))
+                )))))
+  (right-click-context-menu))))
+#+END_SRC
 
 * Evil
 
-: All Evil settings are meant to be isolated in a separate file evil.tau.
+  : All Evil settings are meant to be isolated in a separate file evil.tau.
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+;; load evil
+(use-package evil
+  :ensure t ;; install the evil package if not installed
+  :init ;; tweak evil's configuration before loading it
+  (setq evil-search-module 'evil-search)
+  (setq evil-ex-complete-emacs-commands nil)
+  (setq evil-vsplit-window-right t)
+  (setq evil-split-window-below t)
+  (setq evil-shift-round nil)
+  (setq evil-want-C-u-scroll t)
+  :config ;; tweak evil after loading it
+  (evil-mode)
 
-** Require Evil related packages
-
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-  (require 'evil)
-  (evil-mode 1)
-#+END_SRC
-
-** Don't wait for any other keys after escape is pressed.
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+  ;; Don't wait for any other keys after escape is pressed.
   (setq evil-esc-delay 0)
-#+END_SRC
+  ;; example how to map a command in normal mode (called 'normal state' in evil)
 
-** Make Evil look a bit more like (n) vim  (??)
-: not sure what all these options do yet
-
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+  ;; Make Evil look a bit more like (n) vim  (??)
   (setq evil-search-module 'isearch-regexp)
   (setq evil-magic 'very-magic)
   (setq evil-shift-width (symbol-value 'tab-width))
@@ -386,46 +472,65 @@ emacs asks 2 annoying confirmations on every startup before actually starting
   (setq evil-want-abbrev-expand-on-insert-exit nil)
   ;; move evil tag to beginning of modeline
   (setq evil-mode-line-format '(before . mode-line-front-space))
+
+  ;; Cursor is alway black because of evil.
+  ;; Here is the workaround
+  ;; (@see https://bitbucket.org/lyro/evil/issue/342/evil-default-cursor-setting-should-default)
+  (setq evil-default-cursor t)
+
+  ;; change cursor color according to mode
+  (setq evil-emacs-state-cursor '("#ff0000" box))
+  (setq evil-motion-state-cursor '("#FFFFFF" box))
+  (setq evil-normal-state-cursor '("#00ff00" box))
+  (setq evil-visual-state-cursor '("#abcdef" box))
+  (setq evil-insert-state-cursor '("#e2f00f" bar))
+  (setq evil-replace-state-cursor '("red" hbar))
+  (setq evil-operator-state-cursor '("red" hollow))
+  (define-key evil-normal-state-map (kbd ", w") 'evil-window-vsplit))
+  (:map evil-normal-state-map
+      ("g t" . centaur-tabs-forward)
+      ("g T" . centaur-tabs-backward)))
 #+END_SRC
+
 
 ** Window and buffer navigation with vim-like bindings
 
 *** vim-like navigation using C- HJKL (uppercase homerow keys)
-#+BEGIN_SRC emacs-lisp :tangle init.el
+    #+BEGIN_SRC emacs-lisp :tangle init.el
   ;; for some readon the bellow lines should be the default native way for navigation on emacs
   ;; but they dont work
   ;; using the above package instead til i find a solution
   ;
   (windmove-default-keybindings 'control)
-  (global-set-key (kbd "C-H") 'windmove-left)
-  (global-set-key (kbd "C-L") 'windmove-right)
-  (global-set-key (kbd "C-K") 'windmove-up)
-  (global-set-key (kbd "C-J") 'windmove-down)
-#+END_SRC
+  (global-set-key (kbd "C-S-H") 'windmove-left)
+  (global-set-key (kbd "C-S-L") 'windmove-right)
+  (global-set-key (kbd "C-S-K") 'windmove-up)
+  (global-set-key (kbd "C-S-J") 'windmove-down)
+    #+END_SRC
 
 *** vim-like navigation with C-w hjkl
 
 
- # #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
- #   (/bindings/define-keys evil-normal-state-map
- #     ("C-w h" #'evil-window-left)
- #     ("C-w j" #'evil-window-down)
- #     ("C-w k" #'evil-window-up)
- #     ("C-w l" #'evil-window-right))
- # #+END_SRC
+    # #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+    #   (/bindings/define-keys evil-normal-state-map
+    #     ("C-w h" #'evil-window-left)
+    #     ("C-w j" #'evil-window-down)
+    #     ("C-w k" #'evil-window-up)
+    #     ("C-w l" #'evil-window-right))
+    # #+END_SRC
 
 
-: Bellow i use the `define-keys` function to map window navigation to default Vim bindings <C-hjkl>
+    : Bellow i use the `define-keys` function to map window navigation to default Vim bindings <C-hjkl>
 
-: First require the file with the function
+    : First require the file with the function
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+    #+BEGIN_SRC emacs-lisp :tangle init.el
   ;; (require 'evil-tmux-navigator)
-#+END_SRC
+    #+END_SRC
 
 
-: Then create the keybindings 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+    : Then create the keybindings
+    #+BEGIN_SRC emacs-lisp :tangle init.el
   (define-prefix-command 'evil-window-map)
   (define-key evil-window-map "h" 'evil-window-left)
   (define-key evil-window-map "j" 'evil-window-down)
@@ -434,29 +539,29 @@ emacs asks 2 annoying confirmations on every startup before actually starting
   (define-key evil-window-map "b" 'evil-window-bottom-right)
   (define-key evil-window-map "c" 'evil-window-delete)
   (define-key evil-motion-state-map "\M-w" 'evil-window-map)
-#+END_SRC
+    #+END_SRC
 
-    
-#+BEGIN_SRC emacs-lisp :tangle init.el
+
+    #+BEGIN_SRC emacs-lisp :tangle init.el
   ;; (/bindings/define-keys evil-normal-state-map
     ;; ("C-w h" #'evil-window-left)
     ;; ("C-w j" #'evil-window-down)
     ;; ("C-w k" #'evil-window-up)
     ;; ("C-w l" #'evil-window-right))
-#+END_SRC
+    #+END_SRC
 
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+    #+BEGIN_SRC emacs-lisp :tangle init.el
   ;; (/bindings/define-keys evil-normal-state-map
   ;;   ("C-w h" #'evil-window-left)
   ;;   ("C-w j" #'evil-window-down)
   ;;   ("C-w k" #'evil-window-up)
   ;;   ("C-w l" #'evil-window-right))
-#+END_SRC
+    #+END_SRC
 
-   
+
 ** make esc quit or cancel everything in Emacs
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
   (define-key evil-normal-state-map [escape] 'keyboard-quit)
   (define-key evil-visual-state-map [escape] 'keyboard-quit)
   (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
@@ -464,20 +569,13 @@ emacs asks 2 annoying confirmations on every startup before actually starting
   (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
   (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
   (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
-#+END_SRC
+   #+END_SRC
 
-** Cursor is alway black because of evil.
-
-: Here is the workaround
-: (@see https://bitbucket.org/lyro/evil/issue/342/evil-default-cursor-setting-should-default)
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-  (setq evil-default-cursor t)
-#+END_SRC
 
 ** recover native emacs commands that are overriden by evil
-: this gives priority to native emacs behaviour rathen than Vim's
+   : this gives priority to native emacs behaviour rathen than Vim's
 
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
   (define-key evil-normal-state-map (kbd "SPC") 'ace-jump-mode)
   (define-key evil-insert-state-map (kbd "C-e") 'move-end-of-line)
   (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
@@ -522,56 +620,30 @@ emacs asks 2 annoying confirmations on every startup before actually starting
   (define-key evil-visual-state-map "Q" 'call-last-kbd-macro)
   (define-key evil-insert-state-map "\C-e" 'end-of-line)
   (define-key evil-insert-state-map "\C-r" 'search-backward)
-#+END_SRC
+   #+END_SRC
 
 ** redefined native emacs commands
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
   (define-key evil-insert-state-map (kbd "C-TAB") 'er/expand-region)
-#+END_SRC
+   #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
   ;; (define-key evil-window-map "\C-h" 'evil-window-left)
   ;; (define-key evil-window-map "\C-j" 'evil-window-down)
   ;; (define-key evil-window-map "\C-k" 'evil-window-up)
   ;; (define-key evil-window-map "\C-l" 'evil-window-right)
-#+END_SRC
+   #+END_SRC
 
 
 
-** change cursor color according to mode
-    
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-  (setq evil-emacs-state-cursor '("#ff0000" box))
-  (setq evil-motion-state-cursor '("#FFFFFF" box))
-  (setq evil-normal-state-cursor '("#00ff00" box))
-  (setq evil-visual-state-cursor '("#abcdef" box))
-  (setq evil-insert-state-cursor '("#e2f00f" bar))
-  (setq evil-replace-state-cursor '("red" hbar))
-  (setq evil-operator-state-cursor '("red" hollow))
-#+END_SRC
-
-** multiple cursors
-
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-  ;; step 1, select thing in visual-mode (OPTIONAL)
-  ;; step 2, `mc/mark-all-like-dwim' or `mc/mark-all-like-this-in-defun'
-  ;; step 3, `ace-mc-add-multiple-cursors' to remove cursor, press RET to confirm
-  ;; step 4, press s or S to start replace
-  ;; step 5, press C-g to quit multiple-cursors
-  (define-key evil-visual-state-map (kbd "mn") 'mc/mark-next-like-this)
-  (define-key evil-visual-state-map (kbd "ma") 'mc/mark-all-like-this-dwim)
-  (define-key evil-visual-state-map (kbd "md") 'mc/mark-all-like-this-in-defun)
-  (define-key evil-visual-state-map (kbd "mm") 'ace-mc-add-multiple-cursors)
-  (define-key evil-visual-state-map (kbd "ms") 'ace-mc-add-single-cursor)
-#+END_SRC
 
 ** evil-leader
 
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
 (require 'evil-leader)
-#+END_SRC
+   #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
   (global-evil-leader-mode)
   (evil-leader/set-leader ",")
   (evil-leader/set-key
@@ -582,17 +654,17 @@ emacs asks 2 annoying confirmations on every startup before actually starting
     "b" 'switch-to-buffer
     "-" 'split-window-bellow
     "|" 'split-window-right)
-#+END_SRC
+   #+END_SRC
 
 ** Evil Surround
-: @see https://github.com/timcharper/evil-surround for tutorial
+   : @see https://github.com/timcharper/evil-surround for tutorial
 
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
   (require 'evil-surround)
   (global-evil-surround-mode 1)
-#+END_SRC
+   #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
 (defun evil-surround-prog-mode-hook-setup ()
   "Documentation string, idk, put something here later."
   (push '(47 . ("/" . "/")) evil-surround-pairs-alist)
@@ -601,21 +673,21 @@ emacs asks 2 annoying confirmations on every startup before actually starting
   (push '(91 . ("[" . "]")) evil-surround-pairs-alist)
   (push '(93 . ("[" . "]")) evil-surround-pairs-alist))
 (add-hook 'prog-mode-hook 'evil-surround-prog-mode-hook-setup)
-#+END_SRC
+   #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
 (defun evil-surround-js-mode-hook-setup ()
-  "ES6." ;  <-- this is a documentation string, a feature in Lisp
+  "ES6." ;  this is a documentation string, a feature in Lisp
   ;; I believe this is for auto closing pairs
   (push '(?1 . ("{`" . "`}")) evil-surround-pairs-alist)
   (push '(?2 . ("${" . "}")) evil-surround-pairs-alist)
   (push '(?4 . ("(e) => " . "(e)")) evil-surround-pairs-alist)
   ;; ReactJS
-  (push '(?3 . ("classNames(" . ")")) evil-surround-pairs-alist))
-(add-hook 'js2-mode-hook 'evil-surround-js-mode-hook-setup)
-#+END_SRC
+  (push '(?3 . ("classNames(" . ")")) evil-surround-pairs-alist)
+  (add-hook 'js2-mode-hook 'evil-surround-js-mode-hook-setup))
+   #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
 (defun evil-surround-emacs-lisp-mode-hook-setup ()
   (push '(?` . ("`" . "'")) evil-surround-pairs-alist))
 (add-hook 'emacs-lisp-mode-hook 'evil-surround-emacs-lisp-mode-hook-setup)
@@ -624,67 +696,86 @@ emacs asks 2 annoying confirmations on every startup before actually starting
   (push '(93 . ("[" . "]")) evil-surround-pairs-alist)
   (push '(?= . ("=" . "=")) evil-surround-pairs-alist))
 (add-hook 'org-mode-hook 'evil-surround-org-mode-hook-setup)
-#+END_SRC
-
+   #+END_SRC
 
 
 ** Vim Commentary
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
 (require 'evil-commentary)
 (evil-commentary-mode)
-#+END_SRC
+   #+END_SRC
 
 ** Evil-Matchit
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
 (require 'evil-matchit)
 (global-evil-matchit-mode 1)
-#+END_SRC
+   #+END_SRC
 
+
+* multiple cursors
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package multiple-cursors
+  :after evil
+  ;; step 1, select thing in visual-mode (OPTIONAL)
+  ;; step 2, `mc/mark-all-like-dwim' or `mc/mark-all-like-this-in-defun'
+  ;; step 3, `ace-mc-add-multiple-cursors' to remove cursor, press RET to confirm
+  ;; step 4, press s or S to start replace
+  ;; step 5, press C-g to quit multiple-cursors
+  :bind
+  ("M-u" . hydra-multiple-cursors/body)
+  :config
+  (define-key evil-visual-state-map (kbd "mn") 'mc/mark-next-like-this)
+  (define-key evil-visual-state-map (kbd "ma") 'mc/mark-all-like-this-dwim)
+  (define-key evil-visual-state-map (kbd "md") 'mc/mark-all-like-this-in-defun)
+  (define-key evil-visual-state-map (kbd "mm") 'ace-mc-add-multiple-cursors)
+  (define-key evil-visual-state-map (kbd "ms") 'ace-mc-add-single-cursor))
+#+END_SRC
 
 * org-mode
 
-: The ORG part of the config compiles to a separate file, inside the config folder, called `org.el`
- 
+  : The ORG part of the config compiles to a separate file, inside the config folder, called `org.el`
+
 ** Require ORG
-   
-#+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
+
+   #+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
 (require 'org)
-#+END_SRC
+   #+END_SRC
 
 ** Resolve issue with Tab not working with ORG only in Normal VI Mode in terminal
-   
-(something with TAB on terminals being related to C-i...)
 
-#+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
-  (add-hook 'org-mode-hook                                                                      
-            (lambda ()                                                                          
-          (define-key evil-normal-state-map (kbd "TAB") 'org-cycle))) 
+   (something with TAB on terminals being related to C-i...)
+
+   #+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
+  (add-hook 'org-mode-hook
+            (lambda ()
+          (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
 
   ;; (setq evil-want-C-i-jump nil)
-#+END_SRC
- 
+   #+END_SRC
+
 
 
 ** Show CLOSED tag line in closed TODO items
-   
-#+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
+
+   #+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
 (setq org-log-done 'time)
-#+END_SRC
+   #+END_SRC
 
 ** Prompt to leave a note when closing an item
-#+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
 (setq org-log-done 'note)
-#+END_SRC
+   #+END_SRC
 
-#+BEGIN_NOTE 
-Also achievable on a per file basis with: #+STARTUP: logdone
-#+STARTUP: logdone
-#+STARTUP: lognotedone.
-#+END_NOTE
+   #+BEGIN_NOTE
+   Also achievable on a per file basis with: #+STARTUP: logdone
+   #+STARTUP: logdone
+   #+STARTUP: lognotedone.
+   #+END_NOTE
 
 ** Function to activate export-on-save in org mode
 
-#+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
 (defun toggle-org-html-export-on-save ()
   "Make Emacs auto-export to HTML when org file is saved.
 Enable calling this function from the file with <M-x>."
@@ -695,11 +786,11 @@ Enable calling this function from the file with <M-x>."
         (message "Disabled org html export on save for current buffer..."))
     (add-hook 'after-save-hook 'org-html-export-to-html nil t)
     (message "Enabled org html export on save for current buffer...")))
-#+END_SRC
+   #+END_SRC
 
 ** Add hook to auto-export automatically on saveing ORG files
 
-#+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
   (defun org-mode-export-hook ()
     "This exports to diffenent outputs everytime the file is saved.
   This will be added to org-mode-hook, so it only activates on ORG files.
@@ -712,11 +803,11 @@ Enable calling this function from the file with <M-x>."
 
   ; Finally adds the above hook in org-mode-hook.
   ;; (add-hook 'org-mode-hook #'org-mode-export-hook)
-#+END_SRC
+   #+END_SRC
 
 
 ** add suport for the ignore tag (ignores a headline without ignoring its content)
-#+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
 (use-package org
   :ensure org-plus-contrib
   :config
@@ -725,45 +816,45 @@ Enable calling this function from the file with <M-x>."
 
 (require 'ox-extra)
 (ox-extras-activate '(ignore-headlines))
-#+END_SRC
+   #+END_SRC
 
 ** Evil-ORG
 
- #+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
    (after 'org
      (require 'evil-org)
      (require 'evil-org-agenda)
      (add-hook 'org-mode-hook #'evil-org-mode)
      (add-hook 'evil-org-mode-hook
-	       (lambda ()
-		 (evil-org-set-key-theme))))
- #+END_SRC
+               (lambda ()
+                 (evil-org-set-key-theme))))
+   #+END_SRC
 
- #+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
  ;; (add-hook 'org-mode-hook 'evil-org-mode)
  ;; (evil-org-set-key-theme '(navigation insert textobjects additional calendar))
  ;; (evil-org-agenda-set-keys)
- #+END_SRC
+   #+END_SRC
 
 ** ox-pandoc
 
-As pandoc supports many number of formats, initial org-export-dispatch
-shortcut menu does not show full of its supported formats. You can customize
-org-pandoc-menu-entry variable (and probably restart Emacs) to change its
-default menu entries.
-If you want delayed loading of `ox-pandoc’ when org-pandoc-menu-entry
-is customized, please consider the following settings in your init file"
+   As pandoc supports many number of formats, initial org-export-dispatch
+   shortcut menu does not show full of its supported formats. You can customize
+   org-pandoc-menu-entry variable (and probably restart Emacs) to change its
+   default menu entries.
+   If you want delayed loading of `ox-pandoc’ when org-pandoc-menu-entry
+   is customized, please consider the following settings in your init file"
 
-#+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
 (with-eval-after-load 'ox
   (require 'ox-pandoc))
-#+END_SRC
+   #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
 (require 'ox-pandoc)
-#+END_SRC
+   #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
   ;; default options for all output formats
   (setq org-pandoc-options '((standalone . t)))
   ;; cancel above settings only for 'docx' format
@@ -773,78 +864,60 @@ is customized, please consider the following settings in your init file"
   (setq org-pandoc-options-for-latex-pdf '((pdf-engine . "luatex")))
   ;; special extensions for markdown_github output
   (setq org-pandoc-format-extensions '(markdown_github+pipe_tables+raw_html))
-#+END_SRC
+   #+END_SRC
 
 ** ox-twbs (exporter to twitter bootstrap html)
-#+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
    (setq org-enable-bootstrap-support t)
-#+END_SRC
-   
-** ReveaJS org-reveal:
-: This delay makes the options to export to RevealJS appear on the exporter menu (C-c C-e)
+   #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
+** ReveaJS org-reveal:
+   : This delay makes the options to export to RevealJS appear on the exporter menu (C-c C-e)
+
+   #+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
 (with-eval-after-load 'ox
   (require 'ox-reveal))
-#+END_SRC
+   #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
 (require 'ox-reveal)
-#+END_SRC
+   #+END_SRC
 
 
 ** UTF8 pretty bullets in org mode
-(require 'org-bullets)
-(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-
+   (require 'org-bullets)
+   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
 * Helm
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(require 'helm)
+  (use-package helm
+    :ensure t
+    :defer t
+    :bind
+    ("M-x" . helm-M-x)
+    :config
+    (progn
+      (helm-mode 1))
+    (setq helm-autoresize-mode t)
+    (setq helm-buffer-max-length 40)
+    (setq helm-bookmark-show-location t)
+    (setq helm-buffer-max-length 40)
+    (setq helm-split-window-inside-p t)
+    (setq helm-mode-fuzzy-match t)
+    (setq helm-ff-file-name-history-use-recentf t)
+    (setq helm-ff-skip-boring-files t)
+    (setq helm-follow-mode-persistent t)
 
-(setq helm-bookmark-show-location t)
-(setq helm-buffer-max-length 40)
-(setq helm-split-window-inside-p t)
-(setq helm-mode-fuzzy-match t)
-(setq helm-ff-file-name-history-use-recentf t)
-(setq helm-ff-skip-boring-files t)
-(setq helm-follow-mode-persistent t)
-
-(after 'helm-source
-  (defun /helm/make-source (f &rest args)
-    (let ((source-type (cadr args))
-          (props (cddr args)))
-      (unless (child-of-class-p source-type 'helm-source-async)
-        (plist-put props :fuzzy-match t))
-      (apply f args)))
-  (advice-add 'helm-make-source :around '/helm/make-source))
-#+END_SRC
-
-
-** Other helm settings
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(after 'helm
-  ;; take between 10-30% of screen space
-  (setq helm-autoresize-min-height 10)
-  (setq helm-autoresize-max-height 30)
-  (helm-autoresize-mode t))
-#+END_SRC
-
-: Make helm replace the default Find-File and M-x
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-   (progn
-   (global-set-key [remap execute-extended-command] #'helm-M-x)
-   (global-set-key [remap find-file] #'helm-find-files)
-   (helm-mode t))
-#+END_SRC
-
-** Helm related bindings
-   
-#+BEGIN_SRC emacs-lisp :tangle init.el
-  (after 'helm
+    ;; take between 10-30% of screen space
+    (setq helm-autoresize-min-height 10)
+    (setq helm-autoresize-max-height 30)
+    (helm-autoresize-mode t)
+    ;; Make helm replace the default Find-File and M-x
+    (progn
+      (global-set-key [remap execute-extended-command] #'helm-M-x)
+      (global-set-key [remap find-file] #'helm-find-files)
+      (helm-mode t)))
     (require 'helm-config)
     (global-set-key (kbd "C-c h") #'helm-command-prefix)
     (global-unset-key (kbd "C-x c"))
@@ -856,134 +929,190 @@ is customized, please consider the following settings in your init file"
     (global-set-key (kbd "M-x") #'helm-M-x)
     (global-set-key (kbd "M-y") #'helm-show-kill-ring)
     (global-set-key (kbd "M-:") #'helm-eval-expression-with-eldoc)
-    (define-key helm-map (kbd "<tab>") #'helm-execute-persistent-action)
-    (define-key helm-map (kbd "C-z") #'helm-select-action)
-  )
-#+END_SRC
-
+    ;; (define-key helm-map (kbd "<tab>") #'helm-execute-persistent-action)
+    ;; (define-key helm-map (kbd "C-z") #'helm-select-action)
+  #+END_SRC
 
 * Projectile
-  
-** Activate Projectile
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(projectile-mode +1)
-(define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
-(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+(use-package projectile
+  :config
+  (projectile-mode)
+  ;; (projectile-mode +1)
+  (setq projectile-globally-ignored-files
+        (append '("~"
+                  ".swp"
+                  ".pyc")
+                projectile-globally-ignored-files))
+  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 #+END_SRC
 
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package helm-projectile
+  :ensure t
+  :config
+  (helm-projectile-on))
+#+END_SRC
 
 * Dired
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+  #+BEGIN_SRC emacs-lisp :tangle init.el
   (after 'dired
     (require 'dired-k)
     (setq dired-k-style 'git)
     (setq dired-k-human-readable t)
     (add-hook 'dired-initial-position-hook #'dired-k))
-#+END_SRC
+  #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+  #+BEGIN_SRC emacs-lisp :tangle init.el
 (setq dired-dwin-target t)
-#+END_SRC
+  #+END_SRC
 
 
 * Magit
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+(use-package magit
+  :custom
+  (magit-auto-revert-mode nil)
+  :bind
+  ("M-g s" . magit-status)
+  ("C-x g" . magit-status))
+#+END_SRC
 
-** Load evil-magit with magit buffer
-
+** evil-magit
 #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-  (require 'evil-magit)
+(use-package evil-magit
+  :init
   (evil-magit-init)
+  (setq evil-magit-state 'normal)
+  (setq evil-magit-use-y-for-yank nil)
+  :config
+  (evil-define-key evil-magit-state magit-mode-map "j" 'magit-log-popup)
+  (evil-define-key evil-magit-state magit-mode-map "k" 'evil-next-visual-line)
+  (evil-define-key evil-magit-state magit-mode-map "l" 'evil-previous-visual-line))
 #+END_SRC
 
-
-** define global keybing to magit-status
-   
-#+BEGIN_SRC emacs-lisp :tangle init.el
-  (global-set-key (kbd "C-x g") 'magit-status)
-#+END_SRC
-   
 
 * treemacs (neotree like navigation)
-  
-** Load treemacs and its relevant subpackages
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-  (require 'treemacs)
 
-  ;; (after [treemacs evil] (
-  (require 'treemacs-evil)
-   ;; ))
+** Treemacs itself
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+(use-package treemacs
+  :ensure t
+  :defer t
+  :hook (after-init . treemacs)
+  :init
+  (with-eval-after-load 'winum
+    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+  :config
+  (progn
+    (setq treemacs-collapse-dirs                 (if treemacs-python-executable 3 0)
+          treemacs-deferred-git-apply-delay      0.5
+          treemacs-display-in-side-window        t
+          treemacs-eldoc-display                 t
+          treemacs-file-event-delay              5000
+          treemacs-file-follow-delay             0.2
+          treemacs-follow-after-init             t
+          treemacs-git-command-pipe              ""
+          treemacs-goto-tag-strategy             'refetch-index
+          treemacs-indentation                   2
+          treemacs-indentation-string            " "
+          treemacs-is-never-other-window         nil
+          treemacs-max-git-entries               5000
+          treemacs-missing-project-action        'ask
+          treemacs-no-png-images                 nil
+          treemacs-no-delete-other-windows       t
+          treemacs-project-follow-cleanup        nil
+          treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+          treemacs-position                      'left
+          treemacs-recenter-distance             0.1
+          treemacs-recenter-after-file-follow    nil
+          treemacs-recenter-after-tag-follow     nil
+          treemacs-recenter-after-project-jump   'always
+          treemacs-recenter-after-project-expand 'on-distance
+          treemacs-show-cursor                   nil
+          treemacs-show-hidden-files             t
+          treemacs-silent-filewatch              nil
+          treemacs-silent-refresh                nil
+          treemacs-sorting                       'alphabetic-desc
+          treemacs-space-between-root-nodes      t
+          treemacs-tag-follow-cleanup            t
+          treemacs-tag-follow-delay              1.5
+          treemacs-width                         35)
 
-  ;; (after [treemacs magit] (
-  (require 'treemacs-magit)
-   ;; ))
+    ;; The default width and height of the icons is 22 pixels. If you are
+    ;; using a Hi-DPI display, uncomment this to double the icon size.
+    ;;(treemacs-resize-icons 44)
 
-  ;; (after [treemacs projectile] (
-  (require 'treemacs-projectile)
-   ;; ))
-#+END_SRC
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode t)
+    (pcase (cons (not (null (executable-find "git")))
+                 (not (null treemacs-python-executable)))
+      (`(t . t)
+       (treemacs-git-mode 'deferred))
+      (`(t . _)
+       (treemacs-git-mode 'simple))))
+  :bind
+  (:map global-map
+        ("<f8>"       . treemacs)
+        ("M-0"       . treemacs-select-window)
+        ("C-x t 1"   . treemacs-delete-other-windows)
+        ("C-x t t"   . treemacs)
+        ("C-x t B"   . treemacs-bookmark)
+        ("C-x t C-t" . treemacs-find-file)
+        ("C-x t M-t" . treemacs-find-tag)))
+   #+END_SRC
 
-** toggle treemacs with F7
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-(global-set-key [f8] 'treemacs)
-#+END_SRC
+** Treemacs Evil
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+(use-package treemacs-evil
+  :after treemacs evil
+  :ensure t)
+   #+END_SRC
 
-** treemacs-git-mode
-`treemacs-git-mode` is a global minor mode which enables treemacs to check for files’ and directories’ git status information and highlight them accordingly (see also the treemacs-git-... faces). The mode is available in 3 variants: simple, extended and deferred:
+** Treemacs Projectile
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+(use-package treemacs-projectile
+  :after treemacs projectile
+  :ensure t)
+   #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-(treemacs-git-mode 'deferred) 
-#+END_SRC
- 
+** Treemacs Dired
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+(use-package treemacs-icons-dired
+  :after treemacs dired
+  :ensure t
+  :config (treemacs-icons-dired-mode))
+   #+END_SRC
 
-** make treemacs open on emacs startup
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-(add-hook 'after-init-hook 'treemacs)
-#+END_SRC
-
+** Treemacs Magit
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+(use-package treemacs-magit
+  :after treemacs magit
+  :ensure t)
+   #+END_SRC
 
 * Neotree
 
 #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-(require 'neotree)
-#+END_SRC
+(use-package neotree
+  :config
+  (global-set-key [f7] 'neotree-toggle)
+  (progn
+    (setq neo-smart-open t)
+    (setq neo-window-fixed-size nil)
+    (evil-leader/set-key
+      "tt" 'neotree-toggle
+      "tp" 'neotree-projectile-action))
 
-** neotree 'icons' theme, which supports filetype icons
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-    ;; (after 'neotree
-  ;; (setq neo-theme (if (display-graphic-p) 'icons))
+  ;; neotree 'icons' theme, which supports filetype icons
+  (setq neo-theme (if (display-graphic-p) 'icons))
+  (setq neo-theme 'icons)
+  (setq neo-window-width 32)
 
-    (setq neo-theme 'icons)
-#+END_SRC
-
-
-** set NeoTree default window width
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-(setq neo-window-width 32)
-#+END_SRC
-
-** toggle neotree with F8
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-(global-set-key [f7] 'neotree-toggle)
-#+END_SRC
-
-
-** make nerdtree open on emacs startup
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-  ;; (add-hook 'after-init-hook #'neotree-toggle)
-#+END_SRC
-
-
-
-
-** make neotree window open and go the file currently opened
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-(setq neo-smart-open t)
-#+END_SRC
-
-
-** solve keybinding conflicts between neotree with evil mode
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+  ;; Neotree bindings
   (add-hook 'neotree-mode-hook
             (lambda ()
               ; default Neotree bindings
@@ -1003,49 +1132,36 @@ is customized, please consider the following settings in your init file"
               (define-key evil-normal-state-local-map (kbd "r") 'neotree-refresh)
               (define-key evil-normal-state-local-map (kbd "u") 'neotree-refresh)
               (define-key evil-normal-state-local-map (kbd "C") 'neotree-change-root)
-              (define-key evil-normal-state-local-map (kbd "c") 'neotree-create-node)))
+              (define-key evil-normal-state-local-map (kbd "c") 'neotree-create-node))))
 #+END_SRC
-
-
 
 * dired-sidebar
 
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+  #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
 (require 'neotree)
-#+END_SRC
+  #+END_SRC
 
 ** toggle neotree with F8
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
 (global-set-key [f6] 'dired-sidebar-toggle-sidebar)
-#+END_SRC
+   #+END_SRC
 
 ** other settings for dired-sidebar
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
 (setq dired-sidebar-subtree-line-prefix "__")
 (setq dired-sidebar-theme 'vscode)
 (setq dired-sidebar-use-term-integration t)
 (setq dired-sidebar-use-custom-font t)
-#+END_SRC
-
-* eyebrowse (window navigation)
-  
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-(require 'eyebrowse)
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
-  ;; (eyebrowse-mode t)
-#+END_SRC
-  
+   #+END_SRC
 
 * Shell
-  
+
 ** System Shell
 *** Make system shell open in a split-window buffer at the bottom of the screen
-   
- #+BEGIN_SRC emacs-lisp :tangle init.el
+
+    #+BEGIN_SRC emacs-lisp :tangle init.el
    (defun /shell/new-window ()
-       "Opens up a new shell in the directory associated with the current buffer's file." 
+       "Opens up a new shell in the directory associated with the current buffer's file."
        (interactive)
        (let* ((parent (if (buffer-file-name)
                           (file-name-directory (buffer-file-name))
@@ -1064,14 +1180,14 @@ is customized, please consider the following settings in your init file"
    (define-key evil-normal-state-map (kbd "\"") #'/shell/new-window)
    (define-key evil-visual-state-map (kbd "\"") #'/shell/new-window)
    (define-key evil-motion-state-map (kbd "\"") #'/shell/new-window)
- #+END_SRC
+    #+END_SRC
 
-  
+
 ** Eshell
 
 *** Make eshell open in a split-window buffer at the bottom of the screen
-   
- #+BEGIN_SRC emacs-lisp :tangle init.el
+
+    #+BEGIN_SRC emacs-lisp :tangle init.el
  (defun /eshell/new-window ()
      "Opens up a new eshell in the directory associated with the current buffer's file.  The eshell is renamed to match that directory to make multiple eshell windows easier."
      (interactive)
@@ -1092,43 +1208,65 @@ is customized, please consider the following settings in your init file"
  (define-key evil-normal-state-map (kbd "!") #'/eshell/new-window)
  (define-key evil-visual-state-map (kbd "!") #'/eshell/new-window)
  (define-key evil-motion-state-map (kbd "!") #'/eshell/new-window)
- #+END_SRC
+    #+END_SRC
 
- 
 
 
 * PDF Tools
 
 ** Install pdf-tools if its not already installed
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
   ;; (pdf-tools-install)
   ;; the docs say if i care about startup time, i should use pdf-loader-install instead of pdf-tools-install, but doenst say why
-  ;; (pdf-loader-install) 
-#+END_SRC
+  ;; (pdf-loader-install)
+   #+END_SRC
 
 ** Make buffer refresh every 1 second to PDF-tools updates the changed pdf
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
-  ;; (add-hook 'pdf-view-mode-hook 'auto-revert-mode) 
-  ;; (add-hook 'doc-view-mode-hook 'auto-revert-mode) 
-#+END_SRC
+  ;; (add-hook 'pdf-view-mode-hook 'auto-revert-mode)
+  ;; (add-hook 'doc-view-mode-hook 'auto-revert-mode)
+   #+END_SRC
 
 ** PDF tools evil keybindings
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
   (evil-define-key 'normal pdf-view-mode-map
     "h" 'pdf-view-previous-page-command
     "j" (lambda () (interactive) (pdf-view-next-line-or-next-page 5))
     "k" (lambda () (interactive) (pdf-view-previous-line-or-previous-page 5))
     "l" 'pdf-view-next-page-command)
-#+END_SRC
+   #+END_SRC
 
 
 
 * Appearance
 
+** cleaning the default UI
+
+   #+BEGIN_SRC emacs-lisp :tangle init.el
+(setq inhibit-splash-screen t)
+
+(blink-cursor-mode t)
+(setq blink-cursor-blinks 0) ;; blink forever
+(setq-default indicate-empty-lines t)
+(setq-default line-spacing 3)
+(setq frame-title-format '("Emacs"))
+   #+END_SRC
+
+*** Remove scroll bars from frames
+    #+BEGIN_SRC emacs-lisp :tangle init.el
+(scroll-bar-mode -1)
+    #+END_SRC
+
+*** Remove menu bar and tool bar
+    #+BEGIN_SRC emacs-lisp :tangle init.el
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+    #+END_SRC
+
 ** Applying my theme
-   
-#+BEGIN_SRC emacs-lisp :tangle init.el
+
+   #+BEGIN_SRC emacs-lisp :tangle init.el
 
   (add-to-list 'custom-theme-load-path "~/dotfiles/emacs.d/themes/")
   ; theme options:
@@ -1138,20 +1276,20 @@ is customized, please consider the following settings in your init file"
   ; gruvbox-dark-hard
   ; gruvbox-dark-light
   ; gruvbox-dark-medium
-  ; base16-default-dark-theme <-- this one is good
+  ; base16-default-dark-theme -- this one is good
 
   (setq my-theme 'darkplus)
-  
-#+END_SRC
 
-Load the theme
+   #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   Load the theme
+
+   #+BEGIN_SRC emacs-lisp :tangle init.el
  (load-theme my-theme t)
-#+END_SRC
+   #+END_SRC
 
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
 
   ;; (defun load-my-theme (frame)
   ;;   "Function to load the theme in current FRAME.
@@ -1166,25 +1304,25 @@ Load the theme
 
   ;; ;; this if was breaking my emacs!!!!!
   ;;  (add-hook 'after-make-frame-functions #'load-my-theme)
-#+END_SRC
+   #+END_SRC
 
 
 ** doom-modeline
-   
-Require and enable the doom-modeline
-#+BEGIN_SRC emacs-lisp :tangle init.el
+
+   Require and enable the doom-modeline
+   #+BEGIN_SRC emacs-lisp :tangle init.el
 (require 'doom-modeline)
 (doom-modeline-mode 1)
-#+END_SRC
+   #+END_SRC
 
-Don’t compact font caches during GC (garbage collection). 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   Don’t compact font caches during GC (garbage collection).
+   #+BEGIN_SRC emacs-lisp :tangle init.el
   ;; (setq inhibit-compacting-font-caches t)
-#+END_SRC
+   #+END_SRC
 
-Customize the doom-modeline (convert the comments to org later
+   Customize the doom-modeline (convert the comments to org later)
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
   ;; How tall the mode-line should be. It's only respected in GUI.
   ;; If the actual char height is larger, it respects the actual height.
   (setq doom-modeline-height 23)
@@ -1195,16 +1333,16 @@ Customize the doom-modeline (convert the comments to org later
   ;; Determines the style used by `doom-modeline-buffer-file-name'.
   ;;
   ;; Given ~/Projects/FOSS/emacs/lisp/comint.el
-  ;;   truncate-upto-project => ~/P/F/emacs/lisp/comint.el
-  ;;   truncate-from-project => ~/Projects/FOSS/emacs/l/comint.el
-  ;;   truncate-with-project => emacs/l/comint.el
-  ;;   truncate-except-project => ~/P/F/emacs/l/comint.el
-  ;;   truncate-upto-root => ~/P/F/e/lisp/comint.el
-  ;;   truncate-all => ~/P/F/e/l/comint.el
-  ;;   relative-from-project => emacs/lisp/comint.el
-  ;;   relative-to-project => lisp/comint.el
-  ;;   file-name => comint.el
-  ;;   buffer-name => comint.el<2> (uniquify buffer name)
+  ;;   truncate-upto-project = ~/P/F/emacs/lisp/comint.el
+  ;;   truncate-from-project = ~/Projects/FOSS/emacs/l/comint.el
+  ;;   truncate-with-project = emacs/l/comint.el
+  ;;   truncate-except-project = ~/P/F/emacs/l/comint.el
+  ;;   truncate-upto-root = ~/P/F/e/lisp/comint.el
+  ;;   truncate-all = ~/P/F/e/l/comint.el
+  ;;   relative-from-project = emacs/lisp/comint.el
+  ;;   relative-to-project = lisp/comint.el
+  ;;   file-name = comint.el
+  ;;   buffer-name = comint.el<2> (uniquify buffer name)
   ;;
   ;; If you are expereicing the laggy issue, especially while editing remote files
   ;; with tramp, please try `file-name' style.
@@ -1287,13 +1425,13 @@ Customize the doom-modeline (convert the comments to org later
 
   ;; Function to stylize the irc buffer names.
   (setq doom-modeline-irc-stylize 'identity)
-#+END_SRC
+   #+END_SRC
 
 
-this was commented with C-c ; so it doenst get exported in favor of doom-modeline 
+   this was commented with C-c ; so it doenst get exported in favor of doom-modeline
 ** COMMENT smart-mode-line
-   
-#+BEGIN_SRC emacs-lisp :tangle init.el
+
+   #+BEGIN_SRC emacs-lisp :tangle init.el
  (require 'smart-mode-line)
  (if (require 'smart-mode-line nil 'noerror)
      (progn
@@ -1318,940 +1456,583 @@ this was commented with C-c ; so it doenst get exported in favor of doom-modelin
 
 
        (display-time-mode 1)
-      
+
        (add-to-list 'sml/replacer-regexp-list '("^~/Dropbox/" ":DB:"))
        (add-to-list 'sml/replacer-regexp-list
                     '("^~/.*/lib/ruby/gems" ":GEMS" ))
        (add-to-list 'sml/replacer-regexp-list
                     '("^~/Projects/" ":CODE:"))))
-#+END_SRC
+   #+END_SRC
 
 ** parrot-mode
-   
-Enable the party parrot
-#+BEGIN_SRC emacs-lisp :tangle init.el
+
+   Enable the party parrot
+   #+BEGIN_SRC emacs-lisp :tangle init.el
 (require 'parrot)
 ;; To see the party parrot in the modeline, turn on parrot mode:
-(parrot-mode)  
-#+END_SRC
+(parrot-mode)
+   #+END_SRC
 
 
-Rotation function keybindings for vanilla emacs
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   Rotation function keybindings for vanilla emacs
+   #+BEGIN_SRC emacs-lisp :tangle init.el
 (global-set-key (kbd "C-c p") 'parrot-rotate-prev-word-at-point)
 (global-set-key (kbd "C-c n") 'parrot-rotate-next-word-at-point)
-#+END_SRC
+   #+END_SRC
 
-Rotation function keybindings for evil users
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   Rotation function keybindings for evil users
+   #+BEGIN_SRC emacs-lisp :tangle init.el
 (define-key evil-normal-state-map (kbd "[r") 'parrot-rotate-prev-word-at-point)
 (define-key evil-normal-state-map (kbd "]r") 'parrot-rotate-next-word-at-point)
-#+END_SRC
+   #+END_SRC
 
-Type of parrots available:
+   Type of parrots available:
 
-- default
-- confused
-- emacs
-- nyan
-- rotating
-- science
-- thumbsup
+   - default
+   - confused
+   - emacs
+   - nyan
+   - rotating
+   - science
+   - thumbsup
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
 (parrot-set-parrot-type 'default)
-#+END_SRC
+   #+END_SRC
 
-Seconds between animation frames (can be a decimal number)
-#+BEGIN_SRC emacs-lisp :tangle init.el
-; parrot-animation-frame-interval  
-#+END_SRC
+   Seconds between animation frames (can be a decimal number)
+   #+BEGIN_SRC emacs-lisp :tangle init.el
+; parrot-animation-frame-interval
+   #+END_SRC
 
-Minimum width of the window, below which party parrot mode will be disabled.
-#+BEGIN_SRC emacs-lisp :tangle init.el
-; parrot-minimum-window-width 
-#+END_SRC
+   Minimum width of the window, below which party parrot mode will be disabled.
+   #+BEGIN_SRC emacs-lisp :tangle init.el
+; parrot-minimum-window-width
+   #+END_SRC
 
 
-To enable parrot animation, nil for a static image.
-#+BEGIN_SRC emacs-lisp :tangle init.el
-; (parrot-animate-parrot t) 
-#+END_SRC
+   To enable parrot animation, nil for a static image.
+   #+BEGIN_SRC emacs-lisp :tangle init.el
+; (parrot-animate-parrot t)
+   #+END_SRC
 
-Number of spaces of padding before and after the parrot.
-#+BEGIN_SRC emacs-lisp :tangle init.el
-; parrot-spaces-before 
+   Number of spaces of padding before and after the parrot.
+   #+BEGIN_SRC emacs-lisp :tangle init.el
+; parrot-spaces-before
 ; parrot-spaces-after
-#+END_SRC
+   #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
 ; - number of times the parrot will cycle through its gif.
-parrot-num-rotations 
-#+END_SRC
+parrot-num-rotations
+   #+END_SRC
 
 
-Add hook to mu4e so the parrot rotates when new email arrives
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   Add hook to mu4e so the parrot rotates when new email arrives
+   #+BEGIN_SRC emacs-lisp :tangle init.el
 (add-hook 'mu4e-index-updated-hook #'parrot-start-animation)
-#+END_SRC
+   #+END_SRC
 
-Rotate the parrot when clicking on it (this can also be used to execute any function when clicking the parrot, like 'flyspell-buffer)
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   Rotate the parrot when clicking on it (this can also be used to execute any function when clicking the parrot, like 'flyspell-buffer)
+   #+BEGIN_SRC emacs-lisp :tangle init.el
 (add-hook 'parrot-click-hook #'parrot-start-animation)
-#+END_SRC
+   #+END_SRC
 
-Rotate parrot when buffer is saved
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   Rotate parrot when buffer is saved
+   #+BEGIN_SRC emacs-lisp :tangle init.el
 (add-hook 'after-save-hook #'parrot-start-animation)
-#+END_SRC
+   #+END_SRC
 
 ** nyan-mode
-   
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(require 'nyan-mode)
-(nyan-mode)
-#+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-  ;; (setq nyan-cat-face-number 1)
-#+END_SRC
-
-I had to add this hook because setting nyan-animate-nyancat to t alone wasnt animating the cat
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(add-hook 'after-init-hook #'nyan-start-animation)
-(setq nyan-animate-nyancat t)
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(setq nyan-wavy-trail t)
+(use-package nyan-mode
+   :if window-system
+   :hook
+   (after-init . nyan-mode)
+   :config
+   (setq nyan-cat-face-number 4)
+   (setq nyan-animate-nyancat t)
+   (setq nyan-wavy-trail t)
+   (nyan-start-animation))
 #+END_SRC
 
 ** solaire-mode
-   
-solaire-mode is an aesthetic plugin that helps visually distinguish file-visiting windows from other types of windows (like popups or sidebars) by giving them a slightly different -- often brighter -- background.
+
+solaire-mode is an aesthetic plugin that helps visually distinguish
+file-visiting windows from other types of windows (like popups or sidebars)
+by giving them a slightly different -- often brighter -- background.
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(require 'solaire-mode)
-#+END_SRC
-
-Enable solaire-mode anywhere it can be enabled
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(solaire-global-mode +1)
-#+END_SRC
-
-To enable solaire-mode unconditionally for certain modes:
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(add-hook 'ediff-prepare-buffer-hook #'solaire-mode)
-#+END_SRC
-
-
-...if you use auto-revert-mode, this prevents solaire-mode from turning itself off every time Emacs reverts the file
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(add-hook 'after-revert-hook #'turn-on-solaire-mode)
-#+END_SRC
-
-highlight the minibuffer when it is activated:
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(add-hook 'minibuffer-setup-hook #'solaire-mode-in-minibuffer)
-#+END_SRC
-
-if the bright and dark background colors are the wrong way around, use this
-to switch the backgrounds of the `default` and `solaire-default-face` faces.
-This should be used *after* you load the active theme!
-
-NOTE: This is necessary for themes in the doom-themes package!
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(solaire-mode-swap-bg)
-#+END_SRC
-
-** cleaning the default UI
-   
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(setq inhibit-splash-screen t)
-
-(blink-cursor-mode t)
-(setq blink-cursor-blinks 0) ;; blink forever
-(setq-default indicate-empty-lines t)
-(setq-default line-spacing 3)
-(setq frame-title-format '("Emacs"))
-#+END_SRC
-
-*** Remove scroll bars from frames
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(scroll-bar-mode -1)
-#+END_SRC
-
-*** Remove menu bar and tool bar
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(tool-bar-mode -1)
-(menu-bar-mode -1)
+  ;; (use-package solaire-mode
+  ;;   :config
+  ;;   (solaire-mode)
+  ;;   :hook
+  ;;   (after-init . solaire-global-mode +1)
+  ;;   ;; To enable solaire-mode unconditionally for certain modes:
+  ;;   (ediff-prepare-buffer . solaire-mode)
+  ;;   ;; if you use auto-revert-mode, this prevents solaire-mode from turning itself off every time Emacs reverts the file
+  ;;   (after-revert- . turn-on-solaire-mode)
+  ;;   ;; highlight the minibuffer when it is activated:
+  ;;   (minibuffer-setup . solaire-mode-in-minibuffer)
+  ;;   (after-change-major-mode . turn-on-solaire-mode)
+  ;;   :config
+  ;;   ;; if the bright and dark background colors are the wrong way around, use this
+  ;;   ;; to switch the backgrounds of the `default` and `solaire-default-face` faces.
+  ;;   ;; This should be used *after* you load the active theme!
+  ;;   ;;  NOTE: This is necessary for themes in the doom-themes package!
+  ;;   (solaire-mode-swap-bg))
 #+END_SRC
 
 
 * centaur-tabs
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(require 'centaur-tabs)
-(centaur-tabs-mode t)
-#+END_SRC
+(use-package centaur-tabs
+   :load-path "~/.emacs.d/other/centaur-tabs"
+   :config
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(global-set-key (kbd "C-<prior>")  'centaur-tabs-backward)
-(global-set-key (kbd "C-<next>") 'centaur-tabs-forward)
-(global-set-key [?\C-.] 'centaur-tabs-forward-tab)
-(global-set-key (kbd "C-,") 'centaur-tabs-backward-tab)
-#+END_SRC
+   ;; Types available:
+   ;; + alternate
+   ;; + bar
+   ;; + box
+   ;; + chamfer
+   ;; + rounded
+   ;; + slang
+   ;; + wave
+   ;; + zigzag
+   (setq centaur-tabs-style "bar")
+   (setq centaur-tabs-height 32)
+   (setq  centaur-tabs-set-icons t)
 
-** Tab Style for centaur-tabs
-Types available: 
-+ alternate
-+ bar
-+ box
-+ chamfer
-+ rounded
-+ slang
-+ wave
-+ zigzag
+   ;; To display a marker indicating that a buffer has been modified (atom-style)
+   (setq centaur-tabs-set-modified-marker t)
+   (setq centaur-tabs-modified-marker "*")
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(setq centaur-tabs-style "bar")
-#+END_SRC
+   (setq centaur-tabs-set-bar 'left) ;; in previous config value was 'over
+   (setq centaur-tabs-gray-out-icons 'buffer)
+   (centaur-tabs-headline-match)
+   ;; (centaur-tabs-enable-buffer-reordering)
+   ;; (setq centaur-tabs-adjust-buffer-order t)
+   (centaur-tabs-mode t)
+   (setq uniquify-separator "/")
+   (setq uniquify-buffer-name-style 'forward)
+   (defun centaur-tabs-buffer-groups ()
+     "`centaur-tabs-buffer-groups' control buffers' group rules.
 
-** Set the tabs height
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(setq centaur-tabs-height 32)
-#+END_SRC
-
-** Use custom icons on tabs from all-the-icons
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(setq centaur-tabs-set-icons t)
-#+END_SRC
-
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(setq centaur-tabs-set-bar 'over)
-#+END_SRC
-
-** Gray out unselected tabs 
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(setq centaur-tabs-gray-out-icons 'buffer)
-#+END_SRC
-
-** Customize the modified marker
-To display a marker indicating that a buffer has been modified (atom-style)
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(setq centaur-tabs-set-modified-marker t)
-#+END_SRC
-
-** To change the displayed string for the modified-marker
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(setq centaur-tabs-modified-marker "*")
-#+END_SRC
-
-
-** Enable vim-like tab motions
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(define-key evil-normal-state-map (kbd "g t") 'centaur-tabs-forward)
-(define-key evil-normal-state-map (kbd "g T") 'centaur-tabs-backward)
-#+END_SRC
-
-
+ Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
+ All buffer name start with * will group to \"Emacs\".
+ Other buffer group by `centaur-tabs-get-group-name' with project name."
+     (list
+      (cond
+	((or (string-equal "*" (substring (buffer-name) 0 1))
+	     (memq major-mode '(magit-process-mode
+				magit-status-mode
+				magit-diff-mode
+				magit-log-mode
+				magit-file-mode
+				magit-blob-mode
+				magit-blame-mode
+				)))
+	 "Emacs")
+	((derived-mode-p 'prog-mode)
+	 "Editing")
+	((derived-mode-p 'dired-mode)
+	 "Dired")
+	((memq major-mode '(helpful-mode
+			    help-mode))
+	 "Help")
+	((memq major-mode '(org-mode
+			    org-agenda-clockreport-mode
+			    org-src-mode
+			    org-agenda-mode
+			    org-beamer-mode
+			    org-indent-mode
+			    org-bullets-mode
+			    org-cdlatex-mode
+			    org-agenda-log-mode
+			    diary-mode))
+	 "OrgMode")
+	(t
+	 (centaur-tabs-get-group-name (current-buffer))))))
+   :hook
+   (dashboard-mode . centaur-tabs-local-mode)
+   (term-mode . centaur-tabs-local-mode)
+   (calendar-mode . centaur-tabs-local-mode)
+   (org-agenda-mode . centaur-tabs-local-mode)
+   (helpful-mode . centaur-tabs-local-mode)
+   :bind
+   ("C-<prior>" . centaur-tabs-backward)
+   ("C-<next>" . centaur-tabs-forward)
+   ("C-c t s" . centaur-tabs-counsel-switch-group)
+   ("C-c t p" . centaur-tabs-group-by-projectile-project)
+   ("C-c t g" . centaur-tabs-group-buffer-groups)
+   (:map evil-normal-state-map
+	  ("g t" . centaur-tabs-forward)
+	  ("g T" . centaur-tabs-backward)))
+  #+END_SRC
 
 * Minor modes
-  
+
 ** Highlighting numbers
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
   (use-package highlight-numbers
     :ensure t
-    :hook prog-mode)
-#+END_SRC
+    :hook ((prog-mode . highlight-numbers-mode)))
+   #+END_SRC
 ** Highlighting operators
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
   (use-package highlight-operators
     :ensure t
-    :hook prog-mode)
-#+END_SRC
+    :hook ((prog-mode . highlight-operators-mode)))
+   #+END_SRC
 ** Highlighting escape sequences
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
   (use-package highlight-escape-sequences
     :ensure t
-    :hook prog-mode)
-#+END_SRC
-#+BEGIN_SRC emacs-lisp :tangle init.el
-  (use-package highlight-parentheses
-    :ensure t
-    :hook prog-mode)
-#+END_SRC
-
-** DELETE THESE LINES (USES PACKAGE.EL)
-#+BEGIN_SRC emacs-lisp :tangle init.el
-  ;; (add-hook 'prog-mode-hook 'highlight-numbers-mode)
-  ;; (add-hook 'prog-mode-hook 'highlight-operators-mode)
-  ;; (add-hook 'prog-mode-hook 'hes-mode)    ;; highlight escape sequences
-#+END_SRC
+    :hook ((prog-mode . hes-mode)))
+   #+END_SRC
+** Highlighting parentheses
+   #+BEGIN_SRC emacs-lisp :tangle init.el
+       (use-package highlight-parentheses
+         :ensure t
+         :hook ((prog-mode . highlight-parentheses-mode)))
+   #+END_SRC
 
 ** which-key
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-  (require 'which-key)
+(use-package which-key
+  :hook (after-init . which-key-mode))
+  :config
   (setq which-key-idle-delay 0.2)
   (setq which-key-min-display-lines 3)
   (setq which-key-max-description-length 20)
   (setq which-key-max-display-columns 6)
-  (which-key-mode)
 #+END_SRC
 
 ** diff-hl (highlights uncommited diffs in bar aside from the line numbers)
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
 (global-diff-hl-mode)
-#+END_SRC
+   #+END_SRC
 
 ** smartparens
-   
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(require 'smartparens-config)
-(add-hook 'prog-mode-hook #'smartparens-mode)
+(use-package smartparens
+  :ensure t
+  :hook
+  (after-init . smartparens-global-mode)
+  :config
+  (require 'smartparens-config)
+  (sp-pair "=" "=" :actions '(wrap))
+  (sp-pair "+" "+" :actions '(wrap))
+  (sp-pair "<" ">" :actions '(wrap))
+  (sp-pair "$" "$" :actions '(wrap)))
 #+END_SRC
 
 *** evil-smartparens helps avoid conflicts between evil and smartparens
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(add-hook 'smartparens-enabled-hook #'evil-smartparens-mode)
+(use-package evil-smartparens
+  :ensure t
+  :hook
+  (smarparens-enabled . evil-smartparens-mode))
+#+END_SRC
+
+** Rainbow Delimiters
+
+This highlights matching parentheses acording to their depth
+Helps editing lisp code
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package rainbow-delimiters
+  :ensure t
+  :hook
+  (emacs-lisp-mode . rainbow-delimiters-mode))
 #+END_SRC
 
 ** rainbow mode
-*** enable rainbow-mode on relevant filetypes
 
 : Colorize hex, rgb and named color codes
-   
+
 #+BEGIN_SRC emacs-lisp :tangle init.el
-   (add-hook 'org-mode-hook 'rainbow-mode)
-   (add-hook 'css-mode-hook 'rainbow-mode)
-   (add-hook 'php-mode-hook 'rainbow-mode)
-   (add-hook 'html-mode-hook 'rainbow-mode)
-   (add-hook 'web-mode-hook 'rainbow-mode)
-   (add-hook 'js2-mode-hook 'rainbow-mode)
+(use-package rainbow-mode
+  :ensure t
+  :hook
+  (org-mode . rainbow-mode)
+  (css-mode . rainbow-mode)
+  (php-mode . rainbow-mode)
+  (html-mode . rainbow-mode)
+  (web-mode . rainbow-mode)
+  (js2-mode . rainbow-mode))
 #+END_SRC
 
 ** Emmet
-    
-*** Add hook to any markup file to load emmet-mode
-#+BEGIN_SRC emacs-lisp :tangle init.el
-   (require 'emmet-mode)
-#+END_SRC
- 
-*** Add hook to any markup file to load emmet-mode
-#+BEGIN_SRC emacs-lisp :tangle init.el
-  (define-key evil-insert-state-map (kbd "TAB") 'emmet-expand-line)
-#+END_SRC
- 
-*** Add hook to any markup file to load emmet-mode
-#+BEGIN_SRC emacs-lisp :tangle init.el
-   (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
-   (add-hook 'html-mode-hook 'emmet-mode) ;; Auto-start on HTML files
-   (add-hook 'web-mode-hook 'emmet-mode) ;; Auto-start on web-mode
-   (add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation. 
-#+END_SRC
 
-*** Use emmet with JSX markup
 #+BEGIN_SRC emacs-lisp :tangle init.el
-   (setq emmet-expand-jsx-className? t) ;; default nil
+(use-package emmet-mode
+  :ensure t
+  :commands emmet-mode
+  :init
+    (setq emmet-indentation 2)
+    (setq emmet-move-cursor-between-quotes t)
+  :hook
+    (sgml-mode . emmet-mode) ;; Auto-start on any markup modes
+    (css-mode . emmet-mode) ;; enable Emmet's css abbreviation.
+    (html-mode . emmet-mode) ;; Auto-start on HTML files
+    (web-mode . emmet-mode) ;; Auto-start on web-mode
+  :config
+    (setq emmet-expand-jsx-className? t)) ;; use emmet with JSX markup
 #+END_SRC
 
 ** Smartscan mode
-: Usage:
-: M-n and M-p move between symbols
-: M-' to replace all symbols in the buffer matching the one under point
-: C-u M-' to replace symbols in your current defun only (as used by narrow-to-defun.)
+   : Usage:
+   : M-n and M-p move between symbols
+   : M-' to replace all symbols in the buffer matching the one under point
+   : C-u M-' to replace symbols in your current defun only (as used by narrow-to-defun.)
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
   (smartscan-mode 1)
-#+END_SRC 
+   #+END_SRC
 
 ** editorconfig
-   
-#+BEGIN_SRC emacs-lisp :tangle init.el
+
+   #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package editorconfig
   :ensure t
   :config
   (editorconfig-mode 1))
-#+END_SRC 
+   #+END_SRC
 
 
 * FlyCheck linter
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(add-hook 'after-init-hook #'global-flycheck-mode)
+(use-package flycheck
+    :ensure t
+    :defer t
+    :hook
+    (after-init . global-flycheck-mode)
+    :init
+    (global-flycheck-mode))
 #+END_SRC
 
+
 ** Turn flycheck inline extension after flycheck starts
-   
-#+BEGIN_SRC emacs-lisp :tangle init.el
+
+   #+BEGIN_SRC emacs-lisp :tangle init.el
   (with-eval-after-load 'flycheck
     (global-flycheck-inline-mode))
   ;; (with-eval-after-load 'flycheck
   ;;   (add-hook 'flycheck-mode-hook #'turn-on-flycheck-inline))
-#+END_SRC
+   #+END_SRC
 
 
 
 * Languages Setup Web-Mode
- #+BEGIN_SRC emacs-lisp :tangle init.el
-   (require 'web-mode)
- #+END_SRC
- 
+  #+BEGIN_SRC emacs-lisp :tangle init.el
+  (require 'web-mode)
+  #+END_SRC
+
 *** web-mode script/code offset indentation (for JavaScript, Java, PHP, Ruby, Go, VBScript, Python, etc.)
-#+BEGIN_SRC emacs-lisp :tangle init.el
+    #+BEGIN_SRC emacs-lisp :tangle init.el
 (setq web-mode-code-indent-offset 2)
-#+END_SRC
-  
+    #+END_SRC
+
 ** JavaScript
-   
-*** Associate Javascript files with js2-mode
 
-: Use js2-mode for JS files  
+*** JS2 Mode
 
- #+BEGIN_SRC emacs-lisp :tangle init.el
-   (add-to-list 'auto-mode-alist '("\\.js?\\'" . js2-mode))
- #+END_SRC
- 
-: Use js2-mode for Typescript files  
+    #+BEGIN_SRC emacs-lisp :tangle init.el
+  ;; js2-mode: enhanced JavaScript editing mode
+  ;; https://github.com/mooz/js2-mode
+  (use-package js2-mode
+    :mode (("\\.js$" . js2-mode)
+           ("\\.ts$" . js2-mode))
+    :hook ((js2-mode . flycheck-mode)
+           (js2-mode . company-mode)
+           (js2-mode . lsp-mode)
+           (js2-mode . add-node-modules-path))
+    :config
+    ;; have 2 space indentation by default
+    (setq js-indent-level 2
+          js2-basic-offset 2
+          js-chain-indent t)
 
- #+BEGIN_SRC emacs-lisp :tangle init.el
-   (add-to-list 'auto-mode-alist '("\\.ts?\\'" . js2-mode))
- #+END_SRC
- 
-: Use js2-jsx-mode for JSX files  
- #+BEGIN_SRC emacs-lisp :tangle init.el
-   (add-to-list 'auto-mode-alist '("\\.jsx?\\'" . js2-jsx-mode))
- #+END_SRC
+    ;; use eslint_d insetad of eslint for faster linting
+    ;; (setq flycheck-javascript-eslint-executable "eslint_d")
+
+    ;; Try to highlight most ECMA built-ins
+    (setq js2-highlight-level 3)
+
+    ;; turn off all warnings in js2-mode
+    (setq js2-mode-show-parse-errors t)
+    (setq js2-mode-show-strict-warnings nil)
+    (setq js2-strict-missing-semi-warning nil))
+    #+END_SRC
 
 *** PrettierJS
 
-**** Require first so i can actually use it
+    #+BEGIN_SRC emacs-lisp :tangle init.el
+  ;; prettier-emacs: minor-mode to prettify javascript files on save
+  ;; https://github.com/prettier/prettier-emacs
+  (use-package prettier-js
+    :hook ((js2-mode . prettier-js-mode)
+           (json-mode . prettier-js-mode)
+           (web-mode . prettier-js-mode)
+           (rjsx-mode . prettier-js-mode))
+    :config
+    (setq prettier-js-args '("--trailing-comma" "all"
+                             "--bracket-spacing" "false"))
+    (defun enable-minor-mode (my-pair)
 
-  #+BEGIN_SRC emacs-lisp :tangle init.el
-    (require 'prettier-js)
-  #+END_SRC
-  
-**** add prettier to js2 and rjsx minor modes
+    "Enable prettier-js-mode if theres a .prettierrc on project dir"
+    (if (buffer-file-name)
+        (if (string-match (car my-pair) buffer-file-name)
+        (funcall (cdr my-pair)))))
+        ; Hook the above function to web-mode
+    (add-hook 'web-mode-hook #'(lambda ()
+        (enable-minor-mode
+            '("\\.js?\\'" . prettier-js-mode)
+            '("\\.jsx?\\'" . prettier-js-mode)
+            '("\\.css?\\'" . prettier-js-mode)))))
+    #+END_SRC
+
+*** JSON Mode
+
+    #+BEGIN_SRC emacs-lisp :tangle init.el
+;; json-mode: Major mode for editing JSON files with emacs
+;; https://github.com/joshwnj/json-mode
+(use-package json-mode
+  :mode "\\.js\\(?:on\\|[hl]int\\(rc\\)?\\)\\'"
+  :config
+  (add-hook 'json-mode-hook #'prettier-js-mode)
+  (setq json-reformat:indent-width 2)
+  (setq json-reformat:pretty-string? t)
+  (setq js-indent-level 2))
+    #+END_SRC
+
+*** ESLint
+
+    #+BEGIN_SRC emacs-lisp :tangle init.el
+   ;; eslintd-fix: Emacs minor-mode to automatically fix javascript with eslint_d.
+   ;; https://github.com/aaronjensen/eslintd-fix/tree/master
+   ;; (use-package eslintd-fix)
+    #+END_SRC
+
+*** RJSX Mode
+https://github.com/felipeochoa/rjsx-mode
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-     (add-hook 'js2-mode-hook 'prettier-js-mode)
-     (add-hook 'json-mode-hook 'prettier-js-mode)
-     (add-hook 'web-mode-hook 'prettier-js-mode)
-     (add-hook 'rjsx-mode-hook 'prettier-js-mode)
+(use-package rjsx-mode
+    :after js2-mode
+    :mode
+    (("\\.jsx$" . rjsx-mode)
+    ("components/.+\\.js$" . rjsx-mode)))
 #+END_SRC
 
-**** Add prettier to Web-Mode
-#+BEGIN_SRC emacs-lisp :tangle init.el
-   (defun enable-minor-mode (my-pair)
-     "Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
-     (if (buffer-file-name)
-         (if (string-match (car my-pair) buffer-file-name)
-         (funcall (cdr my-pair)))))
-#+END_SRC
-
-***** And then hook to web-mode like this:
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-   (add-hook 'web-mode-hook #'(lambda ()
-                               (enable-minor-mode
-                                '("\\.js?\\'" . prettier-js-mode)
-                                '("\\.jsx?\\'" . prettier-js-mode)
-                                '("\\.css?\\'" . prettier-js-mode))))
-#+END_SRC
-
-*** js2-refactor
- #+BEGIN_SRC emacs-lisp :tangle init.el
-   (add-hook 'js2-mode-hook #'js2-refactor-mode)
- #+END_SRC
-
-
-**** choose js2-refactor keybinding scheme (this can be changed easily)
-
- #+BEGIN_SRC emacs-lisp :tangle init.el
-   (js2r-add-keybindings-with-prefix "C-c C-m")
- #+END_SRC
-
-** Elixir
-   
-: This elixir part of the config compiles to a separate files, inside the config folder, named `elixir.tau.el`
-   
-*** Install elixir-mode if not already installed
-    
- #+BEGIN_SRC emacs-lisp :tangle config/elixir.tau.el
-   (unless (package-installed-p 'elixir-mode)
-   (package-install 'elixir-mode))  
- #+END_SRC
-
-*** Require elixir-mode
-    
- #+BEGIN_SRC emacs-lisp :tangle config/elixir.tau.el
- (require 'elixir-mode)
- #+END_SRC
-
-*** Elixir file types associations
-#+BEGIN_SRC emacs-lisp :tangle config/elixir.tau.el
-(add-to-list 'auto-mode-alist '("\\.ex\\'" . elixir-mode))
-(add-to-list 'auto-mode-alist '("\\.exs\\'" . elixir-mode))
-;; Use web-mode for elixir template files (eex)
-(add-to-list 'auto-mode-alist '("\\.eex\\'" . web-mode))
-#+END_SRC
-
-*** Create a buffer-local hook to run elixir-format on save, only when we enable elixir-mode.
-   
-#+BEGIN_SRC emacs-lisp :tangle config/elixir.tau.el
-  (add-hook 'elixir-mode-hook
-            (lambda () (add-hook 'before-save-hook 'elixir-format nil t)))
-#+END_SRC
-          
-
-*** Alchemist
-   
-**** Install Alchemist if already not installed
- #+BEGIN_SRC emacs-lisp :tangle config/elixir.tau.el
- (unless (package-installed-p 'alchemist)
-   (package-install 'alchemist)) 
- #+END_SRC
-
-** Ruby
-   
-: This Ruby part of the config compiles to a separate file, inside the config folder, called `ruby.tau.el`
- 
-*** Associate common Ruby files with  enh-ruby-mode
-#+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
-(add-to-list 'auto-mode-alist
-             '("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode))
-#+END_SRC
-*** Require enhanced-ruby major mode replacement for native ruby-mode
- #+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
-   (require 'enh-ruby-mode)
- #+END_SRC
-
-*** this bellow is optional, i only use it because it complains about not finding ruby in /usr/local/bin
- "This is also easily solvable by creating a symbolic link to the ruby shim to /usr/local/bin/ruby
- #+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
- (setq enh-ruby-program "~/.rbenv/shims/ruby") ; so that still works if ruby points to ruby1.8
- #+END_SRC
-
- #+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
- (setq-default
-   ruby-use-encoding-map nil
-   ruby-insert-encoding-magic-comment nil)
- #+END_SRC
-
-*** Enable superword-mode for enh-ruby-mode 
- It change all cursor movement/edit commands to stop in-between the “camelCase” words.
-
- #+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
- (add-hook 'enh-ruby-mode-hook 'superword-mode)
- #+END_SRC
-
-*** Enhanced Ruby Mode defines its own specific faces with the hook erm-define-faces. If your theme is already defining those faces, to not overwrite them, just remove the hook with:
- #+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
- (remove-hook 'enh-ruby-mode-hook 'erm-define-faces)
- #+END_SRC
-
-
- #+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
- (after 'page-break-lines
-             (push 'ruby-mode page-break-lines-modes))
- #+END_SRC
-
- #+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
- (require 'rspec-mode)
- #+END_SRC
-
-*** Inferior ruby
- #+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
- (require 'inf-ruby)
- (add-hook 'enh-ruby-mode-hook 'inf-ruby-minor-mode)
- #+END_SRC
-
-*** Ruby compilation
- #+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
- (require 'ruby-compilation)
-
- (after 'enh-ruby-mode
-             (let ((m ruby-mode-map))
-               (define-key m [S-f7] 'ruby-compilation-this-buffer)
-               (define-key m [f7] 'ruby-compilation-this-test)))
-
- (after 'ruby-compilation
-             (defalias 'rake 'ruby-compilation-rake))
- #+END_SRC
-
-*** COMMENT Robe mode
- Dependencies:   
- - opry
- - pry-doc >= 0.6.0 (on MRI)
- - method_source >= 0.8.2 (for compatibility with the latest Rubinius)
-
- /Note that if your project is using Bundler, the dependencies have to be added to the Gemfile./
-**** Enable robe-mode upon enh-ruby-mode
- #+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
- (add-hook 'enh-ruby-mode-hook 'robe-mode)   
- #+END_SRC
-
-**** Company completion for Robe
- #+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
- (eval-after-load 'company
-   '(push 'company-robe company-backends))
- #+END_SRC
-
-**** native autocomplete with robe
- #+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
- (add-hook 'robe-mode-hook 'ac-robe-setup)
- #+END_SRC
-
-*** ri support
- #+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
- ;; (require 'yari)
- ;; (defalias 'ri 'yari)
- #+END_SRC
-
-
-
- #+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
-   ;; (require 'goto-gem)
- #+END_SRC
-
-
- #+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
- (require 'bundler)
- #+END_SRC
-
-
- #+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
-   ;; (when (maybe-require 'yard-mode)
-   ;;   (add-hook 'ruby-mode-hook 'yard-mode)
-   ;;   (add-hook 'enh-ruby-mode-hook 'yard-mode)
-   ;;   (after 'yard-mode
-   ;;               (diminish 'yard-mode)))
- #+END_SRC
-
-*** Rubocop
- #+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
- (require 'rubocop)
- #+END_SRC
-
-** Go
-
-*** Enable go-mode
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(require 'go-mode)
-(autoload 'go-mode "go-mode" "Major mode for editing Go code." t)
-
-#+END_SRC
-
-*** Associate Go files with go-mode
- #+BEGIN_SRC emacs-lisp :tangle init.el
-   (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
- #+END_SRC
-
-** Elm 
-*** Company backend for elm
-#+BEGIN_SRC emacs-lisp :tangle init.el
-
-(with-eval-after-load 'company
-  (add-to-list 'company-backends 'company-elm))
-
-#+END_SRC
-
-** Haskell
- #+BEGIN_SRC emacs-lisp :tangle init.el
- (add-hook 'haskell-mode-hook #'flycheck-haskell-setup)
- ; ; (require 'haskell-interactive-mode)
- ; (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
- ; (eval-after-load 'flycheck
- ;                  '(add-hook 'flycheck-mode-hook #'flycheck-haskell-setup))
- ; (add-hook 'haskell-mode-hook (lambda ()
- ;                                (electric-indent-mode -1)))
- ; (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
- ; (add-hook 'haskell-mode-hook (lambda () (global-set-key (kbd "<f5>") 'haskell-process-cabal-build)))
- #+END_SRC
- 
-** PHP
-
- : Use web-mode for PHP files  
-
- #+BEGIN_SRC emacs-lisp :tangle init.el
-   (add-to-list 'auto-mode-alist '("\\.php?\\'" . web-mode))
-   (add-to-list 'auto-mode-alist '("\\.inc?\\'" . web-mode))
- #+END_SRC
-
-** HTML
-   
-*** Associate HTML with web-mode   
-
- #+BEGIN_SRC emacs-lisp :tangle init.el
-   (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-   (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
- #+END_SRC
- 
-*** HTML element offset indentation
-#+BEGIN_SRC emacs-lisp :tangle init.el
- (setq web-mode-markup-indent-offset 4)
-#+END_SRC
-
-** CSS   
-
-*** Open CSS files with web-mode
-#+BEGIN_SRC emacs-lisp :tangle init.el
-  (add-to-list 'auto-mode-alist '("\\.css?\\'" . web-mode))
-#+END_SRC
-
-*** CSS offset indentation
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(setq web-mode-css-indent-offset 2)
-#+END_SRC
-
-** YAML
-  
- #+BEGIN_SRC emacs-lisp :tangle init.el
-   (require 'yaml-mode)
-   (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
- #+END_SRC
-
-
-*** Unlike python-mode, this mode follows the Emacs convention of not binding the ENTER key to `newline-and-indent'.  To get this behavior, add the key definition to `yaml-mode-hook':
-
- #+BEGIN_SRC emacs-lisp :tangle init.el
-     (add-hook 'yaml-mode-hook
-       '(lambda ()
-         (define-key yaml-mode-map "\C-m" 'newline-and-indent))) 
- #+END_SRC
-
-** LaTeX
-
- #+BEGIN_SRC emacs-lisp :tangle init.el
- (require 'ox-latex)
- #+END_SRC
-
-*** AucTex settings
-
- #+BEGIN_SRC emacs-lisp :tangle init.el
-   ;; (require 'tex)
- #+END_SRC
-
- Three steps are required (as according to ORG official docs) to setup AucTex with Emacs:
-
-**** 1) Tell emacs where the LaTeX related bins are located in the system
-
- #+BEGIN_SRC emacs-lisp :tangle init.el
- (setq exec-path (append exec-path '("/usr/bin/tex")))
- #+END_SRC
-
-**** 2) Load AucTex
-    
- #+BEGIN_SRC emacs-lisp :tangle init.el
-   ;; (load "auctex.el" nil t t)
-   ;; (load "preview-latex.el" nil t t)
- #+END_SRC
-
-**** 3) Add Latex to list of org-babel loaded languages
-    
- #+END_SRC
-  #+BEGIN_SRC emacs-lisp :tangle init.el
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((latex . t)))
-  #+END_SRC
-
-  #+BEGIN_SRC emacs-lisp :tangle init.el
-      (setq TeX-auto-save t)
-      (setq TeX-parse-self t)
-      (setq-default TeX-master nil)
-  #+END_SRC
-
-
-  #+BEGIN_SRC emacs-lisp :tangle init.el
-      (add-hook 'LaTeX-mode-hook 'visual-line-mode)
-      (add-hook 'LaTeX-mode-hook 'flyspell-mode)
-      (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)   
-  #+END_SRC
-
-
-
-
-*** Latex Classes
-**** Add the beamer presentation class template to org
-  #+BEGIN_SRC emacs-lisp :tangle init.el
-   (add-to-list 'org-latex-classes
-	        '("beamer"
-	          "\\documentclass\[presentation\]\{beamer\}"
-	          ("\\section\{%s\}" . "\\section*\{%s\}")
-	          ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
-	          ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")))
-  #+END_SRC
-
-
-**** Add the memoir class template to org
-    
- The Sections and Heading Levels gets configured as follows: 
-
-     | Division       | <c>Level | <c>org-equivalent |
-     | \book          |       -2 | *                 |
-     | \part          |       -1 | **                |
-     | \chapter       |        0 | ***               |
-     | \section       |        1 | ****              |
-     | \subsection    |        2 | *****             |
-     | \subsubsection |        3 | ******            |
-     | \paragraph     |        4 | *******           |
-     | \subparagraph  |        5 | ********          |
-
-    
- #+BEGIN_SRC emacs-lisp :tangle init.el
-    (add-to-list 'org-latex-classes
-                 '("memoir"
-                   "\\documentclass\[a4paper\]\{memoir\}"
-                   ("\\book\{%s\}" . "\\book*\{%s\}")
-                   ("\\part\{%s\}" . "\\part*\{%s\}")
-                   ("\\chapter\{%s\}" . "\\chapter*\{%s\}")
-                   ("\\section\{%s\}" . "\\section*\{%s\}")
-                   ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
-                   ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")))
- #+END_SRC
-
-**** Add abntex2 class to org list of latex classes
- This class is based on the Memoir class
- The Sections and Heading Levels gets configured as follows: 
-
-     | Division       | <c>Level | <c>org-equivalent |
-     | \part          |       -1 | *                 |
-     | \chapter       |        0 | **                |
-     | \section       |        1 | ***               |
-     | \subsection    |        2 | ****              |
-     | \subsubsection |        3 | *****             |
-     | \paragraph     |        4 | ******            |
-     | \subparagraph  |        5 | *******           |
- #+BEGIN_SRC emacs-lisp :tangle init.el
-    (add-to-list 'org-latex-classes
-                '("abntex2"
-                  "\\documentclass\[a4paper,oneside,12pt\]\{abntex2\}"
-                  ("\\chapter\{%s\}" . "\\chapter*\{%s\}")
-                  ("\\section\{%s\}" . "\\section*\{%s\}")
-                  ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
-                  ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")
-                  ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")
-                  ("\\paragraph\{%s\}" . "\\paragraph*\{%s\}")))
- #+END_SRC
-
- 
-*** Enable latex-preview-pane
- #+BEGIN_SRC emacs-lisp :tangle init.el
-    (latex-preview-pane-enable)
- #+END_SRC
-
-*** To compile documents to PDF by default add the following to your ~/.emacs.
-
- #+BEGIN_SRC emacs-lisp :tangle init.el
-      (setq TeX-PDF-mode t)
- #+END_SRC
-
-**** If it doesn’t work, try this :
-
- #+BEGIN_SRC emacs-lisp :tangle init.el
-   ;; (TeX-global-PDF-mode t)
- #+END_SRC
-
-
-*** To highlight (or font-lock) the “\section{title}” lines:
-
- #+BEGIN_SRC emacs-lisp :tangle init.el
- (font-lock-add-keywords
-    'latex-mode
-    `((,(concat "^\\s-*\\\\\\("
-                "\\(documentclass\\|\\(sub\\)?section[*]?\\)"
-                "\\(\\[[^]% \t\n]*\\]\\)?{[-[:alnum:]_ ]+"
-                "\\|"
-                "\\(begin\\|end\\){document"
-                "\\)}.*\n?")
-       (0 'your-face append))))
- #+END_SRC
-
-
-*** Convert quotes to LaTeX Smartquotes
-   
- #+BEGIN_SRC emacs-lisp :tangle init.el
- (setq org-export-with-smart-quotes t)
- #+END_SRC
-
-*** Keep latex logfiles
- #+BEGIN_SRC emacs-lisp :tangle init.el
- (setq org-latex-remove-logfiles nil)
- #+END_SRC
-
-  
-** Markdown
-   
-*** Enable markdown-mode
- #+BEGIN_SRC emacs-lisp :tangle init.el
-   (autoload 'mardown-mode "markdown-mode")
-   (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
- #+END_SRC
-
- 
 * Devops tools setup and helpers (dockerfile, netlify)
-  
-#+BEGIN_SRC emacs-lisp :tangle init.el
+
+  #+BEGIN_SRC emacs-lisp :tangle init.el
 (require 'dockerfile-mode)
-(add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode)) 
-#+END_SRC
+(add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode))
+  #+END_SRC
 
 
-* Autocompletion and Snippets
- 
-** LSP (language server protocol implementation for emacs) 
-   
-*** require and create lsp-mode hook for every programming language
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(require 'lsp-mode)
-(add-hook 'prog-mode-hook #'lsp) 
-(add-hook 'enh-ruby-mode-hook #'lsp) 
-(add-hook 'js2-mode-hook #'lsp) 
-(add-hook 'js2-jsx-mode-hook #'lsp) 
-#+END_SRC
+* LSP
 
-*** lsp-ui
-
-: This contains all the higher level UI modules of lsp-mode, like flycheck support and code lenses.
+** LSP (language server protocol implementation for emacs)
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(require 'lsp-ui)
-(add-hook 'lsp-mode-hook 'lsp-ui-mode)
+(use-package lsp-mode
+  :ensure t
+  :init (setq lsp-inhibit-message t
+              lsp-eldoc-render-all nil
+              lsp-highlight-symbol-at-point nil)
+  :hook ((enh-ruby-mode . lsp)
+         (js2-mode . lsp)
+         (js2-jsx-mode . lsp)))
+
 #+END_SRC
 
-*** company-lsp
-    
-: Company completion backend for lsp-mode. 
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package company-lsp
+  :after  company
+  :ensure t
+  :config
+  (setq company-lsp-enable-snippet t
+        company-lsp-cache-candidates t))
+#+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(require 'company-lsp)
-(push 'company-lsp company-backends)
+(use-package lsp-ui
+  :ensure t
+  :hook ((lsp-mode . lsp-ui-mode))
+  :config
+  (setq ;; lsp-ui-doc
+        lsp-ui-doc-enable t
+        lsp-ui-doc-header t
+        lsp-ui-doc-include-signature nil
+        lsp-ui-doc-position 'top ;; top, bottom, or at-point
+        lsp-ui-doc-max-width 120
+        lsp-ui-doc-max-height 30
+        lsp-ui-doc-use-childframe t
+        lsp-ui-doc-use-webkit t
+        ;; lsp-ui-flycheck
+        lsp-ui-flycheck-enable t
+        lsp-ui-flycheck-list-position 'right
+        lsp-ui-flycheck-live-reporting t
+        ;; lsp-ui-sideline
+        lsp-ui-sideline-enable t
+        lsp-ui-sideline-ignore-duplicate t
+        lsp-ui-sideline-show-symbol t
+        lsp-ui-sideline-show-hover t
+        lsp-ui-sideline-show-diagnostics nil
+        lsp-ui-sideline-show-code-actions t
+        lsp-ui-sideline-code-actions-prefix ""
+        lsp-ui-sideline-update-mode 'point
+        ;; lsp-ui-imenu
+        lsp-ui-imenu-enable t
+        lsp-ui-imenu-kind-position 'top
+        ;; lsp-ui-peek
+        lsp-ui-peek-enable t
+        lsp-ui-peek-peek-height 20
+        lsp-ui-peek-list-width 50
+        lsp-ui-peek-fontify 'on-demand) ;; never, on-demand, or always
+  :bind
+    (:map lsp-mode-map
+      ("C-c C-r" . lsp-ui-peek-find-references)
+      ("C-c C-j" . lsp-ui-peek-find-definitions)
+      ("C-c i"   . lsp-ui-peek-find-implementation)
+      ("C-c m"   . lsp-ui-imenu)
+      ("C-c s"   . lsp-ui-sideline-mode)
+      ("C-c d"   . ladicle/toggle-lsp-ui-doc)))
 #+END_SRC
 
 ** Disable <RET> for autocomplete and leave on TAB
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
 ;; (define-key ac-completing-map [return] nil)
 ;; (define-key ac-completing-map "\r" nil)
-#+END_SRC
-  
+   #+END_SRC
+
 
 ** enable autocompletion engine
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   #+BEGIN_SRC emacs-lisp :tangle init.el
 (require 'auto-complete)
 (global-auto-complete-mode t)
-#+END_SRC
+   #+END_SRC
 
 
-** Company mode (Complete Anything)
-   
-*** Basic settings for company-mode
-#+BEGIN_SRC emacs-lisp :tangle init.el
-  (require 'company)
-  (global-company-mode t)
+* Company
+
+    #+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package company
+  :ensure t
+  :defer t
+  :init (global-company-mode)
+  :config
+  (define-key evil-insert-state-map (kbd "TAB")
+       #'company-indent-or-complete-common)
   (setq company-tooltip-limit 20)                      ; bigger popup window
   (setq company-minimum-prefix-length 1)               ; start completing after 1st char typed
   (setq company-idle-delay .1)                         ; decrease delay before autocompletion popup shows
@@ -2262,50 +2043,88 @@ To display a marker indicating that a buffer has been modified (atom-style)
   (setq company-dabbrev-code-everywhere t)
   (setq company-selection-wrap-around t)               ; continue from top when reaching bottom
   (setq company-auto-complete 'company-explicit-action-p)
+  (setq company-require-match nil)
+  (setq company-tooltip-align-annotations t)
+  ;; (setq company-tooltip-flip-when-above t)
+  (setq company-transformers '(company-sort-by-occurrence)) ; weight by frequency
+  (define-key company-active-map (kbd "M-n") nil)
+  (define-key company-active-map (kbd "M-p") nil)
+  (define-key company-active-map (kbd "C-n") 'company-select-next)
+  (define-key company-active-map (kbd "C-p") 'company-select-previous)
+  (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
+  (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
+  (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
+  (define-key company-active-map (kbd "<backtab>") 'company-select-previous)
+  (progn
+    ;; Use Company for completion
+    (bind-key [remap completion-at-point] #'company-complete company-mode-map)
+
+    (setq company-tooltip-align-annotations t
+          ;; Easy navigation to candidates with M-<n>
+          company-show-numbers t)
+    (setq company-dabbrev-downcase nil)))
 #+END_SRC
 
-*** Enable company-mode in all buffers
+** Company-QuickHelp
 #+BEGIN_SRC emacs-lisp :tangle init.el
-  (add-hook 'after-init-hook 'global-company-mode)
-#+END_SRC
-
-*** Bind <TAB> to company-indent-or-complete
-#+BEGIN_SRC emacs-lisp :tangle init.el
-  (add-hook 'after-init-hook 'global-company-mode)
-
-  (after "company-autoloads"
-     (define-key evil-insert-state-map (kbd "TAB")
-       #'company-indent-or-complete-common))
-#+END_SRC
-
-
-** Yasnippets
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-  (require 'yasnippet)
-  (yas-global-mode 1)
+(use-package company-quickhelp          ; Documentation popups for Company
+  :ensure t
+  :defer t
+  :init (add-hook 'global-company-mode-hook #'company-quickhelp-mode))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(setq yas-snippet-dirs
-      '("~/.emacs.d/snippets"                 ;; personal snippets
-        ))
+(use-package company-go
+  :ensure t
+  :defer t
+  :init
+  (with-eval-after-load 'company
+    (add-to-list 'company-backends 'company-go)))
 #+END_SRC
 
- 
+* Yasnippets
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (use-package yasnippet                  ; Snippets
+    :ensure t
+    :config
+      (setq yas-verbosity 1)                      ; No need to be so verbose
+      (setq yas-wrap-around-region t)
+
+    (with-eval-after-load 'yasnippet
+      (setq yas-snippet-dirs '(yasnippet-snippets-dir)))
+
+    ;; Bind `SPC' to `yas-expand' when snippet expansion available (it
+    ;; will still call `self-insert-command' otherwise).
+    ;; yas-maybe-expand contains a special value which, when bound in a keymap,
+    ;; tells Emacs to call yas-expand if and only if there is a snippet abbrev before point.
+    ;; If there is no snippet to expand, Emacs will behave as if yas-expand is unbound
+    ;; and so will run whatever command is bound to that key normally.
+    (define-key yas-minor-mode-map (kbd "TAB") yas-maybe-expand)
+    ;; Bind `C-c y' to `yas-expand' ONLY.
+    (define-key yas-minor-mode-map (kbd "C-c y") #'yas-expand)
+
+    (yas-reload-all)
+    (yas-global-mode))
+
+  (use-package yasnippet-snippets         ; Collection of snippets
+    :ensure t)
+#+END_SRC
+
+
 * Copy/Paste To/From System's Clipboard =D
-this was supposed to be on the helper functions and macro section at the beggining of the file
-but it has evil defined keybindings and had to be put after the evil section or emacs would complain it didnt know what evil is
-   
+  this was supposed to be on the helper functions and macro section at the beggining of the file
+  but it has evil defined keybindings and had to be put after the evil section or emacs would complain it didnt know what evil is
+
 *** Copy
-    
-#+BEGIN_SRC emacs-lisp :tangle init.el
+
+    #+BEGIN_SRC emacs-lisp :tangle init.el
   (defun copy-to-clipboard ()
     "Make F8 and F9 Copy and Paste to/from OS Clipboard.  Super usefull."
     (interactive)
     (if (display-graphic-p)
-	(progn
-	  (message "Yanked region to x-clipboard!")
+        (progn
+          (message "Yanked region to x-clipboard!")
 	  (call-interactively 'clipboard-kill-ring-save)
 	  )
       (if (region-active-p)
@@ -2315,12 +2134,12 @@ but it has evil defined keybindings and had to be put after the evil section or 
 	    (deactivate-mark))
 	(message "No region active; can't yank to clipboard!")))
     )
-#+END_SRC
+    #+END_SRC
 
 
 *** Paste
-    
-#+BEGIN_SRC emacs-lisp :tangle init.el
+
+    #+BEGIN_SRC emacs-lisp :tangle init.el
   (evil-define-command paste-from-clipboard()
     (if (display-graphic-p)
 	(progn
@@ -2328,47 +2147,47 @@ but it has evil defined keybindings and had to be put after the evil section or 
 	  (message "graphics active")
 	  )
       (insert (shell-command-to-string "xsel -o -b")) ) )
-#+END_SRC
+    #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+    #+BEGIN_SRC emacs-lisp :tangle init.el
   (global-set-key [f9] 'copy-to-clipboard)
   (global-set-key [f10] 'paste-from-clipboard)
-#+END_SRC
-  
+    #+END_SRC
+
 
 * Provide my personal packages in separate files
-  
+
 ** Provide the evil.tau.el file (this need to be the last thing on the file)
-   
-#+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
+
+   #+BEGIN_SRC emacs-lisp :tangle config/evil.tau.el
   (provide 'evil.tau)
   ;;; evil.tau.el ends here...
-#+END_SRC
+   #+END_SRC
 
 ** Provide the org.tau.el file (this needs to be the last part of the org config file)
-   
-#+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
+
+   #+BEGIN_SRC emacs-lisp :tangle config/org.tau.el
   (provide 'org.tau)
   ;;; elixir.tau.el ends here...
-#+END_SRC
+   #+END_SRC
 
 ** Provide the ruby.tau.el file (this needs to be the last part of the org config file)
-   
-#+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
+
+   #+BEGIN_SRC emacs-lisp :tangle config/ruby.tau.el
   (provide 'ruby.tau)
   ;;; elixir.tau.el ends here...
-#+END_SRC
+   #+END_SRC
 
 ** Provide the elixir.tau.el file (this needs to be the last part of the org config file)
-   
-#+BEGIN_SRC emacs-lisp :tangle config/elixir.tau.el
+
+   #+BEGIN_SRC emacs-lisp :tangle config/elixir.tau.el
   (provide 'elixir.tau)
   ;;; elixir.tau.el ends here...
-#+END_SRC
+   #+END_SRC
 
 
 * End init.el file
-#+BEGIN_SRC emacs-lisp :tangle init.el
+  #+BEGIN_SRC emacs-lisp :tangle init.el
 ;; Local Variables:
 ;; coding: utf-8
 ;; no-byte-compile: t
@@ -2378,7 +2197,4 @@ but it has evil defined keybindings and had to be put after the evil section or 
 (provide 'init)
 ;;; .emacs ends here
 
-#+END_SRC
-
-
-
+  #+END_SRC

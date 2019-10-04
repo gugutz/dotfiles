@@ -12,22 +12,27 @@ bindkey -v
 # set theme
 ZSH_THEME="robbyrussell"
 
-#########################################
-# oh-my-zsh
-source $ZSH/oh-my-zsh.sh
 
 #########################################
 # plugins can be found in ~/.oh-my-zsh/plugins/*
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 plugins=(
-    zsh-syntax-highlighting
-    zsh-auto-suggestions
+    # native oh-my-zsh plugins
     git
     ruby
     docker
     docker-compose
+    fzf
     tmuxinator
+    # custom (installed) plugins
+    zsh-syntax-highlighting
+    zsh-autosuggestions
+    you-should-use
     )
+
+#########################################
+# oh-my-zsh
+source $ZSH/oh-my-zsh.sh
 
 #########################################
 # start prompt plugin
@@ -41,20 +46,23 @@ prompt pure > /dev/null
 #########################################
 # ZSH settings
 
-# Uncomment the following line to enable command auto-correction.
+# enable command auto-correction.
 ENABLE_CORRECTION="true"
 
-# Uncomment the following line to display red dots whilst waiting for completion.
+# display red dots whilst waiting for completion.
 COMPLETION_WAITING_DOTS="true"
 
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
+# disable marking untracked files under VCS as dirty.
+# This makes repository status check for large repositories much, much faster.
 # DISABLE_UNTRACKED_FILES_DIRTY="true"
 
+# save history (show previous used commands)
+SAVEHIST=1000
+HISTFILE=~/.zsh_history
+
 #########################################
-# fzf
-[ -f $HOME/.fzf.zsh ] && source $HOME/.fzf.zsh
+# fzf (replaced by oh-my-zsh native fzf plugin)
+# [ -f $HOME/.fzf.zsh ] && source $HOME/.fzf.zsh
 
 #########################################
 # bind home/end keys
@@ -125,5 +133,3 @@ export SSH_KEY_PATH="~/.ssh/rsa_id"
 # Example aliases
 alias zshconfig="vim ~/.zshrc"
 alias ohmyzsh="vim ~/.oh-my-zsh"
-
-

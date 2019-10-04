@@ -11,6 +11,13 @@ tangled, and the tangled file is compiled."
 
 (add-hook 'after-save-hook #'/util/tangle-init)
 
+;; (use-package server
+;;   :ensure nil
+;;   :init
+;;   (unless (or (daemonp) (server-running-p))
+;;     (server-start))
+;;   :hook (after-init . server-mode))
+
 (require 'server)
 (unless (or (daemonp) (server-running-p))
   (server-start))
@@ -20,9 +27,6 @@ tangled, and the tangled file is compiled."
 (setq x-select-enable-clipboard t)
 
 (setq vc-follow-symlinks t)
-
-(when (eq window-system nil)
-  (xterm-mouse-mode 1))
 
 (defconst emacs-tmp-dir (expand-file-name (format "emacs%d" (user-uid)) temporary-file-directory))
 (setq backup-directory-alist
@@ -38,6 +42,8 @@ tangled, and the tangled file is compiled."
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 (fset 'yes-or-no-p 'y-or-n-p)
+
+(add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode))
 
 ; parentheses
 (show-paren-mode t)
@@ -59,11 +65,37 @@ tangled, and the tangled file is compiled."
 
 (setq next-line-add-newlines t)
 
+(defun remove-dos-eol ()
+  "Do not show ^M in files containing mixed UNIX and DOS line endings."
+  (interactive)
+  (setq buffer-display-table (make-display-table))
+  (aset buffer-display-table ?\^M []))
+
+(add-hook 'text-mode-hook 'remove-dos-eol)
+(add-hook 'prog-mode-hook 'remove-dos-eol)
+
 (global-set-key (kbd "C-+") #'text-scale-increase)
 (global-set-key (kbd "C-_") #'text-scale-decrease)
 ;; (global-set-key (kbd "C-)") #'text-scale-adjust)
 
 (global-set-key "\M- " 'hippie-expand)
+
+(defun upcase-backward-word (arg)
+  (interactive "p")
+  (upcase-word (- arg)))
+
+(defun downcase-backward-word (arg)
+  (interactive "p")
+  (downcase-word (- arg)))
+
+(defun capitalize-backward-word (arg)
+  (interactive "p")
+  (capitalize-word (- arg)))
+
+(global-set-key (kbd "C-M-u")	 'upcase-backward-word)
+(global-set-key (kbd "C-M-l")	 'downcase-backward-word)
+;; this replaces native capitlize word!
+(global-set-key (kbd "M-c")	 'capitalize-backward-word)
 
 (defmacro /bindings/define-prefix-keys (keymap prefix &rest body)
   (declare (indent defun))
@@ -148,7 +180,7 @@ FEATURE may be any one of:
  '(fci-rule-color "#3E4451")
  '(package-selected-packages
    (quote
-    (highlight-parentheses pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
+   (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -171,15 +203,40 @@ FEATURE may be any one of:
 (require 'ruby.tau)
 (require 'elixir.tau)
 
+(when (eq window-system nil)
+  (xterm-mouse-mode 1))
+
+;; (use-package mouse3
+;;     :config
+;; (global-set-key (kbd "<mouse-3>") 'mouse3-popup-menu))
+
+(use-package right-click-context
+  :ensure t
+  :config
+  (global-set-key (kbd "<menu>") 'right-click-context-menu)
+  (global-set-key (kbd "<mouse-3>") 'right-click-context-menu)
+  (bind-key "C-c <mouse-3>" 'right-click-context-menu)
+
+  ;; (setq right-click-context-mode-lighter "🐭")
+
+  ;; customize the right-click-context-menu
+  (let ((right-click-context-local-menu-tree
+       (append right-click-context-global-menu-tree
+             '(("Insert"
+                ("Go to definition" :call (lsp-goto-type-definition)
+                ("FooBar" :call (insert "FooBar"))
+                )))))
+  (right-click-context-menu))))
+
 ;; for some readon the bellow lines should be the default native way for navigation on emacs
 ;; but they dont work
 ;; using the above package instead til i find a solution
 ;
 (windmove-default-keybindings 'control)
-(global-set-key (kbd "C-H") 'windmove-left)
-(global-set-key (kbd "C-L") 'windmove-right)
-(global-set-key (kbd "C-K") 'windmove-up)
-(global-set-key (kbd "C-J") 'windmove-down)
+(global-set-key (kbd "C-S-H") 'windmove-left)
+(global-set-key (kbd "C-S-L") 'windmove-right)
+(global-set-key (kbd "C-S-K") 'windmove-up)
+(global-set-key (kbd "C-S-J") 'windmove-down)
 
 ;; (require 'evil-tmux-navigator)
 
@@ -204,37 +261,48 @@ FEATURE may be any one of:
 ;;   ("C-w k" #'evil-window-up)
 ;;   ("C-w l" #'evil-window-right))
 
-(require 'helm)
+(use-package multiple-cursors
+  ;; step 1, select thing in visual-mode (OPTIONAL)
+  ;; step 2, `mc/mark-all-like-dwim' or `mc/mark-all-like-this-in-defun'
+  ;; step 3, `ace-mc-add-multiple-cursors' to remove cursor, press RET to confirm
+  ;; step 4, press s or S to start replace
+  ;; step 5, press C-g to quit multiple-cursors
+  :bind
+  ("M-u" . hydra-multiple-cursors/body)
+  :config
+  (define-key evil-visual-state-map (kbd "mn") 'mc/mark-next-like-this)
+  (define-key evil-visual-state-map (kbd "ma") 'mc/mark-all-like-this-dwim)
+  (define-key evil-visual-state-map (kbd "md") 'mc/mark-all-like-this-in-defun)
+  (define-key evil-visual-state-map (kbd "mm") 'ace-mc-add-multiple-cursors)
+  (define-key evil-visual-state-map (kbd "ms") 'ace-mc-add-single-cursor))
 
-(setq helm-bookmark-show-location t)
-(setq helm-buffer-max-length 40)
-(setq helm-split-window-inside-p t)
-(setq helm-mode-fuzzy-match t)
-(setq helm-ff-file-name-history-use-recentf t)
-(setq helm-ff-skip-boring-files t)
-(setq helm-follow-mode-persistent t)
+(use-package helm
+  :ensure t
+  :defer t
+  :bind
+  ("M-x" . helm-M-x)
+  :config
+  (progn
+    (helm-mode 1))
+  (setq helm-autoresize-mode t)
+  (setq helm-buffer-max-length 40)
+  (setq helm-bookmark-show-location t)
+  (setq helm-buffer-max-length 40)
+  (setq helm-split-window-inside-p t)
+  (setq helm-mode-fuzzy-match t)
+  (setq helm-ff-file-name-history-use-recentf t)
+  (setq helm-ff-skip-boring-files t)
+  (setq helm-follow-mode-persistent t)
 
-(after 'helm-source
-  (defun /helm/make-source (f &rest args)
-    (let ((source-type (cadr args))
-          (props (cddr args)))
-      (unless (child-of-class-p source-type 'helm-source-async)
-        (plist-put props :fuzzy-match t))
-      (apply f args)))
-  (advice-add 'helm-make-source :around '/helm/make-source))
-
-(after 'helm
   ;; take between 10-30% of screen space
   (setq helm-autoresize-min-height 10)
   (setq helm-autoresize-max-height 30)
-  (helm-autoresize-mode t))
-
-(progn
-(global-set-key [remap execute-extended-command] #'helm-M-x)
-(global-set-key [remap find-file] #'helm-find-files)
-(helm-mode t))
-
-(after 'helm
+  (helm-autoresize-mode t)
+  ;; Make helm replace the default Find-File and M-x
+  (progn
+    (global-set-key [remap execute-extended-command] #'helm-M-x)
+    (global-set-key [remap find-file] #'helm-find-files)
+    (helm-mode t)))
   (require 'helm-config)
   (global-set-key (kbd "C-c h") #'helm-command-prefix)
   (global-unset-key (kbd "C-x c"))
@@ -246,13 +314,25 @@ FEATURE may be any one of:
   (global-set-key (kbd "M-x") #'helm-M-x)
   (global-set-key (kbd "M-y") #'helm-show-kill-ring)
   (global-set-key (kbd "M-:") #'helm-eval-expression-with-eldoc)
-  (define-key helm-map (kbd "<tab>") #'helm-execute-persistent-action)
-  (define-key helm-map (kbd "C-z") #'helm-select-action)
-)
+  ;; (define-key helm-map (kbd "<tab>") #'helm-execute-persistent-action)
+  ;; (define-key helm-map (kbd "C-z") #'helm-select-action)
 
-(projectile-mode +1)
-(define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
-(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+(use-package projectile
+  :config
+  ;; (projectile-mode)
+  (projectile-mode +1)
+  (setq projectile-globally-ignored-files
+        (append '("~"
+                  ".swp"
+                  ".pyc")
+                projectile-globally-ignored-files))
+  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
+
+(use-package helm-projectile
+  :ensure t
+  :config
+  (helm-projectile-on))
 
 (after 'dired
   (require 'dired-k)
@@ -262,10 +342,8 @@ FEATURE may be any one of:
 
 (setq dired-dwin-target t)
 
-(global-set-key (kbd "C-x g") 'magit-status)
-
 (defun /shell/new-window ()
-    "Opens up a new shell in the directory associated with the current buffer's file." 
+    "Opens up a new shell in the directory associated with the current buffer's file."
     (interactive)
     (let* ((parent (if (buffer-file-name)
                        (file-name-directory (buffer-file-name))
@@ -311,7 +389,7 @@ FEATURE may be any one of:
 ;; (pdf-loader-install)
 
 (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
-;; (add-hook 'pdf-view-mode-hook 'auto-revert-mode) 
+;; (add-hook 'pdf-view-mode-hook 'auto-revert-mode)
 ;; (add-hook 'doc-view-mode-hook 'auto-revert-mode)
 
 (evil-define-key 'normal pdf-view-mode-map
@@ -319,6 +397,19 @@ FEATURE may be any one of:
   "j" (lambda () (interactive) (pdf-view-next-line-or-next-page 5))
   "k" (lambda () (interactive) (pdf-view-previous-line-or-previous-page 5))
   "l" 'pdf-view-next-page-command)
+
+(setq inhibit-splash-screen t)
+
+(blink-cursor-mode t)
+(setq blink-cursor-blinks 0) ;; blink forever
+(setq-default indicate-empty-lines t)
+(setq-default line-spacing 3)
+(setq frame-title-format '("Emacs"))
+
+(scroll-bar-mode -1)
+
+(tool-bar-mode -1)
+(menu-bar-mode -1)
 
 (add-to-list 'custom-theme-load-path "~/dotfiles/emacs.d/themes/")
 ; theme options:
@@ -328,7 +419,7 @@ FEATURE may be any one of:
 ; gruvbox-dark-hard
 ; gruvbox-dark-light
 ; gruvbox-dark-medium
-; base16-default-dark-theme <-- this one is good
+; base16-default-dark-theme -- this one is good
 
 (setq my-theme 'darkplus)
 
@@ -363,16 +454,16 @@ FEATURE may be any one of:
 ;; Determines the style used by `doom-modeline-buffer-file-name'.
 ;;
 ;; Given ~/Projects/FOSS/emacs/lisp/comint.el
-;;   truncate-upto-project => ~/P/F/emacs/lisp/comint.el
-;;   truncate-from-project => ~/Projects/FOSS/emacs/l/comint.el
-;;   truncate-with-project => emacs/l/comint.el
-;;   truncate-except-project => ~/P/F/emacs/l/comint.el
-;;   truncate-upto-root => ~/P/F/e/lisp/comint.el
-;;   truncate-all => ~/P/F/e/l/comint.el
-;;   relative-from-project => emacs/lisp/comint.el
-;;   relative-to-project => lisp/comint.el
-;;   file-name => comint.el
-;;   buffer-name => comint.el<2> (uniquify buffer name)
+;;   truncate-upto-project = ~/P/F/emacs/lisp/comint.el
+;;   truncate-from-project = ~/Projects/FOSS/emacs/l/comint.el
+;;   truncate-with-project = emacs/l/comint.el
+;;   truncate-except-project = ~/P/F/emacs/l/comint.el
+;;   truncate-upto-root = ~/P/F/e/lisp/comint.el
+;;   truncate-all = ~/P/F/e/l/comint.el
+;;   relative-from-project = emacs/lisp/comint.el
+;;   relative-to-project = lisp/comint.el
+;;   file-name = comint.el
+;;   buffer-name = comint.el<2> (uniquify buffer name)
 ;;
 ;; If you are expereicing the laggy issue, especially while editing remote files
 ;; with tramp, please try `file-name' style.
@@ -474,7 +565,7 @@ FEATURE may be any one of:
 
 ; (parrot-animate-parrot t)
 
-; parrot-spaces-before 
+; parrot-spaces-before
 ; parrot-spaces-after
 
 ; - number of times the parrot will cycle through its gif.
@@ -486,40 +577,34 @@ parrot-num-rotations
 
 (add-hook 'after-save-hook #'parrot-start-animation)
 
-(require 'nyan-mode)
-(nyan-mode)
+(use-package nyan-mode
+   :if window-system
+   :hook
+   (after-init . nyan-mode)
+   :config
+   (setq nyan-cat-face-number 4)
+   (setq nyan-animate-nyancat t)
+   (setq nyan-wavy-trail t)
+   (nyan-start-animation))
 
-;; (setq nyan-cat-face-number 1)
-
-(add-hook 'after-init-hook #'nyan-start-animation)
-(setq nyan-animate-nyancat t)
-
-(setq nyan-wavy-trail t)
-
-(require 'solaire-mode)
-
-(solaire-global-mode +1)
-
-(add-hook 'ediff-prepare-buffer-hook #'solaire-mode)
-
-(add-hook 'after-revert-hook #'turn-on-solaire-mode)
-
-(add-hook 'minibuffer-setup-hook #'solaire-mode-in-minibuffer)
-
-(solaire-mode-swap-bg)
-
-(setq inhibit-splash-screen t)
-
-(blink-cursor-mode t)
-(setq blink-cursor-blinks 0) ;; blink forever
-(setq-default indicate-empty-lines t)
-(setq-default line-spacing 3)
-(setq frame-title-format '("Emacs"))
-
-(scroll-bar-mode -1)
-
-(tool-bar-mode -1)
-(menu-bar-mode -1)
+;; (use-package solaire-mode
+;;   :config
+;;   (solaire-mode)
+;;   :hook
+;;   (after-init . solaire-global-mode +1)
+;;   ;; To enable solaire-mode unconditionally for certain modes:
+;;   (ediff-prepare-buffer . solaire-mode)
+;;   ;; if you use auto-revert-mode, this prevents solaire-mode from turning itself off every time Emacs reverts the file
+;;   (after-revert- . turn-on-solaire-mode)
+;;   ;; highlight the minibuffer when it is activated:
+;;   (minibuffer-setup . solaire-mode-in-minibuffer)
+;;   (after-change-major-mode . turn-on-solaire-mode)
+;;   :config
+;;   ;; if the bright and dark background colors are the wrong way around, use this
+;;   ;; to switch the backgrounds of the `default` and `solaire-default-face` faces.
+;;   ;; This should be used *after* you load the active theme!
+;;   ;;  NOTE: This is necessary for themes in the doom-themes package!
+;;   (solaire-mode-swap-bg))
 
 (require 'centaur-tabs)
 (centaur-tabs-mode t)
@@ -548,55 +633,78 @@ parrot-num-rotations
 
 (use-package highlight-numbers
   :ensure t
-  :hook prog-mode)
+  :hook ((prog-mode . highlight-numbers-mode)))
 
 (use-package highlight-operators
   :ensure t
-  :hook prog-mode)
+  :hook ((prog-mode . highlight-operators-mode)))
 
 (use-package highlight-escape-sequences
   :ensure t
-  :hook prog-mode)
+  :hook ((prog-mode . hes-mode)))
 
 (use-package highlight-parentheses
   :ensure t
-  :hook prog-mode)
+  :hook ((prog-mode . highlight-parentheses-mode)))
 
 ;; (add-hook 'prog-mode-hook 'highlight-numbers-mode)
 ;; (add-hook 'prog-mode-hook 'highlight-operators-mode)
 ;; (add-hook 'prog-mode-hook 'hes-mode)    ;; highlight escape sequences
 
-(require 'which-key)
-(setq which-key-idle-delay 0.2)
-(setq which-key-min-display-lines 3)
-(setq which-key-max-description-length 20)
-(setq which-key-max-display-columns 6)
-(which-key-mode)
+(use-package which-key
+  :hook (after-init . which-key-mode))
+  :config
+  (setq which-key-idle-delay 0.2)
+  (setq which-key-min-display-lines 3)
+  (setq which-key-max-description-length 20)
+  (setq which-key-max-display-columns 6)
 
 (global-diff-hl-mode)
 
-(require 'smartparens-config)
-(add-hook 'prog-mode-hook #'smartparens-mode)
+(use-package smartparens
+  :ensure t
+  :hook
+  (after-init . smartparens-global-mode)
+  :config
+  (require 'smartparens-config)
+  (sp-pair "=" "=" :actions '(wrap))
+  (sp-pair "+" "+" :actions '(wrap))
+  (sp-pair "<" ">" :actions '(wrap))
+  (sp-pair "$" "$" :actions '(wrap)))
 
-(add-hook 'smartparens-enabled-hook #'evil-smartparens-mode)
+(use-package evil-smartparens
+  :ensure t
+  :hook
+  (smarparens-enabled . evil-smartparens-mode))
 
-(add-hook 'org-mode-hook 'rainbow-mode)
-(add-hook 'css-mode-hook 'rainbow-mode)
-(add-hook 'php-mode-hook 'rainbow-mode)
-(add-hook 'html-mode-hook 'rainbow-mode)
-(add-hook 'web-mode-hook 'rainbow-mode)
-(add-hook 'js2-mode-hook 'rainbow-mode)
+(use-package rainbow-delimiters
+  :ensure t
+  :hook
+  (emacs-lisp-mode . rainbow-delimiters-mode))
 
-(require 'emmet-mode)
+(use-package rainbow-mode
+  :ensure t
+  :hook
+  (org-mode . rainbow-mode)
+  (css-mode . rainbow-mode)
+  (php-mode . rainbow-mode)
+  (html-mode . rainbow-mode)
+  (web-mode . rainbow-mode)
+  (js2-mode . rainbow-mode))
 
-(define-key evil-insert-state-map (kbd "TAB") 'emmet-expand-line)
-
-(add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
-(add-hook 'html-mode-hook 'emmet-mode) ;; Auto-start on HTML files
-(add-hook 'web-mode-hook 'emmet-mode) ;; Auto-start on web-mode
-(add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.
-
-(setq emmet-expand-jsx-className? t) ;; default nil
+(use-package emmet-mode
+  :ensure t
+  :commands emmet-mode
+  :init
+    (setq emmet-indentation 2)
+    (setq emmet-move-cursor-between-quotes t)
+  :hook
+    (sgml-mode . emmet-mode) ;; Auto-start on any markup modes
+    (css-mode . emmet-mode) ;; enable Emmet's css abbreviation.
+    (html-mode . emmet-mode) ;; Auto-start on HTML files
+    (web-mode . emmet-mode) ;; Auto-start on web-mode
+  :config
+    (setq emmet-expand-jsx-className? t)) ;; use emmet with JSX markup
 
 (smartscan-mode 1)
 
@@ -605,7 +713,13 @@ parrot-num-rotations
   :config
   (editorconfig-mode 1))
 
-(add-hook 'after-init-hook #'global-flycheck-mode)
+(use-package flycheck
+    :ensure t
+    :defer t
+    :hook
+    (after-init . global-flycheck-mode)
+    :init
+    (global-flycheck-mode))
 
 (with-eval-after-load 'flycheck
   (global-flycheck-inline-mode))
@@ -616,157 +730,136 @@ parrot-num-rotations
 
 (setq web-mode-code-indent-offset 2)
 
-(add-to-list 'auto-mode-alist '("\\.js?\\'" . js2-mode))
+;; js2-mode: enhanced JavaScript editing mode
+;; https://github.com/mooz/js2-mode
+(use-package js2-mode
+  :mode (("\\.js$" . js2-mode)
+         ("\\.ts$" . js2-mode))
+  :hook ((js2-mode . flycheck-mode)
+         (js2-mode . company-mode)
+         (js2-mode . lsp-mode)
+         (js2-mode . add-node-modules-path))
+  :config
+  ;; have 2 space indentation by default
+  (setq js-indent-level 2
+        js2-basic-offset 2
+        js-chain-indent t)
 
-(add-to-list 'auto-mode-alist '("\\.ts?\\'" . js2-mode))
+  ;; use eslint_d insetad of eslint for faster linting
+  ;; (setq flycheck-javascript-eslint-executable "eslint_d")
 
-(add-to-list 'auto-mode-alist '("\\.jsx?\\'" . js2-jsx-mode))
+  ;; Try to highlight most ECMA built-ins
+  (setq js2-highlight-level 3)
 
-(require 'prettier-js)
+  ;; turn off all warnings in js2-mode
+  (setq js2-mode-show-parse-errors t)
+  (setq js2-mode-show-strict-warnings nil)
+  (setq js2-strict-missing-semi-warning nil))
 
-(add-hook 'js2-mode-hook 'prettier-js-mode)
-(add-hook 'json-mode-hook 'prettier-js-mode)
-(add-hook 'web-mode-hook 'prettier-js-mode)
-(add-hook 'rjsx-mode-hook 'prettier-js-mode)
+;; prettier-emacs: minor-mode to prettify javascript files on save
+;; https://github.com/prettier/prettier-emacs
+(use-package prettier-js
+  :hook ((js2-mode . prettier-js-mode)
+         (json-mode . prettier-js-mode)
+         (web-mode . prettier-js-mode)
+         (rjsx-mode . prettier-js-mode))
+  :config
+  (setq prettier-js-args '("--trailing-comma" "all"
+                           "--bracket-spacing" "false"))
+  (defun enable-minor-mode (my-pair)
 
-(defun enable-minor-mode (my-pair)
-  "Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
+  "Enable prettier-js-mode if theres a .prettierrc on project dir"
   (if (buffer-file-name)
       (if (string-match (car my-pair) buffer-file-name)
       (funcall (cdr my-pair)))))
+      ; Hook the above function to web-mode
+  (add-hook 'web-mode-hook #'(lambda ()
+      (enable-minor-mode
+          '("\\.js?\\'" . prettier-js-mode)
+          '("\\.jsx?\\'" . prettier-js-mode)
+          '("\\.css?\\'" . prettier-js-mode)))))
 
-(add-hook 'web-mode-hook #'(lambda ()
-                            (enable-minor-mode
-                             '("\\.js?\\'" . prettier-js-mode)
-                             '("\\.jsx?\\'" . prettier-js-mode)
-                             '("\\.css?\\'" . prettier-js-mode))))
+;; json-mode: Major mode for editing JSON files with emacs
+;; https://github.com/joshwnj/json-mode
+(use-package json-mode
+  :mode "\\.js\\(?:on\\|[hl]int\\(rc\\)?\\)\\'"
+  :config
+  (add-hook 'json-mode-hook #'prettier-js-mode)
+  (setq json-reformat:indent-width 2)
+  (setq json-reformat:pretty-string? t)
+  (setq js-indent-level 2))
 
-(add-hook 'js2-mode-hook #'js2-refactor-mode)
+;; eslintd-fix: Emacs minor-mode to automatically fix javascript with eslint_d.
+;; https://github.com/aaronjensen/eslintd-fix/tree/master
+;; (use-package eslintd-fix)
 
-(js2r-add-keybindings-with-prefix "C-c C-m")
-
-(require 'go-mode)
-(autoload 'go-mode "go-mode" "Major mode for editing Go code." t)
-
-(add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
-
-(with-eval-after-load 'company
-  (add-to-list 'company-backends 'company-elm))
-
-(add-hook 'haskell-mode-hook #'flycheck-haskell-setup)
-; ; (require 'haskell-interactive-mode)
-; (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
-; (eval-after-load 'flycheck
-;                  '(add-hook 'flycheck-mode-hook #'flycheck-haskell-setup))
-; (add-hook 'haskell-mode-hook (lambda ()
-;                                (electric-indent-mode -1)))
-; (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
-; (add-hook 'haskell-mode-hook (lambda () (global-set-key (kbd "<f5>") 'haskell-process-cabal-build)))
-
-(add-to-list 'auto-mode-alist '("\\.php?\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.inc?\\'" . web-mode))
-
-(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-
-(setq web-mode-markup-indent-offset 4)
-
-(add-to-list 'auto-mode-alist '("\\.css?\\'" . web-mode))
-
-(setq web-mode-css-indent-offset 2)
-
-(require 'yaml-mode)
-(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
-
-(add-hook 'yaml-mode-hook
-  '(lambda ()
-    (define-key yaml-mode-map "\C-m" 'newline-and-indent)))
-
-(require 'ox-latex)
-
-;; (require 'tex)
-
-(setq exec-path (append exec-path '("/usr/bin/tex")))
-
-;; (load "auctex.el" nil t t)
-;; (load "preview-latex.el" nil t t)
-
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((latex . t)))
-
-(setq TeX-auto-save t)
-(setq TeX-parse-self t)
-(setq-default TeX-master nil)
-
-(add-hook 'LaTeX-mode-hook 'visual-line-mode)
-(add-hook 'LaTeX-mode-hook 'flyspell-mode)
-(add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
-
-(add-to-list 'org-latex-classes
-	     '("beamer"
-	       "\\documentclass\[presentation\]\{beamer\}"
-	       ("\\section\{%s\}" . "\\section*\{%s\}")
-	       ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
-	       ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")))
-
-(add-to-list 'org-latex-classes
-             '("memoir"
-               "\\documentclass\[a4paper\]\{memoir\}"
-               ("\\book\{%s\}" . "\\book*\{%s\}")
-               ("\\part\{%s\}" . "\\part*\{%s\}")
-               ("\\chapter\{%s\}" . "\\chapter*\{%s\}")
-               ("\\section\{%s\}" . "\\section*\{%s\}")
-               ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
-               ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")))
-
-(add-to-list 'org-latex-classes
-            '("abntex2"
-              "\\documentclass\[a4paper,oneside,12pt\]\{abntex2\}"
-              ("\\chapter\{%s\}" . "\\chapter*\{%s\}")
-              ("\\section\{%s\}" . "\\section*\{%s\}")
-              ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
-              ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")
-              ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")
-              ("\\paragraph\{%s\}" . "\\paragraph*\{%s\}")))
-
-(latex-preview-pane-enable)
-
-(setq TeX-PDF-mode t)
-
-;; (TeX-global-PDF-mode t)
-
-(font-lock-add-keywords
-   'latex-mode
-   `((,(concat "^\\s-*\\\\\\("
-               "\\(documentclass\\|\\(sub\\)?section[*]?\\)"
-               "\\(\\[[^]% \t\n]*\\]\\)?{[-[:alnum:]_ ]+"
-               "\\|"
-               "\\(begin\\|end\\){document"
-               "\\)}.*\n?")
-      (0 'your-face append))))
-
-(setq org-export-with-smart-quotes t)
-
-(setq org-latex-remove-logfiles nil)
-
-(autoload 'mardown-mode "markdown-mode")
-(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+(use-package rjsx-mode
+    :after js2-mode
+    :mode
+    (("\\.jsx$" . rjsx-mode)
+    ("components/.+\\.js$" . rjsx-mode)))
 
 (require 'dockerfile-mode)
 (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode))
 
-(require 'lsp-mode)
-(add-hook 'prog-mode-hook #'lsp) 
-(add-hook 'enh-ruby-mode-hook #'lsp) 
-(add-hook 'js2-mode-hook #'lsp) 
-(add-hook 'js2-jsx-mode-hook #'lsp)
+(use-package lsp-mode
+  :ensure t
+  :init (setq lsp-inhibit-message t
+              lsp-eldoc-render-all nil
+              lsp-highlight-symbol-at-point nil)
+  :hook ((enh-ruby-mode . lsp)
+         (js2-mode . lsp)
+         (js2-jsx-mode . lsp)))
 
-(require 'lsp-ui)
-(add-hook 'lsp-mode-hook 'lsp-ui-mode)
+(use-package company-lsp
+  :after  company
+  :ensure t
+  :config
+  (setq company-lsp-enable-snippet t
+        company-lsp-cache-candidates t))
 
-(require 'company-lsp)
-(push 'company-lsp company-backends)
+(use-package lsp-ui
+  :ensure t
+  :hook ((lsp-mode . lsp-ui-mode))
+  :config
+  (setq ;; lsp-ui-doc
+        lsp-ui-doc-enable t
+        lsp-ui-doc-header t
+        lsp-ui-doc-include-signature nil
+        lsp-ui-doc-position 'top ;; top, bottom, or at-point
+        lsp-ui-doc-max-width 120
+        lsp-ui-doc-max-height 30
+        lsp-ui-doc-use-childframe t
+        lsp-ui-doc-use-webkit t
+        ;; lsp-ui-flycheck
+        lsp-ui-flycheck-enable t
+        lsp-ui-flycheck-list-position 'right
+        lsp-ui-flycheck-live-reporting t
+        ;; lsp-ui-sideline
+        lsp-ui-sideline-enable t
+        lsp-ui-sideline-ignore-duplicate t
+        lsp-ui-sideline-show-symbol t
+        lsp-ui-sideline-show-hover t
+        lsp-ui-sideline-show-diagnostics nil
+        lsp-ui-sideline-show-code-actions t
+        lsp-ui-sideline-code-actions-prefix ""
+        lsp-ui-sideline-update-mode 'point
+        ;; lsp-ui-imenu
+        lsp-ui-imenu-enable t
+        lsp-ui-imenu-kind-position 'top
+        ;; lsp-ui-peek
+        lsp-ui-peek-enable t
+        lsp-ui-peek-peek-height 20
+        lsp-ui-peek-list-width 50
+        lsp-ui-peek-fontify 'on-demand) ;; never, on-demand, or always
+  :bind
+    (:map lsp-mode-map
+      ("C-c C-r" . lsp-ui-peek-find-references)
+      ("C-c C-j" . lsp-ui-peek-find-definitions)
+      ("C-c i"   . lsp-ui-peek-find-implementation)
+      ("C-c m"   . lsp-ui-imenu)
+      ("C-c s"   . lsp-ui-sideline-mode)
+      ("C-c d"   . ladicle/toggle-lsp-ui-doc)))
 
 ;; (define-key ac-completing-map [return] nil)
 ;; (define-key ac-completing-map "\r" nil)
@@ -774,40 +867,87 @@ parrot-num-rotations
 (require 'auto-complete)
 (global-auto-complete-mode t)
 
-(require 'company)
-(global-company-mode t)
-(setq company-tooltip-limit 20)                      ; bigger popup window
-(setq company-minimum-prefix-length 1)               ; start completing after 1st char typed
-(setq company-idle-delay .1)                         ; decrease delay before autocompletion popup shows
-(setq company-echo-delay 0)                          ; remove annoying blinking
-(setq company-begin-commands '(self-insert-command)) ; start autocompletion only after typing
-(setq company-dabbrev-downcase nil)                  ; Do not convert to lowercase
-(setq company-dabbrev-ignore-case t)
-(setq company-dabbrev-code-everywhere t)
-(setq company-selection-wrap-around t)               ; continue from top when reaching bottom
-(setq company-auto-complete 'company-explicit-action-p)
+(use-package company
+  :ensure t
+  :defer t
+  :init (global-company-mode)
+  :config
+  (define-key evil-insert-state-map (kbd "TAB")
+       #'company-indent-or-complete-common)
+  (setq company-tooltip-limit 20)                      ; bigger popup window
+  (setq company-minimum-prefix-length 1)               ; start completing after 1st char typed
+  (setq company-idle-delay .1)                         ; decrease delay before autocompletion popup shows
+  (setq company-echo-delay 0)                          ; remove annoying blinking
+  (setq company-begin-commands '(self-insert-command)) ; start autocompletion only after typing
+  (setq company-dabbrev-downcase nil)                  ; Do not convert to lowercase
+  (setq company-dabbrev-ignore-case t)
+  (setq company-dabbrev-code-everywhere t)
+  (setq company-selection-wrap-around t)               ; continue from top when reaching bottom
+  (setq company-auto-complete 'company-explicit-action-p)
+  (setq company-require-match nil)
+  (setq company-tooltip-align-annotations t)
+  ;; (setq company-tooltip-flip-when-above t)
+  (setq company-transformers '(company-sort-by-occurrence)) ; weight by frequency
+  (define-key company-active-map (kbd "M-n") nil)
+  (define-key company-active-map (kbd "M-p") nil)
+  (define-key company-active-map (kbd "C-n") 'company-select-next)
+  (define-key company-active-map (kbd "C-p") 'company-select-previous)
+  (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
+  (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
+  (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
+  (define-key company-active-map (kbd "<backtab>") 'company-select-previous)
+  (progn
+    ;; Use Company for completion
+    (bind-key [remap completion-at-point] #'company-complete company-mode-map)
 
-(add-hook 'after-init-hook 'global-company-mode)
+    (setq company-tooltip-align-annotations t
+          ;; Easy navigation to candidates with M-<n>
+          company-show-numbers t)
+    (setq company-dabbrev-downcase nil)))
 
-(add-hook 'after-init-hook 'global-company-mode)
+(use-package company-quickhelp          ; Documentation popups for Company
+  :ensure t
+  :defer t
+  :init (add-hook 'global-company-mode-hook #'company-quickhelp-mode))
 
-(after "company-autoloads"
-   (define-key evil-insert-state-map (kbd "TAB")
-     #'company-indent-or-complete-common))
+(use-package company-go
+  :ensure t
+  :defer t
+  :init
+  (with-eval-after-load 'company
+    (add-to-list 'company-backends 'company-go)))
 
-(require 'yasnippet)
-(yas-global-mode 1)
+(use-package yasnippet                  ; Snippets
+  :ensure t
+  :config
+    (setq yas-verbosity 1)                      ; No need to be so verbose
+    (setq yas-wrap-around-region t)
 
-(setq yas-snippet-dirs
-      '("~/.emacs.d/snippets"                 ;; personal snippets
-        ))
+  (with-eval-after-load 'yasnippet
+    (setq yas-snippet-dirs '(yasnippet-snippets-dir)))
+
+  ;; Bind `SPC' to `yas-expand' when snippet expansion available (it
+  ;; will still call `self-insert-command' otherwise).
+  ;; yas-maybe-expand contains a special value which, when bound in a keymap,
+  ;; tells Emacs to call yas-expand if and only if there is a snippet abbrev before point.
+  ;; If there is no snippet to expand, Emacs will behave as if yas-expand is unbound
+  ;; and so will run whatever command is bound to that key normally.
+  (define-key yas-minor-mode-map (kbd "TAB") yas-maybe-expand)
+  ;; Bind `C-c y' to `yas-expand' ONLY.
+  (define-key yas-minor-mode-map (kbd "C-c y") #'yas-expand)
+
+  (yas-reload-all)
+  (yas-global-mode))
+
+(use-package yasnippet-snippets         ; Collection of snippets
+  :ensure t)
 
 (defun copy-to-clipboard ()
   "Make F8 and F9 Copy and Paste to/from OS Clipboard.  Super usefull."
   (interactive)
   (if (display-graphic-p)
       (progn
-	(message "Yanked region to x-clipboard!")
+        (message "Yanked region to x-clipboard!")
 	(call-interactively 'clipboard-kill-ring-save)
 	)
     (if (region-active-p)
