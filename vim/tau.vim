@@ -413,17 +413,10 @@ set laststatus=2
 " set statusline+=%b,0x%-8B\                   " current char
 " set statusline+=%-14.(%l,%c%V%)\ %<%P        " offset
 
-
-"##############################################################
-"#--- PLUGINS                                                 #
-
-" avoid using standard Vim directory names like 'plugin'
-" remember to use single quotes
+"##########################################
+" plugins
 
 call plug#begin('~/.vim/plugged')
-
-"-------------------------------
-" APPEARANCE
 
 Plug 'tomasiser/vim-code-dark'
 Plug 'vim-airline/vim-airline'           " Vim Airline statusbar
@@ -431,107 +424,50 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'mkitt/tabline.vim'                 " Cleaner tabs
 Plug 'kien/rainbow_parentheses.vim'      " Colour matched brackets
 Plug 'ryanoasis/vim-devicons'            " Icons for dev file types
-" Plug 'tiagofumo/vim-nerdtree-syntax-highlight'  " coloured icons for vim-devicons
-
-"-------------------------------
-" CODE EDITING PLUGINS
-
 Plug 'editorconfig/editorconfig-vim'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'                  " so that vim-surroud actions will be repeatable with dot command .
 Plug 'tpope/vim-commentary'              " use with 'gc', equivalent to vscode ctrl+/)
-" Plug 'terryma/vim-multiple-cursors'       " Install vim-multiple-cursors (equivalent to vscode ctrl+d)
+Plug 'terryma/vim-multiple-cursors'       " Install vim-multiple-cursors (equivalent to vscode ctrl+d)
 Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'unblevable/quick-scope'            " Highlight jump characters
 Plug 'francoiscabrol/ranger.vim'         " Install ranger-vim integration with ranger file manager
 Plug 'christoomey/vim-tmux-navigator'    
 Plug 'RRethy/vim-illuminate'             " illuminate other uses of current word under cursor
-
-"-------------------------------
-" Git
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-git'
-
-"-------------------------------
-" Dev tools (language support, linters, etc..)
 Plug 'w0rp/ale'                          " ALE Asynchronous ESLinter for several languages
 Plug 'prettier/vim-prettier', { 'do': 'npm install' }
 Plug 'amiorin/vim-project'
 Plug 'pbrisbin/vim-runfile'
 Plug 'chrisbra/Colorizer'                " Show hex codes as colours
-
-"-------------------------------
-" SNIPPETS
-
-" Emmet
 Plug 'mattn/emmet-vim'
-
-" UltSnips engine
 Plug 'SirVer/ultisnips'
-" Snippets for UltSnips
 Plug 'honza/vim-snippets'
-
-
-"-------------------------------
-" AUTO COMPLETION ENGINES
-
-Plug 'vim-scripts/AutoComplPop'          " Activate omnicomplete suggestions as you type
-
-" Deoplete Completion Engine
-" if has('nvim')
-"     Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-" else
-"     Plug 'Shougo/deoplete.nvim'
-"     Plug 'roxma/nvim-yarp'
-"     Plug 'roxma/vim-hug-neovim-rpc'
-" endif
-
-
-"-------------------------------
-" LANGUAGE SPECIFIC PLUGINS
-
-" HTML
 Plug 'adelarsq/vim-matchit' " Matchit extends the % function, navigating to more than a single character
 Plug 'valloric/MatchTagAlways'           " Show matching and closing tags
-
-" JavaScript
 Plug 'pangloss/vim-javascript'
 Plug 'xojs/vim-xo'                       " Install vim-xo for xo linting support
 Plug 'mxw/vim-jsx'                       " JSX syntax colors and indent support. Depends on vim-javascript
-
-" Ruby
 Plug 'tpope/vim-rake'
 Plug 'tpope/vim-bundler'
 Plug 'vim-ruby/vim-ruby'
 Plug 'tpope/vim-rails'
 Plug 'sunaku/vim-ruby-minitest'
-
-" Elixir
 Plug 'elixir-editors/vim-elixir'
-" elixir module and function completions, mix and iex integration, ...
 Plug 'slashmili/alchemist.vim'
-
-" PHP
 Plug 'shawncplus/phpcomplete.vim'       " better php omnicompletion
-
-" Latex 
 Plug 'lervag/vimtex'
-
-" Markdown
 Plug 'suan/vim-instant-markdown'         " Markdown preview instant-markdown-
 Plug 'godlygeek/tabular'                 " Tabular align texts that grow
 Plug 'plasticboy/vim-markdown'
 Plug 'vim-pandoc/vim-pandoc'             " Pandoc for vim
 Plug 'vim-pandoc/vim-pandoc-syntax'      " Syntax colors for pandoc-markdown files
-
-
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-sensible'
 Plug 'vim-airline/vim-airline'
-Plug 'terryma/vim-multiple-cursors'
-Plug 'editorconfig/editorconfig-vim'
 Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-eunuch'
 Plug 'ntpeters/vim-better-whitespace'
@@ -539,46 +475,32 @@ Plug 'sheerun/vim-polyglot'
 Plug 'mhinz/vim-mix-format'
 Plug 'vim-scripts/vim-auto-save'
 Plug 'nathanaelkane/vim-indent-guides'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
 " Initialize plugin system
 call plug#end()
 
-
-
-"##############################################################
-"#--- PLUGINS SETTINGS                                        #
-"##############################################################
-
-"""""""""""""""""""""""""""""""""""""""
-" VIM MARKDOWN SETTINGS
+"######################################
+" PLUGINS SETTINGS
 
 " Disable folding on Vim Markdown
 let g:vim_markdown_folding_disabled = 1
 
-
-"""""""""""""""""""""""""""""""""""""""
 " RUBY MINITEST SETTINGS (i_ctrl+x_ctrl+u for minitest method completion)
-
 set completefunc=syntaxcomplete#Complete
 
-
-"""""""""""""""""""""""""""""""""""""""
 " APPLY THE COLOR SCHEME
-
 " This has to be put after the plugins load. The downloaded color scheme
 " only becomes available after the plug#end() line
-
 colorscheme codedark
 
 
-"""""""""""""""""""""""""""""""""""""""
 " ALE LINTER SETTINGS
-
 " show linting errors on a separate window
 " let g:ale_open_list = 1
 " let g:ale_list_window_size = 5
 
 
-"""""""""""""""""""""""""""""""""""""""
 " VIM NATIVE'S OMNICOMPLETE COMPLETION ENGINE SETTINGS
 " taken from http://vim.wikia.com/wiki/Make_Vim_completion_popup_menu_work_just_like_in_an_IDE
 
@@ -607,21 +529,15 @@ let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 " If you want :UltiSnipsEdit to split your window.
 let g:UltiSnipsEditSplit="vertical"
 
-
-
-
-"""""""""""""""""""""""""""""""""""""""
 " VIM AIRLINE SETTINGS
-
 " set rtp+=/usr/lib/python3.6/site-packages/powerline/bindings/vim
-
 let g:airline_theme='codedark'                        " this airline theme resembles VSCode blueish status bar
 let g:airline#extensions#tabline#enabled=1
 let g:airline#extensions#tabline#formatter='unique_tail'
 let g:airline_powerline_fonts=1                     " needed by devicons
 
 
-"""""""""""""""""""""""""""""""""""""""
+"############################################
 " NERDTREE SETTINGS
 
 " Toogle NERDTree
@@ -645,7 +561,7 @@ let NERDTreeDirArrows = 1
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 
-"""""""""""""""""""""""""""""""""""""""
+"############################################
 " EMMET SETTINGS
 " Use TAB to expand emmet snippets (equivalent to <C-y>,
 " let g:user_emmet_expandabbr_key = '<S-tab>'
@@ -656,22 +572,21 @@ map <C-Space> <c-y>,
 inoremap <C->> <c-y>n<CR>
 
 
-"""""""""""""""""""""""""""""""""""""""
+"############################################
 " VIM COLORIZER SETTINGS
 
 " Make colorizer start when opening or creating files
 :autocmd BufNewFile,BufRead * ColorHighlight
 
 
-
-"""""""""""""""""""""""""""""""""""""""
+"############################################
 " VIM ILLUMINATE SETTINGS
 
 " disable illuminate words on NerdTREE
 let g:Illuminate_ftblacklist = ['nerdtree']
 
 
-"""""""""""""""""""""""""""""""""""""""
+"############################################
 " VIM DEVICONS SETTINGS
 
 let g:webdevicons_enable = 1
@@ -701,17 +616,15 @@ if exists("g:loaded_webdevicons")
     call webdevicons#refresh()
 endif
 
-
-"""""""""""""""""""""""""""""""""""""""
+"############################################
 " VIM RUNFILE CONFIG
 
 " vim-runfile keymap
 noremap <Leader>r, :Run<CR>
 
 
-"##############################################################
-"#--- HELPER METHODS                                          #
-"##############################################################
+"############################################
+" HELPER METHODS
 
 function! VisualSelection(direction, extra_filter) range
     let l:saved_reg = @"
@@ -757,8 +670,5 @@ endfunction
 command! ZoomToggle call s:ZoomToggle()
 " mapping the ZoomToggle function
 noremap <leader>z :ZoomToggle<CR>
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 

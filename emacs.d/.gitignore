@@ -2,60 +2,57 @@
 
 *~
 \#*\#
+/url/cache
 /.emacs.desktop
-/.emacs.desktop.lock
-*.elc
-auto-save-list
-tramp
-.\#*
-
-# Org-mode
-.org-id-locations
-*_archive
-
-# flymake-mode
-*_flymake.*
-
-# eshell files
-/eshell/history
-/eshell/lastdir
-
-# elpa packages
-/elpa/
-
-# cache files
-/.cache/
-
-# reftex files
-*.rel
-
-# AUCTeX auto folder
-/auto/
-
-# cask packages
-.cask/
-dist/
-
-# Flycheck
-flycheck_*.el
-
-# server auth directory
-/server/
-
-# projectiles files
-.projectile
-
-# directory configuration
-.dir-locals.el
-
-# network security
+/auto-save-list
 /network-security.data
-
-# dunno what those are, but they seem not relevant for a repo
-ac-comphist.dat
-.mc-lists.el
-
-# the resulting filed from tangled org file and html and stuff
-emacs.html
-/config/*.el
-emacs.log
+/.session
+/session.*
+/custom.el
+/config
+*.elc
+CVS
+.svn
+*~
+.cvsignore
+.*.lock
+/tramp
+/TODO
+/.org-id-locations
+cookies
+/newsticker
+\#*
+/elpa
+/elpa-*
+site-lisp/package/
+/swank
+/.mc-lists.el
+/var
+/.sqli_history
+/frame-restore-parameters
+/.achievements
+/.bookmarks.el
+/history
+/helm-adaptive-history
+/thumbs/
+/emms/
+/.smex-items
+/image-dired/
+/eshell
+/.cask/
+/.sx/
+/org-clock-save.el
+/ditaa*.jar
+/ido.last
+/recentf
+/viper
+/projectile-bookmarks.eld
+/anaconda-mode/
+/.historian
+/.uptimes.el
+/rake.cache
+/plantuml.jar
+/magithub
+.cache/
+/forge-database.sqlite
+/transient

@@ -14,3 +14,15 @@ yay -S ttf-all-the-icons
 
 echo "install ag searcher for dumb-jump to work better"
 sudo pacman -S --noconfirm the_silver_searcher
+
+echo "## install typescript/javascript language server"
+npm install -g typescript-language-server
+
+
+echo "## install angular language server3"
+wget -o angular-language-server.zip https://marketplace.visualstudio.com/_apis/public/gallery/publishers/Angular/vsextensions/ng-template/0.802.3/vspackage
+tar -xvf angular-language-server --directory ~/.angular
+
+echo "## install pandoc for document generation in org mode"
+sudo pacman -S --noconfirm pandoc
+

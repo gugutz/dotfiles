@@ -14,8 +14,8 @@
 # find out yours with the commands:
 # xrandr --current OR xrandr --listmonitors
 # set $primary_monitor     HDMI-
-set $primary_monitor   DVI-I-2
-set $secondary_monitor   DVI-I-1
+set $primary_monitor  eDP1
+set $secondary_monitor  DP1
 
 exec_always --no-startup-id xrandr --output $primary_monitor --primary
 
@@ -120,7 +120,8 @@ set $browser firefox
 # define main terminal as st in tmux (suckless terminal)
 # this make tmux use a main session and doenst spawn multiple unused sessions
 # set $terminal st -e tmux new-session -A -s "main-session"
-set $terminal       st -e tmux new-session
+# set $terminal       st -e tmux new-session
+set $terminal       st
 
 # define default text editor
 # set $editor st -e tmux new-session -A -s "emacs-session" emacs -t -nw
@@ -242,20 +243,21 @@ bindsym XF86PowerOff		exec prompt "Are you sure you want to shutdown?" "$shutdow
 bindsym $mod+Control+9 exec --no-startup-id blurlock
 
 # auto start blurlock after 10 minutes
-exec --no-startup-id xautolock -time 10 -locker blurlock
+exec --no-startup-id xautolock -time 8 -locker blurlock
 
 ################################################
 # Autostart applications
 ################################################
 
 # emacsclient
-exec_always --no-startup-id $editorgui 
+exec_always --no-startup-id $editorgui
 
 # Discord
 exec discord
 assign [class="discord"] → $ws8
 
 # Slack
+exec slack
 assign [class="Slack"]  → $ws8
 
 
@@ -329,7 +331,7 @@ bindsym Print exec ~/dotfiles/i3/scripts/i3-take-screenshot.sh root
 bindsym $mod+Print --release exec --no-startup-id i3-scrot -w
 
 # Select an area to screen shot
-bindsym  $mod+Shift+Print --release exec --no-startup-id import ~/sync/img/screenshots/last-screenshot.png
+bindsym  $mod+Shift+Print --release exec --no-startup-id import ~/img/screenshots/last-screenshot.png
 # bindsym $mod+Shift+Print --release exec --no-startup-id i3-scrot -s
 
 # scrot & gimp - select window or rectangle
@@ -704,18 +706,38 @@ bindsym $mod+Shift+b move container to workspace back_and_forth; workspace back_
 # MULTI-MONITORS WORKSPACES SETUP
 ################################################
 
-# distribution of workspaces between monitors
-workspace $ws1 output $primary_monitor
-workspace $ws2 output $primary_monitor
-workspace $ws3 output $primary_monitor
-workspace $ws4 output $primary_monitor
-workspace $ws5 output $primary_monitor
-workspace $ws6 output $primary_monitor
-workspace $ws7 output $secondary_monitor
-workspace $ws8 output $secondary_monitor
-workspace $ws9 output $secondary_monitor
-workspace $ws10 output $secondary_monitor
+# HOME LAYOUT
+# workspace $ws1 output $primary_monitor
+# workspace $ws2 output $primary_monitor
+# workspace $ws3 output $primary_monitor
+# workspace $ws4 output $primary_monitor
+# workspace $ws5 output $primary_monitor
+# workspace $ws6 output $primary_monitor
+# workspace $ws7 output $secondary_monitor
+# workspace $ws8 output $secondary_monitor
+# workspace $ws9 output $secondary_monitor
+# workspace $ws10 output $secondary_monitor
 
+# WORK LAYOUT
+workspace $ws1 output $secondary_monitor
+workspace $ws2 output $secondary_monitor
+workspace $ws3 output $secondary_monitor
+workspace $ws4 output $secondary_monitor
+workspace $ws5 output $secondary_monitor
+workspace $ws6 output $secondary_monitor
+workspace $ws7 output $primary_monitor
+workspace $ws8 output $primary_monitor
+workspace $ws9 output $primary_monitor
+workspace $ws10 output $primary_monitor
+
+#--------------------------------------------
+# BINDINGS TO CHANGE SCREEN LAYOUT
+
+# WORK - Use dual-screen layout
+bindsym $mod+Control+Shift+KP_1 exec ~/dotfiles/stairs/stairs-single-screen-layout.sh
+
+# WORK - Use dual-screen layout
+bindsym $mod+Control+Shift+KP_2 exec ~/dotfiles/stairs/stairs-dual-screen-layout.sh
 
 ################################################
 # RESIZE MODE
