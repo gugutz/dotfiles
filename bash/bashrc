@@ -191,3 +191,6 @@ export NVM_DIR="$HOME/.nvm"
 # tmuxinator
 source ~/.bin/tmuxinator.bash
 
+
+export YVM_DIR=/home/tau/.yvm
+[ -r $YVM_DIR/yvm.sh ] && . $YVM_DIR/yvm.sh

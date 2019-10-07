@@ -1,23 +1,33 @@
 ################################################
+#                                              #
 #         gugutz i3-gaps config file           #
 #          http://github.com/gugutz            #
 #                                              #
-#        place it under ~/.config/i3/          #
 ################################################
 
 ################################################
 # SET FIRST AND SECOND MONITORS
 # this must be run before the rest of the script
-################################################
+
 
 # name of first and second monitors
 # find out yours with the commands:
 # xrandr --current OR xrandr --listmonitors
-# set $primary_monitor     HDMI-
-set $primary_monitor  eDP1
-set $secondary_monitor  DP1
+#
+# Home monitor config
+#set DVI-I-2 DVI-I-2
+#set  DVI-I-1
+# STAIRS monitor config
+# set DVI-I-2  eDP1
+# set   DP1
 
-exec_always --no-startup-id xrandr --output $primary_monitor --primary
+#exec_always --no-startup-id xrandr --output DVI-I-2 --primary
+
+#exec --no-startup-id ~/dotfiles/i3/scripts/monitors-setup.sh
+
+# monitors set with my monitors-setup.sh script
+set $primary_monitor DVI-I-2
+set $secondary_monitor DVI-I-1
 
 ################################################
 # GENERAL I3 SETTINGS #
@@ -249,11 +259,14 @@ exec --no-startup-id xautolock -time 8 -locker blurlock
 # Autostart applications
 ################################################
 
+# run emacs as a daemon at startup
+exec emacs --daemon
+
 # emacsclient
 exec_always --no-startup-id $editorgui
 
 # Discord
-exec discord
+#exec discord
 assign [class="discord"] → $ws8
 
 # Slack
@@ -666,6 +679,33 @@ workspace $ws1 gaps outer 1
 workspace $ws3 gaps outer 1
 workspace $ws5 gaps outer 0
 
+################################################
+# MULTI-MONITORS WORKSPACES SETUP
+################################################
+
+# HOME LAYOUT
+workspace $ws1 output $primary_monitor
+workspace $ws2 output $primary_monitor
+workspace $ws3 output $primary_monitor
+workspace $ws4 output $primary_monitor
+workspace $ws5 output $primary_monitor
+workspace $ws6 output $primary_monitor
+workspace $ws7 output $secondary_monitor
+workspace $ws8 output $secondary_monitor
+workspace $ws9 output $secondary_monitor
+workspace $ws10 output $secondary_monitor
+
+# WORK LAYOUT
+# workspace $ws1 output $secondary_monitor
+# workspace $ws2 output $secondary_monitor
+# workspace $ws3 output $secondary_monitor
+# workspace $ws4 output $secondary_monitor
+# workspace $ws5 output $secondary_monitor
+# workspace $ws6 output $secondary_monitor
+# workspace $ws7 output $primary_monitor
+# workspace $ws8 output $primary_monitor
+# workspace $ws9 output $primary_monitor
+# workspace $ws10 output $primary_monitor
 
 # switch to workspace
 bindsym $mod+1 workspace $ws1
@@ -702,33 +742,6 @@ workspace_auto_back_and_forth yes
 bindsym $mod+b workspace back_and_forth
 bindsym $mod+Shift+b move container to workspace back_and_forth; workspace back_and_forth
 
-################################################
-# MULTI-MONITORS WORKSPACES SETUP
-################################################
-
-# HOME LAYOUT
-# workspace $ws1 output $primary_monitor
-# workspace $ws2 output $primary_monitor
-# workspace $ws3 output $primary_monitor
-# workspace $ws4 output $primary_monitor
-# workspace $ws5 output $primary_monitor
-# workspace $ws6 output $primary_monitor
-# workspace $ws7 output $secondary_monitor
-# workspace $ws8 output $secondary_monitor
-# workspace $ws9 output $secondary_monitor
-# workspace $ws10 output $secondary_monitor
-
-# WORK LAYOUT
-workspace $ws1 output $secondary_monitor
-workspace $ws2 output $secondary_monitor
-workspace $ws3 output $secondary_monitor
-workspace $ws4 output $secondary_monitor
-workspace $ws5 output $secondary_monitor
-workspace $ws6 output $secondary_monitor
-workspace $ws7 output $primary_monitor
-workspace $ws8 output $primary_monitor
-workspace $ws9 output $primary_monitor
-workspace $ws10 output $primary_monitor
 
 #--------------------------------------------
 # BINDINGS TO CHANGE SCREEN LAYOUT
