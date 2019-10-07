@@ -14,6 +14,68 @@ tangled, and the tangled file is compiled."
 
 (add-hook 'after-save-hook #'/util/tangle-init)
 
+(require 'package)
+;; add melpa stable emacs package repository
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t) ; Org-mode's repository
+
+(package-initialize)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(TeX-after-compilation-finished-functions (quote TeX-revert-document-buffer) t)
+ '(TeX-auto-save t t)
+ '(TeX-master nil t)
+ '(TeX-parse-self t t)
+ '(TeX-view-program-list (quote (("pdf-tools" "TeX-pdf-tools-sync-view"))) t)
+ '(TeX-view-program-selection (quote ((output-pdf "pdf-tools"))) t)
+ '(custom-safe-themes
+   (quote
+    ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
+ '(fci-rule-color "#3E4451")
+ '(magit-auto-revert-mode nil)
+ '(package-selected-packages
+   (quote
+    (helm-css-scss scss-mode pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
+   
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(css-selector ((t (:inherit default :foreground "#66CCFF"))))
+ '(font-lock-comment-face ((t (:foreground "#828282")))))
+
+(add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
+;; (add-to-list 'load-path "~/dotfiles/emacs.d/config")
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package)
+)
+
+(eval-when-compile
+  (require 'use-package))
+
+(use-package use-package-ensure-system-package
+  :ensure t)
+
+(require 'use-package-ensure)
+(setq use-package-always-ensure t)
+
+(use-package auto-package-update
+  :config
+  (setq auto-package-update-interval 7) ;; in days
+  (setq auto-package-update-prompt-before-update t)
+  (setq auto-package-update-delete-old-versions t)
+  (setq auto-package-update-hide-results t)
+  (auto-package-update-maybe)
+)
+
 ;; (use-package server
 ;;   :ensure nil
 ;;   :init
@@ -85,8 +147,6 @@ tangled, and the tangled file is compiled."
 ;; (require 'expand-region)
 (global-set-key (kbd "C-S-<tab>") 'er/expand-region)
 
-(global-set-key (kbd "C-M-SPC") 'hippie-expand)
-
 (global-set-key [f5] '(lambda () (interactive) (revert-buffer nil t nil)))
 
 ;; Kill current buffer; prompt only if
@@ -132,59 +192,6 @@ tangled, and the tangled file is compiled."
 (require 'epa-file)
 (epa-file-enable)
 
-(require 'package)
-;; add melpa stable emacs package repository
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
-(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t) ; Org-mode's repository
-
-(package-initialize)
-
-(custom-set-variables
-;; custom-set-variables was added by Custom.
-;; If you edit it by hand, you could mess it up, so be careful.
-;; Your init file should contain only one such instance.
-;; If there is more than one, they won't work right.
-'(custom-safe-themes
-   (quote
-   ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
-   '(fci-rule-color "#3E4451")
-   '(package-selected-packages
-     (quote
-     (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
-   (custom-set-faces
-   ;; custom-set-faces was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
-   )
-
-(add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
-;; (add-to-list 'load-path "~/dotfiles/emacs.d/config")
-
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package)
-)
-
-(eval-when-compile
-  (require 'use-package))
-
-(use-package use-package-ensure-system-package
-  :ensure t)
-
-(require 'use-package-ensure)
-(setq use-package-always-ensure t)
-
-(use-package auto-package-update
-  :config
-  (setq auto-package-update-interval 7) ;; in days
-  (setq auto-package-update-prompt-before-update t)
-  (setq auto-package-update-delete-old-versions t)
-  (setq auto-package-update-hide-results t)
-  (auto-package-update-maybe)
-)
-
 (use-package exec-path-from-shell
   :if (memq window-system '(mac ns))
   :ensure t
@@ -216,6 +223,26 @@ tangled, and the tangled file is compiled."
                 ("FooBar" :call (insert "FooBar"))
                 )))))
   (right-click-context-menu))))
+
+(use-package hippie-exp
+  ;;:ensure nil
+  :defer t
+  :bind
+  ("<tab>" . hippie-expand)
+  ("<C-return>" . hippie-expand)
+  ("C-M-SPC" . hippie-expand)
+  (:map evil-insert-state-map
+  ("<tab>" . hippie-expand)
+  )
+  :config
+  (setq-default hippie-expand-try-functions-list
+        '(yas-hippie-try-expand
+          yas-expand
+          company-indent-or-complete-common
+          emmet-expand-line
+          )
+  )
+)
 
 (use-package undo-tree
   :ensure t
@@ -359,6 +386,7 @@ tangled, and the tangled file is compiled."
     "e" 'find-file
     "q" 'evil-quit
     "w" 'save-buffer
+    "d" 'delete-frame
     "k" 'kill-buffer
     "b" 'switch-to-buffer
     "-" 'split-window-bellow
@@ -438,7 +466,16 @@ tangled, and the tangled file is compiled."
   ("C-c a" . org-agenda)
   ("C-c c" . org-capture)
   ("C-c b" . org-switch)
+  ;; this map is to delete de bellow commented lambda that does the same thing
+  ;; Resolve issue with Tab not working with ORG only in Normal VI Mode in terminal
+  ;; (something with TAB on terminals being related to C-i...)
+  (:map evil-normal-state-map
+  ("<tab>" . org-cycle)
+  )
   :config
+  ;;(add-hook 'org-mode-hook
+  ;;          (lambda ()
+  ;;        (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
   ;; ox-extras
   ;; add suport for the ignore tag (ignores a headline without ignoring its content)
   (require ox-extra)
@@ -457,12 +494,7 @@ tangled, and the tangled file is compiled."
   (setq org-log-done 'note)
 
   ;;ox-twbs (exporter to twitter bootstrap html)
-   (setq org-enable-bootstrap-support t)
-  ;; Resolve issue with Tab not working with ORG only in Normal VI Mode in terminal
-  ;; (something with TAB on terminals being related to C-i...)
-  (add-hook 'org-mode-hook
-            (lambda ()
-          (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
+  (setq org-enable-bootstrap-support t)
 
   (defun org-export-turn-on-syntax-highlight()
     "Setup variables to turn on syntax highlighting when calling `org-latex-export-to-pdf'"
@@ -1115,7 +1147,10 @@ tangled, and the tangled file is compiled."
     (html-mode . emmet-mode) ;; Auto-start on HTML files
     (web-mode . emmet-mode) ;; Auto-start on web-mode
   :config
-    (setq emmet-expand-jsx-className? t)) ;; use emmet with JSX markup
+  (unbind-key "<C-return>" emmet-mode-keymap)
+  (unbind-key "C-M-<left>" emmet-mode-keymap)
+  (unbind-key "C-M-<right>" emmet-mode-keymap)
+  (setq emmet-expand-jsx-className? t)) ;; use emmet with JSX markup
 
 (smartscan-mode 1)
 
@@ -1149,9 +1184,10 @@ tangled, and the tangled file is compiled."
     :ensure t
     :defer t
     :hook
-    (after-init . global-flycheck-mode)
+    (prog-mode . flycheck-mode)
     :init
-    (global-flycheck-mode))
+    (global-flycheck-mode)
+)
 
 (with-eval-after-load 'flycheck
   (global-flycheck-inline-mode))
@@ -1183,6 +1219,38 @@ tangled, and the tangled file is compiled."
   (lambda ()
     (set (make-local-variable 'sgml-basic-offset) 4)))
 
+(use-package scss-mode
+  :ensure t
+  :defer t
+  :mode ("\\.scss\\'")
+  :config
+  (autoload 'scss-mode "scss-mode")
+  (setq scss-compile-at-save 'nil)
+)
+
+(use-package helm-css-scss
+  :ensure t
+  :bind
+  (:map isearch-mode-mode
+  ("s-i" . helm-css-scss-from-isearch)
+  :map helm-css-scss-map
+  ("s-i" . helm-css-scss-multi-from-helm-css-scss)
+  :map css-mode-map
+  ("s-i" . helm-css-scss)
+  ("s-I" . helm-css-scss-back-to-last-point)
+  :map less-css-mode-map
+  ("s-i" . helm-css-scss)
+  ("s-I" . helm-css-scss-back-to-last-point)
+  :map scss-mode-map
+  ("s-i" . helm-css-scss)
+  ("s-I" . helm-css-scss-back-to-last-point)
+  )
+  :config
+  (setq helm-css-scss-insert-close-comment-depth 2
+        helm-css-scss-split-with-multiple-windows t
+        helm-css-scss-split-direction 'split-window-vertically)
+)
+
 (use-package web-mode
   :custom-face
   (css-selector ((t (:inherit default :foreground "#66CCFF"))))
@@ -1197,7 +1265,8 @@ tangled, and the tangled file is compiled."
 ;; js2-mode: enhanced JavaScript editing mode
 ;; https://github.com/mooz/js2-mode
 (use-package js2-mode
-  :mode (("\\.js$" . js2-mode))
+  :mode
+  ("\\.js$" . js2-mode)
 
   :hook ((js2-mode . flycheck-mode)
          (js2-mode . company-mode)
@@ -1223,30 +1292,30 @@ tangled, and the tangled file is compiled."
 ;; prettier-emacs: minor-mode to prettify javascript files on save
 ;; https://github.com/prettier/prettier-emacs
 (use-package prettier-js
+  :mode
+  ("\\.js$" . prettier-js-mode)
+  ("\\.scss$" . prettier-js-mode)
   :ensure-system-package
-   (prettier . "npm install -g prettier")
+  (prettier . "npm install -g prettier")
   :hook
   (js2-mode . prettier-js-mode)
-  (json-mode . prettier-js-mode)
   (web-mode . prettier-js-mode)
-  ;; removed typescript to use TIDE formatter
-  ;;(typescript-mode . prettier-js-mode)
   (rjsx-mode . prettier-js-mode)
+  (css-mode . prettier-js-mode)
+  (scss-mode . prettier-js-mode)
+  (json-mode . prettier-js-mode)
   :config
-  (setq prettier-js-args '("--trailing-comma" "all"
-                           "--bracket-spacing" "false"))
-  (defun enable-minor-mode (my-pair)
-
-  "Enable prettier-js-mode if theres a .prettierrc on project dir"
-  (if (buffer-file-name)
-      (if (string-match (car my-pair) buffer-file-name)
-      (funcall (cdr my-pair)))))
-  ; Hook the above function to web-mode
-  (add-hook 'web-mode-hook #'(lambda ()
-    (enable-minor-mode
-       '("\\.js?\\'" . prettier-js-mode)
-       '("\\.jsx?\\'" . prettier-js-mode)
-       '("\\.css?\\'" . prettier-js-mode)))))
+  (setq prettier-js-args '("--bracket-spacing" "false"
+                           "--print-width" "80"
+                           "--tab-width" "2"
+                           "--use-tabs" "false"
+                           "--no-semi" "true"
+                           "--single-quote" "true"
+                           "--trailing-comma" "none"
+                           "--no-bracket-spacing" "true"
+                           "--jsx-bracket-same-line" "false"
+                           "--arrow-parens" "avoid"))
+)
 
 ;; json-mode: Major mode for editing JSON files with emacs
 ;; https://github.com/joshwnj/json-mode
@@ -1268,21 +1337,11 @@ tangled, and the tangled file is compiled."
     (("\\.jsx$" . rjsx-mode)
     ("components/.+\\.js$" . rjsx-mode)))
 
-;; (use-package tide
-;;   :ensure t
-;;   :after (typescript-mode company flycheck eldoc)
-;;   :init
-;;   (setq flycheck-check-syntax-automatically '(save mode-enabled))
-;;   (tide-hl-identifier-mode +1)
-;;   (eldoc-mode +1)
-;;   :hook
-;;   (typescript-mode . tide-setup)
-;;   (before-save . tide-format-before-save)
-;;   (typescript-mode . tide-hl-identifier-mode)
-;;   :config
-;;   ;; aligns annotation to the right hand side
-;;   (setq company-tooltip-align-annotations t)
-;; )
+(use-package typescript-mode
+  :ensure t
+  :mode (("\\.ts\\'" . typescript-mode)
+         ("\\.tsx\\'" . typescript-mode))
+)
 
 (defun setup-tide-mode ()
   (interactive)
@@ -1291,24 +1350,24 @@ tangled, and the tangled file is compiled."
   (setq flycheck-check-syntax-automatically '(save mode-enabled))
   (eldoc-mode +1)
   (tide-hl-identifier-mode +1)
-  ;; company is an optional dependency. You have to
-  ;; install it separately via package-install
-  ;; `M-x package-install [ret] company`
-  (company-mode +1))
+  (company-mode +1)
+)
 
-;; aligns annotation to the right hand side
-(setq company-tooltip-align-annotations t)
-
-;; formats the buffer before saving
-(add-hook 'before-save-hook 'tide-format-before-save)
-
-(add-hook 'typescript-mode-hook #'setup-tide-mode)
+(use-package tide
+  :ensure t
+  :config
+  (progn
+    (add-hook 'before-save-hook 'tide-format-before-save)
+    (add-hook 'typescript-mode-hook #'setup-tide-mode)
+  )
+)
 
 (require 'dockerfile-mode)
 (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode))
 
 (use-package lsp-mode
   :ensure t
+  :commands lsp
   :init
   (setq lsp-inhibit-message t)
   (setq lsp-eldoc-render-all nil)
@@ -1322,21 +1381,54 @@ tangled, and the tangled file is compiled."
 
 (use-package company-lsp
   :ensure t
+  :custom
+  ;; debug
+  (lsp-print-io nil)
+  (lsp-trace nil)
+  (lsp-print-performance nil)
+  ;; general
+  (lsp-auto-guess-root t)
+  (lsp-document-sync-method 'incremental) ;; none, full, incremental, or nil
+  (lsp-response-timeout 10)
+  (lsp-prefer-flymake t) ;; t(flymake), nil(lsp-ui), or :none
   :config
-  (setq company-lsp-enable-snippet t
-        company-lsp-cache-candidates t)
+  (setq company-lsp-enable-snippet t)
+  (setq company-lsp-async t)
+  (setq company-lsp-cache-candidates t)
+  (setq company-lsp-enable-recompletion t)
 )
 
 (use-package lsp-ui
   :ensure t
   :hook ((lsp-mode . lsp-ui-mode))
+  :preface
+  (defun ladicle/toggle-lsp-ui-doc ()
+    (interactive)
+    (if lsp-ui-doc-mode
+      (progn
+        (lsp-ui-doc-mode -1)
+        (lsp-ui-doc--hide-frame)
+      )
+    (lsp-ui-doc-mode 1)
+    )
+  )
   :config
+  ;; lsp-ui appearance
+  (set-face-attribute 'lsp-ui-doc-background  nil :background "#f9f2d9")
+  (add-hook 'lsp-ui-doc-frame-hook
+    (lambda (frame _w)
+      (set-face-attribute 'default frame :font "Overpass Mono 11")
+    )
+  )
+  (set-face-attribute 'lsp-ui-sideline-global nil
+                      :inherit 'shadow
+                      :background "#f9f2d9")
   (setq ;; lsp-ui-doc
         lsp-ui-doc-enable t
         lsp-ui-doc-header t
         lsp-ui-doc-include-signature nil
-        lsp-ui-doc-position 'top ;; top, bottom, or at-point
-        lsp-ui-doc-max-width 120
+        lsp-ui-doc-position 'at-point ;; top, bottom, or at-point
+        lsp-ui-doc-max-width 100
         lsp-ui-doc-max-height 30
         lsp-ui-doc-use-childframe t
         lsp-ui-doc-use-webkit t
@@ -1359,12 +1451,16 @@ tangled, and the tangled file is compiled."
         ;; lsp-ui-peek
         lsp-ui-peek-enable t
         lsp-ui-peek-peek-height 20
-        lsp-ui-peek-list-width 50
+        lsp-ui-peek-list-width 40
         lsp-ui-peek-fontify 'on-demand) ;; never, on-demand, or always
   :bind
     (:map lsp-mode-map
       ("C-c C-r" . lsp-ui-peek-find-references)
       ("C-c C-j" . lsp-ui-peek-find-definitions)
+      ("C-c g d" . lsp-goto-type-definition)
+      ("C-c f d" . lsp-find-definition)
+      ("C-c g i" . lsp-goto-implementation)
+      ("C-c f i" . lsp-find-implementation)
       ("C-c i"   . lsp-ui-peek-find-implementation)
       ("C-c m"   . lsp-ui-imenu)
       ("C-c s"   . lsp-ui-sideline-mode)
@@ -1387,10 +1483,12 @@ tangled, and the tangled file is compiled."
 (use-package company
   :ensure t
   :defer t
-  :init (global-company-mode)
+  :init
+  (global-company-mode)
   :bind
   (:map evil-insert-state-map
-  ("<tab>" . company-indent-or-complete-common)
+  ;; ("<tab>" . company-indent-or-complete-common)
+  ("C-SPC" . company-indent-or-complete-common)
   )
   (:map company-active-map
   ("M-n" . nil)
@@ -1399,7 +1497,13 @@ tangled, and the tangled file is compiled."
   ("C-p" . company-select-previous)
   ("<tab>" . company-complete-common-or-cycle)
   ("S-<tab>" . company-select-previous)
-  ("<backtab>" . company-select-previous))
+  ("<backtab>" . company-select-previous)
+  ("C-d" . company-show-doc-buffer)
+  )
+  (:map company-search-map
+   ("C-p" . company-select-previous)
+   ("C-n" . company-select-next)
+  )
   :config
   ;; Use Company for completion
   (progn
@@ -1434,19 +1538,39 @@ tangled, and the tangled file is compiled."
   ;; (define-key company-active-map (kbd "<backtab>") 'company-select-previous)
 )
 
-(use-package company-emoji)
-(add-to-list 'company-backends 'company-emoji)
+(use-package company-emoji
+  :ensure t
+  :config
+  (add-to-list 'company-backends 'company-emoji)
+)
 
 (use-package company-quickhelp          ; Documentation popups for Company
-  :ensure t
-  :defer t
-  ;; :init (add-hook 'global-company-mode-hook #'company-quickhelp-mode))
-  :hook
-  (global-company-mode . company-quickhelp-mode)
-  :config
-  (setq company-quickhelp-delay 0.1)
-  (company-quickhelp-mode)
+   :ensure t
+   ;; :defer t
+   :hook
+   (global-company-mode . company-quickhelp-mode)
+   :bind
+   (:map company-active-map
+   ("M-h" . company-quickhelp-manual-begin)
+   )
+   :config
+   (setq company-quickhelp-delay 0.7)
+   (company-quickhelp-mode)
 )
+
+(use-package company-posframe
+  :ensure t
+  :hook
+  (company-mode . company-posframe-mode)
+  (global-company-mode . company-posframe-mode)
+)
+
+;; (use-package company-box
+;;   :ensure t
+;;   :hook
+;;   (company-mode . company-box-mode)
+;;   (global-company-mode . company-box-mode)
+;; )
 
 (use-package company-go
   :ensure t
@@ -1498,12 +1622,12 @@ tangled, and the tangled file is compiled."
   (prog-mode . yas-minor-mode)
   (text-mode . yas-minor-mode)
   :bind
-  ("<tab>" . yas-maybe-expand)
+  ;; ("<tab>" . yas-maybe-expand)
   ("C-<tab>" . yas-maybe-expand)
   (:map yas-minor-mode-map
   ;; yas-maybe-expand only expands if there are candidates.
   ;; if not, acts like binding is unbound and run whatever command is bound to that key normally
-  ("<tab>" . yas-maybe-expand)
+  ;; ("<tab>" . yas-maybe-expand)
   ;; Bind `C-c y' to `yas-expand' ONLY.
   ("C-c y" . yas-expand)
   ("C-SPC" . yas-expand)

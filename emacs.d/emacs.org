@@ -38,6 +38,95 @@ tangled, and the tangled file is compiled."
   (add-hook 'after-save-hook #'/util/tangle-init)
   #+END_SRC
 
+* Packages
+
+** package repositories
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(require 'package)
+;; add melpa stable emacs package repository
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t) ; Org-mode's repository
+#+END_SRC
+
+** initialize packages
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(package-initialize)
+#+END_SRC
+
+moved this part to beggining of the file because if the
+custom-safe-themes variable is not set before smart-mode-line (sml) activates
+emacs asks 2 annoying confirmations on every startup before actually starting
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(custom-set-variables
+;; custom-set-variables was added by Custom.
+;; If you edit it by hand, you could mess it up, so be careful.
+;; Your init file should contain only one such instance.
+;; If there is more than one, they won't work right.
+'(custom-safe-themes
+   (quote
+   ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
+   '(fci-rule-color "#3E4451")
+   '(package-selected-packages
+     (quote
+     (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
+   (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   )
+#+END_SRC
+
+** Add the folder 'config' to emacs load-path so i can require stuff from there
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
+;; (add-to-list 'load-path "~/dotfiles/emacs.d/config")
+#+END_SRC
+
+** require use-package
+
+*** Install use-package if not already installed
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package)
+)
+#+END_SRC
+
+*** load use-package
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(eval-when-compile
+  (require 'use-package))
+#+END_SRC
+
+*** Enable use-package extension `ensure-system-package`
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package use-package-ensure-system-package
+  :ensure t)
+#+END_SRC
+
+*** Set `:ensure t` globally for all packages using use-package
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(require 'use-package-ensure)
+(setq use-package-always-ensure t)
+#+END_SRC
+
+*** Auto update packages
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package auto-package-update
+  :config
+  (setq auto-package-update-interval 7) ;; in days
+  (setq auto-package-update-prompt-before-update t)
+  (setq auto-package-update-delete-old-versions t)
+  (setq auto-package-update-hide-results t)
+  (auto-package-update-maybe)
+)
+#+END_SRC
+
 
 * General editor settings
 
@@ -193,12 +282,6 @@ PS: this also stops preventing editing colisions, so watch out
 (global-set-key (kbd "C-S-<tab>") 'er/expand-region)
 #+END_SRC
 
-** hippie-expand (native emacs expand function)
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(global-set-key (kbd "C-M-SPC") 'hippie-expand)
-#+END_SRC
-
 ** refresh buffer with F5
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (global-set-key [f5] '(lambda () (interactive) (revert-buffer nil t nil)))
@@ -271,95 +354,6 @@ I almost always want to kill the current buffer, so this snippet helps in that.
 (epa-file-enable)
   #+END_SRC
 
-* Packages
-
-** package repositories
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(require 'package)
-;; add melpa stable emacs package repository
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
-(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t) ; Org-mode's repository
-#+END_SRC
-
-** initialize packages
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(package-initialize)
-#+END_SRC
-
-moved this part to beggining of the file because if the
-custom-safe-themes variable is not set before smart-mode-line (sml) activates
-emacs asks 2 annoying confirmations on every startup before actually starting
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(custom-set-variables
-;; custom-set-variables was added by Custom.
-;; If you edit it by hand, you could mess it up, so be careful.
-;; Your init file should contain only one such instance.
-;; If there is more than one, they won't work right.
-'(custom-safe-themes
-   (quote
-   ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
-   '(fci-rule-color "#3E4451")
-   '(package-selected-packages
-     (quote
-     (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
-   (custom-set-faces
-   ;; custom-set-faces was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
-   )
-#+END_SRC
-
-** Add the folder 'config' to emacs load-path so i can require stuff from there
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
-;; (add-to-list 'load-path "~/dotfiles/emacs.d/config")
-#+END_SRC
-
-** require use-package
-
-*** Install use-package if not already installed
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package)
-)
-#+END_SRC
-
-*** load use-package
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(eval-when-compile
-  (require 'use-package))
-#+END_SRC
-
-*** Enable use-package extension `ensure-system-package`
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package use-package-ensure-system-package
-  :ensure t)
-#+END_SRC
-
-*** Set `:ensure t` globally for all packages using use-package
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(require 'use-package-ensure)
-(setq use-package-always-ensure t)
-#+END_SRC
-
-*** Auto update packages
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package auto-package-update
-  :config
-  (setq auto-package-update-interval 7) ;; in days
-  (setq auto-package-update-prompt-before-update t)
-  (setq auto-package-update-delete-old-versions t)
-  (setq auto-package-update-hide-results t)
-  (auto-package-update-maybe)
-)
-#+END_SRC
-
 * Make emacs use $PATH defined in the systems shell
 
 : snippet taken from oficial use package github page
@@ -406,6 +400,30 @@ emacs asks 2 annoying confirmations on every startup before actually starting
                 ("FooBar" :call (insert "FooBar"))
                 )))))
   (right-click-context-menu))))
+#+END_SRC
+
+* hippie-expand (native emacs expand function)
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package hippie-exp
+  ;;:ensure nil
+  :defer t
+  :bind
+  ("<tab>" . hippie-expand)
+  ("<C-return>" . hippie-expand)
+  ("C-M-SPC" . hippie-expand)
+  (:map evil-insert-state-map
+  ("<tab>" . hippie-expand)
+  )
+  :config
+  (setq-default hippie-expand-try-functions-list
+        '(yas-hippie-try-expand
+          yas-expand
+          company-indent-or-complete-common
+          emmet-expand-line
+          )
+  )
+)
 #+END_SRC
 
 
@@ -570,6 +588,7 @@ emacs asks 2 annoying confirmations on every startup before actually starting
     "e" 'find-file
     "q" 'evil-quit
     "w" 'save-buffer
+    "d" 'delete-frame
     "k" 'kill-buffer
     "b" 'switch-to-buffer
     "-" 'split-window-bellow
@@ -676,7 +695,16 @@ emacs asks 2 annoying confirmations on every startup before actually starting
   ("C-c a" . org-agenda)
   ("C-c c" . org-capture)
   ("C-c b" . org-switch)
+  ;; this map is to delete de bellow commented lambda that does the same thing
+  ;; Resolve issue with Tab not working with ORG only in Normal VI Mode in terminal
+  ;; (something with TAB on terminals being related to C-i...)
+  (:map evil-normal-state-map
+  ("<tab>" . org-cycle)
+  )
   :config
+  ;;(add-hook 'org-mode-hook
+  ;;          (lambda ()
+  ;;        (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
   ;; ox-extras
   ;; add suport for the ignore tag (ignores a headline without ignoring its content)
   (require ox-extra)
@@ -695,12 +723,7 @@ emacs asks 2 annoying confirmations on every startup before actually starting
   (setq org-log-done 'note)
 
   ;;ox-twbs (exporter to twitter bootstrap html)
-   (setq org-enable-bootstrap-support t)
-  ;; Resolve issue with Tab not working with ORG only in Normal VI Mode in terminal
-  ;; (something with TAB on terminals being related to C-i...)
-  (add-hook 'org-mode-hook
-            (lambda ()
-          (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
+  (setq org-enable-bootstrap-support t)
 
   (defun org-export-turn-on-syntax-highlight()
     "Setup variables to turn on syntax highlighting when calling `org-latex-export-to-pdf'"
@@ -713,7 +736,6 @@ emacs asks 2 annoying confirmations on every startup before actually starting
 )
 #+END_SRC
 
-#+END_SRC
 
 ** Evil-ORG
 
@@ -1618,7 +1640,10 @@ Helps editing lisp code
     (html-mode . emmet-mode) ;; Auto-start on HTML files
     (web-mode . emmet-mode) ;; Auto-start on web-mode
   :config
-    (setq emmet-expand-jsx-className? t)) ;; use emmet with JSX markup
+  (unbind-key "<C-return>" emmet-mode-keymap)
+  (unbind-key "C-M-<left>" emmet-mode-keymap)
+  (unbind-key "C-M-<right>" emmet-mode-keymap)
+  (setq emmet-expand-jsx-className? t)) ;; use emmet with JSX markup
 #+END_SRC
 
 ** Smartscan mode
@@ -1676,9 +1701,10 @@ Helps editing lisp code
     :ensure t
     :defer t
     :hook
-    (after-init . global-flycheck-mode)
+    (prog-mode . flycheck-mode)
     :init
-    (global-flycheck-mode))
+    (global-flycheck-mode)
+)
 #+END_SRC
 
 
@@ -1731,6 +1757,46 @@ Helps editing lisp code
     (set (make-local-variable 'sgml-basic-offset) 4)))
 #+END_SRC
 
+
+* CSS and SCSS
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package scss-mode
+  :ensure t
+  :defer t
+  :mode ("\\.scss\\'")
+  :config
+  (autoload 'scss-mode "scss-mode")
+  (setq scss-compile-at-save 'nil)
+)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package helm-css-scss
+  :ensure t
+  :bind
+  (:map isearch-mode-mode
+  ("s-i" . helm-css-scss-from-isearch)
+  :map helm-css-scss-map
+  ("s-i" . helm-css-scss-multi-from-helm-css-scss)
+  :map css-mode-map
+  ("s-i" . helm-css-scss)
+  ("s-I" . helm-css-scss-back-to-last-point)
+  :map less-css-mode-map
+  ("s-i" . helm-css-scss)
+  ("s-I" . helm-css-scss-back-to-last-point)
+  :map scss-mode-map
+  ("s-i" . helm-css-scss)
+  ("s-I" . helm-css-scss-back-to-last-point)
+  )
+  :config
+  (setq helm-css-scss-insert-close-comment-depth 2
+        helm-css-scss-split-with-multiple-windows t
+        helm-css-scss-split-direction 'split-window-vertically)
+)
+#+END_SRC
+
+
 * Web-Mode
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package web-mode
@@ -1753,7 +1819,8 @@ Helps editing lisp code
   ;; js2-mode: enhanced JavaScript editing mode
   ;; https://github.com/mooz/js2-mode
   (use-package js2-mode
-    :mode (("\\.js$" . js2-mode))
+    :mode
+    ("\\.js$" . js2-mode)
 
     :hook ((js2-mode . flycheck-mode)
            (js2-mode . company-mode)
@@ -1783,30 +1850,30 @@ Helps editing lisp code
 ;; prettier-emacs: minor-mode to prettify javascript files on save
 ;; https://github.com/prettier/prettier-emacs
 (use-package prettier-js
+  :mode
+  ("\\.js$" . prettier-js-mode)
+  ("\\.scss$" . prettier-js-mode)
   :ensure-system-package
-   (prettier . "npm install -g prettier")
+  (prettier . "npm install -g prettier")
   :hook
   (js2-mode . prettier-js-mode)
-  (json-mode . prettier-js-mode)
   (web-mode . prettier-js-mode)
-  ;; removed typescript to use TIDE formatter
-  ;;(typescript-mode . prettier-js-mode)
   (rjsx-mode . prettier-js-mode)
+  (css-mode . prettier-js-mode)
+  (scss-mode . prettier-js-mode)
+  (json-mode . prettier-js-mode)
   :config
-  (setq prettier-js-args '("--trailing-comma" "all"
-                           "--bracket-spacing" "false"))
-  (defun enable-minor-mode (my-pair)
-
-  "Enable prettier-js-mode if theres a .prettierrc on project dir"
-  (if (buffer-file-name)
-      (if (string-match (car my-pair) buffer-file-name)
-      (funcall (cdr my-pair)))))
-  ; Hook the above function to web-mode
-  (add-hook 'web-mode-hook #'(lambda ()
-    (enable-minor-mode
-       '("\\.js?\\'" . prettier-js-mode)
-       '("\\.jsx?\\'" . prettier-js-mode)
-       '("\\.css?\\'" . prettier-js-mode)))))
+  (setq prettier-js-args '("--bracket-spacing" "false"
+                           "--print-width" "80"
+                           "--tab-width" "2"
+                           "--use-tabs" "false"
+                           "--no-semi" "true"
+                           "--single-quote" "true"
+                           "--trailing-comma" "none"
+                           "--no-bracket-spacing" "true"
+                           "--jsx-bracket-same-line" "false"
+                           "--arrow-parens" "avoid"))
+)
 #+END_SRC
 
 
@@ -1846,26 +1913,16 @@ https://github.com/felipeochoa/rjsx-mode
 
 * Typescript
 
-** Tide
+** Typescript mode
+
 #+BEGIN_SRC emacs-lisp :tangle init.el
-  ;; (use-package tide
-  ;;   :ensure t
-  ;;   :after (typescript-mode company flycheck eldoc)
-  ;;   :init
-  ;;   (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  ;;   (tide-hl-identifier-mode +1)
-  ;;   (eldoc-mode +1)
-  ;;   :hook
-  ;;   (typescript-mode . tide-setup)
-  ;;   (before-save . tide-format-before-save)
-  ;;   (typescript-mode . tide-hl-identifier-mode)
-  ;;   :config
-  ;;   ;; aligns annotation to the right hand side
-  ;;   (setq company-tooltip-align-annotations t)
-  ;; )
+(use-package typescript-mode
+  :ensure t
+  :mode (("\\.ts\\'" . typescript-mode)
+         ("\\.tsx\\'" . typescript-mode))
+)
 #+END_SRC
 
-*** WIthout use-package (see if use-package version works and delete this)
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (defun setup-tide-mode ()
   (interactive)
@@ -1874,18 +1931,21 @@ https://github.com/felipeochoa/rjsx-mode
   (setq flycheck-check-syntax-automatically '(save mode-enabled))
   (eldoc-mode +1)
   (tide-hl-identifier-mode +1)
-  ;; company is an optional dependency. You have to
-  ;; install it separately via package-install
-  ;; `M-x package-install [ret] company`
-  (company-mode +1))
+  (company-mode +1)
+)
+#+END_SRC
 
-;; aligns annotation to the right hand side
-(setq company-tooltip-align-annotations t)
+** Tide
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package tide
+  :ensure t
+  :config
+  (progn
+    (add-hook 'before-save-hook 'tide-format-before-save)
+    (add-hook 'typescript-mode-hook #'setup-tide-mode)
+  )
+)
 
-;; formats the buffer before saving
-(add-hook 'before-save-hook 'tide-format-before-save)
-
-(add-hook 'typescript-mode-hook #'setup-tide-mode)
 #+END_SRC
 
 * Devops tools setup and helpers (dockerfile, netlify)
@@ -1903,6 +1963,7 @@ https://github.com/felipeochoa/rjsx-mode
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package lsp-mode
   :ensure t
+  :commands lsp
   :init
   (setq lsp-inhibit-message t)
   (setq lsp-eldoc-render-all nil)
@@ -1919,9 +1980,21 @@ https://github.com/felipeochoa/rjsx-mode
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package company-lsp
   :ensure t
+  :custom
+  ;; debug
+  (lsp-print-io nil)
+  (lsp-trace nil)
+  (lsp-print-performance nil)
+  ;; general
+  (lsp-auto-guess-root t)
+  (lsp-document-sync-method 'incremental) ;; none, full, incremental, or nil
+  (lsp-response-timeout 10)
+  (lsp-prefer-flymake t) ;; t(flymake), nil(lsp-ui), or :none
   :config
-  (setq company-lsp-enable-snippet t
-        company-lsp-cache-candidates t)
+  (setq company-lsp-enable-snippet t)
+  (setq company-lsp-async t)
+  (setq company-lsp-cache-candidates t)
+  (setq company-lsp-enable-recompletion t)
 )
 #+END_SRC
 
@@ -1929,13 +2002,34 @@ https://github.com/felipeochoa/rjsx-mode
 (use-package lsp-ui
   :ensure t
   :hook ((lsp-mode . lsp-ui-mode))
+  :preface
+  (defun ladicle/toggle-lsp-ui-doc ()
+    (interactive)
+    (if lsp-ui-doc-mode
+      (progn
+        (lsp-ui-doc-mode -1)
+        (lsp-ui-doc--hide-frame)
+      )
+    (lsp-ui-doc-mode 1)
+    )
+  )
   :config
+  ;; lsp-ui appearance
+  (set-face-attribute 'lsp-ui-doc-background  nil :background "#f9f2d9")
+  (add-hook 'lsp-ui-doc-frame-hook
+    (lambda (frame _w)
+      (set-face-attribute 'default frame :font "Overpass Mono 11")
+    )
+  )
+  (set-face-attribute 'lsp-ui-sideline-global nil
+                      :inherit 'shadow
+                      :background "#f9f2d9")
   (setq ;; lsp-ui-doc
         lsp-ui-doc-enable t
         lsp-ui-doc-header t
         lsp-ui-doc-include-signature nil
-        lsp-ui-doc-position 'top ;; top, bottom, or at-point
-        lsp-ui-doc-max-width 120
+        lsp-ui-doc-position 'at-point ;; top, bottom, or at-point
+        lsp-ui-doc-max-width 100
         lsp-ui-doc-max-height 30
         lsp-ui-doc-use-childframe t
         lsp-ui-doc-use-webkit t
@@ -1958,12 +2052,16 @@ https://github.com/felipeochoa/rjsx-mode
         ;; lsp-ui-peek
         lsp-ui-peek-enable t
         lsp-ui-peek-peek-height 20
-        lsp-ui-peek-list-width 50
+        lsp-ui-peek-list-width 40
         lsp-ui-peek-fontify 'on-demand) ;; never, on-demand, or always
   :bind
     (:map lsp-mode-map
       ("C-c C-r" . lsp-ui-peek-find-references)
       ("C-c C-j" . lsp-ui-peek-find-definitions)
+      ("C-c g d" . lsp-goto-type-definition)
+      ("C-c f d" . lsp-find-definition)
+      ("C-c g i" . lsp-goto-implementation)
+      ("C-c f i" . lsp-find-implementation)
       ("C-c i"   . lsp-ui-peek-find-implementation)
       ("C-c m"   . lsp-ui-imenu)
       ("C-c s"   . lsp-ui-sideline-mode)
@@ -1998,10 +2096,12 @@ https://github.com/felipeochoa/rjsx-mode
 (use-package company
   :ensure t
   :defer t
-  :init (global-company-mode)
+  :init
+  (global-company-mode)
   :bind
   (:map evil-insert-state-map
-  ("<tab>" . company-indent-or-complete-common)
+  ;; ("<tab>" . company-indent-or-complete-common)
+  ("C-SPC" . company-indent-or-complete-common)
   )
   (:map company-active-map
   ("M-n" . nil)
@@ -2010,7 +2110,13 @@ https://github.com/felipeochoa/rjsx-mode
   ("C-p" . company-select-previous)
   ("<tab>" . company-complete-common-or-cycle)
   ("S-<tab>" . company-select-previous)
-  ("<backtab>" . company-select-previous))
+  ("<backtab>" . company-select-previous)
+  ("C-d" . company-show-doc-buffer)
+  )
+  (:map company-search-map
+   ("C-p" . company-select-previous)
+   ("C-n" . company-select-next)
+  )
   :config
   ;; Use Company for completion
   (progn
@@ -2050,23 +2156,52 @@ https://github.com/felipeochoa/rjsx-mode
 
 : use `:` to use emojis
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package company-emoji)
-(add-to-list 'company-backends 'company-emoji)
+(use-package company-emoji
+  :ensure t
+  :config
+  (add-to-list 'company-backends 'company-emoji)
+)
 #+END_SRC
 
 ** Company-QuickHelp
-#+BEGIN_SRC emacs-lisp :tangle init.el
+ #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package company-quickhelp          ; Documentation popups for Company
+   :ensure t
+   ;; :defer t
+   :hook
+   (global-company-mode . company-quickhelp-mode)
+   :bind
+   (:map company-active-map
+   ("M-h" . company-quickhelp-manual-begin)
+   )
+   :config
+   (setq company-quickhelp-delay 0.7)
+   (company-quickhelp-mode)
+)
+ #+END_SRC
+
+** Company postframe
+
+: PS: this looks exactly the same as the usual company popup, except it doesn't disturb other overlays (like line numbers) in the buffer.
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package company-posframe
   :ensure t
-  :defer t
-  ;; :init (add-hook 'global-company-mode-hook #'company-quickhelp-mode))
   :hook
-  (global-company-mode . company-quickhelp-mode)
-  :config
-  (setq company-quickhelp-delay 0.1)
-  (company-quickhelp-mode)
+  (company-mode . company-posframe-mode)
+  (global-company-mode . company-posframe-mode)
 )
 #+END_SRC
+
+** Company Box (icons in suggestions)
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  ;; (use-package company-box
+  ;;   :ensure t
+  ;;   :hook
+  ;;   (company-mode . company-box-mode)
+  ;;   (global-company-mode . company-box-mode)
+  ;; )
+#+END_SRC
+
 
 ** company-go
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -2129,12 +2264,12 @@ https://github.com/felipeochoa/rjsx-mode
     (prog-mode . yas-minor-mode)
     (text-mode . yas-minor-mode)
     :bind
-    ("<tab>" . yas-maybe-expand)
+    ;; ("<tab>" . yas-maybe-expand)
     ("C-<tab>" . yas-maybe-expand)
     (:map yas-minor-mode-map
     ;; yas-maybe-expand only expands if there are candidates.
     ;; if not, acts like binding is unbound and run whatever command is bound to that key normally
-    ("<tab>" . yas-maybe-expand)
+    ;; ("<tab>" . yas-maybe-expand)
     ;; Bind `C-c y' to `yas-expand' ONLY.
     ("C-c y" . yas-expand)
     ("C-SPC" . yas-expand)
