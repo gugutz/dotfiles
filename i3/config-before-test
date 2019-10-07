@@ -1,33 +1,27 @@
 ################################################
-#                                              #
 #         gugutz i3-gaps config file           #
 #          http://github.com/gugutz            #
 #                                              #
+#        place it under ~/.config/i3/          #
 ################################################
 
 ################################################
 # SET FIRST AND SECOND MONITORS
 # this must be run before the rest of the script
-
+################################################
 
 # name of first and second monitors
 # find out yours with the commands:
 # xrandr --current OR xrandr --listmonitors
 #
 # Home monitor config
-#set DVI-I-2 DVI-I-2
-#set  DVI-I-1
-# STAIRS monitor config
-# set DVI-I-2  eDP1
-# set   DP1
-
-#exec_always --no-startup-id xrandr --output DVI-I-2 --primary
-
-#exec --no-startup-id ~/dotfiles/i3/scripts/monitors-setup.sh
-
-# monitors set with my monitors-setup.sh script
 set $primary_monitor DVI-I-2
 set $secondary_monitor DVI-I-1
+# STAIRS monitor config
+# set $primary_monitor  eDP1
+# set $secondary_monitor  DP1
+
+exec_always --no-startup-id xrandr --output $primary_monitor --primary
 
 ################################################
 # GENERAL I3 SETTINGS #
@@ -259,14 +253,11 @@ exec --no-startup-id xautolock -time 8 -locker blurlock
 # Autostart applications
 ################################################
 
-# run emacs as a daemon at startup
-exec emacs --daemon
-
 # emacsclient
 exec_always --no-startup-id $editorgui
 
 # Discord
-#exec discord
+exec discord
 assign [class="discord"] → $ws8
 
 # Slack

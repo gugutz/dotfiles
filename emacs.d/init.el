@@ -1,3 +1,6 @@
+;; (setq user-full-name "Gustavo P Borges")
+;; (setq user-mail-address "gugutz@gmail.com")
+
 (defun /util/tangle-init ()
   (interactive)
   "If the current buffer is init.org' the code-blocks are
@@ -69,94 +72,62 @@ tangled, and the tangled file is compiled."
   "Do not show ^M in files containing mixed UNIX and DOS line endings."
   (interactive)
   (setq buffer-display-table (make-display-table))
-  (aset buffer-display-table ?\^M []))
+  (aset buffer-display-table ?\^M [])
+)
 
 (add-hook 'text-mode-hook 'remove-dos-eol)
 (add-hook 'prog-mode-hook 'remove-dos-eol)
 
-(global-set-key (kbd "C-+") #'text-scale-increase)
-(global-set-key (kbd "C-_") #'text-scale-decrease)
+(global-set-key (kbd "C-S-+") #'text-scale-increase)
+(global-set-key (kbd "C-S-_") #'text-scale-decrease)
 ;; (global-set-key (kbd "C-)") #'text-scale-adjust)
 
-(global-set-key "\M- " 'hippie-expand)
+;; (require 'expand-region)
+(global-set-key (kbd "C-S-<tab>") 'er/expand-region)
+
+(global-set-key (kbd "C-M-SPC") 'hippie-expand)
+
+(global-set-key [f5] '(lambda () (interactive) (revert-buffer nil t nil)))
+
+;; Kill current buffer; prompt only if
+;; there are unsaved changes.
+(global-set-key (kbd "C-x k")
+  '(lambda () (interactive) (kill-buffer (current-buffer)))
+)
+
+;; Vertical Scroll
+(setq scroll-step 1)
+(setq scroll-margin 1)
+(setq scroll-conservatively 101)
+(setq scroll-up-aggressively 0.01)
+(setq scroll-down-aggressively 0.01)
+(setq auto-window-vscroll nil)
+(setq fast-but-imprecise-scrolling nil)
+(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
+(setq mouse-wheel-progressive-speed nil)
+;; Horizontal Scroll
+(setq hscroll-step 1)
+(setq hscroll-margin 1)
 
 (defun upcase-backward-word (arg)
   (interactive "p")
-  (upcase-word (- arg)))
+  (upcase-word (- arg))
+)
 
 (defun downcase-backward-word (arg)
   (interactive "p")
-  (downcase-word (- arg)))
+  (downcase-word (- arg))
+)
 
 (defun capitalize-backward-word (arg)
   (interactive "p")
-  (capitalize-word (- arg)))
+  (capitalize-word (- arg))
+)
 
 (global-set-key (kbd "C-M-u")	 'upcase-backward-word)
 (global-set-key (kbd "C-M-l")	 'downcase-backward-word)
 ;; this replaces native capitlize word!
 (global-set-key (kbd "M-c")	 'capitalize-backward-word)
-
-(defmacro /bindings/define-prefix-keys (keymap prefix &rest body)
-  (declare (indent defun))
-  `(progn
-     ,@(cl-loop for binding in body
-                collect
-                `(let ((seq ,(car binding))
-                       (func ,(cadr binding))
-                       (desc ,(caddr binding)))
-                   (define-key ,keymap (kbd seq) func)
-                   (when desc
-                     (which-key-add-key-based-replacements
-                       (if ,prefix
-                           (concat ,prefix " " seq)
-                         seq)
-                       desc))))))
-
-(defmacro /bindings/define-keys (keymap &rest body)
-  (declare (indent defun))
-  `(/bindings/define-prefix-keys ,keymap nil ,@body))
-
-(defmacro /bindings/define-key (keymap sequence binding &optional description)
-  (declare (indent defun))
-  `(/bindings/define-prefix-keys ,keymap nil
-     (,sequence ,binding ,description)))
-
-;; examples
-;; after [evil magit] (
-  ;; execute after evil and magit have been loaded
-;  )
-
-;; macro definiton
-(defmacro after (feature &rest body)
-  "Executes BODY after FEATURE has been loaded.
-
-FEATURE may be any one of:
-    'evil            => (with-eval-after-load 'evil BODY)
-    \"evil-autoloads\" => (with-eval-after-load \"evil-autolaods\" BODY)
-    [evil cider]     => (with-eval-after-load 'evil
-                          (with-eval-after-load 'cider
-                            BODY))
-"
-  (declare (indent 1))
-  (cond
-   ((vectorp feature)
-    (let ((prog (macroexp-progn body)))
-      (cl-loop for f across feature
-               do
-               (progn
-                 (setq prog (append `(',f) `(,prog)))
-                 (setq prog (append '(with-eval-after-load) prog))))
-      prog))
-   (t
-    `(with-eval-after-load ,feature ,@body))))
-
-(defun my-save ()
-  "Save file when leaving insert mode in Evil."
-  (if (buffer-file-name)
-      (evil-save)))
-
-;; (add-hook 'evil-insert-state-exit-hook 'my-save)
 
 (require 'epa-file)
 (epa-file-enable)
@@ -170,38 +141,56 @@ FEATURE may be any one of:
 (package-initialize)
 
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
+;; custom-set-variables was added by Custom.
+;; If you edit it by hand, you could mess it up, so be careful.
+;; Your init file should contain only one such instance.
+;; If there is more than one, they won't work right.
+'(custom-safe-themes
    (quote
-    ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
- '(fci-rule-color "#3E4451")
- '(package-selected-packages
-   (quote
-   (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+   ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
+   '(fci-rule-color "#3E4451")
+   '(package-selected-packages
+     (quote
+     (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
+   (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   )
 
 (add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
 ;; (add-to-list 'load-path "~/dotfiles/emacs.d/config")
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
-  (package-install 'use-package))
+  (package-install 'use-package)
+)
 
 (eval-when-compile
   (require 'use-package))
 
-(require 'evil.tau)
-(require 'org.tau)
-(require 'ruby.tau)
-(require 'elixir.tau)
+(use-package use-package-ensure-system-package
+  :ensure t)
+
+(require 'use-package-ensure)
+(setq use-package-always-ensure t)
+
+(use-package auto-package-update
+  :config
+  (setq auto-package-update-interval 7) ;; in days
+  (setq auto-package-update-prompt-before-update t)
+  (setq auto-package-update-delete-old-versions t)
+  (setq auto-package-update-hide-results t)
+  (auto-package-update-maybe)
+)
+
+(use-package exec-path-from-shell
+  :if (memq window-system '(mac ns))
+  :ensure t
+  :config
+  (exec-path-from-shell-initialize)
+)
 
 (when (eq window-system nil)
   (xterm-mouse-mode 1))
@@ -228,40 +217,204 @@ FEATURE may be any one of:
                 )))))
   (right-click-context-menu))))
 
-;; for some readon the bellow lines should be the default native way for navigation on emacs
-;; but they dont work
-;; using the above package instead til i find a solution
-;
-(windmove-default-keybindings 'control)
-(global-set-key (kbd "C-S-H") 'windmove-left)
-(global-set-key (kbd "C-S-L") 'windmove-right)
-(global-set-key (kbd "C-S-K") 'windmove-up)
-(global-set-key (kbd "C-S-J") 'windmove-down)
+(use-package undo-tree
+  :ensure t
+  :init
+  (global-undo-tree-mode)
+;;  (undo-tree-mode)
+)
 
-;; (require 'evil-tmux-navigator)
+(use-package evil
+    :ensure t
+    :init
+    (setq evil-ex-complete-emacs-commands nil)
+    (setq evil-vsplit-window-right t)
+    (setq evil-split-window-below t)
+    (setq evil-shift-round nil)
+    (setq evil-esc-delay 0)  ;; Don't wait for any other keys after escape is pressed.
+    ;; Make Evil look a bit more like (n) vim  (??)
+    (setq evil-search-module 'isearch-regexp)
+    ;; (setq evil-search-module 'evil-search)
+    (setq evil-magic 'very-magic)
+    (setq evil-shift-width (symbol-value 'tab-width))
+    (setq evil-regexp-search t)
+    (setq evil-search-wrap t)
+    ;; (setq evil-want-C-i-jump t)
+    (setq evil-want-C-u-scroll t)
+    (setq evil-want-fine-undo nil)
+    (setq evil-want-integration nil)
+    ;; (setq evil-want-abbrev-on-insert-exit nil)
+    (setq evil-want-abbrev-expand-on-insert-exit nil)
+    (setq evil-mode-line-format '(before . mode-line-front-space)) ;; move evil tag to beginning of modeline
+    ;; Cursor is alway black because of evil.
+    ;; Here is the workaround
+    ;; (@see https://bitbucket.org/lyro/evil/issue/342/evil-default-cursor-setting-should-default)
+    (setq evil-default-cursor t)
+    ;; change cursor color according to mode
+    (setq evil-emacs-state-cursor '("#ff0000" box))
+    (setq evil-motion-state-cursor '("#FFFFFF" box))
+    (setq evil-normal-state-cursor '("#00ff00" box))
+    (setq evil-visual-state-cursor '("#abcdef" box))
+    (setq evil-insert-state-cursor '("#e2f00f" bar))
+    (setq evil-replace-state-cursor '("red" hbar))
+    (setq evil-operator-state-cursor '("red" hollow))
 
-(define-prefix-command 'evil-window-map)
-(define-key evil-window-map "h" 'evil-window-left)
-(define-key evil-window-map "j" 'evil-window-down)
-(define-key evil-window-map "k" 'evil-window-up)
-(define-key evil-window-map "l" 'evil-window-right)
-(define-key evil-window-map "b" 'evil-window-bottom-right)
-(define-key evil-window-map "c" 'evil-window-delete)
-(define-key evil-motion-state-map "\M-w" 'evil-window-map)
+  :bind
+  (:map evil-normal-state-map
+  ("g t" . centaur-tabs-forward)
+  ("g T" . centaur-tabs-backward)
+  (", w" . evil-window-vsplit)
+  ("C-r" . undo-tree-redo)
+  )
+  (:map evil-insert-state-map
+  ;; this is also defined globally above in the config
+  ("C-S-<tab>" . er/expand-region)
+  )
 
-;; (/bindings/define-keys evil-normal-state-map
-  ;; ("C-w h" #'evil-window-left)
-  ;; ("C-w j" #'evil-window-down)
-  ;; ("C-w k" #'evil-window-up)
-  ;; ("C-w l" #'evil-window-right))
+;; check if global-set-key also maps to evil insert mode; if yes delete bellow snippets
+  :config
+  (evil-mode)
 
-;; (/bindings/define-keys evil-normal-state-map
-;;   ("C-w h" #'evil-window-left)
-;;   ("C-w j" #'evil-window-down)
-;;   ("C-w k" #'evil-window-up)
-;;   ("C-w l" #'evil-window-right))
+;; unset evil bindings that conflits with other stuff
+  (define-key evil-insert-state-map (kbd "<tab>") nil)
+  (define-key evil-normal-state-map (kbd "<tab>") nil)
+  (define-key evil-visual-state-map (kbd "<tab>") nil)
+
+  ;; vim-like navigation with C-w hjkl
+  (define-prefix-command 'evil-window-map)
+  (define-key evil-window-map (kbd "h") 'evil-window-left)
+  (define-key evil-window-map (kbd "j") 'evil-window-down)
+  (define-key evil-window-map (kbd "k") 'evil-window-up)
+  (define-key evil-window-map (kbd "l") 'evil-window-right)
+  (define-key evil-window-map (kbd "b") 'evil-window-bottom-right)
+  (define-key evil-window-map (kbd "c") 'evil-window-delete)
+  (define-key evil-motion-state-map (kbd "M-w") 'evil-window-map)
+
+  ;; make esc quit or cancel everything in Emacs
+  (define-key evil-normal-state-map [escape] 'keyboard-quit)
+  (define-key evil-visual-state-map [escape] 'keyboard-quit)
+  (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
+  (define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
+  (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
+  (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
+  (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
+
+  ;; recover native emacs commands that are overriden by evil
+  ;; this gives priority to native emacs behaviour rathen than Vim's
+  (define-key evil-normal-state-map (kbd "SPC") 'ace-jump-mode)
+  (define-key evil-visual-state-map (kbd "SPC") 'ace-jump-mode)
+  (define-key evil-normal-state-map (kbd "C-e") 'evil-end-of-line)
+  (define-key evil-insert-state-map (kbd "C-e") 'move-end-of-line)
+  (define-key evil-visual-state-map (kbd "C-e") 'evil-end-of-line)
+  (define-key evil-motion-state-map (kbd "C-e") 'evil-end-of-line)
+  (define-key evil-insert-state-map (kbd "C-d") 'evil-delete-char)
+  (define-key evil-normal-state-map (kbd "C-d") 'evil-delete-char)
+  (define-key evil-visual-state-map (kbd "C-d") 'evil-delete-char)
+  (define-key evil-normal-state-map (kbd "C-k") 'kill-line)
+  (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
+  (define-key evil-visual-state-map (kbd "C-k") 'kill-line)
+  (define-key evil-insert-state-map (kbd "C-w") 'kill-region)
+  (define-key evil-normal-state-map (kbd "C-w") 'kill-region)
+  (define-key evil-visual-state-map (kbd "C-w") 'kill-region)
+  (define-key evil-normal-state-map (kbd "C-w") 'evil-delete)
+  (define-key evil-insert-state-map (kbd "C-w") 'evil-delete)
+  (define-key evil-visual-state-map (kbd "C-w") 'evil-delete)
+  (define-key evil-normal-state-map (kbd "C-y") 'yank)
+  (define-key evil-insert-state-map (kbd "C-y") 'yank)
+  (define-key evil-visual-state-map (kbd "C-y") 'yank)
+  (define-key evil-normal-state-map (kbd "C-f") 'evil-forward-char)
+  (define-key evil-insert-state-map (kbd "C-f") 'evil-forward-char)
+  (define-key evil-insert-state-map (kbd "C-f") 'evil-forward-char)
+  (define-key evil-normal-state-map (kbd "C-b") 'evil-backward-char)
+  (define-key evil-insert-state-map (kbd "C-b") 'evil-backward-char)
+  (define-key evil-visual-state-map (kbd "C-b") 'evil-backward-char)
+  (define-key evil-normal-state-map (kbd "C-n") 'evil-next-line)
+  (define-key evil-insert-state-map (kbd "C-n") 'evil-next-line)
+  (define-key evil-visual-state-map (kbd "C-n") 'evil-next-line)
+  (define-key evil-normal-state-map (kbd "C-p") 'evil-previous-line)
+  (define-key evil-insert-state-map (kbd "C-p") 'evil-previous-line)
+  (define-key evil-visual-state-map (kbd "C-p") 'evil-previous-line)
+  (define-key evil-normal-state-map (kbd "Q") 'call-last-kbd-macro)
+  (define-key evil-visual-state-map (kbd "Q") 'call-last-kbd-macro)
+  (define-key evil-insert-state-map (kbd "C-r") 'search-backward)
+)
+
+(use-package windmove
+  :ensure t
+  :config
+  ;; use shift + arrow keys to switch between visible buffers
+  ;; (windmove-default-keybindings)
+  (windmove-default-keybindings 'control)
+  (global-set-key (kbd "C-S-H") 'windmove-left)
+  (global-set-key (kbd "C-S-L") 'windmove-right)
+  (global-set-key (kbd "C-S-K") 'windmove-up)
+  (global-set-key (kbd "C-S-J") 'windmove-down)
+)
+
+(use-package evil-leader
+  :config
+  (global-evil-leader-mode)
+  (evil-leader/set-leader ",")
+  (evil-leader/set-key
+    "e" 'find-file
+    "q" 'evil-quit
+    "w" 'save-buffer
+    "k" 'kill-buffer
+    "b" 'switch-to-buffer
+    "-" 'split-window-bellow
+    "|" 'split-window-right)
+)
+
+(use-package evil-surround
+  :config
+  (global-evil-surround-mode 1)
+)
+
+(defun evil-surround-prog-mode-hook-setup ()
+  "Documentation string, idk, put something here later."
+  (push '(47 . ("/" . "/")) evil-surround-pairs-alist)
+  (push '(40 . ("(" . ")")) evil-surround-pairs-alist)
+  (push '(41 . ("(" . ")")) evil-surround-pairs-alist)
+  (push '(91 . ("[" . "]")) evil-surround-pairs-alist)
+  (push '(93 . ("[" . "]")) evil-surround-pairs-alist)
+)
+(add-hook 'prog-mode-hook 'evil-surround-prog-mode-hook-setup)
+
+(defun evil-surround-js-mode-hook-setup ()
+  "ES6." ;  this is a documentation string, a feature in Lisp
+  ;; I believe this is for auto closing pairs
+  (push '(?1 . ("{`" . "`}")) evil-surround-pairs-alist)
+  (push '(?2 . ("${" . "}")) evil-surround-pairs-alist)
+  (push '(?4 . ("(e) => " . "(e)")) evil-surround-pairs-alist)
+  ;; ReactJS
+  (push '(?3 . ("classNames(" . ")")) evil-surround-pairs-alist)
+)
+(add-hook 'js2-mode-hook 'evil-surround-js-mode-hook-setup)
+
+(defun evil-surround-emacs-lisp-mode-hook-setup ()
+  (push '(?` . ("`" . "'")) evil-surround-pairs-alist)
+)
+(add-hook 'emacs-lisp-mode-hook 'evil-surround-emacs-lisp-mode-hook-setup)
+
+(defun evil-surround-org-mode-hook-setup ()
+  (push '(91 . ("[" . "]")) evil-surround-pairs-alist)
+  (push '(93 . ("[" . "]")) evil-surround-pairs-alist)
+  (push '(?= . ("=" . "=")) evil-surround-pairs-alist)
+)
+(add-hook 'org-mode-hook 'evil-surround-org-mode-hook-setup)
+
+(use-package evil-commentary
+  :config
+  (evil-commentary-mode)
+)
+
+(use-package evil-matchit
+  :config
+  (global-evil-matchit-mode 1)
+)
 
 (use-package multiple-cursors
+  :after evil
   ;; step 1, select thing in visual-mode (OPTIONAL)
   ;; step 2, `mc/mark-all-like-dwim' or `mc/mark-all-like-this-in-defun'
   ;; step 3, `ace-mc-add-multiple-cursors' to remove cursor, press RET to confirm
@@ -274,16 +427,130 @@ FEATURE may be any one of:
   (define-key evil-visual-state-map (kbd "ma") 'mc/mark-all-like-this-dwim)
   (define-key evil-visual-state-map (kbd "md") 'mc/mark-all-like-this-in-defun)
   (define-key evil-visual-state-map (kbd "mm") 'ace-mc-add-multiple-cursors)
-  (define-key evil-visual-state-map (kbd "ms") 'ace-mc-add-single-cursor))
+  (define-key evil-visual-state-map (kbd "ms") 'ace-mc-add-single-cursor)
+)
+
+(use-package org
+  :ensure org-plus-contrib
+  :defer t
+  :bind
+  ("C-c l" . org-store-link)
+  ("C-c a" . org-agenda)
+  ("C-c c" . org-capture)
+  ("C-c b" . org-switch)
+  :config
+  ;; ox-extras
+  ;; add suport for the ignore tag (ignores a headline without ignoring its content)
+  (require ox-extra)
+  (ox-extras-activate '(ignore-headlines))
+  ;; general org config variables
+  (setq org-log-done 'time)
+  (setq org-export-backends (quote (ascii html icalendar latex md odt)))
+  (setq org-use-speed-commands t)
+  (setq org-confirm-babel-evaluate 'nil)
+  (setq org-todo-keywords
+   '((sequence "TODO" "IN-PROGRESS" "REVIEW" "|" "DONE")))
+  (setq org-agenda-window-setup 'other-window)
+  ;; Show CLOSED tag line in closed TODO items
+  (setq org-log-done 'time)
+  ;; Prompt to leave a note when closing an item
+  (setq org-log-done 'note)
+
+  ;;ox-twbs (exporter to twitter bootstrap html)
+   (setq org-enable-bootstrap-support t)
+  ;; Resolve issue with Tab not working with ORG only in Normal VI Mode in terminal
+  ;; (something with TAB on terminals being related to C-i...)
+  (add-hook 'org-mode-hook
+            (lambda ()
+          (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
+
+  (defun org-export-turn-on-syntax-highlight()
+    "Setup variables to turn on syntax highlighting when calling `org-latex-export-to-pdf'"
+    (interactive)
+    (setq org-latex-listings 'minted
+          org-latex-packages-alist '(("" "minted"))
+          org-latex-pdf-process
+          '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+            "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")))
+)
+
+(use-package evil-org
+  :after (org)
+  :hook
+  (org-mode . evil-org-mode)
+  :config
+  (lambda ()
+    (evil-org-set-key-theme))
+)
+
+(use-package ox-pandoc
+  :after (org ox)
+  :config
+  ;; default options for all output formats
+  (setq org-pandoc-options '((standalone . t)))
+  ;; cancel above settings only for 'docx' format
+  (setq org-pandoc-options-for-docx '((standalone . nil)))
+  ;; special settings for beamer-pdf and latex-pdf exporters
+  (setq org-pandoc-options-for-beamer-pdf '((pdf-engine . "xelatex")))
+  (setq org-pandoc-options-for-latex-pdf '((pdf-engine . "luatex")))
+  ;; special extensions for markdown_github output
+  (setq org-pandoc-format-extensions '(markdown_github+pipe_tables+raw_html))
+)
+
+(use-package ox-reveal
+  :after (ox)
+  :config (setq org-reveal-root "https://cdn.jsdelivr.net/reveal.js/3.0.0/")
+)
+
+(use-package org-bullets
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+)
+
+(use-package tex
+  :ensure auctex
+  :defer t
+  :custom
+  (TeX-auto-save t)
+  (TeX-parse-self t)
+  (TeX-master nil)
+  ;; to use pdfview with auctex
+  (TeX-view-program-selection '((output-pdf "pdf-tools"))
+    TeX-source-correlate-start-server t)
+  (TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view")))
+  (TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+  :config
+  (if (version< emacs-version "26")
+    (add-hook LaTeX-mode-hook #'display-line-numbers-mode))
+  (add-hook 'LaTeX-mode-hook
+    (lambda ()
+        (turn-on-reftex)
+        (setq reftex-plug-into-AUCTeX t)
+        (reftex-isearch-minor-mode)
+        (setq TeX-PDF-mode t)
+        (setq TeX-source-correlate-method 'synctex)
+        (setq TeX-source-correlate-start-server t)))
+)
 
 (use-package helm
   :ensure t
-  :defer t
   :bind
   ("M-x" . helm-M-x)
-  :config
-  (progn
-    (helm-mode 1))
+  ("M-x" . helm-M-x)
+  ("C-c h" . helm-command-prefix)
+  ("C-x b" . helm-buffers-list)
+  ("C-x C-b" . helm-mini)
+  ("C-x C-f" . helm-find-files)
+  ("C-x r b" . helm-bookmarks)
+  ("M-y" . helm-show-kill-ring)
+  ("M-:" . helm-eval-expression-with-eldoc)
+  (:map helm-map
+  ("C-z" . helm-select-action)
+  ("C-h a" . helm-apropos)
+  ("C-c h" . helm-execute-persistent-action)
+  ("<tab>" . helm-execute-persistent-action)
+  )
+  :init
   (setq helm-autoresize-mode t)
   (setq helm-buffer-max-length 40)
   (setq helm-bookmark-show-location t)
@@ -293,70 +560,216 @@ FEATURE may be any one of:
   (setq helm-ff-file-name-history-use-recentf t)
   (setq helm-ff-skip-boring-files t)
   (setq helm-follow-mode-persistent t)
-
   ;; take between 10-30% of screen space
   (setq helm-autoresize-min-height 10)
   (setq helm-autoresize-max-height 30)
-  (helm-autoresize-mode t)
-  ;; Make helm replace the default Find-File and M-x
-  (progn
-    (global-set-key [remap execute-extended-command] #'helm-M-x)
-    (global-set-key [remap find-file] #'helm-find-files)
-    (helm-mode t)))
+  :config
   (require 'helm-config)
-  (global-set-key (kbd "C-c h") #'helm-command-prefix)
+  (helm-mode 1)
+  ;; Make helm replace the default Find-File and M-x
+  (global-set-key [remap execute-extended-command] #'helm-M-x)
+  (global-set-key [remap find-file] #'helm-find-files)
+  ;; helm bindings
   (global-unset-key (kbd "C-x c"))
-  ;; (global-set-key (kbd "C-h a") #'helm-apropos)
-  (global-set-key (kbd "C-x b") #'helm-buffers-list)
-  (global-set-key (kbd "C-x C-b") #'helm-mini)
-  (global-set-key (kbd "C-x C-f") #'helm-find-files)
-  (global-set-key (kbd "C-x r b") #'helm-bookmarks)
-  (global-set-key (kbd "M-x") #'helm-M-x)
-  (global-set-key (kbd "M-y") #'helm-show-kill-ring)
-  (global-set-key (kbd "M-:") #'helm-eval-expression-with-eldoc)
-  ;; (define-key helm-map (kbd "<tab>") #'helm-execute-persistent-action)
-  ;; (define-key helm-map (kbd "C-z") #'helm-select-action)
+)
 
 (use-package projectile
+  :ensure t
+  :bind
+  (:map projectile-mode-map
+  ("s-p" . projectile-command-map)
+  ("C-c p" . projectile-command-map)
+  )
   :config
-  ;; (projectile-mode)
   (projectile-mode +1)
   (setq projectile-globally-ignored-files
         (append '("~"
                   ".swp"
                   ".pyc")
                 projectile-globally-ignored-files))
-  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
+)
 
 (use-package helm-projectile
   :ensure t
+;  :after projectile
+;  :demand t
   :config
-  (helm-projectile-on))
+  (helm-projectile-on)
+)
 
-(after 'dired
-  (require 'dired-k)
+(use-package dired-k
+  :after dired
+  :config
   (setq dired-k-style 'git)
   (setq dired-k-human-readable t)
-  (add-hook 'dired-initial-position-hook #'dired-k))
+  (setq dired-dwin-target t)
+  (add-hook 'dired-initial-position-hook #'dired-k)
+)
 
-(setq dired-dwin-target t)
+(use-package magit
+  :ensure t
+  :custom
+  (magit-auto-revert-mode nil)
+  :bind
+  ("M-g s" . magit-status)
+  ("C-x g" . magit-status)
+)
+
+(use-package evil-magit
+  :ensure t
+  :init
+;;  (evil-magit-init)
+  (setq evil-magit-state 'normal)
+  (setq evil-magit-use-y-for-yank nil)
+  :config
+  (evil-define-key evil-magit-state magit-mode-map "j" 'magit-log-popup)
+  (evil-define-key evil-magit-state magit-mode-map "k" 'evil-next-visual-line)
+  (evil-define-key evil-magit-state magit-mode-map "l" 'evil-previous-visual-line)
+)
+
+(use-package treemacs
+  :ensure t
+  :defer t
+  :hook
+  (after-init . treemacs)
+  :config
+  (progn
+    (setq treemacs-collapse-dirs                 (if treemacs-python-executable 3 0)
+          treemacs-deferred-git-apply-delay      0.5
+          treemacs-display-in-side-window        t
+          treemacs-eldoc-display                 t
+          treemacs-file-event-delay              5000
+          treemacs-file-follow-delay             0.2
+          treemacs-follow-after-init             t
+          treemacs-git-command-pipe              ""
+          treemacs-goto-tag-strategy             'refetch-index
+          treemacs-indentation                   2
+          treemacs-indentation-string            " "
+          treemacs-is-never-other-window         nil
+          treemacs-max-git-entries               5000
+          treemacs-missing-project-action        'ask
+          treemacs-no-png-images                 nil
+          treemacs-no-delete-other-windows       t
+          treemacs-project-follow-cleanup        nil
+          treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+          treemacs-position                      'left
+          treemacs-recenter-distance             0.1
+          treemacs-recenter-after-file-follow    nil
+          treemacs-recenter-after-tag-follow     nil
+          treemacs-recenter-after-project-jump   'always
+          treemacs-recenter-after-project-expand 'on-distance
+          treemacs-show-cursor                   nil
+          treemacs-show-hidden-files             t
+          treemacs-silent-filewatch              nil
+          treemacs-silent-refresh                nil
+          treemacs-sorting                       'alphabetic-desc
+          treemacs-space-between-root-nodes      t
+          treemacs-tag-follow-cleanup            t
+          treemacs-tag-follow-delay              1.5
+          treemacs-width                         35)
+
+    ;; The default width and height of the icons is 22 pixels. If you are
+    ;; using a Hi-DPI display, uncomment this to double the icon size.
+    ;;(treemacs-resize-icons 44)
+
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode t)
+    (pcase (cons (not (null (executable-find "git")))
+                 (not (null treemacs-python-executable)))
+      (`(t . t)
+       (treemacs-git-mode 'deferred))
+      (`(t . _)
+       (treemacs-git-mode 'simple))))
+  :bind
+  (:map global-map
+        ("<f8>"       . treemacs)
+        ("M-0"       . treemacs-select-window)
+        ("C-x t 1"   . treemacs-delete-other-windows)
+        ("C-x t t"   . treemacs)
+        ("C-x t B"   . treemacs-bookmark)
+        ("C-x t C-t" . treemacs-find-file)
+        ("C-x t M-t" . treemacs-find-tag)))
+
+(use-package treemacs-evil
+  :after treemacs evil
+  :ensure t)
+
+(use-package treemacs-projectile
+  :after treemacs projectile
+  :ensure t)
+
+(use-package treemacs-icons-dired
+  :after treemacs dired
+  :ensure t
+  :config (treemacs-icons-dired-mode))
+
+(use-package treemacs-magit
+  :after treemacs magit
+  :ensure t)
+
+(use-package neotree
+  :bind
+  ("<f7>" . neotree-toggle)
+  :config
+  (progn
+    (setq neo-smart-open t)
+    (setq neo-window-fixed-size nil)
+    (evil-leader/set-key
+      "tt" 'neotree-toggle
+      "tp" 'neotree-projectile-action))
+
+  ;; neotree 'icons' theme, which supports filetype icons
+  (setq neo-theme (if (display-graphic-p) 'icons))
+  (setq neo-theme 'icons)
+  (setq neo-window-width 32)
+
+  ;; Neotree bindings
+  (add-hook 'neotree-mode-hook
+            (lambda ()
+              ; default Neotree bindings
+              (define-key evil-normal-state-local-map (kbd "<tab>") 'neotree-enter)
+              (define-key evil-normal-state-local-map (kbd "SPC") 'neotree-quick-look)
+              (define-key evil-normal-state-local-map (kbd "q") 'neotree-hide)
+              (define-key evil-normal-state-local-map (kbd "RET") 'neotree-enter)
+              (define-key evil-normal-state-local-map (kbd "g") 'neotree-refresh)
+              (define-key evil-normal-state-local-map (kbd "n") 'neotree-next-line)
+              (define-key evil-normal-state-local-map (kbd "p") 'neotree-previous-line)
+              (define-key evil-normal-state-local-map (kbd "A") 'neotree-stretch-toggle)
+              (define-key evil-normal-state-local-map (kbd "H") 'neotree-hidden-file-toggle)
+              (define-key evil-normal-state-local-map (kbd "|") 'neotree-enter-vertical-split)
+              (define-key evil-normal-state-local-map (kbd "-") 'neotree-enter-horizontal-split)
+              ; simulating NERDTree bindings in Neotree
+              (define-key evil-normal-state-local-map (kbd "R") 'neotree-refresh)
+              (define-key evil-normal-state-local-map (kbd "r") 'neotree-refresh)
+              (define-key evil-normal-state-local-map (kbd "u") 'neotree-refresh)
+              (define-key evil-normal-state-local-map (kbd "C") 'neotree-change-root)
+              (define-key evil-normal-state-local-map (kbd "c") 'neotree-create-node))))
+
+(require 'neotree)
+
+(global-set-key [f6] 'dired-sidebar-toggle-sidebar)
+
+(setq dired-sidebar-subtree-line-prefix "__")
+(setq dired-sidebar-theme 'vscode)
+(setq dired-sidebar-use-term-integration t)
+(setq dired-sidebar-use-custom-font t)
 
 (defun /shell/new-window ()
     "Opens up a new shell in the directory associated with the current buffer's file."
     (interactive)
     (let* ((parent (if (buffer-file-name)
-                       (file-name-directory (buffer-file-name))
-                     default-directory))
-           (height (/ (window-total-height) 3))
-           (name   (car (last (split-string parent "/" t)))))
-      (split-window-vertically (- height))
-      (other-window 1)
-      (shell "new")
-      (rename-buffer (concat "*shell: " name "*"))
-
-      (insert (concat "ls"))
-      ))
+                        (file-name-directory (buffer-file-name))
+                    default-directory))
+            (height (/ (window-total-height) 3))
+            (name   (car (last (split-string parent "/" t)))))
+        (split-window-vertically (- height))
+        (other-window 1)
+        (shell "new")
+        (rename-buffer (concat "*shell: " name "*"))
+        (insert (concat "ls"))
+    )
+)
 
 ; Pull system shell in a new bottom window
 (define-key evil-normal-state-map (kbd "\"") #'/shell/new-window)
@@ -383,6 +796,12 @@ FEATURE may be any one of:
 (define-key evil-normal-state-map (kbd "!") #'/eshell/new-window)
 (define-key evil-visual-state-map (kbd "!") #'/eshell/new-window)
 (define-key evil-motion-state-map (kbd "!") #'/eshell/new-window)
+
+(use-package ace-jump-mode
+  :ensure t
+  :bind
+  ("C-." . ace-jump-mode)
+)
 
 ;; (pdf-tools-install)
 ;; the docs say if i care about startup time, i should use pdf-loader-install instead of pdf-tools-install, but doenst say why
@@ -547,35 +966,20 @@ FEATURE may be any one of:
 ;; Function to stylize the irc buffer names.
 (setq doom-modeline-irc-stylize 'identity)
 
-(require 'parrot)
-;; To see the party parrot in the modeline, turn on parrot mode:
-(parrot-mode)
-
-(global-set-key (kbd "C-c p") 'parrot-rotate-prev-word-at-point)
-(global-set-key (kbd "C-c n") 'parrot-rotate-next-word-at-point)
-
-(define-key evil-normal-state-map (kbd "[r") 'parrot-rotate-prev-word-at-point)
-(define-key evil-normal-state-map (kbd "]r") 'parrot-rotate-next-word-at-point)
-
-(parrot-set-parrot-type 'default)
-
-; parrot-animation-frame-interval
-
-; parrot-minimum-window-width
-
-; (parrot-animate-parrot t)
-
-; parrot-spaces-before
-; parrot-spaces-after
-
-; - number of times the parrot will cycle through its gif.
-parrot-num-rotations
-
-(add-hook 'mu4e-index-updated-hook #'parrot-start-animation)
-
-(add-hook 'parrot-click-hook #'parrot-start-animation)
-
-(add-hook 'after-save-hook #'parrot-start-animation)
+(use-package parrot
+  :config
+  ;; To see the party parrot in the modeline, turn on parrot mode:
+  (parrot-mode)
+  (parrot-set-parrot-type 'default)
+  ;; Rotate the parrot when clicking on it (this can also be used to execute any function when clicking the parrot, like 'flyspell-buffer)
+  (add-hook 'parrot-click-hook #'parrot-start-animation)
+  ;; Rotate parrot when buffer is saved
+  (add-hook 'after-save-hook #'parrot-start-animation)
+  ;;/Rotation function keybindings for evil users
+  (define-key evil-normal-state-map (kbd "[r") 'parrot-rotate-prev-word-at-point)
+  (define-key evil-normal-state-map (kbd "]r") 'parrot-rotate-next-word-at-point)
+  (add-hook 'mu4e-index-updated-hook #'parrot-start-animation)
+)
 
 (use-package nyan-mode
    :if window-system
@@ -606,30 +1010,38 @@ parrot-num-rotations
 ;;   ;;  NOTE: This is necessary for themes in the doom-themes package!
 ;;   (solaire-mode-swap-bg))
 
-(require 'centaur-tabs)
-(centaur-tabs-mode t)
-
-(global-set-key (kbd "C-<prior>")  'centaur-tabs-backward)
-(global-set-key (kbd "C-<next>") 'centaur-tabs-forward)
-(global-set-key [?\C-.] 'centaur-tabs-forward-tab)
-(global-set-key (kbd "C-,") 'centaur-tabs-backward-tab)
-
-(setq centaur-tabs-style "bar")
-
-(setq centaur-tabs-height 32)
-
-(setq centaur-tabs-set-icons t)
-
-(setq centaur-tabs-set-bar 'over)
-
-(setq centaur-tabs-gray-out-icons 'buffer)
-
-(setq centaur-tabs-set-modified-marker t)
-
-(setq centaur-tabs-modified-marker "*")
-
-(define-key evil-normal-state-map (kbd "g t") 'centaur-tabs-forward)
-(define-key evil-normal-state-map (kbd "g T") 'centaur-tabs-backward)
+(use-package centaur-tabs
+   ;; :load-path "~/.emacs.d/other/centaur-tabs"
+   :hook
+   (dashboard-mode . centaur-tabs-local-mode)
+   (term-mode . centaur-tabs-local-mode)
+   (calendar-mode . centaur-tabs-local-mode)
+   (org-agenda-mode . centaur-tabs-local-mode)
+   (helpful-mode . centaur-tabs-local-mode)
+   :bind
+   ("C-<prior>" . centaur-tabs-backward)
+   ("C-<next>" . centaur-tabs-forward)
+   ("C-c t s" . centaur-tabs-counsel-switch-group)
+   ("C-c t p" . centaur-tabs-group-by-projectile-project)
+   ("C-c t g" . centaur-tabs-group-buffer-groups)
+   (:map evil-normal-state-map
+   ("g t" . centaur-tabs-forward)
+   ("g T" . centaur-tabs-backward))
+   :config
+   (centaur-tabs-mode t)
+   (setq centaur-tabs-style "bar") ; types available: (alternative, bar, box, chamfer, rounded, slang, wave, zigzag)
+   (setq centaur-tabs-height 32)
+   (setq centaur-tabs-set-icons t)
+   (setq centaur-tabs-set-modified-marker t) ;; display a marker indicating that a buffer has been modified (atom-style)
+   (setq centaur-tabs-modified-marker "*")
+   (setq centaur-tabs-set-bar 'left) ;; in previous config value was 'over
+   (setq centaur-tabs-gray-out-icons 'buffer)
+   (setq centaur-tabs-headline-match)
+   ;; (centaur-tabs-enable-buffer-reordering)
+   ;; (setq centaur-tabs-adjust-buffer-order t)
+   (setq uniquify-separator "/")
+   (setq uniquify-buffer-name-style 'forward)
+)
 
 (use-package highlight-numbers
   :ensure t
@@ -646,10 +1058,6 @@ parrot-num-rotations
 (use-package highlight-parentheses
   :ensure t
   :hook ((prog-mode . highlight-parentheses-mode)))
-
-;; (add-hook 'prog-mode-hook 'highlight-numbers-mode)
-;; (add-hook 'prog-mode-hook 'highlight-operators-mode)
-;; (add-hook 'prog-mode-hook 'hes-mode)    ;; highlight escape sequences
 
 (use-package which-key
   :hook (after-init . which-key-mode))
@@ -675,12 +1083,15 @@ parrot-num-rotations
 (use-package evil-smartparens
   :ensure t
   :hook
-  (smarparens-enabled . evil-smartparens-mode))
+  (smartparens-enabled . evil-smartparens-mode)
+)
 
 (use-package rainbow-delimiters
   :ensure t
   :hook
-  (emacs-lisp-mode . rainbow-delimiters-mode))
+  (emacs-lisp-mode . rainbow-delimiters-mode)
+  (prog-mode . rainbow-delimiters-mode)
+)
 
 (use-package rainbow-mode
   :ensure t
@@ -713,6 +1124,27 @@ parrot-num-rotations
   :config
   (editorconfig-mode 1))
 
+(global-prettify-symbols-mode 1)
+(defun add-pretty-lambda ()
+  "Make some word or string show as pretty Unicode symbols. See https://unicodelookup.com for more."
+  (setq prettify-symbols-alist
+        '(
+          ("lambda" . 955)
+          ("delta" . 120517)
+          ("epsilon" . 120518)
+          ("->" . 8594)
+          ("<=" . 8804)
+          (">=" . 8805)
+          )))
+(add-hook 'prog-mode-hook 'add-pretty-lambda)
+(add-hook 'org-mode-hook 'add-pretty-lambda)
+
+(use-package quickrun
+  :bind
+  ("C-<f5>" . quickrun)
+  ("M-<f5>" . quickrun-shell)
+)
+
 (use-package flycheck
     :ensure t
     :defer t
@@ -726,15 +1158,47 @@ parrot-num-rotations
 ;; (with-eval-after-load 'flycheck
 ;;   (add-hook 'flycheck-mode-hook #'turn-on-flycheck-inline))
 
-(require 'web-mode)
+(use-package ruby-mode
+  :mode "\\.rb\\'"
+  :interpreter "ruby"
+  :ensure-system-package
+  ((rubocop     . "gem install rubocop")
+   (ruby-lint   . "gem install ruby-lint")
+   (ripper-tags . "gem install ripper-tags")
+   (pry         . "gem install pry"))
+  :functions inf-ruby-keys
+  :config
+  (defun my-ruby-mode-hook ()
+    (require 'inf-ruby)
+    (inf-ruby-keys))
+  (add-hook 'ruby-mode-hook 'my-ruby-mode-hook)
+)
 
-(setq web-mode-code-indent-offset 2)
+(use-package go-mode
+  :mode "\\.go\\'"
+  :hook (before-save . gofmt-before-save)
+)
+
+(add-hook 'html-mode-hook
+  (lambda ()
+    (set (make-local-variable 'sgml-basic-offset) 4)))
+
+(use-package web-mode
+  :custom-face
+  (css-selector ((t (:inherit default :foreground "#66CCFF"))))
+  (font-lock-comment-face ((t (:foreground "#828282"))))
+  :mode
+  ("\\.phtml\\'" "\\.tpl\\.php\\'" "\\.[agj]sp\\'" "\\.as[cp]x\\'"
+  "\\.erb\\'" "\\.mustache\\'" "\\.djhtml\\'" "\\.[t]?html?\\'"))
+  :config
+  ;; web-mode indentation
+  (setq web-mode-code-indent-offset 2)
 
 ;; js2-mode: enhanced JavaScript editing mode
 ;; https://github.com/mooz/js2-mode
 (use-package js2-mode
-  :mode (("\\.js$" . js2-mode)
-         ("\\.ts$" . js2-mode))
+  :mode (("\\.js$" . js2-mode))
+
   :hook ((js2-mode . flycheck-mode)
          (js2-mode . company-mode)
          (js2-mode . lsp-mode)
@@ -759,10 +1223,15 @@ parrot-num-rotations
 ;; prettier-emacs: minor-mode to prettify javascript files on save
 ;; https://github.com/prettier/prettier-emacs
 (use-package prettier-js
-  :hook ((js2-mode . prettier-js-mode)
-         (json-mode . prettier-js-mode)
-         (web-mode . prettier-js-mode)
-         (rjsx-mode . prettier-js-mode))
+  :ensure-system-package
+   (prettier . "npm install -g prettier")
+  :hook
+  (js2-mode . prettier-js-mode)
+  (json-mode . prettier-js-mode)
+  (web-mode . prettier-js-mode)
+  ;; removed typescript to use TIDE formatter
+  ;;(typescript-mode . prettier-js-mode)
+  (rjsx-mode . prettier-js-mode)
   :config
   (setq prettier-js-args '("--trailing-comma" "all"
                            "--bracket-spacing" "false"))
@@ -772,12 +1241,12 @@ parrot-num-rotations
   (if (buffer-file-name)
       (if (string-match (car my-pair) buffer-file-name)
       (funcall (cdr my-pair)))))
-      ; Hook the above function to web-mode
+  ; Hook the above function to web-mode
   (add-hook 'web-mode-hook #'(lambda ()
-      (enable-minor-mode
-          '("\\.js?\\'" . prettier-js-mode)
-          '("\\.jsx?\\'" . prettier-js-mode)
-          '("\\.css?\\'" . prettier-js-mode)))))
+    (enable-minor-mode
+       '("\\.js?\\'" . prettier-js-mode)
+       '("\\.jsx?\\'" . prettier-js-mode)
+       '("\\.css?\\'" . prettier-js-mode)))))
 
 ;; json-mode: Major mode for editing JSON files with emacs
 ;; https://github.com/joshwnj/json-mode
@@ -799,24 +1268,64 @@ parrot-num-rotations
     (("\\.jsx$" . rjsx-mode)
     ("components/.+\\.js$" . rjsx-mode)))
 
+;; (use-package tide
+;;   :ensure t
+;;   :after (typescript-mode company flycheck eldoc)
+;;   :init
+;;   (setq flycheck-check-syntax-automatically '(save mode-enabled))
+;;   (tide-hl-identifier-mode +1)
+;;   (eldoc-mode +1)
+;;   :hook
+;;   (typescript-mode . tide-setup)
+;;   (before-save . tide-format-before-save)
+;;   (typescript-mode . tide-hl-identifier-mode)
+;;   :config
+;;   ;; aligns annotation to the right hand side
+;;   (setq company-tooltip-align-annotations t)
+;; )
+
+(defun setup-tide-mode ()
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  ;; company is an optional dependency. You have to
+  ;; install it separately via package-install
+  ;; `M-x package-install [ret] company`
+  (company-mode +1))
+
+;; aligns annotation to the right hand side
+(setq company-tooltip-align-annotations t)
+
+;; formats the buffer before saving
+(add-hook 'before-save-hook 'tide-format-before-save)
+
+(add-hook 'typescript-mode-hook #'setup-tide-mode)
+
 (require 'dockerfile-mode)
 (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode))
 
 (use-package lsp-mode
   :ensure t
-  :init (setq lsp-inhibit-message t
-              lsp-eldoc-render-all nil
-              lsp-highlight-symbol-at-point nil)
-  :hook ((enh-ruby-mode . lsp)
-         (js2-mode . lsp)
-         (js2-jsx-mode . lsp)))
+  :init
+  (setq lsp-inhibit-message t)
+  (setq lsp-eldoc-render-all nil)
+  (setq lsp-highlight-symbol-at-point nil)
+  :hook
+  (js2-mode . lsp)
+  (js2-jsx-mode . lsp)
+  (typescript-mode . lsp)
+  (enh-ruby-mode . lsp)
+)
 
 (use-package company-lsp
-  :after  company
   :ensure t
   :config
   (setq company-lsp-enable-snippet t
-        company-lsp-cache-candidates t))
+        company-lsp-cache-candidates t)
+)
 
 (use-package lsp-ui
   :ensure t
@@ -859,7 +1368,15 @@ parrot-num-rotations
       ("C-c i"   . lsp-ui-peek-find-implementation)
       ("C-c m"   . lsp-ui-imenu)
       ("C-c s"   . lsp-ui-sideline-mode)
-      ("C-c d"   . ladicle/toggle-lsp-ui-doc)))
+      ("C-c d"   . ladicle/toggle-lsp-ui-doc)
+    )
+    ;; remap native find-definitions and references to use lsp-ui
+    (:map lsp-ui-mode-map
+      ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+      ([remap xref-find-references] . lsp-ui-peek-find-references)
+      ("C-c u" . lsp-ui-imenu)
+    )
+)
 
 ;; (define-key ac-completing-map [return] nil)
 ;; (define-key ac-completing-map "\r" nil)
@@ -871,99 +1388,163 @@ parrot-num-rotations
   :ensure t
   :defer t
   :init (global-company-mode)
+  :bind
+  (:map evil-insert-state-map
+  ("<tab>" . company-indent-or-complete-common)
+  )
+  (:map company-active-map
+  ("M-n" . nil)
+  ("M-p" . nil)
+  ("C-n" . company-select-next)
+  ("C-p" . company-select-previous)
+  ("<tab>" . company-complete-common-or-cycle)
+  ("S-<tab>" . company-select-previous)
+  ("<backtab>" . company-select-previous))
   :config
-  (define-key evil-insert-state-map (kbd "TAB")
-       #'company-indent-or-complete-common)
+  ;; Use Company for completion
+  (progn
+    (bind-key [remap completion-at-point] #'company-complete company-mode-map))
   (setq company-tooltip-limit 20)                      ; bigger popup window
   (setq company-minimum-prefix-length 1)               ; start completing after 1st char typed
-  (setq company-idle-delay .1)                         ; decrease delay before autocompletion popup shows
+  (setq company-idle-delay 0)                         ; decrease delay before autocompletion popup shows
   (setq company-echo-delay 0)                          ; remove annoying blinking
   (setq company-begin-commands '(self-insert-command)) ; start autocompletion only after typing
-  (setq company-dabbrev-downcase nil)                  ; Do not convert to lowercase
-  (setq company-dabbrev-ignore-case t)
+  ;; company-dabbrev
+  (setq company-dabbrev-downcase nil)                  ;; Do not downcase completions by default.
+  (setq company-dabbrev-ignore-case t)  ;; Even if I write something with the ‘wrong’ case, provide the ‘correct’ casing.
   (setq company-dabbrev-code-everywhere t)
+  (setq company-dabbrev-other-buffers t)
+  (setq company-dabbrev-code-other-buffers t)
   (setq company-selection-wrap-around t)               ; continue from top when reaching bottom
   (setq company-auto-complete 'company-explicit-action-p)
   (setq company-require-match nil)
   (setq company-tooltip-align-annotations t)
-  ;; (setq company-tooltip-flip-when-above t)
+  (setq company-complete-number t)                     ;; Allow (lengthy) numbers to be eligible for completion.
+  (setq company-show-numbers t)  ;; M-⟪num⟫ to select an option according to its number.
   (setq company-transformers '(company-sort-by-occurrence)) ; weight by frequency
-  (define-key company-active-map (kbd "M-n") nil)
-  (define-key company-active-map (kbd "M-p") nil)
-  (define-key company-active-map (kbd "C-n") 'company-select-next)
-  (define-key company-active-map (kbd "C-p") 'company-select-previous)
-  (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
-  (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
-  (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
-  (define-key company-active-map (kbd "<backtab>") 'company-select-previous)
-  (progn
-    ;; Use Company for completion
-    (bind-key [remap completion-at-point] #'company-complete company-mode-map)
+  ;; (setq company-tooltip-flip-when-above t)
+  ;; DELETE THIS PART IF USE PACKAGE :MAP WORKS
+  ;; (define-key company-active-map (kbd "M-n") nil)
+  ;; (define-key company-active-map (kbd "M-p") nil)
+  ;; (define-key company-active-map (kbd "C-n") 'company-select-next)
+  ;; (define-key company-active-map (kbd "C-p") 'company-select-previous)
+  ;; (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
+  ;; (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
+  ;; (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
+  ;; (define-key company-active-map (kbd "<backtab>") 'company-select-previous)
+)
 
-    (setq company-tooltip-align-annotations t
-          ;; Easy navigation to candidates with M-<n>
-          company-show-numbers t)
-    (setq company-dabbrev-downcase nil)))
+(use-package company-emoji)
+(add-to-list 'company-backends 'company-emoji)
 
 (use-package company-quickhelp          ; Documentation popups for Company
   :ensure t
   :defer t
-  :init (add-hook 'global-company-mode-hook #'company-quickhelp-mode))
+  ;; :init (add-hook 'global-company-mode-hook #'company-quickhelp-mode))
+  :hook
+  (global-company-mode . company-quickhelp-mode)
+  :config
+  (setq company-quickhelp-delay 0.1)
+  (company-quickhelp-mode)
+)
 
 (use-package company-go
   :ensure t
   :defer t
   :init
   (with-eval-after-load 'company
-    (add-to-list 'company-backends 'company-go)))
+    (add-to-list 'company-backends 'company-go))
+)
 
-(use-package yasnippet                  ; Snippets
+;; (use-package company-tabnine
+;;   :demand
+;;   :custom
+;;   (company-tabnine-max-num-results 9)
+;;   :bind
+;;   (("M-q" . company-other-backend)
+;;    ("C-z t" . company-tabnine))
+;;   :config
+;;   ;; Enable TabNine on default
+;;   (add-to-list 'company-backends #'company-tabnine)
+
+;;   ;; Integrate company-tabnine with lsp-mode
+;;   (defun company//sort-by-tabnine (candidates)
+;;     (if (or (functionp company-backend)
+;;             (not (and (listp company-backend) (memq 'company-tabnine company-backend))))
+;;         candidates
+;;       (let ((candidates-table (make-hash-table :test #'equal))
+;;             candidates-lsp
+;;             candidates-tabnine)
+;;         (dolist (candidate candidates)
+;;           (if (eq (get-text-property 0 'company-backend candidate)
+;;                   'company-tabnine)
+;;               (unless (gethash candidate candidates-table)
+;;                 (push candidate candidates-tabnine))
+;;             (push candidate candidates-lsp)
+;;             (puthash candidate t candidates-table)))
+;;         (setq candidates-lsp (nreverse candidates-lsp))
+;;         (setq candidates-tabnine (nreverse candidates-tabnine))
+;;         (nconc (seq-take candidates-tabnine 3)
+;;                (seq-take candidates-lsp 6)))))
+;;   (add-hook 'lsp-after-open-hook
+;;             (lambda ()
+;;               (setq company-tabnine-max-num-results 3)
+;;               (add-to-list 'company-transformers 'company//sort-by-tabnine t)
+;;               (add-to-list 'company-backends '(company-lsp :with company-tabnine :separate)))))
+
+(use-package yasnippet
   :ensure t
-  :config
-    (setq yas-verbosity 1)                      ; No need to be so verbose
-    (setq yas-wrap-around-region t)
-
-  (with-eval-after-load 'yasnippet
-    (setq yas-snippet-dirs '(yasnippet-snippets-dir)))
-
-  ;; Bind `SPC' to `yas-expand' when snippet expansion available (it
-  ;; will still call `self-insert-command' otherwise).
-  ;; yas-maybe-expand contains a special value which, when bound in a keymap,
-  ;; tells Emacs to call yas-expand if and only if there is a snippet abbrev before point.
-  ;; If there is no snippet to expand, Emacs will behave as if yas-expand is unbound
-  ;; and so will run whatever command is bound to that key normally.
-  (define-key yas-minor-mode-map (kbd "TAB") yas-maybe-expand)
+  :hook
+  (prog-mode . yas-minor-mode)
+  (text-mode . yas-minor-mode)
+  :bind
+  ("<tab>" . yas-maybe-expand)
+  ("C-<tab>" . yas-maybe-expand)
+  (:map yas-minor-mode-map
+  ;; yas-maybe-expand only expands if there are candidates.
+  ;; if not, acts like binding is unbound and run whatever command is bound to that key normally
+  ("<tab>" . yas-maybe-expand)
   ;; Bind `C-c y' to `yas-expand' ONLY.
-  (define-key yas-minor-mode-map (kbd "C-c y") #'yas-expand)
-
+  ("C-c y" . yas-expand)
+  ("C-SPC" . yas-expand)
+  )
+  :config
+  ;; set snippets directory
+  ;; (with-eval-after-load 'yasnippet
+  ;;  (setq yas-snippet-dirs '(yasnippet-snippets-dir)))
+  (setq yas-verbosity 1)                      ; No need to be so verbose
+  (setq yas-wrap-around-region t)
   (yas-reload-all)
-  (yas-global-mode))
+  ;; disabled global mode in favor or hooks in prog and text modes only
+  ;; (yas-global-mode 1)
+)
 
 (use-package yasnippet-snippets         ; Collection of snippets
-  :ensure t)
+  :ensure t
+)
 
 (defun copy-to-clipboard ()
-  "Make F8 and F9 Copy and Paste to/from OS Clipboard.  Super usefull."
-  (interactive)
-  (if (display-graphic-p)
-      (progn
+"Make F8 and F9 Copy and Paste to/from OS Clipboard.  Super usefull."
+(interactive)
+(if (display-graphic-p)
+    (progn
         (message "Yanked region to x-clipboard!")
-	(call-interactively 'clipboard-kill-ring-save)
-	)
+        (call-interactively 'clipboard-kill-ring-save)
+        )
     (if (region-active-p)
-	(progn
-	  (shell-command-on-region (region-beginning) (region-end) "xsel -i -b")
-	  (message "Yanked region to clipboard!")
-	  (deactivate-mark))
-      (message "No region active; can't yank to clipboard!")))
-  )
+        (progn
+        (shell-command-on-region (region-beginning) (region-end) "xsel -i -b")
+        (message "Yanked region to clipboard!")
+        (deactivate-mark))
+    (message "No region active; can't yank to clipboard!")))
+)
 
 (evil-define-command paste-from-clipboard()
-  (if (display-graphic-p)
-      (progn
-	(clipboard-yank)
-	(message "graphics active")
-	)
+(if (display-graphic-p)
+    (progn
+        (clipboard-yank)
+        (message "graphics active")
+        )
     (insert (shell-command-to-string "xsel -o -b")) ) )
 
 (global-set-key [f9] 'copy-to-clipboard)
