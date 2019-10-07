@@ -47,6 +47,7 @@ flycheck_*.el
 
 # projectiles files
 .projectile
+projectile-*.eld
 
 # directory configuration
 .dir-locals.el
@@ -81,4 +82,3 @@ emacs.log
 .zsh_history
 /bash/bash_history
 .bash_history
-
