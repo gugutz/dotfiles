@@ -2,8 +2,18 @@
 # GENERAL I3 SETTINGS #
 ################################################
 
+# Set mod key (Mod1=<Alt>, Mod4=<Super>)
+set $mod Mod4
+
+# define variable to use alt in keybindings
+set $alt Mod1
+
 # set default desktop layout (default is tiling)
 # workspace_layout tabbed <stacking|tabbed>
+
+# Configure border style <normal|1pixel|pixel xx|none|pixel>
+default_border pixel 1
+default_floating_border normal
 
 # Configure border style <normal|1pixel|pixel xx|none|pixel>
 new_window pixel 1
@@ -20,6 +30,14 @@ bindsym $mod+n border normal
 
 # set main mod key (super aka win key)
 floating_modifier $mod
+
+################################################
+# BASIC I3 WM CONTROL BINDINGS
+################################################
+
+# kill focused window
+bindsym $mod+q        kill
+bindsym $mod+Shift+q  kill
 
 ################################################
 # fonts
@@ -54,16 +72,6 @@ bindsym $mod+Ctrl+m exec $terminal -e 'alsamixer'
 
 
 ################################################
-# BASIC I3 WM CONTROL BINDINGS
-################################################
-
-# kill focused window
-bindsym $mod+q        kill
-bindsym $mod+Shift+q  kill
-
-
-
-################################################
 # Misc Apps
 ################################################
 
@@ -71,7 +79,11 @@ bindsym $mod+Shift+q  kill
 bindsym XF86MonBrightnessUp exec "xbacklight -inc 10; notify-send 'brightness up'"
 bindsym XF86MonBrightnessDown exec "xbacklight -dec 10; notify-send 'brightness down'"
 
-bindsym $mod+t exec --no-startup-id pkill compton
+################################################
+# Start applications
+################################################
+
+# bindsym $mod+t exec --no-startup-id pkill compton
 bindsym $mod+Ctrl+t exec --no-startup-id compton -b
 bindsym $mod+Shift+d --release exec "killall dunst; exec notify-send 'restart dunst'"
 bindsym $mod+Ctrl+x --release exec --no-startup-id xkill
@@ -94,7 +106,7 @@ set $file_manager ranger
 set $file_manager_gui pcmanfm
 
 # define default browser
-set $browser firefox
+set $browser brave
 
 # define main terminal as st in tmux (suckless terminal)
 # this make tmux use a main session and doenst spawn multiple unused sessions
@@ -106,15 +118,6 @@ set $terminal       st
 # set $editor st -e tmux new-session -A -s "emacs-session" emacs -t -nw
 set $editorterm         st -e tmux new-session emacsclient -c -t
 set $editorgui         st -e tmux new-session emacsclient -c -n
-set $codemacs       st -e codemacs
-
-
-## define modifier key to Super (aka Winkey)
-set $mod Mod4
-
-# define variable to use alt in keybindings
-set $alt mod1
-
 
 #############################
 ### settings for i3-gaps: ###
@@ -205,10 +208,11 @@ mode "$mode_system" {
 }
 
 # hibernate
-bindsym $mod+Control+f4		        exec --no-startup-id $hibernate
-bindsym Control+Shift+$mod+h	exec --no-startup-id $hibernate
+bindsym $mod+$alt+Control+Shift+F4		        exec --no-startup-id $hibernate
+bindsym $mod+$alt+Control+Shift+h	exec --no-startup-id $hibernate
+bindsym $mod+$alt+Control+Shift+r	exec --no-startup-id $reboot
 
-bindsym $mod+Shift+Escape 	exec prompt "Are you sure you want to leave i3?" "i3-msg exit"
+bindsym $mod+Control+Shift+Escape 	exec prompt "Are you sure you want to leave i3?" "i3-msg exit"
 
 # shutdown computer
 # XF86 special key for shutting down
@@ -221,35 +225,10 @@ bindsym XF86PowerOff		exec prompt "Are you sure you want to shutdown?" "$shutdow
 ################################################
 bindsym $mod+Control+9 exec --no-startup-id blurlock
 
-# auto start blurlock after 10 minutes
-exec --no-startup-id xautolock -time 8 -locker blurlock
 
 ################################################
 # Autostart applications
 ################################################
-
-# emacsclient
-exec_always --no-startup-id $editorgui
-
-# Discord
-exec discord
-assign [class="discord"] → $ws8
-
-# Slack
-exec slack
-assign [class="Slack"]  → $ws8
-
-
-# firefox
-exec firefox
-assign [class="Firefox"]  → $ws3
-
-# Telegram Desktop
-exec telegram-desktop
-assign [class="TelegramDesktop"] → $ws9
-
-# Conky
-exec_always --no-startup-id ~/dotfiles/conky/scripts/conky-start.sh
 
 # these were in the default manjaro i3 config, not sure what they do yet
 exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
@@ -270,9 +249,75 @@ exec --no-startup-id clipit
 # start blueman bluetooth manager tray applet
 # exec --no-startup-id blueman-applet
 
+# auto start blurlock after 10 minutes
+exec --no-startup-id xautolock -time 8 -locker blurlock
+
 # exec_always --no-startup-id sbxkb
 exec_always --no-startup-id ff-theme-util
 exec_always --no-startup-id fix_xcursor
+
+# Conky
+exec_always --no-startup-id ~/dotfiles/conky/scripts/conky-start.sh
+
+# emacs server
+exec --no-startup-id emacs --daemon
+
+# Discord
+exec discord
+assign [class="discord"] → $ws8
+
+# Slack
+exec slack
+assign [class="Slack"]  → $ws8
+
+# browser
+exec $browser
+# \$browser_window_class "Brave"
+assign [class="Brave"]  → $ws3
+
+# Telegram Desktop
+exec telegram-desktop
+assign [class="TelegramDesktop"] → $ws9
+
+# Toggl Desktop
+exec TogglDesktop
+assign [class="TogglDesktop"] → $ws5
+
+
+################################################
+# COLLOR PALETTE FOR THE TERMINAL
+################################################
+
+# Color palette used for the terminal ( ~/.Xresources file )
+# Colors are gathered based on the documentation:
+# https://i3wm.org/docs/userguide.html#xresources
+# Change the variable name at the place you want to match the color
+# of your terminal like this:
+# [example]
+# If you want your bar to have the same background color as your
+# terminal background change the line 362 from:
+# background #14191D
+# to:
+# background $term_background
+# Same logic applied to everything else.
+set_from_resource $term_background background
+set_from_resource $term_foreground foreground
+set_from_resource $term_color0     color0
+set_from_resource $term_color1     color1
+set_from_resource $term_color2     color2
+set_from_resource $term_color3     color3
+set_from_resource $term_color4     color4
+set_from_resource $term_color5     color5
+set_from_resource $term_color6     color6
+set_from_resource $term_color7     color7
+set_from_resource $term_color8     color8
+set_from_resource $term_color9     color9
+set_from_resource $term_color10    color10
+set_from_resource $term_color11    color11
+set_from_resource $term_color12    color12
+set_from_resource $term_color13    color13
+set_from_resource $term_color14    color14
+set_from_resource $term_color15    color15
 
 ################################################
 # WALLPAPER SETUP
@@ -485,8 +530,8 @@ bindsym $mod+Ctrl+b exec terminal -e 'bmenu'
 # launch categorized menu
 bindsym $mod+Shift+z exec --no-startup-id morc_menu
 
-# firefox
-bindsym Control+Shift+f		exec $terminal -e firefox
+# # firefox
+# bindsym Control+Shift+f		exec $terminal -e firefox
 
 # htop
 bindsym $mod+p            exec $terminal -e htop
@@ -570,6 +615,8 @@ bindsym $mod+Shift+i		resize grow height 10 px or 10 ppt
 bindsym $mod+Shift+u		resize shrink height 10 px or 10 ppt
 bindsym $mod+Shift+o		resize grow width 10 px or 10 ppt
 
+# focus_follows_mouse no
+
 # change window focus (vim-like bindings)
 bindsym $mod+h focus left
 bindsym $mod+j focus down
@@ -581,39 +628,39 @@ bindsym $mod+Down focus down
 bindsym $mod+Up focus up
 bindsym $mod+Right focus right
 
-# move focused window (vim-like bindings)
-bindsym $mod+Shift+j move left
-bindsym $mod+Shift+k move down
-bindsym $mod+Shift+l move up
-bindsym $mod+Shift+ccedilla move right
-# move focused window using the arrow (cursor) keys
+# move focused window
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+# alternatively, you can use the cursor keys:
 bindsym $mod+Shift+Left move left
 bindsym $mod+Shift+Down move down
 bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
-# split in horizontal orientation
-bindsym $mod+Shift+h split h
+# split orientation
+bindsym $mod+Control+h split h;exec notify-send 'tile horizontally'
+bindsym $mod+Control+v split v;exec notify-send 'tile vertically'
+# this binding was giving errors even though its not used anywhere else ?!?!?!
+bindsym $mod+Control+q split toggle;exec notify-send 'toggle split'
 
-# split in vertical orientation
-bindsym $mod+Shift+v split v
-
-# enter fullscreen mode for the focused container
+# toggle fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
 
 # change container layout (stacked, tabbed, toggle split)
-bindsym $mod+s layout stacking
-bindsym $mod+w layout tabbed
-bindsym $mod+e layout toggle split
+bindsym $mod+s layout stacking;exec notify-send 'layout stacking'
+bindsym $mod+w layout tabbed;exec notify-send 'layout tabbed'
+bindsym $mod+e layout toggle split;exec notify-send 'layout toggle split'
 
 # toggle tiling / floating
 bindsym $mod+Shift+space floating toggle
 
-# toggle sticky
-bindsym $mod+Shift+s sticky toggle
-
 # change focus between tiling / floating windows
 bindsym $mod+space focus mode_toggle
+
+# toggle sticky
+bindsym $mod+Shift+s sticky toggle
 
 # focus the parent container
 bindsym $mod+a focus parent
@@ -631,13 +678,13 @@ for_window [urgent=latest] focus
 # setting variables to hold the workspaces names
 set $ws1 "1: emacs"
 set $ws2 "2: terminal"
-set $ws3 "3: firefox"
-set $ws4 "4: ranger"
+set $ws3 "3: browser"
+set $ws4 "4: file manager"
 set $ws5 "5: extra"
-set $ws6 "6: wine"
+set $ws6 "6: extra"
 set $ws7 "7: browser"
-set $ws8 "8: social"
-set $ws9 "9: temp"
+set $ws8 "8: slack"
+set $ws9 "9: telegram/whatsapp"
 set $ws10 "10: terminal"
 
 # workspaces settings
@@ -645,11 +692,8 @@ workspace $ws1 gaps outer 1
 workspace $ws3 gaps outer 1
 workspace $ws5 gaps outer 0
 
-################################################
-# MULTI-MONITORS WORKSPACES SETUP
-################################################
 
-# HOME LAYOUT
+# Workspaces setup between monitors
 workspace $ws1 output $primary_monitor
 workspace $ws2 output $primary_monitor
 workspace $ws3 output $primary_monitor
@@ -660,18 +704,6 @@ workspace $ws7 output $secondary_monitor
 workspace $ws8 output $secondary_monitor
 workspace $ws9 output $secondary_monitor
 workspace $ws10 output $secondary_monitor
-
-# WORK LAYOUT
-# workspace $ws1 output $secondary_monitor
-# workspace $ws2 output $secondary_monitor
-# workspace $ws3 output $secondary_monitor
-# workspace $ws4 output $secondary_monitor
-# workspace $ws5 output $secondary_monitor
-# workspace $ws6 output $secondary_monitor
-# workspace $ws7 output $primary_monitor
-# workspace $ws8 output $primary_monitor
-# workspace $ws9 output $primary_monitor
-# workspace $ws10 output $primary_monitor
 
 # switch to workspace
 bindsym $mod+1 workspace $ws1
@@ -698,10 +730,10 @@ bindsym $mod+Shift+9 move container to workspace $ws9
 bindsym $mod+Shift+0 move container to workspace $ws10
 
 # move current workspace between monitors
-bindsym $mod+Control+h move workspace to output left
-bindsym $mod+Control+j move workspace to output down
-bindsym $mod+Control+k move workspace to output up
-bindsym $mod+Control+l move workspace to output right
+bindsym $mod+Control+Shift+h move workspace to output left
+bindsym $mod+Control+Shift+j move workspace to output down
+bindsym $mod+Control+Shift+k move workspace to output up
+bindsym $mod+Control+Shift+l move workspace to output right
 
 # workspace back and forth (with/without active container)
 workspace_auto_back_and_forth yes
@@ -762,6 +794,7 @@ for_window [title="alsamixer"] floating enable border pixel 1
 for_window [class="calamares"] floating enable border normal
 for_window [class="Clipgrab"] floating enable
 for_window [title="File Transfer*"] floating enable
+for_window [class="fpakman"] floating enable
 for_window [class="Galculator"] floating enable border pixel 1
 for_window [class="GParted"] floating enable border normal
 for_window [title="i3_help"] floating enable sticky enable border normal
@@ -774,6 +807,8 @@ for_window [class="Nitrogen"] floating enable sticky enable border normal
 for_window [class="Oblogout"] fullscreen enable
 for_window [class="octopi"] floating enable
 for_window [title="About Pale Moon"] floating enable
+for_window [title="About Firefox"] floating enable
+for_window [title="About Brave"] floating enable
 for_window [class="Pamac-manager"] floating enable
 for_window [class="Pavucontrol"] floating enable
 for_window [class="qt5ct"] floating enable sticky enable border normal

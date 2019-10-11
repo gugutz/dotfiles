@@ -12,6 +12,8 @@ home_second_monitor="DVI-I-1"
 stairs_main_monitor="eDP1"
 stairs_second_monitor="DP1"
 
+xrandr_command=
+
 # colors for echo commands using tput command
 # color must be reseted at the end of the line or the entire file will use previous used color
 red=`tput setaf 1`
@@ -51,21 +53,25 @@ fi
 if [ "$main_monitor" = "$home_main_monitor" ] && [ "$second_monitor" = "" ]; then
   echo "External monitor is not connected!"
   # hack to make i3 think the second monitor is present and send all workspaces to main monitor
-  $second_monitor = $main_monitor
-  xrandr --output $main_monitor --primary --mode 1920x1080 --pos 0x0 --rotate normal
+  second_monitor=$main_monitor
+  $xrandr_command="xrandr --output \$main_monitor --primary --mode 1920x1080 --pos 0x0 --rotate normal"
 #
 elif [ "$second_monitor" = "$home_second_monitor" ]; then
   echo "Found HOME secondary monitor!"
   echo "Setting home dual screen layout with extended screen mode"
-  xrandr --output $main_monitor --primary --mode 1920x1080 --pos 0x0 --rotate normal --output $second_monitor --mode 1280x1024 --pos 1920x56 --rotate normal
+  xrandr_command="xrandr --output \$main_monitor --primary --mode 1920x1080 --pos 0x0 --rotate normal --output \$secondary_monitor --mode 1280x1024 --pos 1920x56 --rotate normal"
 #
 # If STAIRS second monitor is connected, use both screens in extended mode
 elif [ "$main_monitor" = "$stairs_main_monitor" ] && [ "$second_monitor" = "$stairs_second_monitor" ]; then
   echo "Found STAIRS secondary monitor!"
   echo "Second monitor is on ${reset_color}$second_monitor${reset_color}"
   echo "Setting dual screen layout to use extended screen mode"
-  echo "PS: In STAIRS, the second monitor is the main screen, while the main monitor is the notebook's monitor"
-  xrandr --output $second_monitor --primary --mode 1920x1080 --pos 0x0 --rotate normal --output $main_monitor --mode 1920x1080 --pos 1920x0 --rotate normal
+  echo "PS: In STAIRS, the second monitor is the big screen in front of me, while the main monitor is the notebook's monitor"
+  echo "## inverting monitor variable names in i3 file so that the tray output doenst mess up and is sent to the big screen"
+  temp=$second_monitor
+  second_monitor=$main_monitor
+  main_monitor=$temp
+  xrandr_command="xrandr --output \$primary_monitor --primary --mode 1920x1080 --pos 0x0 --rotate normal --output \$secondary_monitor --mode 1920x1080 --pos 1920x0 --rotate normal"
 #
 ## if in STAIRS and second monitor is disconnected, then overlap both screens in the main (notebook) monitor
 elif [ "$main_monitor" = "$stairs_main_monitor" ] && [ "$second_monitor" = "" ]; then
@@ -73,8 +79,8 @@ elif [ "$main_monitor" = "$stairs_main_monitor" ] && [ "$second_monitor" = "" ];
   echo "Main monitor is on ${reset_color}$main_monitor${reset_color}"
   echo "Setting single screen layout"
   echo "Overlaping both screens to main (notebook) monitor on ${reset_color}$main_monitor${reset_color}"
-  $second_monitor = $main_monitor
-  xrandr --output $main_monitor --primary --mode 1920x1080 --pos 0x0 --rotate normal --output $second_monitor --mode 1920x1080 --pos 0x0 --rotate normal
+  second_monitor=$main_monitor
+  xrandr_command="xrandr --output \$primary_monitor --primary --mode 1920x1080 --pos 0x0 --rotate normal --output \$secondary_monitor --mode 1920x1080 --pos 0x0 --rotate normal"
 #
 fi
 
@@ -111,5 +117,8 @@ cat <<EOT > ~/dotfiles/i3/config.monitors
 # monitors set with my monitors-setup.sh script
 set \$primary_monitor $main_monitor
 set \$secondary_monitor $second_monitor
+
+# xrandr command to setup screens layout
+exec_always --no-startup-id $xrandr_command
 
 EOT

@@ -37,11 +37,13 @@ tangled, and the tangled file is compiled."
    (quote
     ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
  '(fci-rule-color "#3E4451")
+ '(flycheck-display-errors-delay 1)
+ '(jiralib-url "https://stairscreativestudio.atlassian.net" t)
  '(magit-auto-revert-mode nil)
  '(package-selected-packages
    (quote
-    (helm-css-scss scss-mode pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
-   
+    (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -65,7 +67,7 @@ tangled, and the tangled file is compiled."
   :ensure t)
 
 (require 'use-package-ensure)
-(setq use-package-always-ensure t)
+;; (setq use-package-always-ensure t)
 
 (use-package auto-package-update
   :config
@@ -108,25 +110,13 @@ tangled, and the tangled file is compiled."
 (defalias 'yes-or-no-p 'y-or-n-p)
 (fset 'yes-or-no-p 'y-or-n-p)
 
-(add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode))
-
-; parentheses
-(show-paren-mode t)
-
-(setq-default indent-tabs-mode nil)
-(setq-default c-basic-offset 2)
-
 (when (version<= "26.0.50" emacs-version )
   (global-display-line-numbers-mode))
 
 (setq linum-format " %d ")
 
-;; (global-subword-mode 1)
-
 (global-auto-revert-mode 1)
 (setq auto-revert-interval 0.5)
-
-(defconst *spell-check-support-enabled* t) ;; Enable with t if you prefer
 
 (setq next-line-add-newlines t)
 
@@ -142,7 +132,7 @@ tangled, and the tangled file is compiled."
 
 (global-set-key (kbd "C-S-+") #'text-scale-increase)
 (global-set-key (kbd "C-S-_") #'text-scale-decrease)
-;; (global-set-key (kbd "C-)") #'text-scale-adjust)
+(global-set-key (kbd "C-S-)") #'text-scale-adjust)
 
 ;; (require 'expand-region)
 (global-set-key (kbd "C-S-<tab>") 'er/expand-region)
@@ -169,6 +159,67 @@ tangled, and the tangled file is compiled."
 (setq hscroll-step 1)
 (setq hscroll-margin 1)
 
+(use-package subword
+  :ensure nil
+  :hook
+  (clojure-mode . subword-mode)
+  (ruby-mode . subword-mode)
+  (enh-ruby-mode . subword-mode)
+  (elixir-mode . subword-mode)
+)
+
+(use-package superword
+  :ensure nil
+  :hook
+  (js2-mode . superword-mode)
+)
+
+; parentheses
+(show-paren-mode t)
+
+(setq-default indent-tabs-mode nil)
+(setq-default c-basic-offset 2)
+
+(add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode))
+
+(use-package iedit
+  :config
+  (set-face-background 'iedit-occurrence "Magenta")
+  :bind
+  ("C-;" . iedit-mode)
+)
+
+(use-package eldoc
+  :diminish
+  :hook
+  (prog-mode       . turn-on-eldoc-mode)
+  (cider-repl-mode . turn-on-eldoc-mode)
+)
+
+(use-package highlight-numbers
+    :ensure t
+    :hook
+    (prog-mode . highlight-numbers-mode)
+)
+
+(use-package highlight-operators
+  :ensure t
+  :hook
+  (prog-mode . highlight-operators-mode)
+)
+
+(use-package highlight-escape-sequences
+  :ensure t
+  :hook
+  (prog-mode . hes-mode)
+)
+
+(use-package highlight-parentheses
+  :ensure t
+  :hook
+  (prog-mode . highlight-parentheses-mode)
+)
+
 (defun upcase-backward-word (arg)
   (interactive "p")
   (upcase-word (- arg))
@@ -188,6 +239,14 @@ tangled, and the tangled file is compiled."
 (global-set-key (kbd "C-M-l")	 'downcase-backward-word)
 ;; this replaces native capitlize word!
 (global-set-key (kbd "M-c")	 'capitalize-backward-word)
+
+(defconst *spell-check-support-enabled* t) ;; Enable with t if you prefer
+
+(use-package flyspell
+  :defer 1
+  :hook
+  (text-mode . flyspell-mode)
+)
 
 (require 'epa-file)
 (epa-file-enable)
@@ -441,6 +500,19 @@ tangled, and the tangled file is compiled."
   (global-evil-matchit-mode 1)
 )
 
+(use-package restclient
+  :ensure t
+  :mode "\\.rest$"
+  :config
+  (progn
+    ;; Add hook to override C-c C-c in this mode to stay in window
+    (add-hook 'restclient-mode-hook
+              '(lambda ()
+                 (local-set-key
+                  (kbd "C-c C-c")
+                  'restclient-http-send-current-stay-in-window))))
+)
+
 (use-package multiple-cursors
   :after evil
   ;; step 1, select thing in visual-mode (OPTIONAL)
@@ -478,8 +550,8 @@ tangled, and the tangled file is compiled."
   ;;        (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
   ;; ox-extras
   ;; add suport for the ignore tag (ignores a headline without ignoring its content)
-  (require ox-extra)
-  (ox-extras-activate '(ignore-headlines))
+;;  (require ox-extra)
+;;  (ox-extras-activate '(ignore-headlines))
   ;; general org config variables
   (setq org-log-done 'time)
   (setq org-export-backends (quote (ascii html icalendar latex md odt)))
@@ -506,8 +578,15 @@ tangled, and the tangled file is compiled."
             "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")))
 )
 
+(use-package ox-extra
+  :ensure nil
+  :config
+  (ox-extras-activate '(ignore-headlines))
+  (ox-extras-activate '(latex-header-blocks ignore-headlines))
+)
+
 (use-package evil-org
-  :after (org)
+  :after org
   :hook
   (org-mode . evil-org-mode)
   :config
@@ -529,14 +608,39 @@ tangled, and the tangled file is compiled."
   (setq org-pandoc-format-extensions '(markdown_github+pipe_tables+raw_html))
 )
 
-(use-package ox-reveal
-  :after (ox)
-  :config (setq org-reveal-root "https://cdn.jsdelivr.net/reveal.js/3.0.0/")
-)
-
 (use-package org-bullets
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+)
+
+(use-package org-jira
+  :ensure t
+  :defer 3
+  :after org
+  :custom
+  (jiralib-url "https://stairscreativestudio.atlassian.net")
+)
+
+(use-package ox-jira
+  :defer 3
+  :after org
+)
+
+(use-package ox-reveal
+  :after ox
+  :config
+  (setq org-reveal-root "https://cdn.jsdelivr.net/reveal.js/3.0.0/")
+)
+
+(use-package ox-md
+  :defer t
+  :after org
+)
+
+(use-package ox-gfm
+  :ensure t
+  :defer t
+  :after org
 )
 
 (use-package tex
@@ -605,6 +709,13 @@ tangled, and the tangled file is compiled."
   (global-unset-key (kbd "C-x c"))
 )
 
+(use-package helm-ag
+  :ensure helm-ag
+  :bind ("M-p" . helm-projectile-ag)
+  :commands (helm-ag helm-projectile-ag)
+  :init (setq helm-ag-insert-at-point 'symbol
+	      helm-ag-command-option "--path-to-ignore ~/.agignore"))
+
 (use-package projectile
   :ensure t
   :bind
@@ -658,6 +769,57 @@ tangled, and the tangled file is compiled."
   (evil-define-key evil-magit-state magit-mode-map "k" 'evil-next-visual-line)
   (evil-define-key evil-magit-state magit-mode-map "l" 'evil-previous-visual-line)
 )
+
+(use-package flycheck
+    :ensure t
+    :defer t
+    :hook
+    (prog-mode . flycheck-mode)
+    :custom
+    (flycheck-display-errors-delay 1)
+    :config
+    (global-flycheck-mode)
+
+    ;; add eslint to list of flycheck checkers
+    (setq flycheck-checkers '(javascript-eslint))
+
+    ;; disable jshint since we prefer eslint checking
+    (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))
+
+    ;; set modes that will use ESLint
+    (flycheck-add-mode 'javascript-eslint 'web-mode)
+    (flycheck-add-mode 'javascript-eslint 'js2-mode)
+    (flycheck-add-mode 'javascript-eslint 'js-mode)
+
+    ;; customize flycheck temp file prefix
+    (setq-default flycheck-temp-prefix ".flycheck")
+
+    ;; disable json-jsonlist checking for json files
+    (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(json-jsonlist)))
+
+    ;; Workaround for eslint loading slow
+    ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
+    (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t))
+)
+
+(use-package quick-peek
+  :ensure t
+)
+
+(use-package flycheck-inline
+  :ensure t
+  :hook
+  (flycheck-mode . flycheck-inline-mode)
+  :config
+  ;; (global-flycheck-inline-mode)
+  (setq flycheck-inline-display-function
+        (lambda (msg pos)
+          (let* ((ov (quick-peek-overlay-ensure-at pos))
+                 (contents (quick-peek-overlay-contents ov)))
+            (setf (quick-peek-overlay-contents ov)
+                  (concat contents (when contents "\n") msg))
+            (quick-peek-update ov)))
+        flycheck-inline-clear-function #'quick-peek-hide))
 
 (use-package treemacs
   :ensure t
@@ -890,6 +1052,40 @@ tangled, and the tangled file is compiled."
 ;; ;; this if was breaking my emacs!!!!!
 ;;  (add-hook 'after-make-frame-functions #'load-my-theme)
 
+(use-package hl-line
+  :defer nil
+  :config
+  (global-hl-line-mode)
+)
+
+(use-package col-highlight
+  :disabled
+  :defer nil
+  :config
+  (col-highlight-toggle-when-idle)
+  (col-highlight-set-interval 2)
+)
+
+(use-package crosshairs
+  :disabled
+  :defer nil
+  :config
+  (crosshairs-mode)
+)
+
+(use-package uniquify
+  :defer 1
+  :ensure nil
+  :custom
+  (uniquify-after-kill-buffer-p t)
+  (uniquify-buffer-name-style 'post-forward)
+  (uniquify-strip-common-suffix t)
+)
+
+(use-package all-the-icons
+  :defer 3
+)
+
 (require 'doom-modeline)
 (doom-modeline-mode 1)
 
@@ -1075,22 +1271,6 @@ tangled, and the tangled file is compiled."
    (setq uniquify-buffer-name-style 'forward)
 )
 
-(use-package highlight-numbers
-  :ensure t
-  :hook ((prog-mode . highlight-numbers-mode)))
-
-(use-package highlight-operators
-  :ensure t
-  :hook ((prog-mode . highlight-operators-mode)))
-
-(use-package highlight-escape-sequences
-  :ensure t
-  :hook ((prog-mode . hes-mode)))
-
-(use-package highlight-parentheses
-  :ensure t
-  :hook ((prog-mode . highlight-parentheses-mode)))
-
 (use-package which-key
   :hook (after-init . which-key-mode))
   :config
@@ -1130,27 +1310,11 @@ tangled, and the tangled file is compiled."
   :hook
   (org-mode . rainbow-mode)
   (css-mode . rainbow-mode)
+  (scss-mode . rainbow-mode)
   (php-mode . rainbow-mode)
   (html-mode . rainbow-mode)
   (web-mode . rainbow-mode)
   (js2-mode . rainbow-mode))
-
-(use-package emmet-mode
-  :ensure t
-  :commands emmet-mode
-  :init
-    (setq emmet-indentation 2)
-    (setq emmet-move-cursor-between-quotes t)
-  :hook
-    (sgml-mode . emmet-mode) ;; Auto-start on any markup modes
-    (css-mode . emmet-mode) ;; enable Emmet's css abbreviation.
-    (html-mode . emmet-mode) ;; Auto-start on HTML files
-    (web-mode . emmet-mode) ;; Auto-start on web-mode
-  :config
-  (unbind-key "<C-return>" emmet-mode-keymap)
-  (unbind-key "C-M-<left>" emmet-mode-keymap)
-  (unbind-key "C-M-<right>" emmet-mode-keymap)
-  (setq emmet-expand-jsx-className? t)) ;; use emmet with JSX markup
 
 (smartscan-mode 1)
 
@@ -1180,20 +1344,6 @@ tangled, and the tangled file is compiled."
   ("M-<f5>" . quickrun-shell)
 )
 
-(use-package flycheck
-    :ensure t
-    :defer t
-    :hook
-    (prog-mode . flycheck-mode)
-    :init
-    (global-flycheck-mode)
-)
-
-(with-eval-after-load 'flycheck
-  (global-flycheck-inline-mode))
-;; (with-eval-after-load 'flycheck
-;;   (add-hook 'flycheck-mode-hook #'turn-on-flycheck-inline))
-
 (use-package ruby-mode
   :mode "\\.rb\\'"
   :interpreter "ruby"
@@ -1215,30 +1365,62 @@ tangled, and the tangled file is compiled."
   :hook (before-save . gofmt-before-save)
 )
 
+(use-package emmet-mode
+  :ensure t
+  :commands emmet-mode
+  :init
+    (setq emmet-indentation 2)
+    (setq emmet-move-cursor-between-quotes t)
+  :hook
+    (sgml-mode . emmet-mode) ;; Auto-start on any markup modes
+    (css-mode . emmet-mode) ;; enable Emmet's css abbreviation.
+    (scss-mode . emmet-mode) ;; enable Emmet's css abbreviation.
+    (html-mode . emmet-mode) ;; Auto-start on HTML files
+    (web-mode . emmet-mode) ;; Auto-start on web-mode
+  :config
+  (unbind-key "<C-return>" emmet-mode-keymap)
+  (unbind-key "C-M-<left>" emmet-mode-keymap)
+  (unbind-key "C-M-<right>" emmet-mode-keymap)
+  (setq emmet-expand-jsx-className? t)) ;; use emmet with JSX markup
+
 (add-hook 'html-mode-hook
   (lambda ()
     (set (make-local-variable 'sgml-basic-offset) 4)))
 
+(use-package yaml-mode
+  :ensure t
+)
+
+(use-package toml-mode
+  :ensure t
+)
+
+(use-package css-mode
+  :ensure t
+  :mode "\\.css\\'"
+  :init
+  (setq css-indent-offset 2)
+)
+
 (use-package scss-mode
   :ensure t
-  :defer t
-  :mode ("\\.scss\\'")
+  ;; this mode doenst load using :mode from use-package, dunno why
+  ;; :mode "\\.scss\\'"
+  :init
+  (setq scss-compile-at-save 'nil)
   :config
   (autoload 'scss-mode "scss-mode")
-  (setq scss-compile-at-save 'nil)
+  (add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
 )
 
 (use-package helm-css-scss
   :ensure t
   :bind
-  (:map isearch-mode-mode
+  (:map isearch-mode-map
   ("s-i" . helm-css-scss-from-isearch)
   :map helm-css-scss-map
   ("s-i" . helm-css-scss-multi-from-helm-css-scss)
   :map css-mode-map
-  ("s-i" . helm-css-scss)
-  ("s-I" . helm-css-scss-back-to-last-point)
-  :map less-css-mode-map
   ("s-i" . helm-css-scss)
   ("s-I" . helm-css-scss-back-to-last-point)
   :map scss-mode-map
@@ -1257,10 +1439,13 @@ tangled, and the tangled file is compiled."
   (font-lock-comment-face ((t (:foreground "#828282"))))
   :mode
   ("\\.phtml\\'" "\\.tpl\\.php\\'" "\\.[agj]sp\\'" "\\.as[cp]x\\'"
-  "\\.erb\\'" "\\.mustache\\'" "\\.djhtml\\'" "\\.[t]?html?\\'"))
+  "\\.erb\\'" "\\.mustache\\'" "\\.djhtml\\'" "\\.[t]?html?\\'")
   :config
   ;; web-mode indentation
+  (setq web-mode-markup-indent-offset 4)
+  (setq web-mode-css-indent-offset 2)
   (setq web-mode-code-indent-offset 2)
+)
 
 ;; js2-mode: enhanced JavaScript editing mode
 ;; https://github.com/mooz/js2-mode
@@ -1268,15 +1453,16 @@ tangled, and the tangled file is compiled."
   :mode
   ("\\.js$" . js2-mode)
 
-  :hook ((js2-mode . flycheck-mode)
-         (js2-mode . company-mode)
-         (js2-mode . lsp-mode)
-         (js2-mode . add-node-modules-path))
+  :hook
+  (js2-mode . flycheck-mode)
+  (js2-mode . company-mode)
+  (js2-mode . lsp-mode)
+  (js2-mode . add-node-modules-path)
   :config
   ;; have 2 space indentation by default
-  (setq js-indent-level 2
-        js2-basic-offset 2
-        js-chain-indent t)
+  (setq js-indent-level 2)
+  (setq js2-basic-offset 2)
+  (setq js-chain-indent t)
 
   ;; use eslint_d insetad of eslint for faster linting
   ;; (setq flycheck-javascript-eslint-executable "eslint_d")
@@ -1287,7 +1473,8 @@ tangled, and the tangled file is compiled."
   ;; turn off all warnings in js2-mode
   (setq js2-mode-show-parse-errors t)
   (setq js2-mode-show-strict-warnings nil)
-  (setq js2-strict-missing-semi-warning nil))
+  (setq js2-strict-missing-semi-warning nil)
+)
 
 ;; prettier-emacs: minor-mode to prettify javascript files on save
 ;; https://github.com/prettier/prettier-emacs
@@ -1327,15 +1514,27 @@ tangled, and the tangled file is compiled."
   (setq json-reformat:pretty-string? t)
   (setq js-indent-level 2))
 
-;; eslintd-fix: Emacs minor-mode to automatically fix javascript with eslint_d.
-;; https://github.com/aaronjensen/eslintd-fix/tree/master
-;; (use-package eslintd-fix)
+(use-package eslintd-fix
+  :ensure t
+  :ensure-system-package
+  (eslint . "npm i -g eslint")
+)
 
 (use-package rjsx-mode
     :after js2-mode
     :mode
-    (("\\.jsx$" . rjsx-mode)
-    ("components/.+\\.js$" . rjsx-mode)))
+    ("\\.jsx$" . rjsx-mode)
+    ("components/.+\\.js$" . rjsx-mode)
+
+    :config
+    ;; for better jsx syntax-highlighting in web-mode
+    ;; - courtesy of Patrick @halbtuerke
+    (defadvice web-mode-highlight-part (around tweak-jsx activate)
+      (if (equal web-mode-content-type "jsx")
+        (let ((web-mode-enable-part-face nil))
+          ad-do-it)
+        ad-do-it))
+)
 
 (use-package typescript-mode
   :ensure t

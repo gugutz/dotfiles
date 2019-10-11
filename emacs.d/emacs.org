@@ -12,8 +12,10 @@
   ;; (setq user-mail-address "gugutz@gmail.com")
 #+END_SRC
 * Observations about this config
-Keybindings use the <kbd> macro, as recommended in Mastering Emacs:
+: Keybindings use the <kbd> macro, as recommended in Mastering Emacs:
 https://www.masteringemacs.org/article/mastering-key-bindings-emacs
+
+: For native packages that come with emacs, `:ensure nil` must be set or use-package will try to download those packages from melpa and break
 
 * Recompile init.el everytime emacs.org is changed and saved
 
@@ -110,9 +112,11 @@ emacs asks 2 annoying confirmations on every startup before actually starting
 #+END_SRC
 
 *** Set `:ensure t` globally for all packages using use-package
+
+: this is disabled for now as i preffer to specify for each package
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(require 'use-package-ensure)
-(setq use-package-always-ensure t)
+  (require 'use-package-ensure)
+  ;; (setq use-package-always-ensure t)
 #+END_SRC
 
 *** Auto update packages
@@ -194,42 +198,15 @@ PS: this also stops preventing editing colisions, so watch out
 (fset 'yes-or-no-p 'y-or-n-p)
    #+END_SRC
 
-** Use unix-conf-mode for .*rc files
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode))
-#+END_SRC
-** show matching parenthesis
-#+BEGIN_SRC emacs-lisp :tangle init.el
-; parentheses
-(show-paren-mode t)
-#+END_SRC
-
-** default indentation
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(setq-default indent-tabs-mode nil)
-(setq-default c-basic-offset 2)
-#+END_SRC
-
 ** show line numbers
-   #+BEGIN_SRC emacs-lisp :tangle init.el
-  (when (version<= "26.0.50" emacs-version )
-    (global-display-line-numbers-mode))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(when (version<= "26.0.50" emacs-version )
+  (global-display-line-numbers-mode))
+#+END_SRC
 
 ** line number : pretty format
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (setq linum-format " %d ")
-#+END_SRC
-
-** superword-mode and subword-modes
-
-: Alt+x subword-mode. It change all cursor movement/edit commands to stop in-between the “camelCase” words.
-: Alt+x superword-mode (emacs 24.4) is similar. It treats text like “x_y” as one word. Useful for “snake_case”.
-: subword-mode and superword-mode are mutally exclusive. Turning one on turns off the other.
-
-: Enable global subword-mode (disabled - its enable per file according to language)
-#+BEGIN_SRC emacs-lisp :tangle init.el
-;; (global-subword-mode 1)
 #+END_SRC
 
 ** Turn on auto-revert mode (auto updates files changed on disk)
@@ -238,11 +215,6 @@ PS: this also stops preventing editing colisions, so watch out
 (global-auto-revert-mode 1)
 (setq auto-revert-interval 0.5)
 #+END_SRC
-
-** Spellchecking
-   #+BEGIN_SRC emacs-lisp :tangle init.el
-(defconst *spell-check-support-enabled* t) ;; Enable with t if you prefer
-   #+END_SRC
 
 ** C-n insert newlines if the point is at the end of the buffer.
 
@@ -270,11 +242,11 @@ PS: this also stops preventing editing colisions, so watch out
 
 ** Increase, decrease and adjust font size
 
-   #+BEGIN_SRC emacs-lisp :tangle init.el
-  (global-set-key (kbd "C-S-+") #'text-scale-increase)
-  (global-set-key (kbd "C-S-_") #'text-scale-decrease)
-  ;; (global-set-key (kbd "C-)") #'text-scale-adjust)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(global-set-key (kbd "C-S-+") #'text-scale-increase)
+(global-set-key (kbd "C-S-_") #'text-scale-decrease)
+(global-set-key (kbd "C-S-)") #'text-scale-adjust)
+#+END_SRC
 
 ** expand-region
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -316,7 +288,116 @@ I almost always want to kill the current buffer, so this snippet helps in that.
 (setq hscroll-margin 1)
 #+END_SRC
 
+
+* Code editing settings
+** subword-mode
+
+: Alt+x subword-mode. It change all cursor movement/edit commands to stop in-between the “camelCase” words.
+: subword-mode and superword-mode are mutally exclusive. Turning one on turns off the other.
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package subword
+  :ensure nil
+  :hook
+  (clojure-mode . subword-mode)
+  (ruby-mode . subword-mode)
+  (enh-ruby-mode . subword-mode)
+  (elixir-mode . subword-mode)
+)
+#+END_SRC
+
+** superword-mode
+
+: Alt+x superword-mode (emacs 24.4) is similar. It treats text like “x_y” as one word. Useful for “snake_case”.
+: subword-mode and superword-mode are mutally exclusive. Turning one on turns off the other.
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package superword
+  :ensure nil
+  :hook
+  (js2-mode . superword-mode)
+)
+#+END_SRC
+
+** show matching parenthesis
+#+BEGIN_SRC emacs-lisp :tangle init.el
+; parentheses
+(show-paren-mode t)
+#+END_SRC
+
+** default indentation
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(setq-default indent-tabs-mode nil)
+(setq-default c-basic-offset 2)
+#+END_SRC
+
+** Use unix-conf-mode for .*rc files
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode))
+#+END_SRC
+
+** iedit
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package iedit
+  :config
+  (set-face-background 'iedit-occurrence "Magenta")
+  :bind
+  ("C-;" . iedit-mode)
+)
+#+END_SRC
+
+** eldoc
+
+Enable documentation for programming languages
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package eldoc
+  :diminish
+  :hook
+  (prog-mode       . turn-on-eldoc-mode)
+  (cider-repl-mode . turn-on-eldoc-mode)
+)
+#+END_SRC
+
+** Highlighting numbers
+   #+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package highlight-numbers
+    :ensure t
+    :hook
+    (prog-mode . highlight-numbers-mode)
+)
+   #+END_SRC
+** Highlighting operators
+   #+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package highlight-operators
+  :ensure t
+  :hook
+  (prog-mode . highlight-operators-mode)
+)
+   #+END_SRC
+** Highlighting escape sequences
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package highlight-escape-sequences
+  :ensure t
+  :hook
+  (prog-mode . hes-mode)
+)
+#+END_SRC
+** Highlighting parentheses
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package highlight-parentheses
+  :ensure t
+  :hook
+  (prog-mode . highlight-parentheses-mode)
+)
+#+END_SRC
+
+
 * Text editing settings
+
+** Helper functions for casing words
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (defun upcase-backward-word (arg)
@@ -346,6 +427,19 @@ I almost always want to kill the current buffer, so this snippet helps in that.
 (global-set-key (kbd "M-c")	 'capitalize-backward-word)
 #+END_SRC
 
+** Spellchecking
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(defconst *spell-check-support-enabled* t) ;; Enable with t if you prefer
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package flyspell
+  :defer 1
+  :hook
+  (text-mode . flyspell-mode)
+)
+#+END_SRC
 
 * GPG Encryption
 
@@ -663,6 +757,22 @@ I almost always want to kill the current buffer, so this snippet helps in that.
 #+END_SRC
 
 
+* restclient
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package restclient
+  :ensure t
+  :mode "\\.rest$"
+  :config
+  (progn
+    ;; Add hook to override C-c C-c in this mode to stay in window
+    (add-hook 'restclient-mode-hook
+              '(lambda ()
+                 (local-set-key
+                  (kbd "C-c C-c")
+                  'restclient-http-send-current-stay-in-window))))
+)
+#+END_SRC
 * multiple cursors
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -686,6 +796,7 @@ I almost always want to kill the current buffer, so this snippet helps in that.
 
 * org-mode
 
+** org-mode setup
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package org
   :ensure org-plus-contrib
@@ -707,8 +818,8 @@ I almost always want to kill the current buffer, so this snippet helps in that.
   ;;        (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
   ;; ox-extras
   ;; add suport for the ignore tag (ignores a headline without ignoring its content)
-  (require ox-extra)
-  (ox-extras-activate '(ignore-headlines))
+;;  (require ox-extra)
+;;  (ox-extras-activate '(ignore-headlines))
   ;; general org config variables
   (setq org-log-done 'time)
   (setq org-export-backends (quote (ascii html icalendar latex md odt)))
@@ -736,12 +847,22 @@ I almost always want to kill the current buffer, so this snippet helps in that.
 )
 #+END_SRC
 
+** ox-extra (org-plus-contrib)
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package ox-extra
+  :ensure nil
+  :config
+  (ox-extras-activate '(ignore-headlines))
+  (ox-extras-activate '(latex-header-blocks ignore-headlines))
+)
+#+END_SRC
 
 ** Evil-ORG
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package evil-org
-  :after (org)
+  :after org
   :hook
   (org-mode . evil-org-mode)
   :config
@@ -777,17 +898,6 @@ is customized, please consider the following settings in your init file"
 )
 #+END_SRC
 
-
-** ReveaJS org-reveal:
-: This delay makes the options to export to RevealJS appear on the exporter menu (C-c C-e)
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package ox-reveal
-  :after (ox)
-  :config (setq org-reveal-root "https://cdn.jsdelivr.net/reveal.js/3.0.0/")
-)
-#+END_SRC
-
 ** UTF8 pretty bullets in org mode
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package org-bullets
@@ -795,6 +905,61 @@ is customized, please consider the following settings in your init file"
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 )
 #+END_SRC
+
+** org-jira
+
+Org Mode Integration with Jira Projects
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package org-jira
+  :ensure t
+  :defer 3
+  :after org
+  :custom
+  (jiralib-url "https://stairscreativestudio.atlassian.net")
+)
+#+END_SRC
+
+*** ox-jira exporter
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package ox-jira
+  :defer 3
+  :after org
+)
+#+END_SRC
+
+
+** ReveaJS org-reveal:
+
+: This delay makes the options to export to RevealJS appear on the exporter menu (C-c C-e)
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package ox-reveal
+  :after ox
+  :config
+  (setq org-reveal-root "https://cdn.jsdelivr.net/reveal.js/3.0.0/")
+)
+ #+END_SRC
+
+** Org Exporters
+
+*** markdown
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package ox-md
+  :defer t
+  :after org
+)
+#+END_SRC
+
+*** github-flavored markdown
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package ox-gfm
+  :ensure t
+  :defer t
+  :after org
+)
+ #+END_SRC
+
 
 * LaTeX
 
@@ -872,6 +1037,17 @@ is customized, please consider the following settings in your init file"
 )
 #+END_SRC
 
+* helm-ag
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package helm-ag
+  :ensure helm-ag
+  :bind ("M-p" . helm-projectile-ag)
+  :commands (helm-ag helm-projectile-ag)
+  :init (setq helm-ag-insert-at-point 'symbol
+	      helm-ag-command-option "--path-to-ignore ~/.agignore"))
+#+END_SRC
+
 * Projectile
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package projectile
@@ -940,6 +1116,69 @@ is customized, please consider the following settings in your init file"
   (evil-define-key evil-magit-state magit-mode-map "l" 'evil-previous-visual-line)
 )
 #+END_SRC
+
+* FlyCheck linter
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package flycheck
+    :ensure t
+    :defer t
+    :hook
+    (prog-mode . flycheck-mode)
+    :custom
+    (flycheck-display-errors-delay 1)
+    :config
+    (global-flycheck-mode)
+
+    ;; add eslint to list of flycheck checkers
+    (setq flycheck-checkers '(javascript-eslint))
+
+    ;; disable jshint since we prefer eslint checking
+    (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))
+
+    ;; set modes that will use ESLint
+    (flycheck-add-mode 'javascript-eslint 'web-mode)
+    (flycheck-add-mode 'javascript-eslint 'js2-mode)
+    (flycheck-add-mode 'javascript-eslint 'js-mode)
+
+    ;; customize flycheck temp file prefix
+    (setq-default flycheck-temp-prefix ".flycheck")
+
+    ;; disable json-jsonlist checking for json files
+    (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(json-jsonlist)))
+
+    ;; Workaround for eslint loading slow
+    ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
+    (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t))
+)
+
+#+END_SRC
+
+
+** Turn flycheck inline extension after flycheck starts
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package quick-peek
+  :ensure t
+)
+#+END_SRC
+
+   #+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package flycheck-inline
+  :ensure t
+  :hook
+  (flycheck-mode . flycheck-inline-mode)
+  :config
+  ;; (global-flycheck-inline-mode)
+  (setq flycheck-inline-display-function
+        (lambda (msg pos)
+          (let* ((ov (quick-peek-overlay-ensure-at pos))
+                 (contents (quick-peek-overlay-contents ov)))
+            (setf (quick-peek-overlay-contents ov)
+                  (concat contents (when contents "\n") msg))
+            (quick-peek-update ov)))
+        flycheck-inline-clear-function #'quick-peek-hide))
+#+END_SRC
+
 
 * Treemacs (neotree like navigation)
 
@@ -1221,7 +1460,7 @@ is customized, please consider the following settings in your init file"
 
 ** Applying my theme
 
-   #+BEGIN_SRC emacs-lisp :tangle init.el
+#+BEGIN_SRC emacs-lisp :tangle init.el
 
   (add-to-list 'custom-theme-load-path "~/dotfiles/emacs.d/themes/")
   ; theme options:
@@ -1261,6 +1500,64 @@ is customized, please consider the following settings in your init file"
   ;;  (add-hook 'after-make-frame-functions #'load-my-theme)
    #+END_SRC
 
+
+** Highlight lines
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package hl-line
+  :defer nil
+  :config
+  (global-hl-line-mode)
+)
+#+END_SRC
+
+** Highlight columns
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package col-highlight
+  :disabled
+  :defer nil
+  :config
+  (col-highlight-toggle-when-idle)
+  (col-highlight-set-interval 2)
+)
+#+END_SRC
+
+** Highlight columns
+
+Highlight crosshair (combination of hl-lines and hl-columns
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package crosshairs
+  :disabled
+  :defer nil
+  :config
+  (crosshairs-mode)
+)
+#+END_SRC
+
+** Uniquify (unique files names in buffers)
+
+This package is included in emacs, so `:ensure nil` prevents use-package from trying to download it on Melpa
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package uniquify
+  :defer 1
+  :ensure nil
+  :custom
+  (uniquify-after-kill-buffer-p t)
+  (uniquify-buffer-name-style 'post-forward)
+  (uniquify-strip-common-suffix t)
+)
+#+END_SRC
+
+** All The Icons - Icon package
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package all-the-icons
+  :defer 3
+)
+#+END_SRC
 
 ** doom-modeline
 
@@ -1529,31 +1826,6 @@ by giving them a slightly different -- often brighter -- background.
 
 * Minor modes
 
-** Highlighting numbers
-   #+BEGIN_SRC emacs-lisp :tangle init.el
-  (use-package highlight-numbers
-    :ensure t
-    :hook ((prog-mode . highlight-numbers-mode)))
-   #+END_SRC
-** Highlighting operators
-   #+BEGIN_SRC emacs-lisp :tangle init.el
-  (use-package highlight-operators
-    :ensure t
-    :hook ((prog-mode . highlight-operators-mode)))
-   #+END_SRC
-** Highlighting escape sequences
-   #+BEGIN_SRC emacs-lisp :tangle init.el
-  (use-package highlight-escape-sequences
-    :ensure t
-    :hook ((prog-mode . hes-mode)))
-   #+END_SRC
-** Highlighting parentheses
-   #+BEGIN_SRC emacs-lisp :tangle init.el
-       (use-package highlight-parentheses
-         :ensure t
-         :hook ((prog-mode . highlight-parentheses-mode)))
-   #+END_SRC
-
 ** which-key
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -1572,18 +1844,18 @@ by giving them a slightly different -- often brighter -- background.
    #+END_SRC
 
 ** smartparens
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package smartparens
-  :ensure t
-  :hook
-  (after-init . smartparens-global-mode)
-  :config
-  (require 'smartparens-config)
-  (sp-pair "=" "=" :actions '(wrap))
-  (sp-pair "+" "+" :actions '(wrap))
-  (sp-pair "<" ">" :actions '(wrap))
-  (sp-pair "$" "$" :actions '(wrap)))
-#+END_SRC
+ #+BEGIN_SRC emacs-lisp :tangle init.el
+ (use-package smartparens
+   :ensure t
+   :hook
+   (after-init . smartparens-global-mode)
+   :config
+   (require 'smartparens-config)
+   (sp-pair "=" "=" :actions '(wrap))
+   (sp-pair "+" "+" :actions '(wrap))
+   (sp-pair "<" ">" :actions '(wrap))
+   (sp-pair "$" "$" :actions '(wrap)))
+ #+END_SRC
 
 *** evil-smartparens helps avoid conflicts between evil and smartparens
 
@@ -1619,31 +1891,11 @@ Helps editing lisp code
   :hook
   (org-mode . rainbow-mode)
   (css-mode . rainbow-mode)
+  (scss-mode . rainbow-mode)
   (php-mode . rainbow-mode)
   (html-mode . rainbow-mode)
   (web-mode . rainbow-mode)
   (js2-mode . rainbow-mode))
-#+END_SRC
-
-** Emmet
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package emmet-mode
-  :ensure t
-  :commands emmet-mode
-  :init
-    (setq emmet-indentation 2)
-    (setq emmet-move-cursor-between-quotes t)
-  :hook
-    (sgml-mode . emmet-mode) ;; Auto-start on any markup modes
-    (css-mode . emmet-mode) ;; enable Emmet's css abbreviation.
-    (html-mode . emmet-mode) ;; Auto-start on HTML files
-    (web-mode . emmet-mode) ;; Auto-start on web-mode
-  :config
-  (unbind-key "<C-return>" emmet-mode-keymap)
-  (unbind-key "C-M-<left>" emmet-mode-keymap)
-  (unbind-key "C-M-<right>" emmet-mode-keymap)
-  (setq emmet-expand-jsx-className? t)) ;; use emmet with JSX markup
 #+END_SRC
 
 ** Smartscan mode
@@ -1685,7 +1937,7 @@ Helps editing lisp code
 (add-hook 'org-mode-hook 'add-pretty-lambda)
 #+END_SRC
 
-** quickrun (compile and execute code)
+* quickrun (compile and execute code)
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package quickrun
   :bind
@@ -1693,30 +1945,6 @@ Helps editing lisp code
   ("M-<f5>" . quickrun-shell)
 )
 #+END_SRC
-
-* FlyCheck linter
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package flycheck
-    :ensure t
-    :defer t
-    :hook
-    (prog-mode . flycheck-mode)
-    :init
-    (global-flycheck-mode)
-)
-#+END_SRC
-
-
-** Turn flycheck inline extension after flycheck starts
-
-   #+BEGIN_SRC emacs-lisp :tangle init.el
-  (with-eval-after-load 'flycheck
-    (global-flycheck-inline-mode))
-  ;; (with-eval-after-load 'flycheck
-  ;;   (add-hook 'flycheck-mode-hook #'turn-on-flycheck-inline))
-   #+END_SRC
-
 
 
 * Ruby
@@ -1748,6 +1976,28 @@ Helps editing lisp code
 #+END_SRC
 
 
+* Emmet
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package emmet-mode
+  :ensure t
+  :commands emmet-mode
+  :init
+    (setq emmet-indentation 2)
+    (setq emmet-move-cursor-between-quotes t)
+  :hook
+    (sgml-mode . emmet-mode) ;; Auto-start on any markup modes
+    (css-mode . emmet-mode) ;; enable Emmet's css abbreviation.
+    (scss-mode . emmet-mode) ;; enable Emmet's css abbreviation.
+    (html-mode . emmet-mode) ;; Auto-start on HTML files
+    (web-mode . emmet-mode) ;; Auto-start on web-mode
+  :config
+  (unbind-key "<C-return>" emmet-mode-keymap)
+  (unbind-key "C-M-<left>" emmet-mode-keymap)
+  (unbind-key "C-M-<right>" emmet-mode-keymap)
+  (setq emmet-expand-jsx-className? t)) ;; use emmet with JSX markup
+#+END_SRC
+
 * HTML
 
 ** Set HTML indentation to 4 spaces by default (only on html-mode)
@@ -1757,17 +2007,44 @@ Helps editing lisp code
     (set (make-local-variable 'sgml-basic-offset) 4)))
 #+END_SRC
 
+* YAML
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package yaml-mode
+  :ensure t
+)
+#+END_SRC
+
+* TOML
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package toml-mode
+  :ensure t
+)
+#+END_SRC
 
 * CSS and SCSS
 
+** CSS
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package css-mode
+  :ensure t
+  :mode "\\.css\\'"
+  :init
+  (setq css-indent-offset 2)
+)
+#+END_SRC
+
+** SCSS
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package scss-mode
   :ensure t
-  :defer t
-  :mode ("\\.scss\\'")
+  ;; this mode doenst load using :mode from use-package, dunno why
+  ;; :mode "\\.scss\\'"
+  :init
+  (setq scss-compile-at-save 'nil)
   :config
   (autoload 'scss-mode "scss-mode")
-  (setq scss-compile-at-save 'nil)
+  (add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
 )
 #+END_SRC
 
@@ -1775,14 +2052,11 @@ Helps editing lisp code
 (use-package helm-css-scss
   :ensure t
   :bind
-  (:map isearch-mode-mode
+  (:map isearch-mode-map
   ("s-i" . helm-css-scss-from-isearch)
   :map helm-css-scss-map
   ("s-i" . helm-css-scss-multi-from-helm-css-scss)
   :map css-mode-map
-  ("s-i" . helm-css-scss)
-  ("s-I" . helm-css-scss-back-to-last-point)
-  :map less-css-mode-map
   ("s-i" . helm-css-scss)
   ("s-I" . helm-css-scss-back-to-last-point)
   :map scss-mode-map
@@ -1805,44 +2079,47 @@ Helps editing lisp code
   (font-lock-comment-face ((t (:foreground "#828282"))))
   :mode
   ("\\.phtml\\'" "\\.tpl\\.php\\'" "\\.[agj]sp\\'" "\\.as[cp]x\\'"
-  "\\.erb\\'" "\\.mustache\\'" "\\.djhtml\\'" "\\.[t]?html?\\'"))
+  "\\.erb\\'" "\\.mustache\\'" "\\.djhtml\\'" "\\.[t]?html?\\'")
   :config
   ;; web-mode indentation
+  (setq web-mode-markup-indent-offset 4)
+  (setq web-mode-css-indent-offset 2)
   (setq web-mode-code-indent-offset 2)
+)
 #+END_SRC
 
-* JavaScript
+* JavaScript JS2-mode
 
-** JS2 Mode
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;; js2-mode: enhanced JavaScript editing mode
+;; https://github.com/mooz/js2-mode
+(use-package js2-mode
+  :mode
+  ("\\.js$" . js2-mode)
 
-    #+BEGIN_SRC emacs-lisp :tangle init.el
-  ;; js2-mode: enhanced JavaScript editing mode
-  ;; https://github.com/mooz/js2-mode
-  (use-package js2-mode
-    :mode
-    ("\\.js$" . js2-mode)
+  :hook
+  (js2-mode . flycheck-mode)
+  (js2-mode . company-mode)
+  (js2-mode . lsp-mode)
+  (js2-mode . add-node-modules-path)
+  :config
+  ;; have 2 space indentation by default
+  (setq js-indent-level 2)
+  (setq js2-basic-offset 2)
+  (setq js-chain-indent t)
 
-    :hook ((js2-mode . flycheck-mode)
-           (js2-mode . company-mode)
-           (js2-mode . lsp-mode)
-           (js2-mode . add-node-modules-path))
-    :config
-    ;; have 2 space indentation by default
-    (setq js-indent-level 2
-          js2-basic-offset 2
-          js-chain-indent t)
+  ;; use eslint_d insetad of eslint for faster linting
+  ;; (setq flycheck-javascript-eslint-executable "eslint_d")
 
-    ;; use eslint_d insetad of eslint for faster linting
-    ;; (setq flycheck-javascript-eslint-executable "eslint_d")
+  ;; Try to highlight most ECMA built-ins
+  (setq js2-highlight-level 3)
 
-    ;; Try to highlight most ECMA built-ins
-    (setq js2-highlight-level 3)
-
-    ;; turn off all warnings in js2-mode
-    (setq js2-mode-show-parse-errors t)
-    (setq js2-mode-show-strict-warnings nil)
-    (setq js2-strict-missing-semi-warning nil))
-    #+END_SRC
+  ;; turn off all warnings in js2-mode
+  (setq js2-mode-show-parse-errors t)
+  (setq js2-mode-show-strict-warnings nil)
+  (setq js2-strict-missing-semi-warning nil)
+)
+#+END_SRC
 
 * PrettierJS
 
@@ -1893,21 +2170,37 @@ Helps editing lisp code
 
 * ESLint
 
+eslintd-fix: Emacs minor-mode to automatically fix javascript with eslint_d.
+https://github.com/aaronjensen/eslintd-fix/tree/master
+
 #+BEGIN_SRC emacs-lisp :tangle init.el
-;; eslintd-fix: Emacs minor-mode to automatically fix javascript with eslint_d.
-;; https://github.com/aaronjensen/eslintd-fix/tree/master
-;; (use-package eslintd-fix)
+(use-package eslintd-fix
+  :ensure t
+  :ensure-system-package
+  (eslint . "npm i -g eslint")
+)
 #+END_SRC
 
 * RJSX Mode
+
 https://github.com/felipeochoa/rjsx-mode
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package rjsx-mode
     :after js2-mode
     :mode
-    (("\\.jsx$" . rjsx-mode)
-    ("components/.+\\.js$" . rjsx-mode)))
+    ("\\.jsx$" . rjsx-mode)
+    ("components/.+\\.js$" . rjsx-mode)
+
+    :config
+    ;; for better jsx syntax-highlighting in web-mode
+    ;; - courtesy of Patrick @halbtuerke
+    (defadvice web-mode-highlight-part (around tweak-jsx activate)
+      (if (equal web-mode-content-type "jsx")
+        (let ((web-mode-enable-part-face nil))
+          ad-do-it)
+        ad-do-it))
+)
 #+END_SRC
 
 
