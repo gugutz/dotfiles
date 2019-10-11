@@ -296,14 +296,6 @@ exec_always --no-startup-id ~/dotfiles/conky/scripts/conky-start.sh
 # emacs server
 exec --no-startup-id emacs --daemon
 
-# Discord
-exec discord
-assign [class="discord"] → $ws8
-
-# Slack
-exec slack
-assign [class="Slack"]  → $ws8
-
 # browser
 exec $browser
 # \$browser_window_class "Brave"
@@ -312,6 +304,18 @@ assign [class="Brave"]  → $ws3
 # Telegram Desktop
 exec telegram-desktop
 assign [class="TelegramDesktop"] → $ws9
+
+# Telegram Desktop
+assign [class="Steam"] → $ws5
+
+# Slack
+exec slack
+assign [class="Slack"]  → $ws8
+
+# Discord
+exec discord
+assign [class="discord"] → $ws8
+
 
 # Toggl Desktop
 exec TogglDesktop
@@ -375,6 +379,14 @@ set_from_resource $term_color15    color15
 exec_always --no-startup-id hsetroot -solid "#000"  #darkgrey
 
 
+################################################
+# UTILITIES BINDINGS
+################################################
+
+# find window class name to use with i3 config
+# for now using urxvt because i didnt figure how to "hold" a terminal open with st yet
+bindsym $mod+Control+Shift+Home exec urxvt -hold -e ~/dotfiles/i3/scripts/find-window-criteria.sh
+# bindsym $mod+Control+Shift+Home exec $terminal -e sh -c '~/dotfiles/i3/scripts/find-window-criteria.sh'
 
 ################################################
 # SCREENSHOTS SETUP
@@ -853,6 +865,7 @@ for_window [class="Skype"] floating enable border normal
 for_window [class="Timeset-gui"] floating enable border normal
 for_window [class="(?i)virtualbox"] floating enable border normal
 for_window [class="Xfburn"] floating enable
+for_window [class="Steam"] floating enable
 
 # set 'App' window_class as floating windows
 # this makes my java build and runs float on top of the idea, and not divide the screen with another window

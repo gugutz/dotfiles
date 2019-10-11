@@ -2100,7 +2100,7 @@ Helps editing lisp code
   :hook
   (js2-mode . flycheck-mode)
   (js2-mode . company-mode)
-  (js2-mode . lsp-mode)
+  (js2-mode . tide-mode)
   (js2-mode . add-node-modules-path)
   :config
   ;; have 2 space indentation by default
@@ -2236,11 +2236,21 @@ https://github.com/felipeochoa/rjsx-mode
   (progn
     (add-hook 'before-save-hook 'tide-format-before-save)
     (add-hook 'typescript-mode-hook #'setup-tide-mode)
+    (add-hook 'js2-mode-hook #'setup-tide-mode)
   )
 )
 
 #+END_SRC
 
+
+* Angular
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package ng2-mode
+  :defer
+  :hook
+  (ng2-mode . prettier-js-mode)
+)
+#+END_SRC
 * Devops tools setup and helpers (dockerfile, netlify)
 
   #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -2258,13 +2268,15 @@ https://github.com/felipeochoa/rjsx-mode
   :ensure t
   :commands lsp
   :init
-  (setq lsp-inhibit-message t)
-  (setq lsp-eldoc-render-all nil)
-  (setq lsp-highlight-symbol-at-point nil)
+  (setq lsp-inhibit-message nil) ;; was `t`, changed to nil to see what it does
+  (setq lsp-eldoc-render-all t)  ;; was `nil`, changed to nil to see what it does
+  (setq lsp-highlight-symbol-at-point t)  ;; was `nil`, changed to nil to see what it does
   :hook
-  (js2-mode . lsp)
+  ;; disabled lsp for javascript and typescript to use Tide-mode only
+  ;; disabled lsp for typescript to use Tide-mode only
+  ;;(typescript-mode . lsp)
+  ;;(js2-mode . lsp)
   (js2-jsx-mode . lsp)
-  (typescript-mode . lsp)
   (enh-ruby-mode . lsp)
 )
 
@@ -2294,7 +2306,8 @@ https://github.com/felipeochoa/rjsx-mode
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package lsp-ui
   :ensure t
-  :hook ((lsp-mode . lsp-ui-mode))
+  :hook
+  (lsp-mode . lsp-ui-mode)
   :preface
   (defun ladicle/toggle-lsp-ui-doc ()
     (interactive)

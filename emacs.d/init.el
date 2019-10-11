@@ -23,34 +23,23 @@ tangled, and the tangled file is compiled."
 (package-initialize)
 
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(TeX-after-compilation-finished-functions (quote TeX-revert-document-buffer) t)
- '(TeX-auto-save t t)
- '(TeX-master nil t)
- '(TeX-parse-self t t)
- '(TeX-view-program-list (quote (("pdf-tools" "TeX-pdf-tools-sync-view"))) t)
- '(TeX-view-program-selection (quote ((output-pdf "pdf-tools"))) t)
- '(custom-safe-themes
+;; custom-set-variables was added by Custom.
+;; If you edit it by hand, you could mess it up, so be careful.
+;; Your init file should contain only one such instance.
+;; If there is more than one, they won't work right.
+'(custom-safe-themes
    (quote
-    ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
- '(fci-rule-color "#3E4451")
- '(flycheck-display-errors-delay 1)
- '(jiralib-url "https://stairscreativestudio.atlassian.net" t)
- '(magit-auto-revert-mode nil)
- '(package-selected-packages
-   (quote
-    (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(css-selector ((t (:inherit default :foreground "#66CCFF"))))
- '(font-lock-comment-face ((t (:foreground "#828282")))))
+   ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
+   '(fci-rule-color "#3E4451")
+   '(package-selected-packages
+     (quote
+     (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
+   (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   )
 
 (add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
 ;; (add-to-list 'load-path "~/dotfiles/emacs.d/config")
@@ -1456,7 +1445,7 @@ tangled, and the tangled file is compiled."
   :hook
   (js2-mode . flycheck-mode)
   (js2-mode . company-mode)
-  (js2-mode . lsp-mode)
+  (js2-mode . tide-mode)
   (js2-mode . add-node-modules-path)
   :config
   ;; have 2 space indentation by default
@@ -1558,6 +1547,7 @@ tangled, and the tangled file is compiled."
   (progn
     (add-hook 'before-save-hook 'tide-format-before-save)
     (add-hook 'typescript-mode-hook #'setup-tide-mode)
+    (add-hook 'js2-mode-hook #'setup-tide-mode)
   )
 )
 
@@ -1568,13 +1558,15 @@ tangled, and the tangled file is compiled."
   :ensure t
   :commands lsp
   :init
-  (setq lsp-inhibit-message t)
-  (setq lsp-eldoc-render-all nil)
-  (setq lsp-highlight-symbol-at-point nil)
+  (setq lsp-inhibit-message nil) ;; was `t`, changed to nil to see what it does
+  (setq lsp-eldoc-render-all t)  ;; was `nil`, changed to nil to see what it does
+  (setq lsp-highlight-symbol-at-point t)  ;; was `nil`, changed to nil to see what it does
   :hook
-  (js2-mode . lsp)
+  ;; disabled lsp for javascript and typescript to use Tide-mode only
+  ;; disabled lsp for typescript to use Tide-mode only
+  ;;(typescript-mode . lsp)
+  ;;(js2-mode . lsp)
   (js2-jsx-mode . lsp)
-  (typescript-mode . lsp)
   (enh-ruby-mode . lsp)
 )
 
@@ -1599,7 +1591,8 @@ tangled, and the tangled file is compiled."
 
 (use-package lsp-ui
   :ensure t
-  :hook ((lsp-mode . lsp-ui-mode))
+  :hook
+  (lsp-mode . lsp-ui-mode)
   :preface
   (defun ladicle/toggle-lsp-ui-doc ()
     (interactive)
