@@ -23,23 +23,37 @@ tangled, and the tangled file is compiled."
 (package-initialize)
 
 (custom-set-variables
-;; custom-set-variables was added by Custom.
-;; If you edit it by hand, you could mess it up, so be careful.
-;; Your init file should contain only one such instance.
-;; If there is more than one, they won't work right.
-'(custom-safe-themes
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(TeX-after-compilation-finished-functions (quote TeX-revert-document-buffer) t)
+ '(TeX-auto-save t t)
+ '(TeX-master nil t)
+ '(TeX-parse-self t t)
+ '(TeX-view-program-list (quote (("pdf-tools" "TeX-pdf-tools-sync-view"))) t)
+ '(TeX-view-program-selection (quote ((output-pdf "pdf-tools"))) t)
+ '(custom-safe-themes
    (quote
-   ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
-   '(fci-rule-color "#3E4451")
-   '(package-selected-packages
-     (quote
-     (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
-   (custom-set-faces
-   ;; custom-set-faces was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
-   )
+    ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
+ '(fci-rule-color "#3E4451")
+ '(flycheck-display-errors-delay 1)
+ '(jiralib-url "https://stairscreativestudio.atlassian.net" t)
+ '(magit-auto-revert-mode nil)
+ '(package-selected-packages
+   (quote
+    (fireplace xkcd goto-line-preview zoom pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
+   
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(css-selector ((t (:inherit default :foreground "#66CCFF"))))
+ '(diff-hl-change ((t (:background "#3a81c3"))))
+ '(diff-hl-delete ((t (:background "#ee6363"))))
+ '(diff-hl-insert ((t (:background "#7ccd7c"))))
+ '(font-lock-comment-face ((t (:foreground "#828282")))))
 
 (add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
 ;; (add-to-list 'load-path "~/dotfiles/emacs.d/config")
@@ -85,7 +99,6 @@ tangled, and the tangled file is compiled."
 (use-package visual-line-mode
   :ensure nil
   :hook
-  (after-init . visual-line-mode)
   (prog-mode . visual-line-mode)
   (text-mode . visual-line-mode)
 )
@@ -185,7 +198,23 @@ tangled, and the tangled file is compiled."
 (setq-default cperl-basic-offset 2)
 (setq-default c-basic-offset 2)
 
-(add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode))
+(use-package conf-mode
+  :mode
+  (;; systemd
+    ("\\.service\\'"     . conf-unix-mode)
+    ("\\.timer\\'"      . conf-unix-mode)
+    ("\\.target\\'"     . conf-unix-mode)
+    ("\\.mount\\'"      . conf-unix-mode)
+    ("\\.automount\\'"  . conf-unix-mode)
+    ("\\.slice\\'"      . conf-unix-mode)
+    ("\\.socket\\'"     . conf-unix-mode)
+    ("\\.path\\'"       . conf-unix-mode)
+
+    ;; general
+    ("conf\\(ig\\)?$"   . conf-mode)
+    ("rc$"              . conf-mode))
+)
+;; (add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode))
 
 (use-package iedit
   :config
@@ -227,6 +256,7 @@ tangled, and the tangled file is compiled."
 
 ;; NOTE that the highlighting works even in comments.
 (use-package hl-todo
+  :ensure t
   :hook
   (prog-mode . hl-todo-mode)
   (text-mode . hl-todo-mode)
@@ -257,6 +287,8 @@ tangled, and the tangled file is compiled."
 ;; this replaces native capitlize word!
 (global-set-key (kbd "M-c")	 'capitalize-backward-word)
 
+(defconst *spell-check-support-enabled* t) ;; Enable with t if you prefer
+
 (use-package hi-lock
   :init
   (global-hi-lock-mode 1)
@@ -271,7 +303,11 @@ tangled, and the tangled file is compiled."
   (setq hi-lock-file-patterns-policy #'(lambda (dummy) t))
 )
 
-(defconst *spell-check-support-enabled* t) ;; Enable with t if you prefer
+(use-package move-text
+  :ensure t
+  :config
+  (move-text-default-bindings)
+)
 
 ;(defun fd-switch-dictionary()
 ;(interactive)
@@ -544,16 +580,18 @@ tangled, and the tangled file is compiled."
   (define-key evil-insert-state-map (kbd "C-r") 'search-backward)
 )
 
-(use-package windmove
+(use-package evil-numbers
   :ensure t
+  :after evil
+  :bind
+  (:map evil-normal-state-map
+  ("C-c +" . evil-numbers/inc-at-pt)
+  ("C-c -" . evil-numbers/dec-at-pt)
+  ("<kp-add>" . evil-numbers/inc-at-pt)
+  ("<kp-subtract>" . evil-numbers/dec-at-pt))
   :config
-  ;; use shift + arrow keys to switch between visible buffers
-  ;; (windmove-default-keybindings)
-  (windmove-default-keybindings 'control)
-  (global-set-key (kbd "C-S-H") 'windmove-left)
-  (global-set-key (kbd "C-S-L") 'windmove-right)
-  (global-set-key (kbd "C-S-K") 'windmove-up)
-  (global-set-key (kbd "C-S-J") 'windmove-down)
+  (global-set-key (kbd "C-c +") 'evil-numbers/inc-at-pt)
+  (global-set-key (kbd "C-c -") 'evil-numbers/dec-at-pt)
 )
 
 (use-package evil-leader
@@ -672,6 +710,18 @@ tangled, and the tangled file is compiled."
 
 
 
+(use-package windmove
+  :ensure t
+  :config
+  ;; use shift + arrow keys to switch between visible buffers
+  ;; (windmove-default-keybindings)
+  (windmove-default-keybindings 'control)
+  (global-set-key (kbd "C-S-H") 'windmove-left)
+  (global-set-key (kbd "C-S-L") 'windmove-right)
+  (global-set-key (kbd "C-S-K") 'windmove-up)
+  (global-set-key (kbd "C-S-J") 'windmove-down)
+)
+
 (use-package evil-paredit
   :ensure t
   :hook
@@ -706,6 +756,20 @@ tangled, and the tangled file is compiled."
 
 (use-package elisp-format
   :ensure t
+)
+
+(use-package shell-pop
+  :init
+  (setq shell-pop-full-span t)
+  (setq shell-pop-default-directory "~/code")
+  (setq shell-pop-shell-type (quote ("ansi-term" "*ansi-term*" (lambda nil (ansi-term shell-pop-term-shell)))))
+  (setq shell-pop-term-shell "/bin/zsh")
+  (setq shell-pop-universal-key "C-c s")
+  (setq shell-pop-window-size 30)
+  (setq shell-pop-full-span t)
+  (setq shell-pop-window-position "bottom")
+  :bind
+  ("C-c s" . shell-pop)
 )
 
 (defun /shell/new-window ()
@@ -1015,6 +1079,29 @@ tangled, and the tangled file is compiled."
   (evil-define-key evil-magit-state magit-mode-map "j" 'magit-log-popup)
   (evil-define-key evil-magit-state magit-mode-map "k" 'evil-next-visual-line)
   (evil-define-key evil-magit-state magit-mode-map "l" 'evil-previous-visual-line)
+)
+
+(use-package git-messenger
+  :ensure t
+  :bind
+  ("C-c g p" . git-messenger:popup-message)
+  :init
+  (setq git-messenger:show-detail t)
+  (setq git-messenger:use-magit-popup t)
+  :config
+  (progn
+    (define-key git-messenger-map (kbd "RET") 'git-messenger:popup-close))
+)
+
+;; Mode for .gitignore files.
+(use-package gitignore-mode
+  :ensure t
+)
+
+(use-package git-timemachine
+  :ensure t
+  :bind
+  ("C-c g t" . git-timemachine-toggle)
 )
 
 (use-package helm
@@ -1637,6 +1724,55 @@ tangled, and the tangled file is compiled."
   :config (dimmer-mode)
 )
 
+(require 'discover)
+(when (featurep 'discover)
+  (discover-add-context-menu
+    :context-menu '(isearch
+              (description "Isearch, occur and highlighting")
+              (lisp-switches
+               ("-cf" "Case should fold search" case-fold-search t nil))
+              (lisp-arguments
+               ("=l" "context lines to show (occur)"
+                "list-matching-lines-default-context-lines"
+                (lambda (dummy) (interactive) (read-number "Number of context lines to show: "))))
+              (actions
+               ("Isearch"
+                ("_" "isearch forward symbol" isearch-forward-symbol)
+                ("w" "isearch forward word" isearch-forward-word))
+               ("Occur"
+                ("o" "occur" occur))
+               ("More"
+                ("h" "highlighters ..." makey-key-mode-popup-isearch-highlight))))
+    :bind "M-s"
+  )
+
+  (discover-add-context-menu
+    :context-menu '(dired)
+    :bind "?"
+    :mode 'dired-mode
+    :mode-hook 'dired-mode-hook
+  )
+)
+
+(use-package zoom
+  :ensure t
+  :bind
+  ("C-S-x +" . zoom)
+  :init
+  (setq zoom-size '(0.618 . 0.618))
+  (setq zoom-ignored-major-modes '(dired-mode markdown-mode))
+  (setq zoom-ignored-buffer-names '("zoom.el" "init.el"))
+  (setq zoom-ignored-buffer-name-regexps '("^*calc"))
+  :config
+  (zoom-mode t)
+)
+
+(use-package goto-line-preview
+  :ensure t
+  :config
+  (global-set-key [remap goto-line] 'goto-line-preview)
+)
+
 (use-package centaur-tabs
    ;; :load-path "~/.emacs.d/other/centaur-tabs"
    :hook
@@ -1678,6 +1814,14 @@ tangled, and the tangled file is compiled."
   (setq which-key-max-description-length 20)
   (setq which-key-max-display-columns 6)
 
+(use-package keyfreq
+  :disabled
+  :ensure t
+  :init
+  (keyfreq-mode 1)
+  (keyfreq-autosave-mode 1)
+)
+
 (use-package diff-hl
   :ensure t
   :hook
@@ -1702,6 +1846,7 @@ tangled, and the tangled file is compiled."
   (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
   (setq diff-hl-side 'left)
   (setq diff-hl-margin-side 'left)
+
 
   (diff-hl-margin-mode 1) ;; show the indicators in the margin
   (diff-hl-flydiff-mode 1) ;;  ;; On-the-fly diff updates
@@ -1832,7 +1977,7 @@ tangled, and the tangled file is compiled."
 (use-package scss-mode
   :ensure t
   ;; this mode doenst load using :mode from use-package, dunno why
-  ;; :mode "\\.scss\\'"
+  :mode "\\.scss\\'"
   :init
   (setq scss-compile-at-save 'nil)
   :config
@@ -1842,17 +1987,17 @@ tangled, and the tangled file is compiled."
 
 (use-package helm-css-scss
   :ensure t
-  :bind
+  :bind (
   (:map isearch-mode-map
   ("s-i" . helm-css-scss-from-isearch)
   :map helm-css-scss-map
   ("s-i" . helm-css-scss-multi-from-helm-css-scss)
   :map css-mode-map
   ("s-i" . helm-css-scss)
-  ("s-I" . helm-css-scss-back-to-last-point)
+  ("s-S-I" . helm-css-scss-back-to-last-point)
   :map scss-mode-map
   ("s-i" . helm-css-scss)
-  ("s-I" . helm-css-scss-back-to-last-point)
+  ("s-S-I" . helm-css-scss-back-to-last-point))
   )
   :config
   (setq helm-css-scss-insert-close-comment-depth 2
@@ -1872,6 +2017,10 @@ tangled, and the tangled file is compiled."
   (setq web-mode-markup-indent-offset 4)
   (setq web-mode-css-indent-offset 2)
   (setq web-mode-code-indent-offset 2)
+
+  ;; Use tidy to check HTML buffers with web-mode.
+  (eval-after-load 'flycheck
+     '(flycheck-add-mode 'html-tidy 'web-mode))
 )
 
 ;; js2-mode: enhanced JavaScript editing mode
@@ -2280,6 +2429,14 @@ tangled, and the tangled file is compiled."
 )
 
 (use-package yasnippet-snippets         ; Collection of snippets
+  :ensure t
+)
+
+(use-package xkcd
+:ensure t
+)
+
+(use-package fireplace
   :ensure t
 )
 

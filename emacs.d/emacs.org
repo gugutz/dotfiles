@@ -160,7 +160,6 @@ Allow access from emacsclient
 (use-package visual-line-mode
   :ensure nil
   :hook
-  (after-init . visual-line-mode)
   (prog-mode . visual-line-mode)
   (text-mode . visual-line-mode)
 )
@@ -352,7 +351,23 @@ I almost always want to kill the current buffer, so this snippet helps in that.
 
 ** Use unix-conf-mode for .*rc files
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode))
+(use-package conf-mode
+  :mode
+  (;; systemd
+    ("\\.service\\'"     . conf-unix-mode)
+    ("\\.timer\\'"      . conf-unix-mode)
+    ("\\.target\\'"     . conf-unix-mode)
+    ("\\.mount\\'"      . conf-unix-mode)
+    ("\\.automount\\'"  . conf-unix-mode)
+    ("\\.slice\\'"      . conf-unix-mode)
+    ("\\.socket\\'"     . conf-unix-mode)
+    ("\\.path\\'"       . conf-unix-mode)
+
+    ;; general
+    ("conf\\(ig\\)?$"   . conf-mode)
+    ("rc$"              . conf-mode))
+)
+;; (add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode))
 #+END_SRC
 
 ** iedit
@@ -423,6 +438,7 @@ and any sequence of X's or ?'s of length at least 3: XXX, XXXX, XXXXX, …, ???,
 #+BEGIN_SRC emacs-lisp :tangle init.el
 ;; NOTE that the highlighting works even in comments.
 (use-package hl-todo
+  :ensure t
   :hook
   (prog-mode . hl-todo-mode)
   (text-mode . hl-todo-mode)
@@ -467,6 +483,11 @@ and any sequence of X's or ?'s of length at least 3: XXX, XXXX, XXXXX, …, ???,
 #+END_SRC
 
 ** Spellchecking
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(defconst *spell-check-support-enabled* t) ;; Enable with t if you prefer
+#+END_SRC
+
 ** hi-lock mode
 
 Highlight regexp
@@ -480,8 +501,6 @@ Emacs will not highlight patterns found in a file automatically. You must explic
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package hi-lock
-  :hook
-  ;; (text-mode . hi-lock-mode)
   :init
   (global-hi-lock-mode 1)
   :config
@@ -496,8 +515,16 @@ Emacs will not highlight patterns found in a file automatically. You must explic
 )
 #+END_SRC
 
+
+
+** move-text
+
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(defconst *spell-check-support-enabled* t) ;; Enable with t if you prefer
+(use-package move-text
+  :ensure t
+  :config
+  (move-text-default-bindings)
+)
 #+END_SRC
 
 ** Flyspell
@@ -821,25 +848,22 @@ Works with mutilang documents
 )
 #+END_SRC
 
-
-** Window and buffer navigation with vim-like bindings
-
-*** vim-like navigation using C- HJKL (uppercase homerow keys)
-    #+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package windmove
+* evil-numbers
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package evil-numbers
   :ensure t
+  :after evil
+  :bind
+  (:map evil-normal-state-map
+  ("C-c +" . evil-numbers/inc-at-pt)
+  ("C-c -" . evil-numbers/dec-at-pt)
+  ("<kp-add>" . evil-numbers/inc-at-pt)
+  ("<kp-subtract>" . evil-numbers/dec-at-pt))
   :config
-  ;; use shift + arrow keys to switch between visible buffers
-  ;; (windmove-default-keybindings)
-  (windmove-default-keybindings 'control)
-  (global-set-key (kbd "C-S-H") 'windmove-left)
-  (global-set-key (kbd "C-S-L") 'windmove-right)
-  (global-set-key (kbd "C-S-K") 'windmove-up)
-  (global-set-key (kbd "C-S-J") 'windmove-down)
+  (global-set-key (kbd "C-c +") 'evil-numbers/inc-at-pt)
+  (global-set-key (kbd "C-c -") 'evil-numbers/dec-at-pt)
 )
 #+END_SRC
-
-
 
 
 ** evil-leader
@@ -992,6 +1016,23 @@ Works with mutilang documents
 #+END_SRC
 
 
+* windmove
+    #+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package windmove
+  :ensure t
+  :config
+  ;; use shift + arrow keys to switch between visible buffers
+  ;; (windmove-default-keybindings)
+  (windmove-default-keybindings 'control)
+  (global-set-key (kbd "C-S-H") 'windmove-left)
+  (global-set-key (kbd "C-S-L") 'windmove-right)
+  (global-set-key (kbd "C-S-K") 'windmove-up)
+  (global-set-key (kbd "C-S-J") 'windmove-down)
+)
+#+END_SRC
+
+
+
 * evil-paredit
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -1041,6 +1082,24 @@ Works with mutilang documents
 
 
 * Shell
+
+** shell-pop
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package shell-pop
+  :init
+  (setq shell-pop-full-span t)
+  (setq shell-pop-default-directory "~/code")
+  (setq shell-pop-shell-type (quote ("ansi-term" "*ansi-term*" (lambda nil (ansi-term shell-pop-term-shell)))))
+  (setq shell-pop-term-shell "/bin/zsh")
+  (setq shell-pop-universal-key "C-c s")
+  (setq shell-pop-window-size 30)
+  (setq shell-pop-full-span t)
+  (setq shell-pop-window-position "bottom")
+  :bind
+  ("C-c s" . shell-pop)
+)
+#+END_SRC
 
 ** System Shell
 *** Make system shell open in a split-window buffer at the bottom of the screen
@@ -1444,7 +1503,13 @@ The Sections and Heading Levels gets configured as follows:
 #+END_SRC
 
 
-* Magit
+* Version Control stuff
+
+Always try to make bindings like this:
+M-g for magit
+C-c g for any git related stuff other than magit's
+
+** Magit
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package magit
@@ -1471,7 +1536,6 @@ The Sections and Heading Levels gets configured as follows:
 )
 #+END_SRC
 
-
 ** evil-magit
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package evil-magit
@@ -1484,6 +1548,43 @@ The Sections and Heading Levels gets configured as follows:
   (evil-define-key evil-magit-state magit-mode-map "j" 'magit-log-popup)
   (evil-define-key evil-magit-state magit-mode-map "k" 'evil-next-visual-line)
   (evil-define-key evil-magit-state magit-mode-map "l" 'evil-previous-visual-line)
+)
+#+END_SRC
+
+** git-messenger
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package git-messenger
+  :ensure t
+  :bind
+  ("C-c g p" . git-messenger:popup-message)
+  :init
+  (setq git-messenger:show-detail t)
+  (setq git-messenger:use-magit-popup t)
+  :config
+  (progn
+    (define-key git-messenger-map (kbd "RET") 'git-messenger:popup-close))
+)
+#+END_SRC
+
+** git-ignore mode
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  ;; Mode for .gitignore files.
+(use-package gitignore-mode
+  :ensure t
+)
+#+END_SRC
+
+** git-time-machine
+
+Navigation through the history of files
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package git-timemachine
+  :ensure t
+  :bind
+  ("C-c g t" . git-timemachine-toggle)
 )
 #+END_SRC
 
@@ -2361,6 +2462,71 @@ by giving them a slightly different -- often brighter -- background.
 )
 #+END_SRC
 
+* Interface Enhancement
+
+** discover
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(require 'discover)
+(when (featurep 'discover)
+  (discover-add-context-menu
+    :context-menu '(isearch
+              (description "Isearch, occur and highlighting")
+              (lisp-switches
+               ("-cf" "Case should fold search" case-fold-search t nil))
+              (lisp-arguments
+               ("=l" "context lines to show (occur)"
+                "list-matching-lines-default-context-lines"
+                (lambda (dummy) (interactive) (read-number "Number of context lines to show: "))))
+              (actions
+               ("Isearch"
+                ("_" "isearch forward symbol" isearch-forward-symbol)
+                ("w" "isearch forward word" isearch-forward-word))
+               ("Occur"
+                ("o" "occur" occur))
+               ("More"
+                ("h" "highlighters ..." makey-key-mode-popup-isearch-highlight))))
+    :bind "M-s"
+  )
+
+  (discover-add-context-menu
+    :context-menu '(dired)
+    :bind "?"
+    :mode 'dired-mode
+    :mode-hook 'dired-mode-hook
+  )
+)
+#+END_SRC
+** zoom
+
+Auto balance windows and frames
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package zoom
+  :ensure t
+  :bind
+  ("C-S-x +" . zoom)
+  :init
+  (setq zoom-size '(0.618 . 0.618))
+  (setq zoom-ignored-major-modes '(dired-mode markdown-mode))
+  (setq zoom-ignored-buffer-names '("zoom.el" "init.el"))
+  (setq zoom-ignored-buffer-name-regexps '("^*calc"))
+  :config
+  (zoom-mode t)
+)
+#+END_SRC
+
+** goto-line-preview
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package goto-line-preview
+  :ensure t
+  :config
+  (global-set-key [remap goto-line] 'goto-line-preview)
+)
+#+END_SRC
+
+
 * centaur-tabs
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -2412,9 +2578,21 @@ by giving them a slightly different -- often brighter -- background.
   (setq which-key-max-display-columns 6)
 #+END_SRC
 
+** key-frequency
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package keyfreq
+  :disabled
+  :ensure t
+  :init
+  (keyfreq-mode 1)
+  (keyfreq-autosave-mode 1)
+)
+#+END_SRC
+
 ** diff-hl (highlights uncommited diffs in bar aside from the line numbers)
 
- #+BEGIN_SRC emacs-lisp :tangle init.el
+#+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package diff-hl
   :ensure t
   :hook
@@ -2439,6 +2617,7 @@ by giving them a slightly different -- often brighter -- background.
   (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
   (setq diff-hl-side 'left)
   (setq diff-hl-margin-side 'left)
+
 
   (diff-hl-margin-mode 1) ;; show the indicators in the margin
   (diff-hl-flydiff-mode 1) ;;  ;; On-the-fly diff updates
@@ -2642,7 +2821,7 @@ Helps editing lisp code
 (use-package scss-mode
   :ensure t
   ;; this mode doenst load using :mode from use-package, dunno why
-  ;; :mode "\\.scss\\'"
+  :mode "\\.scss\\'"
   :init
   (setq scss-compile-at-save 'nil)
   :config
@@ -2654,17 +2833,17 @@ Helps editing lisp code
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package helm-css-scss
   :ensure t
-  :bind
+  :bind (
   (:map isearch-mode-map
   ("s-i" . helm-css-scss-from-isearch)
   :map helm-css-scss-map
   ("s-i" . helm-css-scss-multi-from-helm-css-scss)
   :map css-mode-map
   ("s-i" . helm-css-scss)
-  ("s-I" . helm-css-scss-back-to-last-point)
+  ("s-S-I" . helm-css-scss-back-to-last-point)
   :map scss-mode-map
   ("s-i" . helm-css-scss)
-  ("s-I" . helm-css-scss-back-to-last-point)
+  ("s-S-I" . helm-css-scss-back-to-last-point))
   )
   :config
   (setq helm-css-scss-insert-close-comment-depth 2
@@ -2688,6 +2867,10 @@ Helps editing lisp code
   (setq web-mode-markup-indent-offset 4)
   (setq web-mode-css-indent-offset 2)
   (setq web-mode-code-indent-offset 2)
+
+  ;; Use tidy to check HTML buffers with web-mode.
+  (eval-after-load 'flycheck
+     '(flycheck-add-mode 'html-tidy 'web-mode))
 )
 #+END_SRC
 
@@ -3201,6 +3384,24 @@ https://github.com/felipeochoa/rjsx-mode
 )
 #+END_SRC
 
+
+* fun packages
+
+** xkcd
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package xkcd
+:ensure t
+)
+#+END_SRC
+
+** fireplaces
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package fireplace
+  :ensure t
+)
+#+END_SRC
 
 * Copy/Paste To/From System's Clipboard =D
 this was supposed to be on the helper functions and macro section at the beggining of the file
