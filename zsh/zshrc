@@ -23,6 +23,7 @@ plugins=(
     docker
     docker-compose
     fzf
+    tmux
     tmuxinator
     # custom (installed) plugins
     zsh-syntax-highlighting
@@ -41,7 +42,7 @@ prompt pure > /dev/null
 
 #########################################
 # my aliases
-[[ -e ~/.aliases ]] && emulate sh -c 'source ~/.aliases'
+[[ -e $HOME/.aliases ]] && emulate sh -c 'source $HOME/.aliases'
 
 #########################################
 # ZSH settings
@@ -58,7 +59,7 @@ COMPLETION_WAITING_DOTS="true"
 
 # save history (show previous used commands)
 SAVEHIST=1000
-HISTFILE=~/.zsh_history
+HISTFILE=$HOME/.zsh_history
 
 #########################################
 # fzf (replaced by oh-my-zsh native fzf plugin)
@@ -71,10 +72,14 @@ bindkey "${terminfo[kend]}" end-of-line
 
 #########################################
 # Tmux
-if [[ $DISPLAY ]]; then
-  [[ $- != *i* ]] && return
-  [[ -z "$TMUX" ]] && exec tmux
-fi
+# ZSH_TMUX_AUTOSTART="true"
+ZSH_TMUX_AUTOSTART_ONCE="true"
+
+# THIS WAS GIVING ME ERRORS WITH EMACS PACKAGE `exec-path-from-shell`
+# if [[ $DISPLAY ]]; then
+#   [[ $- != *i* ]] && return
+#   [[ -z "$TMUX" ]] && tmux -e zsh
+# fi
 
 #########################################
 # ASDF
@@ -119,19 +124,19 @@ load-nvmrc
 #########################################
 # Preferred editor for local and remote sessions
 
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
+if [[ -n $SSH_CONNECTION ]]; then
+  export EDITOR='vim'
+else
+  export EDITOR='mvim'
+fi
 
 #########################################
 # ssh
-export SSH_KEY_PATH="~/.ssh/rsa_id"
+export SSH_KEY_PATH="$HOME/.ssh/rsa_id"
 
 #########################################
 # Example aliases
-alias zshconfig="vim ~/.zshrc"
-alias ohmyzsh="vim ~/.oh-my-zsh"
+alias zshconfig="vim $HOME/.zshrc"
+alias ohmyzsh="vim $HOME/.oh-my-zsh"
 
-export YVM_DIR=/home/tau/.yvm
+export YVM_DIR=$HOME/.yvm

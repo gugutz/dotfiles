@@ -53,7 +53,11 @@ tangled, and the tangled file is compiled."
   (require 'use-package))
 
 (use-package use-package-ensure-system-package
-  :ensure t)
+  :ensure t
+  :init
+  ;; use sudo when needed
+  (setq system-packages-use-sudo t)
+)
 
 (require 'use-package-ensure)
 ;; (setq use-package-always-ensure t)
@@ -77,6 +81,14 @@ tangled, and the tangled file is compiled."
 (require 'server)
 (unless (or (daemonp) (server-running-p))
   (server-start))
+
+(use-package visual-line-mode
+  :ensure nil
+  :hook
+  (after-init . visual-line-mode)
+  (prog-mode . visual-line-mode)
+  (text-mode . visual-line-mode)
+)
 
 (setq create-lockfiles nil)
 
@@ -167,6 +179,10 @@ tangled, and the tangled file is compiled."
 (show-paren-mode t)
 
 (setq-default indent-tabs-mode nil)
+;; C e C-like langs default indent size
+(setq-default tab-width 2)
+;; Perl default indent size
+(setq-default cperl-basic-offset 2)
 (setq-default c-basic-offset 2)
 
 (add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode))
@@ -209,6 +225,18 @@ tangled, and the tangled file is compiled."
   (prog-mode . highlight-parentheses-mode)
 )
 
+;; NOTE that the highlighting works even in comments.
+(use-package hl-todo
+  :hook
+  (prog-mode . hl-todo-mode)
+  (text-mode . hl-todo-mode)
+  :config
+  ;; Adding a new keyword: TEST.
+  (add-to-list 'hl-todo-keyword-faces '("TEST" . "#dc8cc3"))
+  :init
+  ;; (add-hook 'text-mode-hook (lambda () (hl-todo-mode t)))
+)
+
 (defun upcase-backward-word (arg)
   (interactive "p")
   (upcase-word (- arg))
@@ -229,22 +257,124 @@ tangled, and the tangled file is compiled."
 ;; this replaces native capitlize word!
 (global-set-key (kbd "M-c")	 'capitalize-backward-word)
 
+(use-package hi-lock
+  :init
+  (global-hi-lock-mode 1)
+  :config
+  (add-hook 'hi-lock-mode-hook
+          (lambda nil
+            (highlight-regexp "FIXME" 'hi-red-b)
+            (highlight-regexp "NOTE" 'hi-red-b)
+            (highlight-regexp "TODO" 'hi-red-b))
+  )
+  ;; always highlight patterns found in files without confirmation
+  (setq hi-lock-file-patterns-policy #'(lambda (dummy) t))
+)
+
 (defconst *spell-check-support-enabled* t) ;; Enable with t if you prefer
+
+;(defun fd-switch-dictionary()
+;(interactive)
+;(let* ((dic ispell-current-dictionary)
+;    (change (if (string= dic "deutsch8") "english" "deutsch8")))
+;  (ispell-change-dictionary change)
+;  (message "Dictionary switched from %s to %s" dic change)
+;  ))
+
+;(global-set-key (kbd "<f12>")   'fd-switch-dictionary)
+
+;; Change dictionaries with F12 (teste pt-br)
+(let ((langs '("american" "brasileiro")))
+  (setq lang-ring (make-ring (length langs)))
+  (dolist (elem langs) (ring-insert lang-ring elem))
+)
+
+(defun cycle-ispell-languages ()
+   (interactive)
+   (let ((lang (ring-ref lang-ring -1)))
+     (ring-insert lang-ring lang)
+     (ispell-change-dictionary lang))
+)
+
+(global-set-key (kbd "<f12>")   'cycle-ispell-languages)
 
 (use-package flyspell
   :defer 1
   :hook
   (text-mode . flyspell-mode)
+  :config
+  ;; ignore org source blocks from spellchecking
+  (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
+  (add-to-list 'ispell-skip-region-alist '("^#+BEGIN_SRC" . "^#+END_SRC"))
+
+  ;; global ispell settings (disabled in favor of conditional hunspell setup bellow)
+  ;; (setenv "LANG" "en_US.UTF-8")
+  ;; (setq ispell-program-name "aspell")
+  ;; (setq ispell-program-name "hunspell")
+  ;; (setq ispell-dictionary "en_US")
+  ;; (setq ispell-local-dictionary "pt_BR")
+  ;; (setq ispell-local-dictionary "en_US")
+
+  ;; Hunspell settings
+  ;; find aspell and hunspell automatically
+;;  (cond
+;;    ;; try aspell first in case both aspell and hunspell are installed, it will
+;;    ;; set `ispell-program-name' to use hunspell
+;;    ((executable-find "aspell")
+;;      (setq ispell-program-name "aspell")
+;;      ;; Please note `ispell-extra-args' contains ACTUAL parameters passed to aspell
+;;      (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US"))
+;;      ;;(setq ispell-local-dictionary "pt_BR")
+;;    )
+;;   ;; if hunspell is available, use it instead of aspell for multilang support
+;;    ((executable-find "hunspell")
+;;      (setq ispell-program-name "hunspell")
+;;      ;; i could set `ispell-dictionary' instead but `ispell-local-dictionary' has higher priority
+;;      (setq ispell-local-dictionary "en_US")
+;;      ;; setup both en_US and pt_BR dictionaries in hunspell
+;;      (ispell-hunspell-add-multi-dic "en_US,pt_BR")
+;;
+;;      (setq ispell-local-dictionary-alist
+;;         ;; Please note the list `("-d" "en_US")` contains ACTUAL parameters passed to hunspell
+;;         ;; You could use `("-d" "en_US,en_US-med")` to check with multiple dictionaries
+;;         '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US,pt_BR") nil utf-8))
+;;      )
+;;    )
+;;  )
+
+)
+
+(use-package guess-language         ; Automatically detect language for Flyspell
+  :ensure t
+  :defer t
+  :hook
+  (text-mode . guess-language-mode)
+  ;; :init (add-hook 'text-mode-hook #'guess-language-mode)
+  :config
+  (setq guess-language-langcodes '((en . ("en_US" "English"))
+                                   (br . ("pt_BR" "Portuguese Brazilian"))
+                                  )
+  guess-language-languages '(en br)
+  guess-language-min-paragraph-length 45)
 )
 
 (require 'epa-file)
 (epa-file-enable)
 
 (use-package exec-path-from-shell
-  :if (memq window-system '(mac ns))
+  :if (memq window-system '(mac ns x))
   :ensure t
+  :init
+  ;;(setenv "SHELL" "/bin/zsh")
+  ;;(setq explicit-shell-file-name "/bin/zsh")
+  ;;(setq shell-file-name "zsh")
   :config
+  ;; This sets $MANPATH, $PATH and exec-path from your shell, but only on OS X and Linux.
   (exec-path-from-shell-initialize)
+  ;; Its possible to copy values from other SHELL variables using one of the two methods bellow
+  ;; either using the `exec-path-from-shell-copy-env' functon or setting the variable `exec-path-from-shell-variables'
+  ;; (exec-path-from-shell-copy-env "PYTHONPATH")
+  ;; (setq exec-path-from-shell-variables '("PYTHONPATH" "GOPATH"))
 )
 
 (when (eq window-system nil)
@@ -489,6 +619,137 @@ tangled, and the tangled file is compiled."
   (global-evil-matchit-mode 1)
 )
 
+(use-package corral
+  :bind
+  ("M-9" . corral-parentheses-backward)
+  :config
+  (setq corral-preserve-point t)
+  ;;(global-set-key (kbd "M-9") 'corral-parentheses-backward)
+  (global-set-key (kbd "M-0") 'corral-parentheses-forward)
+  (global-set-key (kbd "M-[") 'corral-brackets-backward)
+  (global-set-key (kbd "M-]") 'corral-brackets-forward)
+  (global-set-key (kbd "M-{") 'corral-braces-backward)
+  (global-set-key (kbd "M-}") 'corral-braces-forward)
+  (global-set-key (kbd "M-\"") 'corral-double-quotes-backward)
+)
+
+(use-package helpful
+  :ensure t
+  :config
+  (global-set-key (kbd "C-h f") #'helpful-callable)
+  (global-set-key (kbd "C-h v") #'helpful-variable)
+  (global-set-key (kbd "C-h k") #'helpful-key)
+
+  ;; Lookup the current symbol at point. C-c C-d is a common keybinding
+  ;; for this in lisp modes.
+  (global-set-key (kbd "C-c C-d") #'helpful-at-point)
+
+  ;; Look up *F*unctions (excludes macros).
+  ;;
+  ;; By default, C-h F is bound to `Info-goto-emacs-command-node'. Helpful
+  ;; already links to the manual, if a function is referenced there.
+  (global-set-key (kbd "C-h F") #'helpful-function)
+
+  ;; Look up *C*ommands.
+  ;;
+  ;; By default, C-h C is bound to describe `describe-coding-system'. I
+  ;; don't find this very useful, but it's frequently useful to only
+  ;; look at interactive functions.
+  (global-set-key (kbd "C-h C") #'helpful-command)
+)
+
+(use-package paredit
+  :ensure t
+  :config
+  (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+  (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+  (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+  (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+)
+
+
+
+(use-package evil-paredit
+  :ensure t
+  :hook
+  (emacs-lisp-mode . evil-paredit-mode)
+)
+
+(use-package parinfer
+  :ensure t
+  :bind
+  ("C-," . parinfer-toggle-mode)
+  :init
+  (progn
+    (setq parinfer-extensions
+          '(defaults       ; should be included.
+            pretty-parens  ; different paren styles for different modes.
+            evil           ; If you use Evil.
+            ;lispy          ; If you use Lispy. With this extension, you should install Lispy and do not enable lispy-mode directly.
+            paredit        ; Introduce some paredit commands.
+            smart-tab      ; C-b & C-f jump positions and smart shift with tab & S-tab.
+            smart-yank))   ; Yank behavior depend on mode.
+    (add-hook 'clojure-mode-hook #'parinfer-mode)
+    (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)
+    (add-hook 'common-lisp-mode-hook #'parinfer-mode)
+    (add-hook 'scheme-mode-hook #'parinfer-mode)
+    (add-hook 'lisp-mode-hook #'parinfer-mode))
+    :config
+    ;; auto switch to Indent Mode whenever parens are balance in Paren Mode
+    (setq parinfer-auto-switch-indent-mode nil)  ;; default is nil
+    (setq parinfer-lighters '(" Parinfer:Indent" . "Parinfer:Paren"))
+
+)
+
+(use-package elisp-format
+  :ensure t
+)
+
+(defun /shell/new-window ()
+    "Opens up a new shell in the directory associated with the current buffer's file."
+    (interactive)
+    (let* ((parent (if (buffer-file-name)
+                        (file-name-directory (buffer-file-name))
+                    default-directory))
+            (height (/ (window-total-height) 3))
+            (name   (car (last (split-string parent "/" t)))))
+        (split-window-vertically (- height))
+        (other-window 1)
+        (shell "new")
+        (rename-buffer (concat "*shell: " name "*"))
+        (insert (concat "ls"))
+    )
+)
+
+; Pull system shell in a new bottom window
+(define-key evil-normal-state-map (kbd "\"") #'/shell/new-window)
+(define-key evil-visual-state-map (kbd "\"") #'/shell/new-window)
+(define-key evil-motion-state-map (kbd "\"") #'/shell/new-window)
+
+(defun /eshell/new-window ()
+    "Opens up a new eshell in the directory associated with the current buffer's file.  The eshell is renamed to match that directory to make multiple eshell windows easier."
+    (interactive)
+    (let* ((parent (if (buffer-file-name)
+                       (file-name-directory (buffer-file-name))
+                     default-directory))
+           (height (/ (window-total-height) 3))
+           (name   (car (last (split-string parent "/" t)))))
+      (split-window-vertically (- height))
+      (other-window 1)
+      (eshell "new")
+      (rename-buffer (concat "*eshell: " name "*"))
+
+      (insert (concat "ls"))
+      (eshell-send-input)))
+
+; Pull eshell in a new bottom window
+(define-key evil-normal-state-map (kbd "!") #'/eshell/new-window)
+(define-key evil-visual-state-map (kbd "!") #'/eshell/new-window)
+(define-key evil-motion-state-map (kbd "!") #'/eshell/new-window)
+
 (use-package restclient
   :ensure t
   :mode "\\.rest$"
@@ -537,22 +798,24 @@ tangled, and the tangled file is compiled."
   ;;(add-hook 'org-mode-hook
   ;;          (lambda ()
   ;;        (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
-  ;; ox-extras
-  ;; add suport for the ignore tag (ignores a headline without ignoring its content)
-;;  (require ox-extra)
-;;  (ox-extras-activate '(ignore-headlines))
+
   ;; general org config variables
   (setq org-log-done 'time)
   (setq org-export-backends (quote (ascii html icalendar latex md odt)))
   (setq org-use-speed-commands t)
+
+  ;; dont display atual width for images inline. set per-file with
+  ;; #+ATTR_HTML: :width 600px :height: auto
+  ;; #+ATTR_ORG: :width 600
+  ;; #+ATTR_LATEX: :width 5in
+  (setq org-image-actual-width nil)
+
   (setq org-confirm-babel-evaluate 'nil)
   (setq org-todo-keywords
    '((sequence "TODO" "IN-PROGRESS" "REVIEW" "|" "DONE")))
   (setq org-agenda-window-setup 'other-window)
-  ;; Show CLOSED tag line in closed TODO items
-  (setq org-log-done 'time)
-  ;; Prompt to leave a note when closing an item
-  (setq org-log-done 'note)
+  (setq org-log-done 'time) ;; Show CLOSED tag line in closed TODO items
+  (setq org-log-done 'note) ;; Prompt to leave a note when closing an item
 
   ;;ox-twbs (exporter to twitter bootstrap html)
   (setq org-enable-bootstrap-support t)
@@ -565,6 +828,10 @@ tangled, and the tangled file is compiled."
           org-latex-pdf-process
           '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
             "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")))
+
+  ;; org-capture
+  (setq org-default-notes-file (concat org-directory "/notes.org"))
+
 )
 
 (use-package ox-extra
@@ -632,9 +899,26 @@ tangled, and the tangled file is compiled."
   :after org
 )
 
+(use-package auctex-latexmk
+  :defer t
+  :init
+  (add-hook 'LaTeX-mode-hook 'auctex-latexmk-setup)
+)
+
+(use-package company-auctex
+  :ensure t
+  :defer t
+  :init
+  (add-hook 'LaTeX-mode-hook 'company-auctex-init)
+)
+
 (use-package tex
   :ensure auctex
   :defer t
+  :hook
+  (LaTeX-mode . visual-line-mode)
+  (LaTeX-mode . flyspell-mode)
+  (LaTeX-mode . LaTeX-math-mode)
   :custom
   (TeX-auto-save t)
   (TeX-parse-self t)
@@ -645,6 +929,10 @@ tangled, and the tangled file is compiled."
   (TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view")))
   (TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
   :config
+  (setq TeX-PDF-mode t) ;; compile to PDF by default
+  (setq org-export-with-smart-quotes t) ;; convert quotes to LaTeX smartquotes on export
+
+
   (if (version< emacs-version "26")
     (add-hook LaTeX-mode-hook #'display-line-numbers-mode))
   (add-hook 'LaTeX-mode-hook
@@ -655,6 +943,78 @@ tangled, and the tangled file is compiled."
         (setq TeX-PDF-mode t)
         (setq TeX-source-correlate-method 'synctex)
         (setq TeX-source-correlate-start-server t)))
+)
+
+(add-to-list 'org-latex-classes
+	      '("beamer"
+	        "\\documentclass\[presentation\]\{beamer\}"
+	        ("\\section\{%s\}" . "\\section*\{%s\}")
+	        ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
+	        ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}"))
+)
+
+;(add-to-list 'org-latex-classes
+;        '("memoir"
+;          "\\documentclass\[a4paper\]\{memoir\}"
+;          ("\\book\{%s\}" . "\\book*\{%s\}")
+;          ("\\part\{%s\}" . "\\part*\{%s\}")
+;          ("\\chapter\{%s\}" . "\\chapter*\{%s\}")
+;          ("\\section\{%s\}" . "\\section*\{%s\}")
+;          ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
+;          ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}"))
+;)
+
+;(add-to-list 'org-latex-classes
+;             '("abntex2"
+;               "\\documentclass{abntex2}"
+;               ("\\part{%s}" . "\\part*{%s}")
+;               ("\\chapter{%s}" . "\\chapter*{%s}")
+;               ("\\section{%s}" . "\\section*{%s}")
+;               ("\\subsection{%s}" . "\\subsection*{%s}")
+;               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+;               ("\\subsubsubsection{%s}" . "\\subsubsubsection*{%s}")
+;               ("\\paragraph{%s}" . "\\paragraph*{%s}"))
+;)
+
+(add-to-list 'org-latex-classes
+             '("abntex2"
+               "\\documentclass{abntex2}"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\subsubsubsection{%s}" . "\\subsubsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}"))
+)
+
+(use-package magit
+  :ensure t
+  :custom
+  (magit-auto-revert-mode nil)
+  :bind
+  ("M-g s" . magit-status)
+  ("C-x g" . magit-status)
+)
+
+(use-package magit-todos
+  :ensure t
+  :after magit
+  :after hl-todo
+  :bind
+  ("M-g t" . magit-todos-list)
+  :config
+  (magit-todos-mode)
+)
+
+(use-package evil-magit
+  :ensure t
+  :init
+;;  (evil-magit-init)
+  (setq evil-magit-state 'normal)
+  (setq evil-magit-use-y-for-yank nil)
+  :config
+  (evil-define-key evil-magit-state magit-mode-map "j" 'magit-log-popup)
+  (evil-define-key evil-magit-state magit-mode-map "k" 'evil-next-visual-line)
+  (evil-define-key evil-magit-state magit-mode-map "l" 'evil-previous-visual-line)
 )
 
 (use-package helm
@@ -681,7 +1041,11 @@ tangled, and the tangled file is compiled."
   (setq helm-bookmark-show-location t)
   (setq helm-buffer-max-length 40)
   (setq helm-split-window-inside-p t)
+
+  ;; turn on helm fuzzy matching
+  (setq helm-M-x-fuzzy-match t)
   (setq helm-mode-fuzzy-match t)
+
   (setq helm-ff-file-name-history-use-recentf t)
   (setq helm-ff-skip-boring-files t)
   (setq helm-follow-mode-persistent t)
@@ -705,58 +1069,30 @@ tangled, and the tangled file is compiled."
   :init (setq helm-ag-insert-at-point 'symbol
 	      helm-ag-command-option "--path-to-ignore ~/.agignore"))
 
-(use-package projectile
+(use-package helm-rg
   :ensure t
-  :bind
-  (:map projectile-mode-map
-  ("s-p" . projectile-command-map)
-  ("C-c p" . projectile-command-map)
-  )
-  :config
-  (projectile-mode +1)
-  (setq projectile-globally-ignored-files
-        (append '("~"
-                  ".swp"
-                  ".pyc")
-                projectile-globally-ignored-files))
+  :defer t
 )
 
-(use-package helm-projectile
+(use-package rg
   :ensure t
-;  :after projectile
-;  :demand t
+  :defer t
+  :ensure-system-package
+  (rg . ripgrep)
   :config
-  (helm-projectile-on)
+  ;; choose between default keybindings or magit like menu interface.
+  ;; both options are mutually exclusive
+  (rg-enable-default-bindings)
+  ;;(rg-enable-menu)
+
 )
 
-(use-package dired-k
-  :after dired
-  :config
-  (setq dired-k-style 'git)
-  (setq dired-k-human-readable t)
-  (setq dired-dwin-target t)
-  (add-hook 'dired-initial-position-hook #'dired-k)
-)
-
-(use-package magit
+(use-package helm-fuzzier
+  :disabled nil
   :ensure t
-  :custom
-  (magit-auto-revert-mode nil)
-  :bind
-  ("M-g s" . magit-status)
-  ("C-x g" . magit-status)
-)
-
-(use-package evil-magit
-  :ensure t
-  :init
-;;  (evil-magit-init)
-  (setq evil-magit-state 'normal)
-  (setq evil-magit-use-y-for-yank nil)
+  :after helm
   :config
-  (evil-define-key evil-magit-state magit-mode-map "j" 'magit-log-popup)
-  (evil-define-key evil-magit-state magit-mode-map "k" 'evil-next-visual-line)
-  (evil-define-key evil-magit-state magit-mode-map "l" 'evil-previous-visual-line)
+  (helm-fuzzier-mode 1)
 )
 
 (use-package flycheck
@@ -809,6 +1145,47 @@ tangled, and the tangled file is compiled."
                   (concat contents (when contents "\n") msg))
             (quick-peek-update ov)))
         flycheck-inline-clear-function #'quick-peek-hide))
+
+;;; Show Flycheck errors in tooltip
+(use-package flycheck-pos-tip
+  :ensure t
+  ;;:disabled t
+  :after flycheck
+  :config (flycheck-pos-tip-mode)
+)
+
+(use-package projectile
+  :ensure t
+  :bind
+  (:map projectile-mode-map
+  ("s-p" . projectile-command-map)
+  ("C-c p" . projectile-command-map)
+  )
+  :config
+  (projectile-mode +1)
+  (setq projectile-globally-ignored-files
+        (append '("~"
+                  ".swp"
+                  ".pyc")
+                projectile-globally-ignored-files))
+)
+
+(use-package helm-projectile
+  :ensure t
+;  :after projectile
+;  :demand t
+  :config
+  (helm-projectile-on)
+)
+
+(use-package dired-k
+  :after dired
+  :config
+  (setq dired-k-style 'git)
+  (setq dired-k-human-readable t)
+  (setq dired-dwin-target t)
+  (add-hook 'dired-initial-position-hook #'dired-k)
+)
 
 (use-package treemacs
   :ensure t
@@ -938,47 +1315,13 @@ tangled, and the tangled file is compiled."
 (setq dired-sidebar-use-term-integration t)
 (setq dired-sidebar-use-custom-font t)
 
-(defun /shell/new-window ()
-    "Opens up a new shell in the directory associated with the current buffer's file."
-    (interactive)
-    (let* ((parent (if (buffer-file-name)
-                        (file-name-directory (buffer-file-name))
-                    default-directory))
-            (height (/ (window-total-height) 3))
-            (name   (car (last (split-string parent "/" t)))))
-        (split-window-vertically (- height))
-        (other-window 1)
-        (shell "new")
-        (rename-buffer (concat "*shell: " name "*"))
-        (insert (concat "ls"))
-    )
+(use-package ranger
+  :ensure t
+  :bind
+  ("C-x C-j" . ranger)
+  :config
+  (setq ranger-show-hidden t) ;; show hidden files
 )
-
-; Pull system shell in a new bottom window
-(define-key evil-normal-state-map (kbd "\"") #'/shell/new-window)
-(define-key evil-visual-state-map (kbd "\"") #'/shell/new-window)
-(define-key evil-motion-state-map (kbd "\"") #'/shell/new-window)
-
-(defun /eshell/new-window ()
-    "Opens up a new eshell in the directory associated with the current buffer's file.  The eshell is renamed to match that directory to make multiple eshell windows easier."
-    (interactive)
-    (let* ((parent (if (buffer-file-name)
-                       (file-name-directory (buffer-file-name))
-                     default-directory))
-           (height (/ (window-total-height) 3))
-           (name   (car (last (split-string parent "/" t)))))
-      (split-window-vertically (- height))
-      (other-window 1)
-      (eshell "new")
-      (rename-buffer (concat "*eshell: " name "*"))
-
-      (insert (concat "ls"))
-      (eshell-send-input)))
-
-; Pull eshell in a new bottom window
-(define-key evil-normal-state-map (kbd "!") #'/eshell/new-window)
-(define-key evil-visual-state-map (kbd "!") #'/eshell/new-window)
-(define-key evil-motion-state-map (kbd "!") #'/eshell/new-window)
 
 (use-package ace-jump-mode
   :ensure t
@@ -1227,6 +1570,73 @@ tangled, and the tangled file is compiled."
 ;;   ;;  NOTE: This is necessary for themes in the doom-themes package!
 ;;   (solaire-mode-swap-bg))
 
+(use-package sublimity
+  :ensure t
+  :config
+  (setq sublimity-scroll-weight 10
+      sublimity-scroll-drift-length 5)
+  ;; this is the only part of the config where i use `use-package' inside another package config.
+  ;; the oficial docs appears to suggest this way
+  (sublimity-mode 1)
+)
+
+(use-package sublimity-scroll
+  :ensure nil
+  :config
+  (setq sublimity-scroll-weight 10)
+  (setq sublimity-scroll-drift-length 5)
+)
+
+(use-package sublimity-map
+  :disabled t
+  :ensure nil
+  :config
+  (setq sublimity-map-size 18)  ;; minimap width
+  (setq sublimity-map-fraction 0.3)
+  (setq sublimity-map-text-scale -7)
+  (sublimity-map-set-delay 4) ;; minimap is displayed after 5 seconds of idle time
+
+  ;; document this snippet better, not sure what it does, but it defines the font-family
+  (add-hook 'sublimity-map-setup-hook
+          (lambda ()
+            (setq buffer-face-mode-face '(:family "Monospace"))
+            (buffer-face-mode)))
+
+)
+
+(use-package sublimity-attractive
+  :disabled nil
+  :ensure nil
+  :config
+  (setq sublimity-attractive-centering-width 110)
+
+  ;; these are functions (NOT variables) to configure some UI parts
+  ;; (sublimity-attractive-hide-bars)
+  ;; (sublimity-attractive-hide-vertical-border)
+  ;; (sublimity-attractive-hide-fringes)
+  ;; (sublimity-attractive-hide-modelines)
+)
+
+(use-package fancy-battery
+  :ensure t
+  :config
+  (add-hook 'after-init-hook #'fancy-battery-mode)
+)
+
+(use-package beacon
+  :ensure t
+  :config
+  (setq beacon-blink-when-window-scrolls nil)
+  (setq beacon-dont-blink-major-modes '(t pdf-view-mode))
+  (setq beacon-size 10)
+  (beacon-mode 1)
+)
+
+(use-package dimmer
+  :ensure t
+  :config (dimmer-mode)
+)
+
 (use-package centaur-tabs
    ;; :load-path "~/.emacs.d/other/centaur-tabs"
    :hook
@@ -1268,7 +1678,35 @@ tangled, and the tangled file is compiled."
   (setq which-key-max-description-length 20)
   (setq which-key-max-display-columns 6)
 
-(global-diff-hl-mode)
+(use-package diff-hl
+  :ensure t
+  :hook
+  (prog-mode . diff-hl-mode)
+  (org-mode . diff-hl-mode)
+  (dired-mode . diff-hl-mode)
+  (magit-post-refresh . diff-hl-mode)
+  :init
+  ;; (add-hook 'prog-mode-hook #'diff-hl-mode)
+  ;; (add-hook 'org-mode-hook #'diff-hl-mode)
+  ;; (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+  ;; (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+
+  ;; Better looking colours for diff indicators
+  (custom-set-faces
+    '(diff-hl-change ((t (:background "#3a81c3"))))
+    '(diff-hl-insert ((t (:background "#7ccd7c"))))
+    '(diff-hl-delete ((t (:background "#ee6363"))))
+  )
+
+  :config
+  (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
+  (setq diff-hl-side 'left)
+  (setq diff-hl-margin-side 'left)
+
+  (diff-hl-margin-mode 1) ;; show the indicators in the margin
+  (diff-hl-flydiff-mode 1) ;;  ;; On-the-fly diff updates
+  (global-diff-hl-mode 1) ;; Enable diff-hl globally
+)
 
 (use-package smartparens
   :ensure t
@@ -1549,6 +1987,12 @@ tangled, and the tangled file is compiled."
     (add-hook 'typescript-mode-hook #'setup-tide-mode)
     (add-hook 'js2-mode-hook #'setup-tide-mode)
   )
+)
+
+(use-package ng2-mode
+  :defer
+  :hook
+  (ng2-mode . prettier-js-mode)
 )
 
 (require 'dockerfile-mode)

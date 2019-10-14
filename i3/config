@@ -144,9 +144,10 @@ set $browser brave
 
 # define main terminal as st in tmux (suckless terminal)
 # this make tmux use a main session and doenst spawn multiple unused sessions
-# set $terminal st -e tmux new-session -A -s "main-session"
+set $terminal st -e tmux new-session -A -s "main-session"
 # set $terminal       st -e tmux new-session
-set $terminal       st
+# disabled bellow snippet to start using the above one again which starts tmux, because the zsh setting that autoloaded tmux was giving errors on emacs package `exec-path-from-shell` by saying `tmux` was not a terminal
+# set $terminal       st
 
 # define default text editor
 # set $editor st -e tmux new-session -A -s "emacs-session" emacs -t -nw

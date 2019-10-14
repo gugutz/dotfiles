@@ -12,6 +12,9 @@ echo "install ttf-all-the-icons from aur"
 echo "this cant be `--noconfirm` because it replaces a lib and requires confirmation"
 yay -S ttf-all-the-icons
 
+echo "## install pandoc for document generation in org mode"
+yay -S emacs-all-the-icons
+
 echo "install ag searcher for dumb-jump to work better"
 sudo pacman -S --noconfirm the_silver_searcher
 
@@ -28,3 +31,7 @@ tar -xvf angular-language-server --directory ~/.angular
 
 echo "## install pandoc for document generation in org mode"
 sudo pacman -S --noconfirm pandoc
+
+echo "## install Hunspell dictionaries for spellchecking with multiple dicts in emacs"
+sudo pacman -S --noconfirm hunspell-pt_br
+sudo pacman -S --noconfirm hunspell-en_US
