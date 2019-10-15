@@ -23,37 +23,23 @@ tangled, and the tangled file is compiled."
 (package-initialize)
 
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(TeX-after-compilation-finished-functions (quote TeX-revert-document-buffer) t)
- '(TeX-auto-save t t)
- '(TeX-master nil t)
- '(TeX-parse-self t t)
- '(TeX-view-program-list (quote (("pdf-tools" "TeX-pdf-tools-sync-view"))) t)
- '(TeX-view-program-selection (quote ((output-pdf "pdf-tools"))) t)
- '(custom-safe-themes
+;; custom-set-variables was added by Custom.
+;; If you edit it by hand, you could mess it up, so be careful.
+;; Your init file should contain only one such instance.
+;; If there is more than one, they won't work right.
+'(custom-safe-themes
    (quote
-    ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
- '(fci-rule-color "#3E4451")
- '(flycheck-display-errors-delay 1)
- '(jiralib-url "https://stairscreativestudio.atlassian.net" t)
- '(magit-auto-revert-mode nil)
- '(package-selected-packages
-   (quote
-    (fireplace xkcd goto-line-preview zoom pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
-   
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(css-selector ((t (:inherit default :foreground "#66CCFF"))))
- '(diff-hl-change ((t (:background "#3a81c3"))))
- '(diff-hl-delete ((t (:background "#ee6363"))))
- '(diff-hl-insert ((t (:background "#7ccd7c"))))
- '(font-lock-comment-face ((t (:foreground "#828282")))))
+   ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
+   '(fci-rule-color "#3E4451")
+   '(package-selected-packages
+     (quote
+     (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
+   (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   )
 
 (add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
 ;; (add-to-list 'load-path "~/dotfiles/emacs.d/config")
@@ -301,6 +287,35 @@ tangled, and the tangled file is compiled."
   )
   ;; always highlight patterns found in files without confirmation
   (setq hi-lock-file-patterns-policy #'(lambda (dummy) t))
+)
+
+(use-package hl-anything
+  :ensure t
+  :after evil
+;;  :hook
+;;  (kill-emacs . hl-save-highlights)
+  :bind
+  ("C-<f8> h" . hl-highlight-thingatpt-local)
+  ("C-<f8> S-h" . hl-highlight-thingatpt-global)
+  ("C-<f8> u l" . hl-unhighlight-all-local)
+  ("C-<f8> u g" . hl-unhighlight-all-global)
+  ("C-<f8> n" . hl-find-next-thing)
+  ("C-<f8> p" . hl-find-prev-thing)
+  ("C-<f8> s" . hl-save-highlights)
+  ("C-<f8> r" . hl-restore-highlights)
+  :config
+  (hl-highlight-mode 1)
+
+  ;; evil leader key bindings for hl-anything
+  (evil-leader/set-key
+    "hul"  'hl-unhighlight-all-local
+    "hug" 'hl-unhighlight-all-global
+    "htg" 'hl-highlight-thingatpt-global
+    "htl"  'hl-highlight-thingatpt-local
+    "hn"  'hl-find-next-thing
+    "hp"  'hl-find-prev-thing
+    "hr"  'hl-restore-highlights
+    "hs"  'hl-save-highlights)
 )
 
 (use-package move-text
@@ -858,11 +873,7 @@ tangled, and the tangled file is compiled."
   (:map evil-normal-state-map
   ("<tab>" . org-cycle)
   )
-  :config
-  ;;(add-hook 'org-mode-hook
-  ;;          (lambda ()
-  ;;        (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
-
+  :init
   ;; general org config variables
   (setq org-log-done 'time)
   (setq org-export-backends (quote (ascii html icalendar latex md odt)))
@@ -873,6 +884,7 @@ tangled, and the tangled file is compiled."
   ;; #+ATTR_ORG: :width 600
   ;; #+ATTR_LATEX: :width 5in
   (setq org-image-actual-width nil)
+  (setq org-startup-with-inline-images t)
 
   (setq org-confirm-babel-evaluate 'nil)
   (setq org-todo-keywords
@@ -880,9 +892,17 @@ tangled, and the tangled file is compiled."
   (setq org-agenda-window-setup 'other-window)
   (setq org-log-done 'time) ;; Show CLOSED tag line in closed TODO items
   (setq org-log-done 'note) ;; Prompt to leave a note when closing an item
+  (setq org-hide-emphasis-markers nil)
 
   ;;ox-twbs (exporter to twitter bootstrap html)
   (setq org-enable-bootstrap-support t)
+  :config
+  ;; org-capture - needs to be in :config because it assumes a variable is already defined: `org-directory'
+  (setq org-default-notes-file (concat org-directory "/notes.org"))
+
+  ;;(add-hook 'org-mode-hook
+  ;;          (lambda ()
+  ;;        (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
 
   (defun org-export-turn-on-syntax-highlight()
     "Setup variables to turn on syntax highlighting when calling `org-latex-export-to-pdf'"
@@ -893,9 +913,19 @@ tangled, and the tangled file is compiled."
           '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
             "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")))
 
-  ;; org-capture
-  (setq org-default-notes-file (concat org-directory "/notes.org"))
-
+  (require 'org-habit)
+  '(org-emphasis-alist
+   (quote
+    (
+     ("!" org-habit-overdue-face)
+     ("%" org-habit-alert-face)
+     ("*" bold)
+     ("/" italic)
+     ("_" underline)
+     ("=" org-verbatim verbatim)
+     ("~" org-code verbatim)
+     ("+" (:strike-through t))
+     )))
 )
 
 (use-package ox-extra

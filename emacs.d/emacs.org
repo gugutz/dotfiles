@@ -517,6 +517,41 @@ Emacs will not highlight patterns found in a file automatically. You must explic
 
 
 
+** hl-anything
+
+Highlight portions of text
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package hl-anything
+  :ensure t
+  :after evil
+;;  :hook
+;;  (kill-emacs . hl-save-highlights)
+  :bind
+  ("C-<f8> h" . hl-highlight-thingatpt-local)
+  ("C-<f8> S-h" . hl-highlight-thingatpt-global)
+  ("C-<f8> u l" . hl-unhighlight-all-local)
+  ("C-<f8> u g" . hl-unhighlight-all-global)
+  ("C-<f8> n" . hl-find-next-thing)
+  ("C-<f8> p" . hl-find-prev-thing)
+  ("C-<f8> s" . hl-save-highlights)
+  ("C-<f8> r" . hl-restore-highlights)
+  :config
+  (hl-highlight-mode 1)
+
+  ;; evil leader key bindings for hl-anything
+  (evil-leader/set-key
+    "hul"  'hl-unhighlight-all-local
+    "hug" 'hl-unhighlight-all-global
+    "htg" 'hl-highlight-thingatpt-global
+    "htl"  'hl-highlight-thingatpt-local
+    "hn"  'hl-find-next-thing
+    "hp"  'hl-find-prev-thing
+    "hr"  'hl-restore-highlights
+    "hs"  'hl-save-highlights)
+)
+#+END_SRC
+
 ** move-text
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -1213,11 +1248,7 @@ Works with mutilang documents
   (:map evil-normal-state-map
   ("<tab>" . org-cycle)
   )
-  :config
-  ;;(add-hook 'org-mode-hook
-  ;;          (lambda ()
-  ;;        (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
-
+  :init
   ;; general org config variables
   (setq org-log-done 'time)
   (setq org-export-backends (quote (ascii html icalendar latex md odt)))
@@ -1228,6 +1259,7 @@ Works with mutilang documents
   ;; #+ATTR_ORG: :width 600
   ;; #+ATTR_LATEX: :width 5in
   (setq org-image-actual-width nil)
+  (setq org-startup-with-inline-images t)
 
   (setq org-confirm-babel-evaluate 'nil)
   (setq org-todo-keywords
@@ -1235,9 +1267,17 @@ Works with mutilang documents
   (setq org-agenda-window-setup 'other-window)
   (setq org-log-done 'time) ;; Show CLOSED tag line in closed TODO items
   (setq org-log-done 'note) ;; Prompt to leave a note when closing an item
+  (setq org-hide-emphasis-markers nil)
 
   ;;ox-twbs (exporter to twitter bootstrap html)
   (setq org-enable-bootstrap-support t)
+  :config
+  ;; org-capture - needs to be in :config because it assumes a variable is already defined: `org-directory'
+  (setq org-default-notes-file (concat org-directory "/notes.org"))
+
+  ;;(add-hook 'org-mode-hook
+  ;;          (lambda ()
+  ;;        (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
 
   (defun org-export-turn-on-syntax-highlight()
     "Setup variables to turn on syntax highlighting when calling `org-latex-export-to-pdf'"
@@ -1248,13 +1288,35 @@ Works with mutilang documents
           '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
             "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")))
 
-  ;; org-capture
-  (setq org-default-notes-file (concat org-directory "/notes.org"))
-
+  (require 'org-habit)
+  '(org-emphasis-alist
+   (quote
+    (
+     ("!" org-habit-overdue-face)
+     ("%" org-habit-alert-face)
+     ("*" bold)
+     ("/" italic)
+     ("_" underline)
+     ("=" org-verbatim verbatim)
+     ("~" org-code verbatim)
+     ("+" (:strike-through t))
+     )))
 )
 #+END_SRC
 
 ** ox-extra (org-plus-contrib)
+** add more custom emacs emphasis characters
+
+
+   first test
+   (require 'org-habit nil t)
+
+(defun org-add-my-extra-fonts ()
+  "Add alert and overdue fonts."
+  (add-to-list 'org-font-lock-extra-keywords '("\\(!\\)\\([^\n\r\t]+\\)\\(!\\)" (1 '(face org-habit-alert-face invisible t)) (2 'org-habit-alert-face) (3 '(face org-habit-alert-face invisible t))))
+  (add-to-list 'org-font-lock-extra-keywords '("\\(%\\)\\([^\n\r\t]+\\)\\(%\\)" (1 '(face org-habit-overdue-face invisible t)) (2 'org-habit-overdue-face) (3 '(face org-habit-overdue-face invisible t)))))
+
+(add-hook 'org-font-lock-set-keywords-hook #'org-add-my-extra-fonts)
 
 ox-extras
 add suport for the ignore tag (ignores a headline without ignoring its content)
