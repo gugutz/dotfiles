@@ -23,7 +23,8 @@ npm install -g typescript-language-server
 
 echo "## install eslint"
 npm install -g eslint babel-eslint eslint-plugin-react
-
+echo "## install eslint typescript plugin"
+npm install -g @typescript-eslint/eslint-plugin@latest
 
 echo "## install angular language server3"
 wget -o angular-language-server.zip https://marketplace.visualstudio.com/_apis/public/gallery/publishers/Angular/vsextensions/ng-template/0.802.3/vspackage

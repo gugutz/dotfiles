@@ -1,34 +1,30 @@
 module.exports = {
   extends: [
-    //'eslint:recommended',
-    //'plugin:react/recommended',
-    //'plugin:@typescript-eslint/recommended',
-    //1'plugin:jest/recommended',
-    //'plugin:import/errors',
-    //'plugin:import/warnings',
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:jest/recommended',
+    'plugin:import/errors',
+    'plugin:import/warnings'
   ],
   env: {
     browser: true,
     node: true,
-    es6: true,
+    es6: true
   },
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2018,
-    sourceType: 'module',
+    sourceType: 'module'
   },
   plugins: [
-    //'react',
-    //'react-hooks',
-    //'import',
-    //'@typescript-eslint/eslint-plugin',
+    'react',
+    'react-hooks',
+    'import',
+    '@typescript-eslint/eslint-plugin'
   ],
   rules: {
     'import/no-unresolved': ['error', { commonjs: true, caseSensitive: true }],
-    'import/order': [
-      'error',
-      { groups: [['builtin', 'external', 'internal']] },
-    ],
+    'import/order': ['error', { groups: [['builtin', 'external', 'internal']] }],
     'import/newline-after-import': 'error',
     '@typescript-eslint/indent': ['error', 2],
     '@typescript-eslint/prefer-interface': 'off',
@@ -37,22 +33,22 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': [
       'error',
       {
-        args: 'after-used',
-      },
+        args: 'after-used'
+      }
     ],
     '@typescript-eslint/indent': 'off',
     'jsx-quotes': ['error', 'prefer-double'],
-    '@typescript-eslint/camelcase': 'off',
+    '@typescript-eslint/camelcase': 'off'
   },
   settings: {
-    //react: {
-      //pragma: 'React',
-      //version: 'detect',
+    react: {
+      pragma: 'React',
+      version: 'detect'
     },
     'import/resolver': {
       node: {
-        extensions: ['.js', '.jsx', '.ts', '.tsx'],
-      },
-    },
-  },
-};
+        extensions: ['.js', '.jsx', '.ts', '.tsx']
+      }
+    }
+  }
+}

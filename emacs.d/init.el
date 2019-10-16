@@ -82,6 +82,19 @@ tangled, and the tangled file is compiled."
 (unless (or (daemonp) (server-running-p))
   (server-start))
 
+(require 'cl)
+(defun font-candidate (&rest fonts)
+  "Return existing font which first match."
+  (find-if (lambda (f) (find-font (font-spec :name f))) fonts))
+
+;; define list of fonts to be used in the above function
+;; the first one found will be used
+(set-face-attribute 'default nil :font (font-candidate '"Hack-10:weight=normal"
+                                                        "Consolas-10:weight=normal"
+                                                        "Droid Sans Mono-10:weight=normal"
+                                                        "DejaVu Sans Mono-10:weight=normal"
+                                                        "Ubuntu Mono-12:weight=normal"))
+
 (use-package visual-line-mode
   :ensure nil
   :hook
@@ -103,20 +116,110 @@ tangled, and the tangled file is compiled."
 (setq auto-save-list-file-prefix
     emacs-tmp-dir)
 
+(use-package files
+  :ensure nil
+  :config
+  (setq make-backup-files nil)
+  ;; dont ask confirmation to kill processes
+  ;;(setq confirm-kill-processes nil)
+)
+
+(setq confirm-kill-processes nil)
+
 (setq ring-bell-function 'ignore)
 
+(setq inhibit-startup-screen t)
+(setq inhibit-startup-message t)
+(setq initial-buffer-choice nil)
+;; Makes *scratch* empty.
 (setq initial-scratch-message nil)
+;; Don't show *Buffer list* when opening multiple files at the same time.
+(setq inhibit-startup-buffer-menu t)
+;; Make the buffer that opens on startup your init file ("~/.emacs" or
+;; "~/.emacs.d/init.el").
+;;(setq initial-buffer-choice user-init-file)
+
+
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 (fset 'yes-or-no-p 'y-or-n-p)
 
-(when (version<= "26.0.50" emacs-version )
-  (global-display-line-numbers-mode))
+(use-package display-line-numbers
+  :ensure nil
+  :if (version<= "26.0.50" emacs-version)
+  :hook
+  ;; (prog-mode. display-line-numbers-mode)
+  ;; (text-mode. display-line-numbers-mode)
+  (LaTeX-mode. display-line-numbers-mode)
+  (typescript-mode. display-line-numbers-mode)
+  (web-mode. display-line-numbers-mode)
+  (js2-mode. display-line-numbers-mode)
+  (css-mode. display-line-numbers-mode)
+  (scss-mode. display-line-numbers-mode)
+  (elixir-mode. display-line-numbers-mode)
 
-(setq linum-format " %d ")
+  :config
+  ;; (global-display-line-numbers-mode)
+  (setq display-line-numbers-grow-only t)
+  (setq display-line-numbers-width-start t)
 
-(global-auto-revert-mode 1)
-(setq auto-revert-interval 0.5)
+  ;; old linum-mode variables, check if they work with new display-line-numbers-mode
+  ;; (setq linum-format 'dynamic)
+  ;; Putting the following in your .emacs will put one space separation between the linenumber display and the buffer contents:
+  (setq linum-format " %d ")
+  ;; If you want a solid line separator, try something like this:
+  ;;(setq linum-format "%4d \u2502 ")
+
+
+
+  ;; Select lines by click-dragging on the margin. Tested with GNU Emacs 23.3
+  (defvar *linum-mdown-line* nil)
+
+  (defun line-at-click ()
+    (save-excursion
+    (let ((click-y (cdr (cdr (mouse-position))))
+        (line-move-visual-store line-move-visual))
+      (setq line-move-visual t)
+      (goto-char (window-start))
+      (next-line (1- click-y))
+      (setq line-move-visual line-move-visual-store)
+      ;; If you are using tabbar substitute the next line with
+      (line-number-at-pos))))
+
+  (defun md-select-linum ()
+    (interactive)
+    (goto-line (line-at-click))
+    (set-mark (point))
+    (setq *linum-mdown-line*
+      (line-number-at-pos)))
+
+  (defun mu-select-linum ()
+    (interactive)
+    (when *linum-mdown-line*
+    (let (mu-line)
+      ;; (goto-line (line-at-click))
+      (setq mu-line (line-at-click))
+      (goto-line (max *linum-mdown-line* mu-line))
+      (set-mark (line-end-position))
+      (goto-line (min *linum-mdown-line* mu-line))
+      (setq *linum-mdown*
+        nil))))
+
+  (global-set-key (kbd "<left-margin> <down-mouse-1>") 'md-select-linum)
+  (global-set-key (kbd "<left-margin> <mouse-1>") 'mu-select-linum)
+  (global-set-key (kbd "<left-margin> <drag-mouse-1>") 'mu-select-linum)
+)
+
+(use-package autorevert
+  :ensure nil
+  :hook
+  (after-init . global-auto-revert-mode)
+  :config
+  (setq auto-revert-interval 0.5)
+  (setq auto-revert-interval 2)
+  (setq auto-revert-check-vc-info t)
+  (setq auto-revert-verbose nil)
+)
 
 (setq next-line-add-newlines t)
 
@@ -175,7 +278,24 @@ tangled, and the tangled file is compiled."
 )
 
 ; parentheses
-(show-paren-mode t)
+(use-package paren
+  :ensure nil
+  :hook
+  (after-init . show-paren-mode)
+  :custom-face
+  (show-paren-match ((nil (:background "#44475a" :foreground "#f1fa8c")))) ;; :box t
+  :config
+  (setq show-paren-delay 0)
+  (setq show-paren-style 'mixed)
+  (setq show-paren-when-point-inside-paren t)
+  (setq show-paren-when-point-in-periphery t)
+  (show-paren-mode +1)
+)
+
+(use-package paren
+  :ensure nil
+  :config
+)
 
 (setq-default indent-tabs-mode nil)
 ;; C e C-like langs default indent size
@@ -210,47 +330,15 @@ tangled, and the tangled file is compiled."
 )
 
 (use-package eldoc
-  :diminish
+  :ensure nil
   :hook
-  (prog-mode       . turn-on-eldoc-mode)
-  (cider-repl-mode . turn-on-eldoc-mode)
-)
-
-(use-package highlight-numbers
-    :ensure t
-    :hook
-    (prog-mode . highlight-numbers-mode)
-)
-
-(use-package highlight-operators
-  :ensure t
-  :hook
-  (prog-mode . highlight-operators-mode)
-)
-
-(use-package highlight-escape-sequences
-  :ensure t
-  :hook
-  (prog-mode . hes-mode)
-)
-
-(use-package highlight-parentheses
-  :ensure t
-  :hook
-  (prog-mode . highlight-parentheses-mode)
-)
-
-;; NOTE that the highlighting works even in comments.
-(use-package hl-todo
-  :ensure t
-  :hook
-  (prog-mode . hl-todo-mode)
-  (text-mode . hl-todo-mode)
+  (prog-mode . eldoc-mode)
+  ;;(prog-mode       . turn-on-eldoc-mode)
+  ;; (cider-repl-mode . turn-on-eldoc-mode)
   :config
-  ;; Adding a new keyword: TEST.
-  (add-to-list 'hl-todo-keyword-faces '("TEST" . "#dc8cc3"))
-  :init
-  ;; (add-hook 'text-mode-hook (lambda () (hl-todo-mode t)))
+  ;; (global-eldoc-mode -1)
+  ;; (add-hook 'prog-mode-hook 'eldoc-mode)
+  (setq eldoc-idle-delay 0.4)
 )
 
 (defun upcase-backward-word (arg)
@@ -269,57 +357,25 @@ tangled, and the tangled file is compiled."
 )
 
 (global-set-key (kbd "C-M-u")	 'upcase-backward-word)
-(global-set-key (kbd "C-M-l")	 'downcase-backward-word)
+(global-set-key (kbd "C-M-l")	 'downcase-backward-WORD)
 ;; this replaces native capitlize word!
 (global-set-key (kbd "M-c")	 'capitalize-backward-word)
 
 (defconst *spell-check-support-enabled* t) ;; Enable with t if you prefer
 
-(use-package hi-lock
-  :init
-  (global-hi-lock-mode 1)
-  :config
-  (add-hook 'hi-lock-mode-hook
-          (lambda nil
-            (highlight-regexp "FIXME" 'hi-red-b)
-            (highlight-regexp "NOTE" 'hi-red-b)
-            (highlight-regexp "TODO" 'hi-red-b))
-  )
-  ;; always highlight patterns found in files without confirmation
-  (setq hi-lock-file-patterns-policy #'(lambda (dummy) t))
-)
-
-(use-package hl-anything
-  :ensure t
-  :after evil
-;;  :hook
-;;  (kill-emacs . hl-save-highlights)
-  :bind
-  ("C-<f8> h" . hl-highlight-thingatpt-local)
-  ("C-<f8> S-h" . hl-highlight-thingatpt-global)
-  ("C-<f8> u l" . hl-unhighlight-all-local)
-  ("C-<f8> u g" . hl-unhighlight-all-global)
-  ("C-<f8> n" . hl-find-next-thing)
-  ("C-<f8> p" . hl-find-prev-thing)
-  ("C-<f8> s" . hl-save-highlights)
-  ("C-<f8> r" . hl-restore-highlights)
-  :config
-  (hl-highlight-mode 1)
-
-  ;; evil leader key bindings for hl-anything
-  (evil-leader/set-key
-    "hul"  'hl-unhighlight-all-local
-    "hug" 'hl-unhighlight-all-global
-    "htg" 'hl-highlight-thingatpt-global
-    "htl"  'hl-highlight-thingatpt-local
-    "hn"  'hl-find-next-thing
-    "hp"  'hl-find-prev-thing
-    "hr"  'hl-restore-highlights
-    "hs"  'hl-save-highlights)
-)
-
 (use-package move-text
   :ensure t
+  :bind
+  ("M-S-j" . move-text-up)
+  ("M-S-k" . move-text-down)
+  (:map evil-normal-state-map
+  ("S-j" . move-text-up)
+  ("S-k" . move-text-down)
+  )
+  (:map evil-visual-state-map
+  ("M-S-j" . move-text-region-up)
+  ("M-S-k" . move-text-region-down)
+  )
   :config
   (move-text-default-bindings)
 )
@@ -466,9 +522,9 @@ tangled, and the tangled file is compiled."
   :config
   (setq-default hippie-expand-try-functions-list
         '(yas-hippie-try-expand
-          yas-expand
-          company-indent-or-complete-common
+          indent-according-to-mode
           emmet-expand-line
+          company-indent-or-complete-common
           )
   )
 )
@@ -517,14 +573,16 @@ tangled, and the tangled file is compiled."
 
   :bind
   (:map evil-normal-state-map
-  ("g t" . centaur-tabs-forward)
-  ("g T" . centaur-tabs-backward)
   (", w" . evil-window-vsplit)
   ("C-r" . undo-tree-redo)
   )
   (:map evil-insert-state-map
   ;; this is also defined globally above in the config
   ("C-S-<tab>" . er/expand-region)
+  )
+  (:map evil-visual-state-map
+  ;; this is also defined globally above in the config
+  ("<tab>" . indent-region)
   )
 
 ;; check if global-set-key also maps to evil insert mode; if yes delete bellow snippets
@@ -935,6 +993,15 @@ tangled, and the tangled file is compiled."
   (ox-extras-activate '(latex-header-blocks ignore-headlines))
 )
 
+(require 'org-habit nil t)
+
+(defun org-add-my-extra-fonts ()
+  "Add alert and overdue fonts."
+  (add-to-list 'org-font-lock-extra-keywords '("\\(!\\)\\([^\n\r\t]+\\)\\(!\\)" (1 '(face org-habit-alert-face invisible t)) (2 'org-habit-alert-face) (3 '(face org-habit-alert-face invisible t))))
+  (add-to-list 'org-font-lock-extra-keywords '("\\(%\\)\\([^\n\r\t]+\\)\\(%\\)" (1 '(face org-habit-overdue-face invisible t)) (2 'org-habit-overdue-face) (3 '(face org-habit-overdue-face invisible t)))))
+
+(add-hook 'org-font-lock-set-keywords-hook #'org-add-my-extra-fonts)
+
 (use-package evil-org
   :after org
   :hook
@@ -1026,9 +1093,6 @@ tangled, and the tangled file is compiled."
   (setq TeX-PDF-mode t) ;; compile to PDF by default
   (setq org-export-with-smart-quotes t) ;; convert quotes to LaTeX smartquotes on export
 
-
-  (if (version< emacs-version "26")
-    (add-hook LaTeX-mode-hook #'display-line-numbers-mode))
   (add-hook 'LaTeX-mode-hook
     (lambda ()
         (turn-on-reftex)
@@ -1109,6 +1173,37 @@ tangled, and the tangled file is compiled."
   (evil-define-key evil-magit-state magit-mode-map "j" 'magit-log-popup)
   (evil-define-key evil-magit-state magit-mode-map "k" 'evil-next-visual-line)
   (evil-define-key evil-magit-state magit-mode-map "l" 'evil-previous-visual-line)
+)
+
+(use-package diff-hl
+  :ensure t
+  :hook
+  (prog-mode . diff-hl-mode)
+  (org-mode . diff-hl-mode)
+  (dired-mode . diff-hl-mode)
+  (magit-post-refresh . diff-hl-mode)
+  :init
+  ;; (add-hook 'prog-mode-hook #'diff-hl-mode)
+  ;; (add-hook 'org-mode-hook #'diff-hl-mode)
+  ;; (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+  ;; (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+
+  ;; Better looking colours for diff indicators
+  (custom-set-faces
+    '(diff-hl-change ((t (:background "#3a81c3"))))
+    '(diff-hl-insert ((t (:background "#7ccd7c"))))
+    '(diff-hl-delete ((t (:background "#ee6363"))))
+  )
+
+  :config
+  (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
+  (setq diff-hl-side 'left)
+  (setq diff-hl-margin-side 'left)
+
+
+  (diff-hl-margin-mode 1) ;; show the indicators in the margin
+  (diff-hl-flydiff-mode 1) ;;  ;; On-the-fly diff updates
+  (global-diff-hl-mode 1) ;; Enable diff-hl globally
 )
 
 (use-package git-messenger
@@ -1224,10 +1319,10 @@ tangled, and the tangled file is compiled."
 
     ;; add eslint to list of flycheck checkers
     (setq flycheck-checkers '(javascript-eslint))
-
     ;; disable jshint since we prefer eslint checking
     (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))
-
+    ;; force flycheck to use its own xml parser instead of libxml32 (was giving me errors)
+    (setq flycheck-xml-parser 'flycheck-parse-xml-region)
     ;; set modes that will use ESLint
     (flycheck-add-mode 'javascript-eslint 'web-mode)
     (flycheck-add-mode 'javascript-eslint 'js2-mode)
@@ -1460,6 +1555,24 @@ tangled, and the tangled file is compiled."
   "k" (lambda () (interactive) (pdf-view-previous-line-or-previous-page 5))
   "l" 'pdf-view-next-page-command)
 
+(use-package edit-server
+  :if (and window-system
+           (not alternate-emacs))
+  ;; :if window-system
+  :ensure t
+  :defer 5
+  :disabled
+  :config
+  (edit-server-start)
+)
+
+(use-package atomic-chrome
+  :ensure t
+  :disabled
+  :config
+  (atomic-chrome-start-server)
+)
+
 (setq inhibit-splash-screen t)
 
 (blink-cursor-mode t)
@@ -1472,6 +1585,9 @@ tangled, and the tangled file is compiled."
 
 (tool-bar-mode -1)
 (menu-bar-mode -1)
+
+(set-background-color "#111111")
+(set-foreground-color "#dddddd")
 
 (add-to-list 'custom-theme-load-path "~/dotfiles/emacs.d/themes/")
 ; theme options:
@@ -1740,15 +1856,6 @@ tangled, and the tangled file is compiled."
   (add-hook 'after-init-hook #'fancy-battery-mode)
 )
 
-(use-package beacon
-  :ensure t
-  :config
-  (setq beacon-blink-when-window-scrolls nil)
-  (setq beacon-dont-blink-major-modes '(t pdf-view-mode))
-  (setq beacon-size 10)
-  (beacon-mode 1)
-)
-
 (use-package dimmer
   :ensure t
   :config (dimmer-mode)
@@ -1803,101 +1910,200 @@ tangled, and the tangled file is compiled."
   (global-set-key [remap goto-line] 'goto-line-preview)
 )
 
-(use-package centaur-tabs
-   ;; :load-path "~/.emacs.d/other/centaur-tabs"
-   :hook
-   (dashboard-mode . centaur-tabs-local-mode)
-   (term-mode . centaur-tabs-local-mode)
-   (calendar-mode . centaur-tabs-local-mode)
-   (org-agenda-mode . centaur-tabs-local-mode)
-   (helpful-mode . centaur-tabs-local-mode)
-   :bind
-   ("C-<prior>" . centaur-tabs-backward)
-   ("C-<next>" . centaur-tabs-forward)
-   ("C-c t s" . centaur-tabs-counsel-switch-group)
-   ("C-c t p" . centaur-tabs-group-by-projectile-project)
-   ("C-c t g" . centaur-tabs-group-buffer-groups)
-   (:map evil-normal-state-map
-   ("g t" . centaur-tabs-forward)
-   ("g T" . centaur-tabs-backward))
-   :config
-   (centaur-tabs-mode t)
-   (setq centaur-tabs-style "bar") ; types available: (alternative, bar, box, chamfer, rounded, slang, wave, zigzag)
-   (setq centaur-tabs-height 32)
-   (setq centaur-tabs-set-icons t)
-   (setq centaur-tabs-set-modified-marker t) ;; display a marker indicating that a buffer has been modified (atom-style)
-   (setq centaur-tabs-modified-marker "*")
-   (setq centaur-tabs-set-bar 'left) ;; in previous config value was 'over
-   (setq centaur-tabs-gray-out-icons 'buffer)
-   (setq centaur-tabs-headline-match)
-   ;; (centaur-tabs-enable-buffer-reordering)
-   ;; (setq centaur-tabs-adjust-buffer-order t)
-   (setq uniquify-separator "/")
-   (setq uniquify-buffer-name-style 'forward)
-)
+(use-package dashboard
+  :ensure t
+  :custom-face
+  (dashboard-heading ((t (:foreground "#f1fa8c" :weight bold))))
+  :init
+  (setq dashboard-items '((recents  . 5)
+                         (bookmarks . 5)
+                         (projects . 5)
+                         (agenda . 5)
+                         (registers . 5)))
 
-(use-package which-key
-  :hook (after-init . which-key-mode))
+  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+
+  ;; Set the title
+  (setq dashboard-banner-logo-title "Welcome to Emacs Dashboard")
+
+  ;; Set the banner
+  ;; Value can be
+  ;; 'official which displays the official emacs logo
+  ;; 'logo which displays an alternative emacs logo
+  ;; 1, 2 or 3 which displays one of the text banners
+  ;; "path/to/your/image.png" which displays whatever image you would prefer
+  (setq dashboard-startup-banner 'logo)
+
+  ;; Content is not centered by default. To center, set
+  (setq dashboard-center-content t)
+
+  ;; To disable shortcut "jump" indicators for each section, set
+  (setq dashboard-show-shortcuts nil)
+
+  ;; To add icons to the widget headings and their items:
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+
+  ;; To show navigator below the banner:
+  (setq dashboard-set-navigator t)
+
+  ;;To show info about the packages loaded and the init time:
+  (setq dashboard-set-init-info t)
+  ;; Also, the message can be customized like this:
+  (setq dashboard-init-info "This is an init message!")
+
+  ;; A randomly selected footnote will be displayed. To disable it:
+  ;;(setq dashboard-set-footer nil)
+
   :config
-  (setq which-key-idle-delay 0.2)
-  (setq which-key-min-display-lines 3)
-  (setq which-key-max-description-length 20)
-  (setq which-key-max-display-columns 6)
+  (dashboard-setup-startup-hook)
 
-(use-package keyfreq
-  :disabled
-  :ensure t
-  :init
-  (keyfreq-mode 1)
-  (keyfreq-autosave-mode 1)
+  ;; Org mode’s agenda
+  ;; To display today’s agenda items on the dashboard, add agenda to dashboard-items:
+  (add-to-list 'dashboard-items '(agenda) t)
+  ;; To show agenda for the upcoming seven days set the variable show-week-agenda-p to t.
+  (setq show-week-agenda-p t)
+  ;; Note that setting list-size for the agenda list is intentionally ignored; all agenda items for the current day will be displayed.
+  ;; To customize which categories from the agenda items should be visible in the dashboard set the dashboard-org-agenda-categories to the list of categories you need.
+  (setq dashboard-org-agenda-categories '("Tasks" "Appointments"))
+
 )
 
-(use-package diff-hl
-  :ensure t
-  :hook
-  (prog-mode . diff-hl-mode)
-  (org-mode . diff-hl-mode)
-  (dired-mode . diff-hl-mode)
-  (magit-post-refresh . diff-hl-mode)
-  :init
-  ;; (add-hook 'prog-mode-hook #'diff-hl-mode)
-  ;; (add-hook 'org-mode-hook #'diff-hl-mode)
-  ;; (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
-  ;; (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+(defun tau/toggle-window-transparency ()
+  "Cycle the frame transparency from default to transparent."
+  (interactive)
+  (let ((transparency 85)
+        (opacity 100))
+    (if (and (not (eq (frame-parameter nil 'alpha) nil))
+             (< (frame-parameter nil 'alpha) opacity))
+        (set-frame-parameter nil 'alpha opacity)
+      (set-frame-parameter nil 'alpha transparency))))
 
-  ;; Better looking colours for diff indicators
+(global-set-key (kbd "M-<f12> t") 'tau/toggle-window-transparency)
+
+(use-package minimap
+  :commands
+  (minimap-bufname minimap-create minimap-kill)
+  :custom
+  (minimap-major-modes '(prog-mode))
+  (minimap-window-location 'right)
+  (minimap-update-delay 0.2)
+  (minimap-minimum-width 20)
+  :bind
+  ("M-<f12> m" . ladicle/toggle-minimap)
+  :preface
+  (defun ladicle/toggle-minimap ()
+    "Toggle minimap for current buffer."
+    (interactive)
+    (if (null minimap-bufname)
+        (minimap-create)
+      (minimap-kill)))
+  :config
   (custom-set-faces
-    '(diff-hl-change ((t (:background "#3a81c3"))))
-    '(diff-hl-insert ((t (:background "#7ccd7c"))))
-    '(diff-hl-delete ((t (:background "#ee6363"))))
-  )
-
-  :config
-  (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
-  (setq diff-hl-side 'left)
-  (setq diff-hl-margin-side 'left)
-
-
-  (diff-hl-margin-mode 1) ;; show the indicators in the margin
-  (diff-hl-flydiff-mode 1) ;;  ;; On-the-fly diff updates
-  (global-diff-hl-mode 1) ;; Enable diff-hl globally
+   '(minimap-active-region-background
+    ((((background dark)) (:background "#555555555555"))
+      (t (:background "#C847D8FEFFFF"))) :group 'minimap))
 )
 
-(use-package smartparens
-  :ensure t
-  :hook
-  (after-init . smartparens-global-mode)
-  :config
-  (require 'smartparens-config)
-  (sp-pair "=" "=" :actions '(wrap))
-  (sp-pair "+" "+" :actions '(wrap))
-  (sp-pair "<" ">" :actions '(wrap))
-  (sp-pair "$" "$" :actions '(wrap)))
+(use-package highlight-numbers
+    :ensure t
+    :hook
+    (prog-mode . highlight-numbers-mode)
+)
 
-(use-package evil-smartparens
+(use-package highlight-operators
   :ensure t
   :hook
-  (smartparens-enabled . evil-smartparens-mode)
+  (prog-mode . highlight-operators-mode)
+)
+
+(use-package highlight-escape-sequences
+  :ensure t
+  :hook
+  (prog-mode . hes-mode)
+)
+
+(use-package highlight-parentheses
+  :ensure t
+  :hook
+  (prog-mode . highlight-parentheses-mode)
+)
+
+;; NOTE that the highlighting works even in comments.
+(use-package hl-todo
+  :ensure t
+  :hook
+  (prog-mode . hl-todo-mode)
+  (text-mode . hl-todo-mode)
+  :init
+  ;; (add-hook 'text-mode-hook (lambda () (hl-todo-mode t)))
+  :config
+  ;; Adding a new keyword: TEST.
+  (add-to-list 'hl-todo-keyword-faces '("TODO" . "#ff3300"))
+  (add-to-list 'hl-todo-keyword-faces '("TEST" . "#dc8cc3"))
+  (add-to-list 'hl-todo-keyword-faces '("NOTE" . "#ffff00"))
+  (add-to-list 'hl-todo-keyword-faces '("DONE" . "#00ff00"))
+)
+
+(use-package hi-lock
+  :init
+  (global-hi-lock-mode 1)
+  :config
+  (add-hook 'hi-lock-mode-hook
+          (lambda nil
+            (highlight-regexp "FIXME" 'hi-red-b)
+            (highlight-regexp "NOTE" 'hi-red-b)
+            (highlight-regexp "TODO" 'hi-red-b))
+  )
+  ;; always highlight patterns found in files without confirmation
+  (setq hi-lock-file-patterns-policy #'(lambda (dummy) t))
+)
+
+(use-package hl-anything
+  :ensure t
+  :after evil
+;;  :hook
+;;  (kill-emacs . hl-save-highlights)
+  :bind
+  ("C-<f8> h" . hl-highlight-thingatpt-local)
+  ("C-<f8> S-h" . hl-highlight-thingatpt-global)
+  ("C-<f8> u l" . hl-unhighlight-all-local)
+  ("C-<f8> u g" . hl-unhighlight-all-global)
+  ("C-<f8> n" . hl-find-next-thing)
+  ("C-<f8> p" . hl-find-prev-thing)
+  ("C-<f8> s" . hl-save-highlights)
+  ("C-<f8> r" . hl-restore-highlights)
+  :config
+  (hl-highlight-mode 1)
+
+  ;; evil leader key bindings for hl-anything
+  (evil-leader/set-key
+    "hul"  'hl-unhighlight-all-local
+    "hug" 'hl-unhighlight-all-global
+    "htg" 'hl-highlight-thingatpt-global
+    "htl"  'hl-highlight-thingatpt-local
+    "hn"  'hl-find-next-thing
+    "hp"  'hl-find-prev-thing
+    "hr"  'hl-restore-highlights
+    "hs"  'hl-save-highlights)
+)
+
+(use-package beacon
+  :ensure t
+  :init
+  (setq beacon-blink-when-point-moves-vertically nil) ; default nil
+  (setq beacon-blink-when-point-moves-horizontally nil) ; default nil
+  (setq beacon-blink-when-buffer-changes t) ; default t
+  (setq beacon-blink-when-window-scrolls t) ; default t
+  (setq beacon-blink-when-window-changes t) ; default t
+  (setq beacon-blink-when-focused nil) ; default nil
+  (setq beacon-blink-duration 0.3) ; default 0.3
+  (setq beacon-blink-delay 0.3) ; default 0.3
+  (setq beacon-size 20) ; default 40
+  ;; (setq beacon-color "yellow") ; default 0.5
+  (setq beacon-color 0.6) ; default 0.5
+  :config
+  (beacon-mode 1)
 )
 
 (use-package rainbow-delimiters
@@ -1917,6 +2123,105 @@ tangled, and the tangled file is compiled."
   (html-mode . rainbow-mode)
   (web-mode . rainbow-mode)
   (js2-mode . rainbow-mode))
+
+(use-package volatile-highlights
+  :ensure t
+  :hook
+  (after-init . volatile-highlights-mode)
+  :custom-face
+  (vhl/default-face ((nil (:foreground "#FF3333" :background "#FFCDCD"))))
+  :config
+  ;;-----------------------------------------------------------------------------
+  ;; Supporting evil-mode.
+  ;;-----------------------------------------------------------------------------
+  (vhl/define-extension 'evil 'evil-paste-after 'evil-paste-before
+                        'evil-paste-pop 'evil-move)
+  (vhl/install-extension 'evil)
+  ;;-----------------------------------------------------------------------------
+  ;; Supporting undo-tree.
+  ;;-----------------------------------------------------------------------------
+  (vhl/define-extension 'undo-tree 'undo-tree-yank 'undo-tree-move)
+  (vhl/install-extension 'undo-tree)
+)
+
+(use-package highlight-indent-guides
+  :ensure t
+  :hook
+  ((prog-mode yaml-mode) . highlight-indent-guides-mode)
+  :custom
+  (highlight-indent-guides-auto-enabled t)
+  (highlight-indent-guides-responsive t)
+  (highlight-indent-guides-method 'character) ; column
+)
+
+(use-package centaur-tabs
+  :ensure t
+  :hook
+  (dashboard-mode . centaur-tabs-local-mode)
+  (term-mode . centaur-tabs-local-mode)
+  (calendar-mode . centaur-tabs-local-mode)
+  (org-agenda-mode . centaur-tabs-local-mode)
+  (helpful-mode . centaur-tabs-local-mode)
+  :bind
+  ("C-<prior>" . centaur-tabs-backward)
+  ("C-<next>" . centaur-tabs-forward)
+  ("C-c t s" . centaur-tabs-counsel-switch-group)
+  ("C-c t p" . centaur-tabs-group-by-projectile-project)
+  ("C-c t g" . centaur-tabs-group-buffer-groups)
+  (:map evil-normal-state-map
+  ("g t" . centaur-tabs-forward)
+  ("g T" . centaur-tabs-backward))
+  :init
+  (setq centaur-tabs-style "rounded") ; types available: (alternative, bar, box, chamfer, rounded, slang, wave, zigzag)
+  (setq centaur-tabs-height 25)
+  (setq centaur-tabs-set-icons t) ;; display themed icons from all the icons
+  (setq centaur-tabs-set-modified-marker t) ;; display a marker indicating that a buffer has been modified (atom-style)
+  (setq centaur-tabs-modified-marker "*")
+  (setq centaur-tabs-set-bar 'over) ;; in previous config value was 'over
+
+  (setq centaur-tabs-gray-out-icons 'buffer)
+  ;; (setq centaur-tabs-adjust-buffer-order t)
+  (setq uniquify-separator "/")
+  (setq uniquify-buffer-name-style 'forward)
+  :config
+  ;; (centaur-tabs-enable-buffer-reordering)
+  (centaur-tabs-headline-match)
+  ;; (centaur-tabs-change-fonts "arial" 160)
+  (centaur-tabs-mode t)
+)
+
+(use-package which-key
+  :hook (after-init . which-key-mode))
+  :config
+  (setq which-key-idle-delay 0.2)
+  (setq which-key-min-display-lines 3)
+  (setq which-key-max-description-length 20)
+  (setq which-key-max-display-columns 6)
+
+(use-package keyfreq
+  :disabled
+  :ensure t
+  :init
+  (keyfreq-mode 1)
+  (keyfreq-autosave-mode 1)
+)
+
+(use-package smartparens
+  :ensure t
+  :hook
+  (after-init . smartparens-global-mode)
+  :config
+  (require 'smartparens-config)
+  (sp-pair "=" "=" :actions '(wrap))
+  (sp-pair "+" "+" :actions '(wrap))
+  (sp-pair "<" ">" :actions '(wrap))
+  (sp-pair "$" "$" :actions '(wrap)))
+
+(use-package evil-smartparens
+  :ensure t
+  :hook
+  (smartparens-enabled . evil-smartparens-mode)
+)
 
 (smartscan-mode 1)
 
@@ -2011,8 +2316,7 @@ tangled, and the tangled file is compiled."
   :init
   (setq scss-compile-at-save 'nil)
   :config
-  (autoload 'scss-mode "scss-mode")
-  (add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
+   (add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
 )
 
 (use-package helm-css-scss
@@ -2174,8 +2478,9 @@ tangled, and the tangled file is compiled."
   (ng2-mode . prettier-js-mode)
 )
 
-(require 'dockerfile-mode)
-(add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode))
+(use-package dockerfile-mode
+  :mode "\\Dockerfile\\'"
+)
 
 (use-package lsp-mode
   :ensure t
@@ -2184,6 +2489,11 @@ tangled, and the tangled file is compiled."
   (setq lsp-inhibit-message nil) ;; was `t`, changed to nil to see what it does
   (setq lsp-eldoc-render-all t)  ;; was `nil`, changed to nil to see what it does
   (setq lsp-highlight-symbol-at-point t)  ;; was `nil`, changed to nil to see what it does
+  (setq lsp-print-io nil)
+  (setq lsp-trace nil)
+  (setq lsp-print-performance nil)
+  (setq lsp-prefer-flymake t) ;; t(flymake), nil(lsp-ui), or :none
+
   :hook
   ;; disabled lsp for javascript and typescript to use Tide-mode only
   ;; disabled lsp for typescript to use Tide-mode only
@@ -2320,6 +2630,15 @@ tangled, and the tangled file is compiled."
    ("C-n" . company-select-next)
   )
   :config
+  ;; define company appearance
+  (custom-set-faces
+  '(company-preview-common ((t (:foreground unspecified :background "#111111"))))
+  '(company-scrollbar-bg ((t (:background "#111111"))))
+  '(company-scrollbar-fg ((t (:background "#555555"))))
+  '(company-tooltip ((t (:inherit default :background "#222222"))))
+  '(company-tooltip-common ((t (:inherit font-lock-constant-face))))
+  '(company-tooltip-selection ((t (:inherit company-tooltip-common :background "#2a2a2a" )))))
+
   ;; Use Company for completion
   (progn
     (bind-key [remap completion-at-point] #'company-complete company-mode-map))
@@ -2381,11 +2700,65 @@ tangled, and the tangled file is compiled."
 )
 
 ;; (use-package company-box
-;;   :ensure t
-;;   :hook
-;;   (company-mode . company-box-mode)
-;;   (global-company-mode . company-box-mode)
-;; )
+  ;;   :ensure t
+  ;;   :hook
+  ;;   (company-mode . company-box-mode)
+  ;;   (global-company-mode . company-box-mode)
+  ;; )
+(use-package company-box
+  :hook
+  (company-mode . company-box-mode)
+  :init
+  (setq company-box-icons-alist 'company-box-icons-all-the-icons)
+  :config
+  (setq company-box-backends-colors nil)
+  (setq company-box-show-single-candidate t)
+  (setq company-box-max-candidates 50)
+
+  (defun company-box-icons--elisp (candidate)
+    (when (derived-mode-p 'emacs-lisp-mode)
+      (let ((sym (intern candidate)))
+        (cond ((fboundp sym) 'Function)
+              ((featurep sym) 'Module)
+              ((facep sym) 'Color)
+              ((boundp sym) 'Variable)
+              ((symbolp sym) 'Text)
+              (t . nil)))))
+
+  (with-eval-after-load 'all-the-icons
+    (declare-function all-the-icons-faicon 'all-the-icons)
+    (declare-function all-the-icons-fileicon 'all-the-icons)
+    (declare-function all-the-icons-material 'all-the-icons)
+    (declare-function all-the-icons-octicon 'all-the-icons)
+    (setq company-box-icons-all-the-icons
+          `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.7 :v-adjust -0.15))
+            (Text . ,(all-the-icons-faicon "book" :height 0.68 :v-adjust -0.15))
+            (Method . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
+            (Function . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
+            (Constructor . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
+            (Field . ,(all-the-icons-faicon "tags" :height 0.65 :v-adjust -0.15 :face 'font-lock-warning-face))
+            (Variable . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face))
+            (Class . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
+            (Interface . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01))
+            (Module . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.15))
+            (Property . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face)) ;; Golang module
+            (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.7 :v-adjust -0.15))
+            (Value . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'font-lock-constant-face))
+            (Enum . ,(all-the-icons-material "storage" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-orange))
+            (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.7 :v-adjust -0.15))
+            (Snippet . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face))
+            (Color . ,(all-the-icons-material "palette" :height 0.7 :v-adjust -0.15))
+            (File . ,(all-the-icons-faicon "file-o" :height 0.7 :v-adjust -0.05))
+            (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.7 :v-adjust -0.15))
+            (Folder . ,(all-the-icons-octicon "file-directory" :height 0.7 :v-adjust -0.05))
+            (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-blueb))
+            (Constant . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05))
+            (Struct . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
+            (Event . ,(all-the-icons-faicon "bolt" :height 0.7 :v-adjust -0.05 :face 'all-the-icons-orange))
+            (Operator . ,(all-the-icons-fileicon "typedoc" :height 0.65 :v-adjust 0.05))
+            (TypeParameter . ,(all-the-icons-faicon "hashtag" :height 0.65 :v-adjust 0.07 :face 'font-lock-const-face))
+            (Template . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face)))))
+)
 
 (use-package company-go
   :ensure t
