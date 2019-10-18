@@ -410,19 +410,27 @@ I almost always want to kill the current buffer, so this snippet helps in that.
 ** smooth scrolling
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package smooth-scrolling
+    :ensure t
+    :config
+    (smooth-scrolling-mode 1)
+)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
 ;; Vertical Scroll
-(setq scroll-step 1)
-(setq scroll-margin 1)
-(setq scroll-conservatively 101)
-(setq scroll-up-aggressively 0.01)
-(setq scroll-down-aggressively 0.01)
-(setq auto-window-vscroll nil)
-(setq fast-but-imprecise-scrolling nil)
-(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
-(setq mouse-wheel-progressive-speed nil)
-;; Horizontal Scroll
-(setq hscroll-step 1)
-(setq hscroll-margin 1)
+;; (setq scroll-step 1)
+;; (setq scroll-margin 1)
+;; (setq scroll-conservatively 101)
+;; (setq scroll-up-aggressively 0.01)
+;; (setq scroll-down-aggressively 0.01)
+;; (setq auto-window-vscroll nil)
+;; (setq fast-but-imprecise-scrolling nil)
+;; (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
+;; (setq mouse-wheel-progressive-speed nil)
+;; (; Horizontal Scroll
+;; (setq hscroll-step 1)
+;; (setq hscroll-margin 1)
 #+END_SRC
 
 ** add final newline
@@ -435,6 +443,17 @@ I almost always want to kill the current buffer, so this snippet helps in that.
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
  (setq-default fill-column 80)
+#+END_SRC
+
+
+** auto balance windows on opening and closing frames
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(setq window-combination-resize t)
+;; (add-hook 'window-configuration-change-hook 'balance-windows-area)
+;; (add-hook 'window-size-change-functions 'balance-windows-area)
+
+;; (add-hook 'after-make-frame-functions 'balance-windows-area)
+;; (add-hook 'delete-frame-functions 'balance-windows-area)
 #+END_SRC
 
 
@@ -1054,6 +1073,33 @@ Make emacs use $PATH defined in the systems shell
 )
 #+END_SRC
 
+** evil-mc
+
+Multiple cursors for evil mode
+
+|------------+---------------------------------|
+| Key        | action                          |
+|------------+---------------------------------|
+| C-t or grn | skip creating a cursor forward  |
+| grp        | skip creating a cursor backward |
+| gru        | undo last addded cursor         |
+| grq        | remove all cursors              |
+|------------+---------------------------------|
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package evil-mc
+  :ensure t
+  :after evil
+  :bind
+  (:map evil-visual-state-map
+  ("C-d" . evil-mc-make-and-goto-next-match) ;; Make a cursor at point and go to the next match of the selected region or the symbol under cursor.
+  ("C-a" . evil-mc-make-all-cursors) ;; Create cursors for all strings that match the selected region or the symbol under cursor.
+  ("C-q" . evil-mc-undo-all-cursors)  ;; Remove all cursors.
+  )
+  :config
+  (global-evil-mc-mode  1)
+)
+#+END_SRC
 
 * org-mode
 
@@ -1636,11 +1682,16 @@ C-c g for any git related stuff other than magit's
 
 ** git-ignore mode
 
+
+** git-modes
+
+Major modes for git related files
+
 #+BEGIN_SRC emacs-lisp :tangle init.el
-  ;; Mode for .gitignore files.
-(use-package gitignore-mode
-  :ensure t
-)
+;; Mode for .gitignore files.
+(use-package gitignore-mode :ensure t :defer t)
+(use-package gitconfig-mode :ensure t :defer t)
+(use-package gitattributes-mode :ensure t :defer t)
 #+END_SRC
 
 ** git-time-machine
@@ -1654,6 +1705,18 @@ Navigation through the history of files
   ("C-c g t" . git-timemachine-toggle)
 )
 #+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (use-package forge
+    :ensure t
+    :after magit
+    :config
+    (setq forge-topic-list-limit '(30 . 5)
+          forge-pull-notifications t)
+)
+#+END_SRC
+
 
 * Projectile
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -1936,6 +1999,7 @@ Navigation through the history of files
   ;;   (global-company-mode . company-box-mode)
   ;; )
 (use-package company-box
+  :ensure t
   :hook
   (company-mode . company-box-mode)
   :init
@@ -2429,15 +2493,6 @@ Navigation through the history of files
  )
  #+END_SRC
 
-
-** auto balance windows on opening and closing frames
-#+BEGIN_SRC emacs-lisp :tangle init.el
-;; (add-hook 'window-configuration-change-hook 'balance-windows-area)
-(add-hook 'window-size-change-functions 'balance-windows-area)
-
-;; (add-hook 'after-make-frame-functions 'balance-windows-area)
-;; (add-hook 'delete-frame-functions 'balance-windows-area)
-#+END_SRC
 
 * windmove
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -2945,6 +3000,14 @@ this was commented with C-c ; so it doenst get exported in favor of doom-modelin
                     '("^~/Projects/" ":CODE:"))))
    #+END_SRC
 
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+ (use-package which-func
+    :config
+    (which-function-mode t)
+)
 #+END_SRC
 
 * Interface Enhancement
@@ -3780,7 +3843,8 @@ The Sections and Heading Levels gets configured as follows:
 (use-package scss-mode
   :ensure t
   ;; this mode doenst load using :mode from use-package, dunno why
-  :mode "\\.scss\\'"
+  :mode (("\\.scss\\'" . scss-mode)
+         ("\\.component.scss\\'" . scss-mode))
   :init
   (setq scss-compile-at-save 'nil)
   :config
@@ -3848,6 +3912,7 @@ The Sections and Heading Levels gets configured as follows:
 
 
 * Ruby
+
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package ruby-mode
   :mode "\\.rb\\'"
@@ -3866,6 +3931,24 @@ The Sections and Heading Levels gets configured as follows:
 )
 #+END_SRC
 
+** ruby-blocks
+
+Highlights ruby def/end blocks
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package ruby-block
+  :ensure t
+  :init
+  ;; do overlay
+  (setq ruby-block-highlight-toggle 'overlay)
+  ;; display to minibuffer
+  (setq ruby-block-highlight-toggle 'minibuffer)
+  ;; display to minibuffer and do overlay
+  (setq ruby-block-highlight-toggle t)
+  :config
+  (ruby-block-mode t)
+)
+#+END_SRC
 * Go
 
 #+BEGIN_SRC emacs-lisp :tangle init.el

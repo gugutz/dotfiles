@@ -246,23 +246,36 @@ tangled, and the tangled file is compiled."
   '(lambda () (interactive) (kill-buffer (current-buffer)))
 )
 
+(use-package smooth-scrolling
+    :ensure t
+    :config
+    (smooth-scrolling-mode 1)
+)
+
 ;; Vertical Scroll
-(setq scroll-step 1)
-(setq scroll-margin 1)
-(setq scroll-conservatively 101)
-(setq scroll-up-aggressively 0.01)
-(setq scroll-down-aggressively 0.01)
-(setq auto-window-vscroll nil)
-(setq fast-but-imprecise-scrolling nil)
-(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
-(setq mouse-wheel-progressive-speed nil)
-;; Horizontal Scroll
-(setq hscroll-step 1)
-(setq hscroll-margin 1)
+;; (setq scroll-step 1)
+;; (setq scroll-margin 1)
+;; (setq scroll-conservatively 101)
+;; (setq scroll-up-aggressively 0.01)
+;; (setq scroll-down-aggressively 0.01)
+;; (setq auto-window-vscroll nil)
+;; (setq fast-but-imprecise-scrolling nil)
+;; (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
+;; (setq mouse-wheel-progressive-speed nil)
+;; (; Horizontal Scroll
+;; (setq hscroll-step 1)
+;; (setq hscroll-margin 1)
 
 (setq require-final-newline t)
 
 (setq-default fill-column 80)
+
+(setq window-combination-resize t)
+;; (add-hook 'window-configuration-change-hook 'balance-windows-area)
+;; (add-hook 'window-size-change-functions 'balance-windows-area)
+
+;; (add-hook 'after-make-frame-functions 'balance-windows-area)
+;; (add-hook 'delete-frame-functions 'balance-windows-area)
 
 (use-package subword
   :ensure nil
@@ -744,6 +757,19 @@ tangled, and the tangled file is compiled."
   (emacs-lisp-mode . evil-paredit-mode)
 )
 
+(use-package evil-mc
+  :ensure t
+  :after evil
+  :bind
+  (:map evil-visual-state-map
+  ("C-d" . evil-mc-make-and-goto-next-match) ;; Make a cursor at point and go to the next match of the selected region or the symbol under cursor.
+  ("C-a" . evil-mc-make-all-cursors) ;; Create cursors for all strings that match the selected region or the symbol under cursor.
+  ("C-q" . evil-mc-undo-all-cursors)  ;; Remove all cursors.
+  )
+  :config
+  (global-evil-mc-mode  1)
+)
+
 (use-package org
   :ensure org-plus-contrib
   :defer t
@@ -1176,14 +1202,22 @@ tangled, and the tangled file is compiled."
 )
 
 ;; Mode for .gitignore files.
-(use-package gitignore-mode
-  :ensure t
-)
+(use-package gitignore-mode :ensure t :defer t)
+(use-package gitconfig-mode :ensure t :defer t)
+(use-package gitattributes-mode :ensure t :defer t)
 
 (use-package git-timemachine
   :ensure t
   :bind
   ("C-c g t" . git-timemachine-toggle)
+)
+
+(use-package forge
+    :ensure t
+    :after magit
+    :config
+    (setq forge-topic-list-limit '(30 . 5)
+          forge-pull-notifications t)
 )
 
 (use-package projectile
@@ -1414,6 +1448,7 @@ tangled, and the tangled file is compiled."
   ;;   (global-company-mode . company-box-mode)
   ;; )
 (use-package company-box
+  :ensure t
   :hook
   (company-mode . company-box-mode)
   :init
@@ -1834,12 +1869,6 @@ tangled, and the tangled file is compiled."
   :config
   (setq ranger-show-hidden t) ;; show hidden files
 )
-
-;; (add-hook 'window-configuration-change-hook 'balance-windows-area)
-(add-hook 'window-size-change-functions 'balance-windows-area)
-
-;; (add-hook 'after-make-frame-functions 'balance-windows-area)
-;; (add-hook 'delete-frame-functions 'balance-windows-area)
 
 (use-package windmove
   :ensure t
@@ -2776,7 +2805,8 @@ tangled, and the tangled file is compiled."
 (use-package scss-mode
   :ensure t
   ;; this mode doenst load using :mode from use-package, dunno why
-  :mode "\\.scss\\'"
+  :mode (("\\.scss\\'" . scss-mode)
+         ("\\.component.scss\\'" . scss-mode))
   :init
   (setq scss-compile-at-save 'nil)
   :config
@@ -2843,6 +2873,19 @@ tangled, and the tangled file is compiled."
     (require 'inf-ruby)
     (inf-ruby-keys))
   (add-hook 'ruby-mode-hook 'my-ruby-mode-hook)
+)
+
+(use-package ruby-block
+  :ensure t
+  :init
+  ;; do overlay
+  (setq ruby-block-highlight-toggle 'overlay)
+  ;; display to minibuffer
+  (setq ruby-block-highlight-toggle 'minibuffer)
+  ;; display to minibuffer and do overlay
+  (setq ruby-block-highlight-toggle t)
+  :config
+  (ruby-block-mode t)
 )
 
 (use-package go-mode
