@@ -140,6 +140,8 @@ tangled, and the tangled file is compiled."
 (defalias 'yes-or-no-p 'y-or-n-p)
 (fset 'yes-or-no-p 'y-or-n-p)
 
+(setq large-file-warning-threshold nil) ;; Don’t warn me about opening large files
+
 (use-package display-line-numbers
   :if (version<= "26.0.50" emacs-version)
   :ensure nil
@@ -161,10 +163,9 @@ tangled, and the tangled file is compiled."
 
   ;; old linum-mode variables, check if they work with new display-line-numbers-mode
   ;; (setq linum-format 'dynamic)
-  ;; Putting the following in your .emacs will put one space separation between the linenumber display and the buffer contents:
-  (setq linum-format " %d ")
-  ;; If you want a solid line separator, try something like this:
-  ;;(setq linum-format "%4d \u2502 ")
+  ;; (setq linum-format " %d ") ;; one space separation between the linenumber display and the buffer contents:
+  ;; (setq linum-format "%4d “) ;; 4 character and a space for line numbers
+  (setq linum-format "%4d \u2502 ") ; 4 chars and a space with solid line separator
 
 
 
@@ -270,12 +271,16 @@ tangled, and the tangled file is compiled."
 
 (setq-default fill-column 80)
 
-(setq window-combination-resize t)
-;; (add-hook 'window-configuration-change-hook 'balance-windows-area)
-;; (add-hook 'window-size-change-functions 'balance-windows-area)
+(prefer-coding-system 'utf-8) ;; Prefer UTF-8 encoding
 
-;; (add-hook 'after-make-frame-functions 'balance-windows-area)
-;; (add-hook 'delete-frame-functions 'balance-windows-area)
+(setq window-combination-resize t)
+
+;; (setq-default line-spacing 1) ;; A nice line height
+(setq-default line-spacing 3)
+
+(setq system-uses-terminfo nil) ;; Fix weird color escape sequences
+
+;; (setq confirm-kill-emacs 'yes-or-no-p) ;; Ask for confirmation before closing emacs
 
 (use-package subword
   :ensure nil
@@ -290,26 +295,6 @@ tangled, and the tangled file is compiled."
   :ensure nil
   :hook
   (js2-mode . superword-mode)
-)
-
-; parentheses
-(use-package paren
-  :ensure nil
-  :hook
-  (after-init . show-paren-mode)
-  :custom-face
-  (show-paren-match ((nil (:background "#44475a" :foreground "#f1fa8c")))) ;; :box t
-  :config
-  (setq show-paren-delay 0)
-  (setq show-paren-style 'mixed)
-  (setq show-paren-when-point-inside-paren t)
-  (setq show-paren-when-point-in-periphery t)
-  (show-paren-mode +1)
-)
-
-(use-package paren
-  :ensure nil
-  :config
 )
 
 (setq-default indent-tabs-mode nil)
@@ -1938,7 +1923,7 @@ tangled, and the tangled file is compiled."
 (blink-cursor-mode t)
 (setq blink-cursor-blinks 0) ;; blink forever
 (setq-default indicate-empty-lines t)
-(setq-default line-spacing 3)
+
 (setq frame-title-format '("Emacs"))
 
 (scroll-bar-mode -1)
@@ -2460,6 +2445,20 @@ tangled, and the tangled file is compiled."
   (centaur-tabs-mode t)
 )
 
+(use-package paren
+  :ensure nil
+  :hook
+  (after-init . show-paren-mode)
+  :custom-face
+  (show-paren-match ((nil (:background "#44475a" :foreground "#f1fa8c")))) ;; :box t
+  :config
+  (setq show-paren-delay 0)
+  (setq show-paren-style 'mixed)
+  (setq show-paren-when-point-inside-paren t)
+  (setq show-paren-when-point-in-periphery t)
+  (show-paren-mode +1)
+)
+
 (use-package highlight-numbers
     :ensure t
     :hook
@@ -2680,6 +2679,15 @@ tangled, and the tangled file is compiled."
   (treemacs-mode . hide-mode-line-mode)
 )
 
+(use-package saveplace
+  :ensure t
+  :hook
+  (after-init . save-place-mode)
+  :init
+  (setq-default save-place t)
+  (setq save-place-file (expand-file-name ".places" user-emacs-directory))
+)
+
 (use-package multiple-cursors
   :after evil
   ;; step 1, select thing in visual-mode (OPTIONAL)
@@ -2811,6 +2819,7 @@ tangled, and the tangled file is compiled."
   (setq scss-compile-at-save 'nil)
   :config
    (add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
+   (add-to-list 'auto-mode-alist '("\\.component.scss\\'" . scss-mode))
 )
 
 (use-package helm-css-scss
@@ -2868,14 +2877,50 @@ tangled, and the tangled file is compiled."
    (ripper-tags . "gem install ripper-tags")
    (pry         . "gem install pry"))
   :functions inf-ruby-keys
+  :hook
+  (ruby-mode . subword-mode)
+  (ruby-mode . eldoc-mode)
   :config
   (defun my-ruby-mode-hook ()
     (require 'inf-ruby)
     (inf-ruby-keys))
-  (add-hook 'ruby-mode-hook 'my-ruby-mode-hook)
+
+  ;; Switch the compilation buffer mode with C-x C-q (useful
+  ;; when interacting with a debugger)
+  (add-hook 'after-init-hook 'inf-ruby-switch-setup)
+
+  (add-hook 'ruby-mode-hook
+            (lambda ()
+              (hs-minor-mode 1) ;; Enables folding
+              (modify-syntax-entry ?: "."))) ;; Adds ":" to the word definition
+)
+
+;; Functions to help with refactoring
+(use-package ruby-refactor
+  :ensure t
+  :defer t
+  :hook
+  (ruby-mode . ruby.refactor-mode-launch)
+)
+
+(use-package ruby-hash-syntax
+  :ensure t
+)
+
+(use-package ruby-additional
+  :ensure t
+)
+
+(use-package ruby-tools
+  :ensure t
+)
+
+(use-package rspec-mode
+  :ensure t
 )
 
 (use-package ruby-block
+  :disabled
   :ensure t
   :init
   ;; do overlay
@@ -2886,6 +2931,12 @@ tangled, and the tangled file is compiled."
   (setq ruby-block-highlight-toggle t)
   :config
   (ruby-block-mode t)
+)
+
+(use-package ruby-extra-highlight
+  :ensure t
+  :hook
+  (ruby-mode . ruby-extra-highlight-mode)
 )
 
 (use-package go-mode
@@ -2949,12 +3000,15 @@ tangled, and the tangled file is compiled."
   :ensure-system-package
   (prettier . "npm install -g prettier")
   :hook
+  (prettier-js-mode . tau/user-prettier-if-in-node-modules)
   (js2-mode . prettier-js-mode)
   (web-mode . prettier-js-mode)
   (rjsx-mode . prettier-js-mode)
   (css-mode . prettier-js-mode)
   (scss-mode . prettier-js-mode)
   (json-mode . prettier-js-mode)
+  :init
+  (setq prettier-js-show-errors 'buffer)
   :config
   (setq prettier-js-args '("--bracket-spacing" "false"
                            "--print-width" "80"
@@ -2966,6 +3020,27 @@ tangled, and the tangled file is compiled."
                            "--no-bracket-spacing" "true"
                            "--jsx-bracket-same-line" "false"
                            "--arrow-parens" "avoid"))
+
+  ;; use prettier from local `node_modules' folder if available
+  (defun tau/use-prettier-if-in-node-modules ()
+  "Enable prettier-js-mode iff prettier was found installed locally in project"
+  (interactive)
+  (let* ((file-name (or (buffer-file-name) default-directory))
+         (root (locate-dominating-file file-name "node_modules"))
+         (prettier (and root
+                        (expand-file-name "node_modules/prettier/bin-prettier.js" root))))
+    (if (and prettier (file-executable-p prettier))
+        (progn
+          (message "Found local prettier executable at %s. Enabling prettier-js-mode" prettier)
+          (setq prettier-js-command prettier)
+          (make-variable-buffer-local 'prettier-js-command)
+          (prettier-js-mode)
+          (message "Disabling aggressive-indent-mode in favour of prettier")
+          (aggressive-indent-mode -1))
+      (progn
+        (message "Prettier not found in %s. Not enabling prettier-js-mode" root)
+        (message "Falling back to aggressive-indent-mode")
+        (aggressive-indent-mode 1)))))
 )
 
 ;; json-mode: Major mode for editing JSON files with emacs
@@ -2982,6 +3057,27 @@ tangled, and the tangled file is compiled."
   :ensure t
   :ensure-system-package
   (eslint . "npm i -g eslint")
+  :config
+  ;; Grab eslint executable from node_modules instead of global
+  ;; Taken from https://github.com/flycheck/flycheck/issues/1087#issuecomment-246514860
+  ;; Gist: https://github.com/lunaryorn/.emacs.d/blob/master/lisp/lunaryorn-flycheck.el#L62
+  (defun lunaryorn-use-js-executables-from-node-modules ()
+    "Set executables of JS and TS checkers from local node modules."
+    (-when-let* ((file-name (buffer-file-name))
+                 (root (locate-dominating-file file-name "node_modules"))
+                 (module-directory (expand-file-name "node_modules" root)))
+      (pcase-dolist (`(,checker . ,module) '((javascript-jshint . "jshint")
+                                             (javascript-eslint . "eslint")
+                                             (typescript-tslint . "tslint")
+                                             (javascript-jscs   . "jscs")))
+        (let ((package-directory (expand-file-name module module-directory))
+              (executable-var (flycheck-checker-executable-variable checker)))
+          (when (file-directory-p package-directory)
+            (set (make-local-variable executable-var)
+                 (expand-file-name (if (string= module "tslint")
+                                       (concat "bin/" module)
+                                     (concat "bin/" module ".js"))
+                                   package-directory)))))))
 )
 
 (use-package rjsx-mode

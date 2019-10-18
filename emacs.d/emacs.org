@@ -207,9 +207,12 @@ PS: this also stops preventing editing colisions, so watch out
 #+END_SRC
 
 ** Use the system clipboard
-   #+BEGIN_SRC emacs-lisp :tangle init.el
+
+Enable copy/past-ing from clipboard
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
 (setq x-select-enable-clipboard t)
-   #+END_SRC
+#+END_SRC
 
 ** Always follow symbolic links to edit the 'actual' file it points to
 
@@ -254,10 +257,17 @@ PS: this also stops preventing editing colisions, so watch out
 #+END_SRC
 
 ** Create alias to yes-or-no anwsers (y-or-n-p
-   #+BEGIN_SRC emacs-lisp :tangle init.el
+
+ #+BEGIN_SRC emacs-lisp :tangle init.el
 (defalias 'yes-or-no-p 'y-or-n-p)
 (fset 'yes-or-no-p 'y-or-n-p)
-   #+END_SRC
+ #+END_SRC
+
+** dont ask for confirmation for opening large files
+
+ #+BEGIN_SRC emacs-lisp :tangle init.el
+(setq large-file-warning-threshold nil) ;; Don’t warn me about opening large files
+ #+END_SRC
 
 ** display-line-numbers
 
@@ -285,10 +295,9 @@ Released with Emacs 26 (released in 2018-05)
 
   ;; old linum-mode variables, check if they work with new display-line-numbers-mode
   ;; (setq linum-format 'dynamic)
-  ;; Putting the following in your .emacs will put one space separation between the linenumber display and the buffer contents:
-  (setq linum-format " %d ")
-  ;; If you want a solid line separator, try something like this:
-  ;;(setq linum-format "%4d \u2502 ")
+  ;; (setq linum-format " %d ") ;; one space separation between the linenumber display and the buffer contents:
+  ;; (setq linum-format "%4d “) ;; 4 character and a space for line numbers
+  (setq linum-format "%4d \u2502 ") ; 4 chars and a space with solid line separator
 
 
 
@@ -441,19 +450,40 @@ I almost always want to kill the current buffer, so this snippet helps in that.
 
 ** fill column
 
+Sets a 80 character line width
+
 #+BEGIN_SRC emacs-lisp :tangle init.el
  (setq-default fill-column 80)
 #+END_SRC
 
+** preffer UTF-8 coding system
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(prefer-coding-system 'utf-8) ;; Prefer UTF-8 encoding
+#+END_SRC
 
 ** auto balance windows on opening and closing frames
+
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (setq window-combination-resize t)
-;; (add-hook 'window-configuration-change-hook 'balance-windows-area)
-;; (add-hook 'window-size-change-functions 'balance-windows-area)
+#+END_SRC
 
-;; (add-hook 'after-make-frame-functions 'balance-windows-area)
-;; (add-hook 'delete-frame-functions 'balance-windows-area)
+** set default line spacing
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;; (setq-default line-spacing 1) ;; A nice line height
+(setq-default line-spacing 3)
+#+END_SRC
+
+** fix wierd color escape system
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(setq system-uses-terminfo nil) ;; Fix weird color escape sequences
+#+END_SRC
+
+** confirm before closing emacs
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;; (setq confirm-kill-emacs 'yes-or-no-p) ;; Ask for confirmation before closing emacs
 #+END_SRC
 
 
@@ -484,29 +514,6 @@ I almost always want to kill the current buffer, so this snippet helps in that.
   :ensure nil
   :hook
   (js2-mode . superword-mode)
-)
-#+END_SRC
-
-** show matching parenthesis
-#+BEGIN_SRC emacs-lisp :tangle init.el
-; parentheses
-(use-package paren
-  :ensure nil
-  :hook
-  (after-init . show-paren-mode)
-  :custom-face
-  (show-paren-match ((nil (:background "#44475a" :foreground "#f1fa8c")))) ;; :box t
-  :config
-  (setq show-paren-delay 0)
-  (setq show-paren-style 'mixed)
-  (setq show-paren-when-point-inside-paren t)
-  (setq show-paren-when-point-in-periphery t)
-  (show-paren-mode +1)
-)
-
-(use-package paren
-  :ensure nil
-  :config
 )
 #+END_SRC
 
@@ -1520,7 +1527,7 @@ Org Mode Integration with Jira Projects
 #+END_SRC
 
 
-** Turn flycheck inline extension after flycheck starts
+** flycheck inline
 
 : Quick peek is an extension that embelishes flycheck inline messages
 
@@ -1536,6 +1543,11 @@ Org Mode Integration with Jira Projects
   :hook
   (flycheck-mode . flycheck-inline-mode)
   :config
+  ;; Set fringe style
+  (setq flycheck-indication-mode 'right-fringe)
+
+  (flycheck-mode-line-prefix "Syntax")
+
   ;; (global-flycheck-inline-mode)
   (setq flycheck-inline-display-function
         (lambda (msg pos)
@@ -1550,15 +1562,40 @@ Org Mode Integration with Jira Projects
 
 ** flycheck-pos-tip (show flycheck messages in tooltip)
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
 ;;; Show Flycheck errors in tooltip
+
+: appearently depends on cask
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package flycheck-pos-tip
   :ensure t
-  ;;:disabled t
+  :disabled
+  :defines flycheck-pos-tip-timeout
   :after flycheck
-  :config (flycheck-pos-tip-mode)
+  :hook
+  (global-flycheck-mode . flycheck-pos-tip-mode)
+  :config
+  (setq flycheck-pos-tip-timeout 30)
+  (flycheck-pos-tip-mode)
 )
 #+END_SRC
+
+** flycheck-popup-tip (show flycheck messages in tooltip)
+
+There is another official flycheck-pos-tip extension for displaying errors under point. However, it does not display popup if you run Emacs under TTY. It displays message on echo area and that is often used for ELDoc. Also, popups made by pos-tip library does not always look good, especially on macOS and Windows.
+: appearently depends on cask
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;;; Show Flycheck errors in tooltip
+(use-package flycheck-popup-tip
+  :ensure t
+  :after flycheck
+  :hook
+  (flycheck-mode . flycheck-popup-tip-mode)
+  :config
+  (setq flycheck-popup-tip-error-prefix "\u27a4") ;;  display arrow like this: `➤'
+  ;; (setq flycheck-popup-tip-error-prefix "* ")
+)
 
 * Version Control
 
@@ -2509,7 +2546,19 @@ Navigation through the history of files
 )
 #+END_SRC
 
+* emacs-rotate
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package rotate
+  :ensure t
+  :bind
+  ("C-c C-r w" . rotate-window)
+  ("C-c C-r l" . rotate-layout)
+)
+#+END_SRC
+
 * ace jump mode
+
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package ace-jump-mode
   :ensure t
@@ -2517,7 +2566,6 @@ Navigation through the history of files
   ("C-." . ace-jump-mode)
 )
 #+END_SRC
-
 
 * PDF Tools
 
@@ -2582,7 +2630,7 @@ Used in adition with the Edit in Emacs plugin for Chrome
 
 ** startup stuff (splash and start screen, scratch message, etc...)
 
- #+BEGIN_SRC emacs-lisp :tangle init.el
+#+BEGIN_SRC emacs-lisp :tangle init.el
 ;; appearantly the `inhibit-splash-screen' was deprecaded. uses `inhibit-startup-screen' now
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-screen t)
@@ -2601,7 +2649,7 @@ Used in adition with the Edit in Emacs plugin for Chrome
 (blink-cursor-mode t)
 (setq blink-cursor-blinks 0) ;; blink forever
 (setq-default indicate-empty-lines t)
-(setq-default line-spacing 3)
+
 (setq frame-title-format '("Emacs"))
  #+END_SRC
 
@@ -3314,6 +3362,26 @@ Zoom in selected window and resize othersAuto balance windows and frames
 
 * Highlights
 
+** show paren mode
+
+Highlight matching parenthesis
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package paren
+  :ensure nil
+  :hook
+  (after-init . show-paren-mode)
+  :custom-face
+  (show-paren-match ((nil (:background "#44475a" :foreground "#f1fa8c")))) ;; :box t
+  :config
+  (setq show-paren-delay 0)
+  (setq show-paren-style 'mixed)
+  (setq show-paren-when-point-inside-paren t)
+  (setq show-paren-when-point-in-periphery t)
+  (show-paren-mode +1)
+)
+#+END_SRC
+
 ** Highlighting numbers
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -3631,13 +3699,13 @@ Highlight crosshair (combination of hl-lines and hl-columns
 
 ** editorconfig
 
-   #+BEGIN_SRC emacs-lisp :tangle init.el
+#+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package editorconfig
   :ensure t
   :config
   (editorconfig-mode 1)
 )
- #+END_SRC
+#+END_SRC
 
 ** hide mode line mode
 
@@ -3648,6 +3716,18 @@ Highlight crosshair (combination of hl-lines and hl-columns
   (completion-list-mode . hide-mode-line-mode)
   (neotree-mode . hide-mode-line-mode)
   (treemacs-mode . hide-mode-line-mode)
+)
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package saveplace
+  :ensure t
+  :hook
+  (after-init . save-place-mode)
+  :init
+  (setq-default save-place t)
+  (setq save-place-file (expand-file-name ".places" user-emacs-directory))
 )
 #+END_SRC
 
@@ -3849,6 +3929,7 @@ The Sections and Heading Levels gets configured as follows:
   (setq scss-compile-at-save 'nil)
   :config
    (add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
+   (add-to-list 'auto-mode-alist '("\\.component.scss\\'" . scss-mode))
 )
 #+END_SRC
 
@@ -3923,20 +4004,82 @@ The Sections and Heading Levels gets configured as follows:
    (ripper-tags . "gem install ripper-tags")
    (pry         . "gem install pry"))
   :functions inf-ruby-keys
+  :hook
+  (ruby-mode . subword-mode)
+  (ruby-mode . eldoc-mode)
   :config
   (defun my-ruby-mode-hook ()
     (require 'inf-ruby)
     (inf-ruby-keys))
-  (add-hook 'ruby-mode-hook 'my-ruby-mode-hook)
+
+  ;; Switch the compilation buffer mode with C-x C-q (useful
+  ;; when interacting with a debugger)
+  (add-hook 'after-init-hook 'inf-ruby-switch-setup)
+
+  (add-hook 'ruby-mode-hook
+            (lambda ()
+              (hs-minor-mode 1) ;; Enables folding
+              (modify-syntax-entry ?: "."))) ;; Adds ":" to the word definition
+)
+#+END_SRC
+
+** ruby refactor
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;; Functions to help with refactoring
+(use-package ruby-refactor
+  :ensure t
+  :defer t
+  :hook
+  (ruby-mode . ruby.refactor-mode-launch)
+)
+#+END_SRC
+
+** ruby hash syntax
+
+Easily toggle ruby's hash syntax
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package ruby-hash-syntax
+  :ensure t
+)
+#+END_SRC
+
+** ruby additional
+
+Ruby rdoc helpers mostly
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package ruby-additional
+  :ensure t
+)
+#+END_SRC
+
+** ruby-tools
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package ruby-tools
+  :ensure t
+)
+#+END_SRC
+
+** rspec-mode
+
+Support for running rspec tests
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package rspec-mode
+  :ensure t
 )
 #+END_SRC
 
 ** ruby-blocks
 
 Highlights ruby def/end blocks
+Unfortunatelly this package has to be installed manually, as its not available on MELPA
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package ruby-block
+  :disabled
   :ensure t
   :init
   ;; do overlay
@@ -3949,6 +4092,18 @@ Highlights ruby def/end blocks
   (ruby-block-mode t)
 )
 #+END_SRC
+
+** ruby-extra-highlights
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package ruby-extra-highlight
+  :ensure t
+  :hook
+  (ruby-mode . ruby-extra-highlight-mode)
+)
+#+END_SRC
+
+
 * Go
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -4025,12 +4180,15 @@ Highlights ruby def/end blocks
   :ensure-system-package
   (prettier . "npm install -g prettier")
   :hook
+  (prettier-js-mode . tau/user-prettier-if-in-node-modules)
   (js2-mode . prettier-js-mode)
   (web-mode . prettier-js-mode)
   (rjsx-mode . prettier-js-mode)
   (css-mode . prettier-js-mode)
   (scss-mode . prettier-js-mode)
   (json-mode . prettier-js-mode)
+  :init
+  (setq prettier-js-show-errors 'buffer) ;; options: 'buffer, 'echo or nil
   :config
   (setq prettier-js-args '("--bracket-spacing" "false"
                            "--print-width" "80"
@@ -4042,6 +4200,27 @@ Highlights ruby def/end blocks
                            "--no-bracket-spacing" "true"
                            "--jsx-bracket-same-line" "false"
                            "--arrow-parens" "avoid"))
+
+  ;; use prettier from local `node_modules' folder if available
+  (defun tau/use-prettier-if-in-node-modules ()
+  "Enable prettier-js-mode iff prettier was found installed locally in project"
+  (interactive)
+  (let* ((file-name (or (buffer-file-name) default-directory))
+         (root (locate-dominating-file file-name "node_modules"))
+         (prettier (and root
+                        (expand-file-name "node_modules/prettier/bin-prettier.js" root))))
+    (if (and prettier (file-executable-p prettier))
+        (progn
+          (message "Found local prettier executable at %s. Enabling prettier-js-mode" prettier)
+          (setq prettier-js-command prettier)
+          (make-variable-buffer-local 'prettier-js-command)
+          (prettier-js-mode)
+          (message "Disabling aggressive-indent-mode in favour of prettier")
+          (aggressive-indent-mode -1))
+      (progn
+        (message "Prettier not found in %s. Not enabling prettier-js-mode" root)
+        (message "Falling back to aggressive-indent-mode")
+        (aggressive-indent-mode 1)))))
 )
 #+END_SRC
 
@@ -4070,6 +4249,27 @@ https://github.com/aaronjensen/eslintd-fix/tree/master
   :ensure t
   :ensure-system-package
   (eslint . "npm i -g eslint")
+  :config
+  ;; Grab eslint executable from node_modules instead of global
+  ;; Taken from https://github.com/flycheck/flycheck/issues/1087#issuecomment-246514860
+  ;; Gist: https://github.com/lunaryorn/.emacs.d/blob/master/lisp/lunaryorn-flycheck.el#L62
+  (defun lunaryorn-use-js-executables-from-node-modules ()
+    "Set executables of JS and TS checkers from local node modules."
+    (-when-let* ((file-name (buffer-file-name))
+                 (root (locate-dominating-file file-name "node_modules"))
+                 (module-directory (expand-file-name "node_modules" root)))
+      (pcase-dolist (`(,checker . ,module) '((javascript-jshint . "jshint")
+                                             (javascript-eslint . "eslint")
+                                             (typescript-tslint . "tslint")
+                                             (javascript-jscs   . "jscs")))
+        (let ((package-directory (expand-file-name module module-directory))
+              (executable-var (flycheck-checker-executable-variable checker)))
+          (when (file-directory-p package-directory)
+            (set (make-local-variable executable-var)
+                 (expand-file-name (if (string= module "tslint")
+                                       (concat "bin/" module)
+                                     (concat "bin/" module ".js"))
+                                   package-directory)))))))
 )
 #+END_SRC
 
