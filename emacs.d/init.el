@@ -26,23 +26,52 @@ tangled, and the tangled file is compiled."
 (package-initialize)
 
 (custom-set-variables
-;; custom-set-variables was added by Custom.
-;; If you edit it by hand, you could mess it up, so be careful.
-;; Your init file should contain only one such instance.
-;; If there is more than one, they won't work right.
-'(custom-safe-themes
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
    (quote
-   ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
-   '(fci-rule-color "#3E4451")
-   '(package-selected-packages
-     (quote
-     (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
-   (custom-set-faces
-   ;; custom-set-faces was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
-   )
+    ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
+ '(fci-rule-color "#3E4451")
+ '(flycheck-display-errors-delay 1)
+ '(jiralib-url "https://stairscreativestudio.atlassian.net" t)
+ '(lsp-auto-guess-root t)
+ '(lsp-document-sync-method (quote incremental))
+ '(lsp-prefer-flymake t)
+ '(lsp-print-io nil)
+ '(lsp-print-performance nil)
+ '(lsp-response-timeout 10)
+ '(lsp-trace nil t)
+ '(magit-auto-revert-mode nil)
+ '(package-selected-packages
+   (quote
+    (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
+   
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(company-preview-common ((t (:foreground unspecified :background "#111111"))))
+ '(company-scrollbar-bg ((t (:background "#111111"))))
+ '(company-scrollbar-fg ((t (:background "#555555"))))
+ '(company-tooltip ((t (:inherit default :background "#222222"))))
+ '(company-tooltip-common ((t (:inherit font-lock-constant-face))))
+ '(company-tooltip-selection ((t (:inherit company-tooltip-common :background "#2a2a2a"))))
+ '(css-selector ((t (:inherit default :foreground "#66CCFF"))))
+ '(diff-hl-change ((t (:foreground "darkolivegreen"))))
+ '(diff-hl-delete ((t (:background "#ee6363"))))
+ '(diff-hl-insert ((t (:background "#7ccd7c"))))
+ '(evil-goggles-change-face ((t (:inherit diff-removed))))
+ '(evil-goggles-delete-face ((t (:inherit diff-removed))))
+ '(evil-goggles-paste-face ((t (:inherit diff-added))))
+ '(evil-goggles-undo-redo-add-face ((t (:inherit diff-added))))
+ '(evil-goggles-undo-redo-change-face ((t (:inherit diff-changed))))
+ '(evil-goggles-undo-redo-remove-face ((t (:inherit diff-removed))))
+ '(evil-goggles-yank-face ((t (:inherit diff-changed))))
+ '(font-lock-comment-face ((t (:foreground "#828282"))))
+ '(show-paren-match ((nil (:background "#44475a" :foreground "#f1fa8c")))))
 
 (add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
 ;; (add-to-list 'load-path "~/dotfiles/emacs.d/config")
@@ -755,6 +784,40 @@ tangled, and the tangled file is compiled."
   (global-evil-mc-mode  1)
 )
 
+(use-package evil-goggles
+  :ensure t
+  :config
+  (evil-goggles-mode)
+  (setq evil-goggles-pulse t) ;; default is to pulse when running in a graphic display
+  (setq evil-goggles-duration 0.100) ;; default is 0.200
+
+;; list of all on/off variables, their default value is `t`:
+
+  (setq evil-goggles-enable-paste nil) ;; to disable the hint when pasting
+;;(setq  evil-goggles-enable-delete t)
+;;(setq  evil-goggles-enable-change t)
+;;(setq evil-goggles-enable-indent t)
+;;(setq  evil-goggles-enable-yank t)
+;;(setq  evil-goggles-enable-join t)
+;;(setq evil-goggles-enable-fill-and-move t)
+;;(setq evil-goggles-enable-paste t)
+;;(setq evil-goggles-enable-shift t)
+;;(setq evil-goggles-enable-surround t)
+;;(setq evil-goggles-enable-commentary)
+;;(setq evil-goggles-enable-nerd-commenter t)
+;;(setq evil-goggles-enable-replace-with-register t)
+;;(setq evil-goggles-enable-set-marker t)
+;;(setq evil-goggles-enable-undo t)
+;;(setq evil-goggles-enable-redo t)
+;;(setq evil-goggles-enable-record-macro t)
+
+  ;; optionally use diff-mode's faces; as a result, deleted text
+  ;; will be highlighed with `diff-removed` face which is typically
+  ;; some red color (as defined by the color theme)
+  ;; other faces such as `diff-added` will be used for other actions
+  (evil-goggles-use-diff-faces)
+)
+
 (use-package org
   :ensure org-plus-contrib
   :defer t
@@ -1073,6 +1136,11 @@ tangled, and the tangled file is compiled."
   :hook
   (flycheck-mode . flycheck-inline-mode)
   :config
+  ;; Set fringe style
+  (setq flycheck-indication-mode 'right-fringe)
+
+  (setq flycheck-mode-line-prefix "Syntax")
+
   ;; (global-flycheck-inline-mode)
   (setq flycheck-inline-display-function
         (lambda (msg pos)
@@ -1083,12 +1151,27 @@ tangled, and the tangled file is compiled."
             (quick-peek-update ov)))
         flycheck-inline-clear-function #'quick-peek-hide))
 
-;;; Show Flycheck errors in tooltip
 (use-package flycheck-pos-tip
   :ensure t
-  ;;:disabled t
+  :disabled
+  :defines flycheck-pos-tip-timeout
   :after flycheck
-  :config (flycheck-pos-tip-mode)
+  :hook
+  (global-flycheck-mode . flycheck-pos-tip-mode)
+  :config
+  (setq flycheck-pos-tip-timeout 30)
+  (flycheck-pos-tip-mode)
+)
+
+;;; Show Flycheck errors in tooltip
+(use-package flycheck-popup-tip
+  :ensure t
+  :after flycheck
+  :hook
+  (flycheck-mode . flycheck-popup-tip-mode)
+  :config
+  (setq flycheck-popup-tip-error-prefix "\u27a4") ;;  display arrow like this: `➤'
+  ;; (setq flycheck-popup-tip-error-prefix "* ")
 )
 
 (use-package magit
@@ -1867,6 +1950,13 @@ tangled, and the tangled file is compiled."
   (global-set-key (kbd "C-S-J") 'windmove-down)
 )
 
+(use-package rotate
+  :ensure t
+  :bind
+  ("C-c C-r w" . rotate-window)
+  ("C-c C-r l" . rotate-layout)
+)
+
 (use-package ace-jump-mode
   :ensure t
   :bind
@@ -1976,6 +2066,7 @@ tangled, and the tangled file is compiled."
 )
 
 (use-package parrot
+  :ensure t
   :config
   ;; To see the party parrot in the modeline, turn on parrot mode:
   (parrot-mode)
@@ -2602,6 +2693,7 @@ tangled, and the tangled file is compiled."
 
 (use-package volatile-highlights
   :ensure t
+  :disabled
   :hook
   (after-init . volatile-highlights-mode)
   :custom-face
@@ -3008,7 +3100,7 @@ tangled, and the tangled file is compiled."
   (scss-mode . prettier-js-mode)
   (json-mode . prettier-js-mode)
   :init
-  (setq prettier-js-show-errors 'buffer)
+  (setq prettier-js-show-errors 'buffer) ;; options: 'buffer, 'echo or nil
   :config
   (setq prettier-js-args '("--bracket-spacing" "false"
                            "--print-width" "80"
