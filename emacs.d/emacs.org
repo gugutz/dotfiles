@@ -1053,7 +1053,7 @@ Make emacs use $PATH defined in the systems shell
 (add-hook 'org-mode-hook 'evil-surround-org-mode-hook-setup)
    #+END_SRC
 
-** Vim Commentary
+** evil-commentary
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package evil-commentary
@@ -1107,6 +1107,45 @@ Multiple cursors for evil mode
   (global-evil-mc-mode  1)
 )
 #+END_SRC
+
+** evil-goggles
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package evil-goggles
+  :ensure t
+  :config
+  (evil-goggles-mode)
+  (setq evil-goggles-pulse t) ;; default is to pulse when running in a graphic display
+  (setq evil-goggles-duration 0.100) ;; default is 0.200
+
+;; list of all on/off variables, their default value is `t`:
+
+  (setq evil-goggles-enable-paste nil) ;; to disable the hint when pasting
+;;(setq  evil-goggles-enable-delete t)
+;;(setq  evil-goggles-enable-change t)
+;;(setq evil-goggles-enable-indent t)
+;;(setq  evil-goggles-enable-yank t)
+;;(setq  evil-goggles-enable-join t)
+;;(setq evil-goggles-enable-fill-and-move t)
+;;(setq evil-goggles-enable-paste t)
+;;(setq evil-goggles-enable-shift t)
+;;(setq evil-goggles-enable-surround t)
+;;(setq evil-goggles-enable-commentary)
+;;(setq evil-goggles-enable-nerd-commenter t)
+;;(setq evil-goggles-enable-replace-with-register t)
+;;(setq evil-goggles-enable-set-marker t)
+;;(setq evil-goggles-enable-undo t)
+;;(setq evil-goggles-enable-redo t)
+;;(setq evil-goggles-enable-record-macro t)
+
+  ;; optionally use diff-mode's faces; as a result, deleted text
+  ;; will be highlighed with `diff-removed` face which is typically
+  ;; some red color (as defined by the color theme)
+  ;; other faces such as `diff-added` will be used for other actions
+  (evil-goggles-use-diff-faces)
+)
+#+END_SRC
+
 
 * org-mode
 
@@ -1547,7 +1586,7 @@ Org Mode Integration with Jira Projects
   ;; Set fringe style
   (setq flycheck-indication-mode 'right-fringe)
 
-  (flycheck-mode-line-prefix "Syntax")
+  (setq flycheck-mode-line-prefix "Syntax")
 
   ;; (global-flycheck-inline-mode)
   (setq flycheck-inline-display-function
@@ -1598,6 +1637,10 @@ There is another official flycheck-pos-tip extension for displaying errors under
   ;; (setq flycheck-popup-tip-error-prefix "* ")
 )
 #+END_SRC
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6403db432bd8f8f02e0232ab09ba0bfa22c85422
 
 * Version Control
 
@@ -2753,6 +2796,7 @@ Type of parrots available:
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package parrot
+  :ensure t
   :config
   ;; To see the party parrot in the modeline, turn on parrot mode:
   (parrot-mode)
@@ -3606,6 +3650,7 @@ Highlight crosshair (combination of hl-lines and hl-columns
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package volatile-highlights
   :ensure t
+  :disabled
   :hook
   (after-init . volatile-highlights-mode)
   :custom-face
