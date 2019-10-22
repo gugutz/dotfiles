@@ -1162,9 +1162,10 @@ Multiple cursors for evil mode
     (interactive)
     (setq org-latex-listings 'minted
           org-latex-packages-alist '(("" "minted"))
-          org-latex-pdf-process
-          '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-            "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")))
+          org-latex-pdf-process '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f")))
+
+(setq org-latex-pdf-process
+  '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
 
   (require 'org-habit)
   '(org-emphasis-alist
@@ -1596,6 +1597,7 @@ There is another official flycheck-pos-tip extension for displaying errors under
   (setq flycheck-popup-tip-error-prefix "\u27a4") ;;  display arrow like this: `➤'
   ;; (setq flycheck-popup-tip-error-prefix "* ")
 )
+#+END_SRC
 
 * Version Control
 

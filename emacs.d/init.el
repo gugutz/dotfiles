@@ -805,9 +805,10 @@ tangled, and the tangled file is compiled."
     (interactive)
     (setq org-latex-listings 'minted
           org-latex-packages-alist '(("" "minted"))
-          org-latex-pdf-process
-          '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-            "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")))
+          org-latex-pdf-process '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f")))
+
+(setq org-latex-pdf-process
+  '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
 
   (require 'org-habit)
   '(org-emphasis-alist
@@ -1073,6 +1074,11 @@ tangled, and the tangled file is compiled."
   :hook
   (flycheck-mode . flycheck-inline-mode)
   :config
+  ;; Set fringe style
+  (setq flycheck-indication-mode 'right-fringe)
+
+  (flycheck-mode-line-prefix "Syntax")
+
   ;; (global-flycheck-inline-mode)
   (setq flycheck-inline-display-function
         (lambda (msg pos)
@@ -1083,12 +1089,27 @@ tangled, and the tangled file is compiled."
             (quick-peek-update ov)))
         flycheck-inline-clear-function #'quick-peek-hide))
 
-;;; Show Flycheck errors in tooltip
 (use-package flycheck-pos-tip
   :ensure t
-  ;;:disabled t
+  :disabled
+  :defines flycheck-pos-tip-timeout
   :after flycheck
-  :config (flycheck-pos-tip-mode)
+  :hook
+  (global-flycheck-mode . flycheck-pos-tip-mode)
+  :config
+  (setq flycheck-pos-tip-timeout 30)
+  (flycheck-pos-tip-mode)
+)
+
+;;; Show Flycheck errors in tooltip
+(use-package flycheck-popup-tip
+  :ensure t
+  :after flycheck
+  :hook
+  (flycheck-mode . flycheck-popup-tip-mode)
+  :config
+  (setq flycheck-popup-tip-error-prefix "\u27a4") ;;  display arrow like this: `➤'
+  ;; (setq flycheck-popup-tip-error-prefix "* ")
 )
 
 (use-package magit
@@ -1865,6 +1886,13 @@ tangled, and the tangled file is compiled."
   (global-set-key (kbd "C-S-L") 'windmove-right)
   (global-set-key (kbd "C-S-K") 'windmove-up)
   (global-set-key (kbd "C-S-J") 'windmove-down)
+)
+
+(use-package rotate
+  :ensure t
+  :bind
+  ("C-c C-r w" . rotate-window)
+  ("C-c C-r l" . rotate-layout)
 )
 
 (use-package ace-jump-mode
@@ -3008,7 +3036,7 @@ tangled, and the tangled file is compiled."
   (scss-mode . prettier-js-mode)
   (json-mode . prettier-js-mode)
   :init
-  (setq prettier-js-show-errors 'buffer)
+  (setq prettier-js-show-errors 'buffer) ;; options: 'buffer, 'echo or nil
   :config
   (setq prettier-js-args '("--bracket-spacing" "false"
                            "--print-width" "80"
