@@ -26,52 +26,23 @@ tangled, and the tangled file is compiled."
 (package-initialize)
 
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
+;; custom-set-variables was added by Custom.
+;; If you edit it by hand, you could mess it up, so be careful.
+;; Your init file should contain only one such instance.
+;; If there is more than one, they won't work right.
+'(custom-safe-themes
    (quote
-    ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
- '(fci-rule-color "#3E4451")
- '(flycheck-display-errors-delay 1)
- '(jiralib-url "https://stairscreativestudio.atlassian.net" t)
- '(lsp-auto-guess-root t)
- '(lsp-document-sync-method (quote incremental))
- '(lsp-prefer-flymake t)
- '(lsp-print-io nil)
- '(lsp-print-performance nil)
- '(lsp-response-timeout 10)
- '(lsp-trace nil t)
- '(magit-auto-revert-mode nil)
- '(package-selected-packages
-   (quote
-    (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
-   
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(company-preview-common ((t (:foreground unspecified :background "#111111"))))
- '(company-scrollbar-bg ((t (:background "#111111"))))
- '(company-scrollbar-fg ((t (:background "#555555"))))
- '(company-tooltip ((t (:inherit default :background "#222222"))))
- '(company-tooltip-common ((t (:inherit font-lock-constant-face))))
- '(company-tooltip-selection ((t (:inherit company-tooltip-common :background "#2a2a2a"))))
- '(css-selector ((t (:inherit default :foreground "#66CCFF"))))
- '(diff-hl-change ((t (:foreground "darkolivegreen"))))
- '(diff-hl-delete ((t (:background "#ee6363"))))
- '(diff-hl-insert ((t (:background "#7ccd7c"))))
- '(evil-goggles-change-face ((t (:inherit diff-removed))))
- '(evil-goggles-delete-face ((t (:inherit diff-removed))))
- '(evil-goggles-paste-face ((t (:inherit diff-added))))
- '(evil-goggles-undo-redo-add-face ((t (:inherit diff-added))))
- '(evil-goggles-undo-redo-change-face ((t (:inherit diff-changed))))
- '(evil-goggles-undo-redo-remove-face ((t (:inherit diff-removed))))
- '(evil-goggles-yank-face ((t (:inherit diff-changed))))
- '(font-lock-comment-face ((t (:foreground "#828282"))))
- '(show-paren-match ((nil (:background "#44475a" :foreground "#f1fa8c")))))
+   ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
+   '(fci-rule-color "#3E4451")
+   '(package-selected-packages
+     (quote
+     (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
+   (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   )
 
 (add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
 ;; (add-to-list 'load-path "~/dotfiles/emacs.d/config")
@@ -370,6 +341,26 @@ tangled, and the tangled file is compiled."
   (setq eldoc-idle-delay 0.4)
 )
 
+(use-package aggressive-indent
+  :ensure t
+  :hook
+  (emacs-lisp-mode . aggressive-indent-mode)
+  (css-mode . aggressive-indent-mode)
+  :config
+)
+
+(defun align-values (start end)
+  "Vertically aligns region based on lengths of the first value of each line.
+Example output:
+
+	foo        bar
+	foofoo     bar
+	foofoofoo  bar"
+  (interactive "r")
+  (align-regexp start end
+				"\\S-+\\(\\s-+\\)"
+				1 1 nil))
+
 (defun upcase-backward-word (arg)
   (interactive "p")
   (upcase-word (- arg))
@@ -395,15 +386,15 @@ tangled, and the tangled file is compiled."
 (use-package move-text
   :ensure t
   :bind
-  ("M-S-j" . move-text-up)
-  ("M-S-k" . move-text-down)
+  ("M-S-J" . move-text-up)
+  ("M-S-K" . move-text-down)
   (:map evil-normal-state-map
-  ("S-j" . move-text-up)
-  ("S-k" . move-text-down)
+  ("S-J" . move-text-up)
+  ("S-K" . move-text-down)
   )
   (:map evil-visual-state-map
-  ("M-S-j" . move-text-region-up)
-  ("M-S-k" . move-text-region-down)
+  ("M-S-J" . move-text-region-up)
+  ("M-S-K" . move-text-region-down)
   )
   :config
   (move-text-default-bindings)
@@ -618,6 +609,7 @@ tangled, and the tangled file is compiled."
   ("C-/" . comment-line)
   ("C-S-/" . comment-region)
   ("C-S-M-/" . comment-box)
+  ("M-=" . #'align-values)
   )
 
 ;; check if global-set-key also maps to evil insert mode; if yes delete bellow snippets
@@ -816,6 +808,20 @@ tangled, and the tangled file is compiled."
   ;; some red color (as defined by the color theme)
   ;; other faces such as `diff-added` will be used for other actions
   (evil-goggles-use-diff-faces)
+)
+
+(use-package evil-lion
+  :ensure t
+  :bind
+  (:map evil-normal-state-map
+  ("g l " . evil-lion-left)
+  ("g L " . evil-lion-right)
+  :map evil-visual-state-map
+  ("g l " . evil-lion-left)
+  ("g L " . evil-lion-right))
+  :config
+  (setq evil-lion-squeeze-spaces t) ;; default t
+  (evil-lion-mode)
 )
 
 (use-package org
@@ -1314,7 +1320,8 @@ tangled, and the tangled file is compiled."
 
 (use-package restclient
   :ensure t
-  :mode "\\.rest$"
+  :mode
+  ("\\.rest$\\'" "\\.http$\\'")
   :config
   (progn
     ;; Add hook to override C-c C-c in this mode to stay in window
@@ -1323,6 +1330,16 @@ tangled, and the tangled file is compiled."
                  (local-set-key
                   (kbd "C-c C-c")
                   'restclient-http-send-current-stay-in-window))))
+)
+
+(use-package ob-restclient
+  :ensure t
+  :mode "\\.rest$"
+  :config
+  ;; add restclient to org-babel languages
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((restclient . t)))
 )
 
 (use-package undo-tree
@@ -3092,7 +3109,6 @@ tangled, and the tangled file is compiled."
   :ensure-system-package
   (prettier . "npm install -g prettier")
   :hook
-  (prettier-js-mode . tau/user-prettier-if-in-node-modules)
   (js2-mode . prettier-js-mode)
   (web-mode . prettier-js-mode)
   (rjsx-mode . prettier-js-mode)
@@ -3115,24 +3131,26 @@ tangled, and the tangled file is compiled."
 
   ;; use prettier from local `node_modules' folder if available
   (defun tau/use-prettier-if-in-node-modules ()
-  "Enable prettier-js-mode iff prettier was found installed locally in project"
-  (interactive)
-  (let* ((file-name (or (buffer-file-name) default-directory))
-         (root (locate-dominating-file file-name "node_modules"))
-         (prettier (and root
-                        (expand-file-name "node_modules/prettier/bin-prettier.js" root))))
-    (if (and prettier (file-executable-p prettier))
+    "Enable prettier-js-mode iff prettier was found installed locally in project"
+    (interactive)
+    (let* ((file-name (or (buffer-file-name) default-directory))
+           (root (locate-dominating-file file-name "node_modules"))
+           (prettier (and root
+                          (expand-file-name "node_modules/prettier/bin-prettier.js" root))))
+      (if (and prettier (file-executable-p prettier))
+          (progn
+            (message "Found local prettier executable at %s. Enabling prettier-js-mode" prettier)
+            (setq prettier-js-command prettier)
+            (make-variable-buffer-local 'prettier-js-command)
+            (prettier-js-mode)
+            (message "Disabling aggressive-indent-mode in favour of prettier")
+            (aggressive-indent-mode -1))
         (progn
-          (message "Found local prettier executable at %s. Enabling prettier-js-mode" prettier)
-          (setq prettier-js-command prettier)
-          (make-variable-buffer-local 'prettier-js-command)
-          (prettier-js-mode)
-          (message "Disabling aggressive-indent-mode in favour of prettier")
-          (aggressive-indent-mode -1))
-      (progn
-        (message "Prettier not found in %s. Not enabling prettier-js-mode" root)
-        (message "Falling back to aggressive-indent-mode")
-        (aggressive-indent-mode 1)))))
+          (message "Prettier not found in %s. Not enabling prettier-js-mode" root)
+          (message "Falling back to aggressive-indent-mode")
+          (aggressive-indent-mode 1)))))
+  (add-hook 'prettier-js-mode-hook #'tau/use-prettier-if-in-node-modules)
+
 )
 
 ;; json-mode: Major mode for editing JSON files with emacs
