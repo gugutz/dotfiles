@@ -577,6 +577,79 @@ Enable documentation for programming languages
 #+END_SRC
 
 
+** aggressive-indent-mode
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package aggressive-indent
+  :ensure t
+  :hook
+  (emacs-lisp-mode . aggressive-indent-mode)
+  (css-mode . aggressive-indent-mode)
+  :config
+)
+#+END_SRC
+
+** interactive-align
+
+ Keymap used in the minibuffer when ialign command is executed.
+ |---------+--------------------------|
+ | Key     | Command                  |
+ |---------+--------------------------|
+ | C-c C-r | ialign-toggle-repeat     |
+ | C-c C-t | ialign-toggle-tabs       |
+ | C-c M-c | ialign-toggle-case-fold  |
+ | C-c +   | ialign-increment-spacing |
+ | C-c -   | ialign-decrement-spacing |
+ | C-c [   | ialign-decrement-group   |
+ | C-c ]   | ialign-increment-group   |
+ | C-c C-f | ialign-set-group         |
+ | C-c C-s | ialign-set-spacing       |
+ | C-c RET | ialign-commit            |
+ | C-c C-c | ialign-update            |
+ | C-c ?   | ialign-show-help         |
+ |---------+--------------------------|
+
+(use-package ialign
+  :ensure t
+  :bind
+  ("C-x l" . ialign)
+  :config
+  ialign-default-spacing
+  ialign-align-with-tabs  ;; default nil
+  ialign-auto-update ;; default t
+)
+** align.el
+
+align text to a specific column, by regexp
+
+This mode allows you to align regions in a context-sensitive fashion.
+The classic use is to align assignments:
+
+   int a = 1;
+   short foo = 2;
+   double blah = 4;
+
+becomes
+
+   int    a    = 1;
+   short  foo  = 2;
+   double blah = 4;
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(defun align-values (start end)
+  "Vertically aligns region based on lengths of the first value of each line.
+Example output:
+
+	foo        bar
+	foofoo     bar
+	foofoofoo  bar"
+  (interactive "r")
+  (align-regexp start end
+				"\\S-+\\(\\s-+\\)"
+				1 1 nil))
+
+
+#+END_SRC
 
 * Text editing settings
 
@@ -623,15 +696,15 @@ Enable documentation for programming languages
 (use-package move-text
   :ensure t
   :bind
-  ("M-S-j" . move-text-up)
-  ("M-S-k" . move-text-down)
+  ("M-S-J" . move-text-up)
+  ("M-S-K" . move-text-down)
   (:map evil-normal-state-map
-  ("S-j" . move-text-up)
-  ("S-k" . move-text-down)
+  ("S-J" . move-text-up)
+  ("S-K" . move-text-down)
   )
   (:map evil-visual-state-map
-  ("M-S-j" . move-text-region-up)
-  ("M-S-k" . move-text-region-down)
+  ("M-S-J" . move-text-region-up)
+  ("M-S-K" . move-text-region-down)
   )
   :config
   (move-text-default-bindings)
@@ -895,6 +968,7 @@ Make emacs use $PATH defined in the systems shell
   ("C-/" . comment-line)
   ("C-S-/" . comment-region)
   ("C-S-M-/" . comment-box)
+  ("M-=" . #'align-values)
   )
 
 ;; check if global-set-key also maps to evil insert mode; if yes delete bellow snippets
@@ -1146,6 +1220,25 @@ Multiple cursors for evil mode
 )
 #+END_SRC
 
+** evil-lion
+
+Align by operators
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package evil-lion
+  :ensure t
+  :bind
+  (:map evil-normal-state-map
+  ("g l " . evil-lion-left)
+  ("g L " . evil-lion-right)
+  :map evil-visual-state-map
+  ("g l " . evil-lion-left)
+  ("g L " . evil-lion-right))
+  :config
+  (setq evil-lion-squeeze-spaces t) ;; default t
+  (evil-lion-mode)
+)
+#+END_SRC
 
 * org-mode
 
@@ -1834,7 +1927,8 @@ Navigation through the history of files
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package restclient
   :ensure t
-  :mode "\\.rest$"
+  :mode
+  ("\\.rest$\\'" "\\.http$\\'")
   :config
   (progn
     ;; Add hook to override C-c C-c in this mode to stay in window
@@ -1846,6 +1940,21 @@ Navigation through the history of files
 )
 #+END_SRC
 
+** ob-restclient
+
+Org source blocks and exporter for restclient
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package ob-restclient
+  :ensure t
+  :mode "\\.rest$"
+  :config
+  ;; add restclient to org-babel languages
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((restclient . t)))
+)
+#+END_SRC
 
 * undo-tree
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -4227,7 +4336,6 @@ Unfortunatelly this package has to be installed manually, as its not available o
   :ensure-system-package
   (prettier . "npm install -g prettier")
   :hook
-  (prettier-js-mode . tau/user-prettier-if-in-node-modules)
   (js2-mode . prettier-js-mode)
   (web-mode . prettier-js-mode)
   (rjsx-mode . prettier-js-mode)
@@ -4250,24 +4358,26 @@ Unfortunatelly this package has to be installed manually, as its not available o
 
   ;; use prettier from local `node_modules' folder if available
   (defun tau/use-prettier-if-in-node-modules ()
-  "Enable prettier-js-mode iff prettier was found installed locally in project"
-  (interactive)
-  (let* ((file-name (or (buffer-file-name) default-directory))
-         (root (locate-dominating-file file-name "node_modules"))
-         (prettier (and root
-                        (expand-file-name "node_modules/prettier/bin-prettier.js" root))))
-    (if (and prettier (file-executable-p prettier))
+    "Enable prettier-js-mode iff prettier was found installed locally in project"
+    (interactive)
+    (let* ((file-name (or (buffer-file-name) default-directory))
+           (root (locate-dominating-file file-name "node_modules"))
+           (prettier (and root
+                          (expand-file-name "node_modules/prettier/bin-prettier.js" root))))
+      (if (and prettier (file-executable-p prettier))
+          (progn
+            (message "Found local prettier executable at %s. Enabling prettier-js-mode" prettier)
+            (setq prettier-js-command prettier)
+            (make-variable-buffer-local 'prettier-js-command)
+            (prettier-js-mode)
+            (message "Disabling aggressive-indent-mode in favour of prettier")
+            (aggressive-indent-mode -1))
         (progn
-          (message "Found local prettier executable at %s. Enabling prettier-js-mode" prettier)
-          (setq prettier-js-command prettier)
-          (make-variable-buffer-local 'prettier-js-command)
-          (prettier-js-mode)
-          (message "Disabling aggressive-indent-mode in favour of prettier")
-          (aggressive-indent-mode -1))
-      (progn
-        (message "Prettier not found in %s. Not enabling prettier-js-mode" root)
-        (message "Falling back to aggressive-indent-mode")
-        (aggressive-indent-mode 1)))))
+          (message "Prettier not found in %s. Not enabling prettier-js-mode" root)
+          (message "Falling back to aggressive-indent-mode")
+          (aggressive-indent-mode 1)))))
+  (add-hook 'prettier-js-mode-hook #'tau/use-prettier-if-in-node-modules)
+
 )
 #+END_SRC
 
