@@ -145,33 +145,29 @@ tangled, and the tangled file is compiled."
 (use-package display-line-numbers
   :if (version<= "26.0.50" emacs-version)
   :ensure nil
-  :hook
+  ;; :hook
   ;; (prog-mode. display-line-numbers-mode)
   ;; (text-mode. display-line-numbers-mode)
-  (LaTeX-mode. display-line-numbers-mode)
-  (typescript-mode. display-line-numbers-mode)
-  (web-mode. display-line-numbers-mode)
-  (js2-mode. display-line-numbers-mode)
-  (css-mode. display-line-numbers-mode)
-  (scss-mode. display-line-numbers-mode)
-  (elixir-mode. display-line-numbers-mode)
-
-  :config
-  ;; (global-display-line-numbers-mode)
+  ;; (LaTeX-mode. display-line-numbers-mode)
+  ;; (typescript-mode. display-line-numbers-mode)
+  ;; (web-mode. display-line-numbers-mode)
+  ;; (js2-mode. display-line-numbers-mode)
+  ;; (css-mode. display-line-numbers-mode)
+  ;; (scss-mode. display-line-numbers-mode)
+  ;; (elixir-mode. display-line-numbers-mode)
+  :init
   (setq display-line-numbers-grow-only t)
   (setq display-line-numbers-width-start t)
-
   ;; old linum-mode variables, check if they work with new display-line-numbers-mode
   ;; (setq linum-format 'dynamic)
   ;; (setq linum-format " %d ") ;; one space separation between the linenumber display and the buffer contents:
   ;; (setq linum-format "%4d “) ;; 4 character and a space for line numbers
   (setq linum-format "%4d \u2502 ") ; 4 chars and a space with solid line separator
-
-
+  :config
+  (global-display-line-numbers-mode)
 
   ;; Select lines by click-dragging on the margin. Tested with GNU Emacs 23.3
   (defvar *linum-mdown-line* nil)
-
   (defun line-at-click ()
     (save-excursion
     (let ((click-y (cdr (cdr (mouse-position))))
@@ -537,7 +533,14 @@ Example output:
                 ("Go to definition" :call (lsp-goto-type-definition)
                 ("FooBar" :call (insert "FooBar"))
                 )))))
-  (right-click-context-menu))))
+  (right-click-context-menu)))
+)
+
+;; zoom in/out like we do everywhere else.
+(global-set-key (kbd "C-=") 'text-scale-increase)
+(global-set-key (kbd "C--") 'text-scale-decrease)
+(global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+(global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
 
 (use-package hippie-exp
   ;;:ensure nil
@@ -1323,6 +1326,7 @@ Example output:
   :mode
   ("\\.rest$\\'" "\\.http$\\'")
   :config
+  (setq restclient-same-buffer-response t)
   (progn
     ;; Add hook to override C-c C-c in this mode to stay in window
     (add-hook 'restclient-mode-hook
@@ -2534,7 +2538,7 @@ Example output:
   (:map evil-normal-state-map
   ("g t" . centaur-tabs-forward)
   ("g T" . centaur-tabs-backward))
-  :init
+  :config
   (setq centaur-tabs-style "rounded") ; types available: (alternative, bar, box, chamfer, rounded, slang, wave, zigzag)
   (setq centaur-tabs-height 25)
   (setq centaur-tabs-set-icons t) ;; display themed icons from all the icons
@@ -2546,7 +2550,6 @@ Example output:
   ;; (setq centaur-tabs-adjust-buffer-order t)
   (setq uniquify-separator "/")
   (setq uniquify-buffer-name-style 'forward)
-  :config
   ;; (centaur-tabs-enable-buffer-reordering)
   (centaur-tabs-headline-match)
   ;; (centaur-tabs-change-fonts "arial" 160)
