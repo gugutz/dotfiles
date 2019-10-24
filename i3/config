@@ -460,6 +460,12 @@ bindsym $mod+m bar mode toggle
 
   client.background       #2B2C2B
 
+################################################
+# i3blocks RELATED BINDINGS
+################################################
+
+bindsym --release Caps_Lock exec pkill -SIGRTMIN+11 i3blocks
+bindsym --release Num_Lock  exec pkill -SIGRTMIN+11 i3blocks
 
 ################################################
 # SCRATCHPAD SETTINGS

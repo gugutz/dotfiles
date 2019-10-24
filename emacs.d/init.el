@@ -145,16 +145,6 @@ tangled, and the tangled file is compiled."
 (use-package display-line-numbers
   :if (version<= "26.0.50" emacs-version)
   :ensure nil
-  ;; :hook
-  ;; (prog-mode. display-line-numbers-mode)
-  ;; (text-mode. display-line-numbers-mode)
-  ;; (LaTeX-mode. display-line-numbers-mode)
-  ;; (typescript-mode. display-line-numbers-mode)
-  ;; (web-mode. display-line-numbers-mode)
-  ;; (js2-mode. display-line-numbers-mode)
-  ;; (css-mode. display-line-numbers-mode)
-  ;; (scss-mode. display-line-numbers-mode)
-  ;; (elixir-mode. display-line-numbers-mode)
   :init
   (setq display-line-numbers-grow-only t)
   (setq display-line-numbers-width-start t)
@@ -164,7 +154,10 @@ tangled, and the tangled file is compiled."
   ;; (setq linum-format "%4d “) ;; 4 character and a space for line numbers
   (setq linum-format "%4d \u2502 ") ; 4 chars and a space with solid line separator
   :config
-  (global-display-line-numbers-mode)
+  ;;(global-display-line-numbers-mode)
+  ;; for some reason the hooks for diplay line numbers wont work if i put them in use-package `:hook'. it has to be after `:config'
+  (add-hook 'prog-mode-hook #'display-line-numbers-mode)
+  (add-hook 'text-mode-hook #'display-line-numbers-mode)
 
   ;; Select lines by click-dragging on the margin. Tested with GNU Emacs 23.3
   (defvar *linum-mdown-line* nil)
@@ -382,15 +375,15 @@ Example output:
 (use-package move-text
   :ensure t
   :bind
-  ("M-S-J" . move-text-up)
-  ("M-S-K" . move-text-down)
+  ("M-S-j" . move-text-up)
+  ("M-S-k" . move-text-down)
   (:map evil-normal-state-map
-  ("S-J" . move-text-up)
-  ("S-K" . move-text-down)
+  ("S-j" . move-text-up)
+  ("S-k" . move-text-down)
   )
   (:map evil-visual-state-map
-  ("M-S-J" . move-text-region-up)
-  ("M-S-K" . move-text-region-down)
+  ("M-S-j" . move-text-region-up)
+  ("M-S-k" . move-text-region-down)
   )
   :config
   (move-text-default-bindings)
@@ -2186,6 +2179,7 @@ Example output:
 )
 
 (use-package dimmer
+  :disabled
   :ensure t
   :config (dimmer-mode)
 )
@@ -2751,7 +2745,6 @@ Example output:
   (setq which-key-max-display-columns 6)
 
 (use-package keyfreq
-  :disabled
   :ensure t
   :init
   (keyfreq-mode 1)
@@ -2930,8 +2923,8 @@ Example output:
   :init
   (setq scss-compile-at-save 'nil)
   :config
-   (add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
-   (add-to-list 'auto-mode-alist '("\\.component.scss\\'" . scss-mode))
+   (add-to-list 'auto-mode-alist '("\\.scss$\\'" . scss-mode))
+   (add-to-list 'auto-mode-alist '("\\.component.scss$\\'" . scss-mode))
 )
 
 (use-package helm-css-scss
