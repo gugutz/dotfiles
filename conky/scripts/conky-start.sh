@@ -1,5 +1,5 @@
 #!/bin/bash
-COMPONENTS_PATH="/home/tau/dotfiles/conky/components"
+COMPONENTS_PATH=~/dotfiles/conky/components
 
 killall conky
 sleep 10 &
