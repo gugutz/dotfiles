@@ -1679,7 +1679,7 @@ Org Mode Integration with Jira Projects
   ;; Set fringe style
   (setq flycheck-indication-mode 'right-fringe)
 
-  (setq flycheck-mode-line-prefix "Syntax")
+  ;; (setq flycheck-mode-line-prefix "Syntax")
 
   ;; (global-flycheck-inline-mode)
   (setq flycheck-inline-display-function
@@ -4016,7 +4016,7 @@ The Sections and Heading Levels gets configured as follows:
 ;)
 #+END_SRC
 
-** TODO Add abntex2 class to org list of latex classes
+** Add abntex2 class to org list of latex classes
 This class is based on the Memoir class
 The Sections and Heading Levels gets configured as follows:
 
@@ -4029,27 +4029,28 @@ The Sections and Heading Levels gets configured as follows:
     | \paragraph     |        4 | ******            |
     | \subparagraph  |        5 | *******           |
 #+BEGIN_SRC emacs-lisp :tangle init.el
-;(add-to-list 'org-latex-classes
-;             '("abntex2"
-;               "\\documentclass{abntex2}"
-;               ("\\part{%s}" . "\\part*{%s}")
-;               ("\\chapter{%s}" . "\\chapter*{%s}")
-;               ("\\section{%s}" . "\\section*{%s}")
-;               ("\\subsection{%s}" . "\\subsection*{%s}")
-;               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-;               ("\\subsubsubsection{%s}" . "\\subsubsubsection*{%s}")
-;               ("\\paragraph{%s}" . "\\paragraph*{%s}"))
-;)
+  ;(add-to-list 'org-latex-classes
+  ;             '("abntex2"
+  ;               "\\documentclass{abntex2}"
+  ;               ("\\part{%s}" . "\\part*{%s}")
+  ;               ("\\chapter{%s}" . "\\chapter*{%s}")
+  ;               ("\\section{%s}" . "\\section*{%s}")
+  ;               ("\\subsection{%s}" . "\\subsection*{%s}")
+  ;               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+  ;               ("\\subsubsubsection{%s}" . "\\subsubsubsection*{%s}")
+  ;               ("\\paragraph{%s}" . "\\paragraph*{%s}"))
+  ;)
 
-(add-to-list 'org-latex-classes
-             '("abntex2"
-               "\\documentclass{abntex2}"
-               ("\\section{%s}" . "\\section*{%s}")
-               ("\\subsection{%s}" . "\\subsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-               ("\\subsubsubsection{%s}" . "\\subsubsubsection*{%s}")
-               ("\\paragraph{%s}" . "\\paragraph*{%s}"))
-)
+  (add-to-list 'org-latex-classes
+               '("abntex2"
+                 "\\documentclass{abntex2}"
+                 ("\\chapter{%s}" . "\\chapter*{%s}")
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsubsection{%s}" . "\\subsubsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}"))
+  )
 #+END_SRC
 
 * HTML

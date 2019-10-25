@@ -1146,11 +1146,7 @@ Example output:
   ;; Set fringe style
   (setq flycheck-indication-mode 'right-fringe)
 
-<<<<<<< HEAD
-  (flycheck-mode-line-prefix "Syntax")
-=======
-  (setq flycheck-mode-line-prefix "Syntax")
->>>>>>> 6403db432bd8f8f02e0232ab09ba0bfa22c85422
+  ;; (setq flycheck-mode-line-prefix "Syntax")
 
   ;; (global-flycheck-inline-mode)
   (setq flycheck-inline-display-function
@@ -2906,6 +2902,7 @@ Example output:
 (add-to-list 'org-latex-classes
              '("abntex2"
                "\\documentclass{abntex2}"
+               ("\\chapter{%s}" . "\\chapter*{%s}")
                ("\\section{%s}" . "\\section*{%s}")
                ("\\subsection{%s}" . "\\subsection*{%s}")
                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
