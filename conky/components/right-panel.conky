@@ -167,9 +167,9 @@ ${alignr}${offset -95}$color${fs_used /opt} / ${fs_size /opt}\
 ${alignr}${offset -70}${fs_bar 7 /opt}
 #
 # /home
-${color2} /home/tau \
-${alignr}${offset -95}$color${fs_used /home/tau} / ${fs_size /home}\
-${alignr}${offset -70}${fs_bar 7 /home/tau}
+${color2} /home \
+${alignr}${offset -95}$color${fs_used /home} / ${fs_size /home}\
+${alignr}${offset -70}${fs_bar 7 /home}
 #
 # ${font Hack:size=9}${color0}${execpi 300 DJS=`date +%_d`; ncal -b -h|sed '1,8!d'| sed '/./!d' | sed 's/^/${goto 120} /'| sed 's/$/ /' | sed 's/^/ /' | sed /" $DJS "/s/" $DJS "/" "'${font Hack=Bold:size=10}${voffset -1}${color red} '"$DJS"'${color}${font Hack:size=9}'" "/}${voffset -1}
 #
