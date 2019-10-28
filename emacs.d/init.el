@@ -1952,6 +1952,26 @@ Example output:
   (setq ranger-show-hidden t) ;; show hidden files
 )
 
+(use-package eyebrowse
+  :bind
+  (:map eyebrowse-mode-map
+  ("M-1" . eyebrowse-switch-to-window-config-1)
+  ("M-2" . eyebrowse-switch-to-window-config-2)
+  ("M-3" . eyebrowse-switch-to-window-config-3)
+  ("M-4" . eyebrowse-switch-to-window-config-4)
+  ("H-<right>" . eyebrowse-next-window-config)
+  ("H-<left>" . eyebrowse-prev-window-config))
+  :config
+  ;;(define-key eyebrowse-mode-map (kbd "M-1") 'eyebrowse-switch-to-window-config-1)
+  ;;(define-key eyebrowse-mode-map (kbd "M-2") 'eyebrowse-switch-to-window-config-2)
+  ;;(define-key eyebrowse-mode-map (kbd "M-3") 'eyebrowse-switch-to-window-config-3)
+  ;;(define-key eyebrowse-mode-map (kbd "M-4") 'eyebrowse-switch-to-window-config-4)
+  ;;(define-key eyebrowse-mode-map (kbd "H-<right>") 'eyebrowse-next-window-config)
+  ;;(define-key eyebrowse-mode-map (kbd "H-<left>") 'eyebrowse-prev-window-config)
+  (eyebrowse-mode t)
+  (setq eyebrowse-new-workspace t))
+)
+
 (use-package windmove
   :ensure t
   :config
@@ -2971,7 +2991,7 @@ Example output:
   (unbind-key "<C-return>" emmet-mode-keymap)
   (unbind-key "C-M-<left>" emmet-mode-keymap)
   (unbind-key "C-M-<right>" emmet-mode-keymap)
-  (setq emmet-expand-jsx-className? t)) ;; use emmet with JSX markup
+  (setq emmet-expand-jsx-className? nil)) ;; use emmet with JSX markup
 
 (use-package ruby-mode
   :mode "\\.rb\\'"
@@ -3193,6 +3213,9 @@ Example output:
     ("components/.+\\.js$" . rjsx-mode)
 
     :config
+    ;; auto register for JS files that are inside a `components' folder
+    (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
+
     ;; for better jsx syntax-highlighting in web-mode
     ;; - courtesy of Patrick @halbtuerke
     (defadvice web-mode-highlight-part (around tweak-jsx activate)

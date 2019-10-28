@@ -2682,6 +2682,29 @@ Org source blocks and exporter for restclient
  #+END_SRC
 
 
+* eyebrowse
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package eyebrowse
+  :bind
+  (:map eyebrowse-mode-map
+  ("M-1" . eyebrowse-switch-to-window-config-1)
+  ("M-2" . eyebrowse-switch-to-window-config-2)
+  ("M-3" . eyebrowse-switch-to-window-config-3)
+  ("M-4" . eyebrowse-switch-to-window-config-4)
+  ("H-<right>" . eyebrowse-next-window-config)
+  ("H-<left>" . eyebrowse-prev-window-config))
+  :config
+  ;;(define-key eyebrowse-mode-map (kbd "M-1") 'eyebrowse-switch-to-window-config-1)
+  ;;(define-key eyebrowse-mode-map (kbd "M-2") 'eyebrowse-switch-to-window-config-2)
+  ;;(define-key eyebrowse-mode-map (kbd "M-3") 'eyebrowse-switch-to-window-config-3)
+  ;;(define-key eyebrowse-mode-map (kbd "M-4") 'eyebrowse-switch-to-window-config-4)
+  ;;(define-key eyebrowse-mode-map (kbd "H-<right>") 'eyebrowse-next-window-config)
+  ;;(define-key eyebrowse-mode-map (kbd "H-<left>") 'eyebrowse-prev-window-config)
+  (eyebrowse-mode t)
+  (setq eyebrowse-new-workspace t))
+)
+#+END_SRC
+
 * windmove
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package windmove
@@ -4143,7 +4166,7 @@ The Sections and Heading Levels gets configured as follows:
   (unbind-key "<C-return>" emmet-mode-keymap)
   (unbind-key "C-M-<left>" emmet-mode-keymap)
   (unbind-key "C-M-<right>" emmet-mode-keymap)
-  (setq emmet-expand-jsx-className? t)) ;; use emmet with JSX markup
+  (setq emmet-expand-jsx-className? nil)) ;; use emmet with JSX markup
 #+END_SRC
 
 
@@ -4441,6 +4464,9 @@ https://github.com/felipeochoa/rjsx-mode
     ("components/.+\\.js$" . rjsx-mode)
 
     :config
+    ;; auto register for JS files that are inside a `components' folder
+    (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
+
     ;; for better jsx syntax-highlighting in web-mode
     ;; - courtesy of Patrick @halbtuerke
     (defadvice web-mode-highlight-part (around tweak-jsx activate)
