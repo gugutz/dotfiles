@@ -51,7 +51,9 @@ tangled, and the tangled file is compiled."
 (defvar my-init-el-start-time (current-time) "Time when init.el was started")
 
 ;; Faster startup
-(setq gc-cons-threshold 100000000)
+;; (setq gc-cons-threshold 100000000)
+;; Defer garbage collection further back in the startup process
+(setq gc-cons-threshold (if (display-graphic-p) 400000000 100000000))
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -237,12 +239,13 @@ tangled, and the tangled file is compiled."
 )
 
 (use-package smooth-scrolling
-    :ensure t
-    :config
-    (smooth-scrolling-mode 1)
+  :disabled
+  :ensure t
+  :config
+  (smooth-scrolling-mode 1)
 )
 
-;; Vertical Scroll
+;; ;; Vertical Scroll
 ;; (setq scroll-step 1)
 ;; (setq scroll-margin 1)
 ;; (setq scroll-conservatively 101)
@@ -252,7 +255,7 @@ tangled, and the tangled file is compiled."
 ;; (setq fast-but-imprecise-scrolling nil)
 ;; (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
 ;; (setq mouse-wheel-progressive-speed nil)
-;; (; Horizontal Scroll
+;; ; Horizontal Scroll
 ;; (setq hscroll-step 1)
 ;; (setq hscroll-margin 1)
 
@@ -374,19 +377,27 @@ Example output:
 
 (use-package move-text
   :ensure t
+  :after evil
   :bind
-  ("M-S-j" . move-text-up)
-  ("M-S-k" . move-text-down)
-  (:map evil-normal-state-map
-  ("S-j" . move-text-up)
-  ("S-k" . move-text-down)
-  )
-  (:map evil-visual-state-map
-  ("M-S-j" . move-text-region-up)
-  ("M-S-k" . move-text-region-down)
-  )
+  ([(meta shift up)] . move-text-up)
+  ([(meta shift down)] . move-text-down)
+  ([(meta k)] . move-text-up)
+  ([(meta j)] . move-text-down)
+  ([(meta shift k)] . move-text-line-up)
+  ([(meta shift j)] . move-text-line-down)
+  :init
+  ;; free the bindings used by this plugin from windmove and other areas that use the same keys
+  (global-unset-key (kbd "M-j"))
+  (global-unset-key (kbd "M-k"))
+  (global-unset-key (kbd "C-S-j"))
+  (global-unset-key (kbd "C-S-k"))
   :config
   (move-text-default-bindings)
+  ;; tried setting these in :bind but use package executes :bind along with init, and i needed to free the keys before
+  (define-key evil-normal-state-map (kbd "M-j") 'move-text-down)
+  (define-key evil-normal-state-map (kbd "M-k") 'move-text-up)
+  (define-key evil-visual-state-map (kbd "M-j") 'move-text-region-up)
+  (define-key evil-visual-state-map (kbd "M-k") 'move-text-region-down)
 )
 
 ;(defun fd-switch-dictionary()
@@ -1198,13 +1209,13 @@ Example output:
 (use-package evil-magit
   :ensure t
   :init
-;;  (evil-magit-init)
   (setq evil-magit-state 'normal)
   (setq evil-magit-use-y-for-yank nil)
   :config
-  (evil-define-key evil-magit-state magit-mode-map "j" 'magit-log-popup)
-  (evil-define-key evil-magit-state magit-mode-map "k" 'evil-next-visual-line)
-  (evil-define-key evil-magit-state magit-mode-map "l" 'evil-previous-visual-line)
+  (evil-magit-init)
+  (evil-define-key evil-magit-state magit-mode-map "l" 'magit-log-popup)
+  (evil-define-key evil-magit-state magit-mode-map "j" 'evil-next-visual-line)
+  (evil-define-key evil-magit-state magit-mode-map "k" 'evil-previous-visual-line)
 )
 
 (use-package diff-hl
@@ -1661,11 +1672,13 @@ Example output:
   (lsp-auto-guess-root t)
   (lsp-document-sync-method 'incremental) ;; none, full, incremental, or nil
   (lsp-response-timeout 10)
-  (lsp-prefer-flymake t) ;; t(flymake), nil(lsp-ui), or :none
+  (lsp-prefer-flymake nil) ;; t(flymake), nil(lsp-ui), or :none
   :config
   (setq company-lsp-enable-snippet t)
   (setq company-lsp-async t)
-  (setq company-lsp-cache-candidates t)
+  ;; When `company-lsp-cache-candidates' is setting is auto, company-lsp will filter the candidates client side without retrieving them from the server when you type. This means that the candidates might not be the same(e. g. might be sorted in a different order) but from a functional standpoint of view you should not notice any difference.
+  ;;(setq company-lsp-cache-candidates t)
+  (setq company-lsp-cache-candidates 'auto)
   (setq company-lsp-enable-recompletion t)
 )
 
@@ -1814,6 +1827,8 @@ Example output:
          ("C-x t C-t" . treemacs-find-file)
          ("C-x t M-t" . treemacs-find-tag))
    :init
+   ;; general variables
+   (setq treemacs-no-png-images nil)
    (setq treemacs-deferred-git-apply-delay 0.5)
    (setq treemacs-display-in-side-window t)
    (setq treemacs-eldoc-display t)
@@ -1827,7 +1842,6 @@ Example output:
    (setq treemacs-is-never-other-window nil)
    (setq treemacs-max-git-entries 5000)
    (setq treemacs-missing-project-action 'ask)
-   (setq treemacs-no-png-images nil)
    (setq treemacs-no-delete-other-windows t)
    (setq treemacs-project-follow-cleanup nil)
    (setq treemacs-persist-file (expand-file-name ".cache/treemacs-persist" user-emacs-directory))
@@ -1847,15 +1861,15 @@ Example output:
    (setq treemacs-tag-follow-delay 1.5)
    (setq treemacs-width 35)
    :config
+
    (setq treemacs-collapse-dirs (if treemacs-python-executable 3 0))
    (add-hook 'treemacs-mode-hook #'hide-mode-line-mode)
    (add-hook 'treemacs-mode-hook (lambda ()
                                    (linum-mode -1)
                                    (fringe-mode 0)
-                                   (setq buffer-face-mode-face `(:background "#211C1C"))
+                                   ;; (setq buffer-face-mode-face `(:background "#211C1C"))
                                    (buffer-face-mode 1)))
 
-   ;;(treemacs-resize-icons 44) ;; usefull on high dpi monitors.  default icon size is 22
 
    (treemacs-follow-mode t)
    (treemacs-filewatch-mode t)
@@ -1866,6 +1880,133 @@ Example output:
       (treemacs-git-mode 'deferred))
      (`(t . _)
       (treemacs-git-mode 'simple)))
+
+  ;; my vscode icon theme, using vscode-icons
+  ;; i just placed the vscode-icons folder inside the treemacs icons vfolder and changed paths
+  (defcustom tau-themes-treemacs-theme "vscode"
+  "Default treemacs theme."
+  :type '(radio (const :doc "A minimalistic atom-inspired icon theme" "doom-atom")
+                (const :doc "A colorful icon theme leveraging all-the-icons" "doom-colors"))
+  :group 'tau-themes-treemacs)
+
+  ;; warn if all-the-icons isnt sinstalled
+  (with-eval-after-load 'treemacs
+  (unless (require 'all-the-icons nil t)
+    (error "all-the-icons isn't installed"))
+
+  (let ((face-spec '(:inherit font-lock-doc-face :slant normal)))  ;; taken from doom-treemacs -theme to use all theicons in some parts
+  (treemacs-create-theme "vscode"
+    :icon-directory (f-join treemacs-dir "icons/default")
+    :config
+    (progn
+      ;; directory and other icons
+      ;; (treemacs-create-icon :file "root.png"        :extensions (root)       :fallback "")
+       (treemacs-create-icon
+         :icon (format " %s\t" (all-the-icons-octicon "repo" :height 1.2 :v-adjust -0.1 :face face-spec))
+         :extensions (root))
+      (treemacs-create-icon :file "vscode/default_folder.png"  :extensions (dir-closed) :fallback (propertize "+ " 'face 'treemacs-term-node-face))
+      (treemacs-create-icon :file "vscode/default_folder_opened.png"    :extensions (dir-open)   :fallback (propertize "- " 'face 'treemacs-term-node-face))
+      (treemacs-create-icon :file "tags-leaf.png"   :extensions (tag-leaf)   :fallback (propertize "• " 'face 'font-lock-constant-face))
+      (treemacs-create-icon :file "tags-open.png"   :extensions (tag-open)   :fallback (propertize "▸ " 'face 'font-lock-string-face))
+      (treemacs-create-icon :file "tags-closed.png" :extensions (tag-closed) :fallback (propertize "▾ " 'face 'font-lock-string-face))
+      (treemacs-create-icon :file "error.png"       :extensions (error)      :fallback (propertize "• " 'face 'font-lock-string-face))
+      (treemacs-create-icon :file "warning.png"     :extensions (warning)    :fallback (propertize "• " 'face 'font-lock-string-face))
+      (treemacs-create-icon :file "info.png"        :extensions (info)       :fallback (propertize "• " 'face 'font-lock-string-face))
+
+      ;; common file types icons
+      (treemacs-create-icon :file "vscode/default_file.png"         :extensions (fallback))
+      (treemacs-create-icon :file "vscode/image.png"       :extensions ("jpg" "jpeg" "bmp" "svg" "png" "xpm" "gif"))
+      (treemacs-create-icon :file "vscode/video.png"       :extensions ("webm" "mp4" "avi" "mkv" "flv" "mov" "wmv" "mpg" "mpeg" "mpv"))
+      (treemacs-create-icon :file "vscode/pdf.png"         :extensions ("pdf"))
+      (treemacs-create-icon :file "vscode/emacs.png"       :extensions ("el" "elc"))
+      (treemacs-create-icon :file "ledger.png"      :extensions ("ledger"))
+      (treemacs-create-icon :file "vscode/config.png"        :extensions ("properties" "conf" "config" "cfg" "ini" "xdefaults" "xresources" "terminalrc" "ledgerrc"))
+      (treemacs-create-icon :file "vscode/shell.png"       :extensions ("sh" "zsh" "fish"))
+      (treemacs-create-icon :file "asciidoc.png"    :extensions ("adoc" "asciidoc"))
+      ;; git
+      (treemacs-create-icon :file "vscode/git.png"         :extensions ("git" "gitignore" "gitconfig" "gitmodules" "gitattributes"))
+      ;; dev lib
+      (treemacs-create-icon :file "vscode/editorconfig.png"         :extensions ("editorconfig"))
+      ;; frontend universe
+      (treemacs-create-icon :file "vscode/json.png"        :extensions ("json"))
+      (treemacs-create-icon :file "vscode/html.png"        :extensions ("html" "htm"))
+      (treemacs-create-icon :file "vscode/css.png"         :extensions ("css"))
+      (treemacs-create-icon :file "vscode/scss.png"         :extensions ("scss"))
+      (treemacs-create-icon :file "vscode/js_official.png"          :extensions ("js" "jsx"))
+      (treemacs-create-icon :file "vscode/typescript.png"          :extensions ("ts" "tsx"))
+      (treemacs-create-icon :file "vscode/typescriptdef.png"          :extensions ("spec"))
+      (treemacs-create-icon :file "vscode/tslint.png"          :extensions ("tslint"))
+      (treemacs-create-icon :file "vscode/tsconfig.png"          :extensions ("tsconfig"))
+      (treemacs-create-icon :file "vscode/vue.png"         :extensions ("vue"))
+      (treemacs-create-icon :file "vscode/elm.png"         :extensions ("elm"))
+      ;; markupgs
+      (treemacs-create-icon :file "vscode/org.png"     :extensions ("org"))
+      (treemacs-create-icon :file "vscode/markdown.png"    :extensions ("md"))
+      (treemacs-create-icon :file "vscode/tex.png"         :extensions ("tex"))
+      (treemacs-create-icon :file "vscode/yaml.png"        :extensions ("yml" "yaml"))
+      (treemacs-create-icon :file "vscode/toml.png"        :extensions ("toml"))
+      (treemacs-create-icon :file "vscode/dartlang.png"        :extensions ("dart"))
+      (treemacs-create-icon :file "vscode/julia.png"       :extensions ("jl"))
+      ;; erlang / elixir
+      (treemacs-create-icon :file "vscode/erlang2.png"      :extensions ("erl" "hrl"))
+      (treemacs-create-icon :file "vscode/elixir.png"         :extensions ("ex"))
+      (treemacs-create-icon :file "elx-light.png"   :extensions ("exs" "eex"))
+      ;; ruby
+      (treemacs-create-icon :file "ruby.png"   :extensions ("rb"))
+      (treemacs-create-icon :file "erb.png"   :extensions ("erb"))
+      ;; backend languages file types
+      (treemacs-create-icon :file "vscode/rust.png"        :extensions ("rs"))
+      (treemacs-create-icon :file "vscode/clojure.png"     :extensions ("clj" "cljs" "cljc"))
+      (treemacs-create-icon :file "vscode/java.png"        :extensions ("java"))
+      (treemacs-create-icon :file "vscode/kotlin.png"      :extensions ("kt"))
+      (treemacs-create-icon :file "vscode/scala.png"       :extensions ("scala"))
+      (treemacs-create-icon :file "sbt.png"         :extensions ("sbt"))
+      (treemacs-create-icon :file "vscode/go.png"          :extensions ("go"))
+      (treemacs-create-icon :file "vscode/php.png"         :extensions ("php"))
+      (treemacs-create-icon :file "vscode/c.png"           :extensions ("c" "h"))
+      (treemacs-create-icon :file "vscode/cpp.png"         :extensions ("cpp" "cxx" "hpp" "tpp" "cc" "hh"))
+      ;; lisp ecosystem
+      (treemacs-create-icon :file "racket.png"      :extensions ("racket" "rkt" "rktl" "rktd" "scrbl" "scribble" "plt"))
+      ;; haskell
+      (treemacs-create-icon :file "vscode/haskell.png"     :extensions ("hs" "lhs"))
+      (treemacs-create-icon :file "cabal.png"       :extensions ("cabal"))
+      ;; python
+      (treemacs-create-icon :file "python.png"      :extensions ("py" "pyc"))
+      (treemacs-create-icon :file "hy.png"          :extensions ("hy"))
+      (treemacs-create-icon :file "ocaml.png"       :extensions ("ml" "mli"))
+      (treemacs-create-icon :file "puppet.png"      :extensions ("pp"))
+      ;; devops tools
+      (treemacs-create-icon :file "vscode/docker.png"      :extensions ("dockerfile"))
+      (treemacs-create-icon :file "vagrant.png"     :extensions ("vagrantfile"))
+      (treemacs-create-icon :file "jinja2.png"      :extensions ("j2" "jinja2"))
+      (treemacs-create-icon :file "purescript.png"  :extensions ("purs"))
+      (treemacs-create-icon :file "nix.png"         :extensions ("nix"))
+      (treemacs-create-icon :file "scons.png"       :extensions ("sconstruct" "sconstript"))
+      (treemacs-create-icon :file "vscode/make.png"    :extensions ("makefile"))
+      (treemacs-create-icon :file "vscode/license.png" :extensions ("license"))
+      (treemacs-create-icon :file "vscode/zip.png"     :extensions ("zip" "7z" "tar" "gz" "rar"))
+      (treemacs-create-icon :file "vscode/elm.png"     :extensions ("elm"))
+      (treemacs-create-icon :file "vscode/xml.png"     :extensions ("xml" "xsl"))
+      (treemacs-create-icon :file "vscode/binary.png"  :extensions ("exe" "dll" "obj" "so" "o"))
+      (treemacs-create-icon :file "vscode/ruby.png"    :extensions ("rb"))
+      (treemacs-create-icon :file "vscode/scss.png"    :extensions ("scss"))
+      (treemacs-create-icon :file "vscode/lua.png"     :extensions ("lua"))
+      (treemacs-create-icon :file "vscode/log.png"     :extensions ("log"))
+      (treemacs-create-icon :file "vscode/lisp.png"    :extensions ("lisp"))
+      (treemacs-create-icon :file "vscode/sql.png"     :extensions ("sql"))
+      (treemacs-create-icon :file "vscode/nim.png"     :extensions ("nim"))
+      (treemacs-create-icon :file "vscode/perl.png"    :extensions ("pl" "pm" "perl"))
+      (treemacs-create-icon :file "vscode/vim.png"     :extensions ("vimrc" "tridactylrc" "vimperatorrc" "ideavimrc" "vrapperrc"))
+      (treemacs-create-icon :file "vscode/deps.png"    :extensions ("cask"))
+      (treemacs-create-icon :file "vscode/r.png"       :extensions ("r"))
+      (treemacs-create-icon :file "vscode/reason.png"  :extensions ("re" "rei")))))
+
+  ;; finally apply the custom theme
+  (treemacs-load-theme tau-themes-treemacs-theme))
+
+   ;;apply treemacs icon theme
+   (treemacs-load-theme "vscode")
+   (treemacs-resize-icons 18) ;; usefull on high dpi monitors.  default icon size is 22
 
 )
 
@@ -1880,7 +2021,8 @@ Example output:
 (use-package treemacs-icons-dired
   :after treemacs dired
   :ensure t
-  :config (treemacs-icons-dired-mode))
+  :config (treemacs-icons-dired-mode)
+)
 
 (use-package treemacs-magit
   :after treemacs magit
@@ -1969,7 +2111,7 @@ Example output:
   ;;(define-key eyebrowse-mode-map (kbd "H-<right>") 'eyebrowse-next-window-config)
   ;;(define-key eyebrowse-mode-map (kbd "H-<left>") 'eyebrowse-prev-window-config)
   (eyebrowse-mode t)
-  (setq eyebrowse-new-workspace t))
+  (setq eyebrowse-new-workspace t)
 )
 
 (use-package windmove
@@ -2059,32 +2201,46 @@ Example output:
 (set-foreground-color "#dddddd")
 
 (add-to-list 'custom-theme-load-path "~/dotfiles/emacs.d/themes/")
-; theme options:
-; atom-one-dark (doenst work well with emacsclient, ugly blue bg)
-; dracula
-; darktooth
-; gruvbox-dark-hard
-; gruvbox-dark-light
-; gruvbox-dark-medium
-; base16-default-dark-theme -- this one is good
+  ; theme options:
+  ; atom-one-dark (doenst work well with emacsclient, ugly blue bg)
+  ; dracula
+  ; darktooth
+  ; gruvbox-dark-hard
+  ; gruvbox-dark-light
+  ; gruvbox-dark-medium
+  ; base16-default-dark-theme -- this one is good
 
 (setq my-theme 'darkplus)
 
 (load-theme my-theme t)
 
-;; (defun load-my-theme (frame)
-;;   "Function to load the theme in current FRAME.
-;;   sed in conjunction
-;;   with bellow snippet to load theme after the frame is loaded
-;;   to avoid terminal breaking theme."
-;;   (select-frame frame)
-;;   (load-theme my-theme t))
+(defun load-my-theme (frame)
+  "Function to load the theme in current FRAME.
+  sed in conjunction
+  with bellow snippet to load theme after the frame is loaded
+  to avoid terminal breaking theme."
+  (select-frame frame)
+  (load-theme my-theme t))
 
-;; ; make emacs load the theme after loading the frame
-;; ; resolves issue with the theme not loading properly in terminal mode on emacsclient
+; make emacs load the theme after loading the frame
+; resolves issue with the theme not loading properly in terminal mode on emacsclient
+;; NOTE this if was breaking my emacs!!!!!
+;; (add-hook 'after-make-frame-functions #'load-my-theme)
 
-;; ;; this if was breaking my emacs!!!!!
-;;  (add-hook 'after-make-frame-functions #'load-my-theme)
+(use-package doom-themes
+  :ensure t
+  :disabled
+  :init (load-theme 'doom-tomorrow-night t)
+  :config
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config)
+
+  ;; Enable custom treemacs theme (all-the-icons must be installed!)
+  (doom-themes-treemacs-config)
+)
 
 (use-package uniquify
   :defer 1
@@ -2096,7 +2252,12 @@ Example output:
 )
 
 (use-package all-the-icons
-  :defer 3
+  :ensure t
+)
+
+(use-package vscode-icon
+  :ensure t
+  :commands (vscode-icon-for-file)
 )
 
 (use-package parrot
@@ -2143,54 +2304,6 @@ Example output:
 ;;   ;; This should be used *after* you load the active theme!
 ;;   ;;  NOTE: This is necessary for themes in the doom-themes package!
 ;;   (solaire-mode-swap-bg))
-
-(use-package sublimity
-  :ensure t
-  :config
-  (setq sublimity-scroll-weight 10
-      sublimity-scroll-drift-length 5)
-  ;; this is the only part of the config where i use `use-package' inside another package config.
-  ;; the oficial docs appears to suggest this way
-  (sublimity-mode 1)
-)
-
-(use-package sublimity-scroll
-  :ensure nil
-  :disabled
-  :config
-  (setq sublimity-scroll-weight 10)
-  (setq sublimity-scroll-drift-length 5)
-)
-
-(use-package sublimity-map
-  :disabled t
-  :ensure nil
-  :config
-  (setq sublimity-map-size 18)  ;; minimap width
-  (setq sublimity-map-fraction 0.3)
-  (setq sublimity-map-text-scale -7)
-  (sublimity-map-set-delay 4) ;; minimap is displayed after 5 seconds of idle time
-
-  ;; document this snippet better, not sure what it does, but it defines the font-family
-  (add-hook 'sublimity-map-setup-hook
-          (lambda ()
-            (setq buffer-face-mode-face '(:family "Monospace"))
-            (buffer-face-mode)))
-
-)
-
-(use-package sublimity-attractive
-  :disabled nil
-  :ensure nil
-  :config
-  (setq sublimity-attractive-centering-width 110)
-
-  ;; these are functions (NOT variables) to configure some UI parts
-  ;; (sublimity-attractive-hide-bars)
-  ;; (sublimity-attractive-hide-vertical-border)
-  ;; (sublimity-attractive-hide-fringes)
-  ;; (sublimity-attractive-hide-modelines)
-)
 
 (use-package fancy-battery
   :ensure t
@@ -2361,6 +2474,54 @@ Example output:
   (zoom-mode t)
 )
 
+(use-package sublimity
+  :ensure t
+  :config
+  ;;(setq sublimity-scroll-weight 10
+  ;;    sublimity-scroll-drift-length 5)
+  ;; this is the only part of the config where i use `use-package' inside another package config.
+  ;; the oficial docs appears to suggest this way
+  (sublimity-mode 1)
+)
+
+(use-package sublimity-scroll
+  :ensure nil
+  :config
+  (setq sublimity-scroll-weight 10)  ;; default 10
+  (setq sublimity-scroll-drift-length 5)  ;; default 5
+  (setq sublimity-scroll-hide-cursor t) ;; default t
+)
+
+(use-package sublimity-map
+  :disabled
+  :ensure nil
+  :config
+  (setq sublimity-map-size 14)  ;; minimap width
+  (setq sublimity-map-fraction 0.3)
+  (setq sublimity-map-text-scale -5)
+  (sublimity-map-set-delay nil) ;; minimap is displayed after 5 seconds of idle time
+
+  ;; document this snippet better, not sure what it does, but it defines the font-family
+;;  (add-hook 'sublimity-map-setup-hook
+;;          (lambda ()
+;;            (setq buffer-face-mode-face '(:family "Monospace"))
+;;            (buffer-face-mode)))
+
+)
+
+(use-package sublimity-attractive
+  :disabled
+  :ensure nil
+  :config
+  (setq sublimity-attractive-centering-width 110)
+
+  ;; these are functions (NOT variables) to configure some UI parts
+  ;; (sublimity-attractive-hide-bars)
+  ;; (sublimity-attractive-hide-vertical-border)
+  ;; (sublimity-attractive-hide-fringes)
+  ;; (sublimity-attractive-hide-modelines)
+)
+
 (use-package goto-line-preview
   :ensure t
   :config
@@ -2369,7 +2530,6 @@ Example output:
 
 (use-package dashboard
   :ensure t
-  :after fireplace ;; testing to add fireplace to dashboard, need to be loaded first
   :preface
   (defun tau/dashboard-banner ()
     "Sets a dashboard banner including information on package initialization
@@ -2407,7 +2567,7 @@ Example output:
   (setq dashboard-center-content t)
 
   ;; To disable shortcut "jump" indicators for each section, set
-  (setq dashboard-show-shortcuts nil)
+  (setq dashboard-show-shortcuts t)
 
   ;; To add icons to the widget headings and their items:
   (setq dashboard-set-heading-icons t)
@@ -2433,10 +2593,10 @@ Example output:
   (setq dashboard-org-agenda-categories '("Tasks" "Appointments"))
 
   ;; adds fireplace as a widget
-  (defun dashboard-insert-custom (list-size)
-    (fireplace))
-  (add-to-list 'dashboard-item-generators  '(fireplace . dashboard-insert-custom))
-  (add-to-list 'dashboard-items '(fireplace) t)
+;;  (defun dashboard-insert-custom (list-size)
+;;    (fireplace))
+;;  (add-to-list 'dashboard-item-generators  '(fireplace . dashboard-insert-custom))
+;;  (add-to-list 'dashboard-items '(fireplace) t)
 
   (dashboard-setup-startup-hook)
 )
@@ -2456,6 +2616,8 @@ Example output:
 (global-set-key (kbd "M-<f12> t") 'tau/toggle-window-transparency)
 
 (use-package minimap
+  :ensure t
+  :disabled t
   :commands
   (minimap-bufname minimap-create minimap-kill)
   :custom
@@ -2464,9 +2626,9 @@ Example output:
   (minimap-update-delay 0.2)
   (minimap-minimum-width 20)
   :bind
-  ("M-<f12> m" . ladicle/toggle-minimap)
+  ("M-<f12> m" . tau/toggle-minimap)
   :preface
-  (defun ladicle/toggle-minimap ()
+  (defun tau/toggle-minimap ()
     "Toggle minimap for current buffer."
     (interactive)
     (if (null minimap-bufname)
@@ -2536,38 +2698,40 @@ Example output:
 (add-hook 'org-mode-hook 'add-pretty-lambda)
 
 (use-package centaur-tabs
-  :ensure t
-  :hook
-  (dashboard-mode . centaur-tabs-local-mode)
-  (term-mode . centaur-tabs-local-mode)
-  (calendar-mode . centaur-tabs-local-mode)
-  (org-agenda-mode . centaur-tabs-local-mode)
-  (helpful-mode . centaur-tabs-local-mode)
-  :bind
-  ("C-<prior>" . centaur-tabs-backward)
-  ("C-<next>" . centaur-tabs-forward)
-  ("C-c t s" . centaur-tabs-counsel-switch-group)
-  ("C-c t p" . centaur-tabs-group-by-projectile-project)
-  ("C-c t g" . centaur-tabs-group-buffer-groups)
-  (:map evil-normal-state-map
-  ("g t" . centaur-tabs-forward)
-  ("g T" . centaur-tabs-backward))
-  :config
-  (setq centaur-tabs-style "rounded") ; types available: (alternative, bar, box, chamfer, rounded, slang, wave, zigzag)
-  (setq centaur-tabs-height 25)
-  (setq centaur-tabs-set-icons t) ;; display themed icons from all the icons
-  (setq centaur-tabs-set-modified-marker t) ;; display a marker indicating that a buffer has been modified (atom-style)
-  (setq centaur-tabs-modified-marker "*")
-  (setq centaur-tabs-set-bar 'over) ;; in previous config value was 'over
+ :ensure t
+ :hook
+ (dashboard-mode . centaur-tabs-local-mode)
+ (term-mode . centaur-tabs-local-mode)
+ (calendar-mode . centaur-tabs-local-mode)
+ (org-agenda-mode . centaur-tabs-local-mode)
+ (helpful-mode . centaur-tabs-local-mode)
+ :bind
+ ("C-<prior>" . centaur-tabs-backward)
+ ("C-<next>" . centaur-tabs-forward)
+ ("C-c t s" . centaur-tabs-counsel-switch-group)
+ ("C-c t p" . centaur-tabs-group-by-projectile-project)
+ ("C-c t g" . centaur-tabs-group-buffer-groups)
+ (:map evil-normal-state-map
+ ("g t" . centaur-tabs-forward)
+ ("g T" . centaur-tabs-backward))
+ :init
+ :config
+ ;; appearantly these dont work if put in :init
+ (setq centaur-tabs-style "rounded") ; types available: (alternative, bar, box, chamfer, rounded, slang, wave, zigzag)
+ (setq centaur-tabs-height 25)
+ (setq centaur-tabs-set-icons t) ;; display themed icons from all the icons
+ (setq centaur-tabs-set-modified-marker t) ;; display a marker indicating that a buffer has been modified (atom-style)
+ (setq centaur-tabs-modified-marker "*")
+ (centaur-tabs-headline-match)
+ (centaur-tabs-mode t)
 
-  (setq centaur-tabs-gray-out-icons 'buffer)
-  ;; (setq centaur-tabs-adjust-buffer-order t)
-  (setq uniquify-separator "/")
-  (setq uniquify-buffer-name-style 'forward)
-  ;; (centaur-tabs-enable-buffer-reordering)
-  (centaur-tabs-headline-match)
-  ;; (centaur-tabs-change-fonts "arial" 160)
-  (centaur-tabs-mode t)
+ (setq centaur-tabs-set-bar 'over) ;; in previous config value was 'over
+ ;; (setq centaur-tabs-gray-out-icons 'buffer)
+ ;; (centaur-tabs-enable-buffer-reordering)
+ ;; (setq centaur-tabs-adjust-buffer-order t)
+ (setq uniquify-separator "/")
+ (setq uniquify-buffer-name-style 'forward)
+ ;; (centaur-tabs-change-fonts "arial" 160)
 )
 
 (use-package paren

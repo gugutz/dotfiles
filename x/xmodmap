@@ -1,14 +1,15 @@
 ! Output below taken from:
 ! xmodmap -pm
 !-----------------------
-shift       Shift_L (0x32),  Shift_R (0x3e)
-lock
-control     Control_L (0x25),  Control_R (0x69)
-mod1        Alt_L (0x40),  Meta_L (0xcd)
-mod2        Num_Lock (0x4d)
-mod3        Scroll_Lock (0x4e)
-mod4        Super_L (0x85),  Super_R (0x86),  Super_L (0xce),  Hyper_L (0xcf)
-mod5        ISO_Level3_Shift (0x5c),  Mode_switch (0xcb)
+! shift       Shift_L (0x32),  Shift_R (0x3e)
+! lock
+! control     Control_L (0x25),  Control_R (0x69)
+! mod1        Alt_L (0x40),  Meta_L (0xcd)
+! mod2        Num_Lock (0x4d)
+! mod3        Scroll_Lock (0x4e)
+! mod4        Super_L (0x85),  Super_R (0x86),  Super_L (0xce),  Hyper_L (0xcf)
+! mod5        ISO_Level3_Shift (0x5c),  Mode_switch (0xcb)
+! mods with numbers that dont how in `xmodmap -pm' are invalid and will give errors on parsing
 
 
 ! Output below taken from:
@@ -29,5 +30,5 @@ clear lock
 
 ! Use right alt as Hyper key
 ! set the menu key as hyper
-add mod6    = Hyper_L Hyper_R
-keycode 135 = Hyper_R
+! add mod6    = Hyper_L Hyper_R
+! keycode 135 = Hyper_R
