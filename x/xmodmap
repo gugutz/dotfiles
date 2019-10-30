@@ -1,5 +1,34 @@
+! Output below taken from:
+! xmodmap -pm
+!-----------------------
+! shift       Shift_L (0x32),  Shift_R (0x3e)
+! lock
+! control     Control_L (0x25),  Control_R (0x69)
+! mod1        Alt_L (0x40),  Meta_L (0xcd)
+! mod2        Num_Lock (0x4d)
+! mod3        Scroll_Lock (0x4e)
+! mod4        Super_L (0x85),  Super_R (0x86),  Super_L (0xce),  Hyper_L (0xcf)
+! mod5        ISO_Level3_Shift (0x5c),  Mode_switch (0xcb)
+! mods with numbers that dont how in `xmodmap -pm' are invalid and will give errors on parsing
+
+
+! Output below taken from:
+! xmodmap -pke | egrep '(Alt|Caps|Control|Hyper|Menu|Meta|Mode|Num|Shift|Super)'
+!-----------------------
+! keycode 9 = caps lock
+! keycode 37 = left control
+! keycode 105 = right control
+! keycode 135 = menu key
+! keycode 204 = left alt
+! keycode 207 = left hyper
+
 ! Use caps lock as esc
 keycode 66 = Escape
 keycode 9 = Caps_Lock
 add Lock = Caps_Lock
 clear lock
+
+! Use right alt as Hyper key
+! set the menu key as hyper
+! add mod6    = Hyper_L Hyper_R
+! keycode 135 = Hyper_R
