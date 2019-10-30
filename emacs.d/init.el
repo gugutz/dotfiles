@@ -341,6 +341,16 @@ tangled, and the tangled file is compiled."
   :config
 )
 
+(use-package ialign
+  :ensure t
+  :bind
+  ("C-x l" . ialign)
+  :config
+  ;;(setq ialign-default-spacing 32)
+  (setq ialign-align-with-tabs nil) ;; default nil
+  (setq ialign-auto-update t) ;; default t
+)
+
 (defun align-values (start end)
   "Vertically aligns region based on lengths of the first value of each line.
 Example output:
@@ -352,6 +362,19 @@ Example output:
   (align-regexp start end
 				"\\S-+\\(\\s-+\\)"
 				1 1 nil))
+
+(use-package dumb-jump
+  :ensure t
+  :bind (("M-g o" . dumb-jump-go-other-window)
+         ("M-g j" . dumb-jump-go)
+         ("M-g b" . dumb-jump-back)
+         ("M-g i" . dumb-jump-go-prompt)
+         ("M-g x" . dumb-jump-go-prefer-external)
+         ("M-g z" . dumb-jump-go-prefer-external-other-window))
+  :config
+  (setq dumb-jump-selector 'helm)
+  ;; (setq dumb-jump-selector 'ivy)
+)
 
 (defun upcase-backward-word (arg)
   (interactive "p")
@@ -881,9 +904,11 @@ Example output:
     (interactive)
     (setq org-latex-listings 'minted
           org-latex-packages-alist '(("" "minted"))
-          org-latex-pdf-process
-          '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-            "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")))
+          (setq org-latex-pdf-process
+          '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))))
+
+  (setq org-latex-pdf-process
+    '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
 
   (require 'org-habit)
   '(org-emphasis-alist
@@ -1192,8 +1217,30 @@ Example output:
   :custom
   (magit-auto-revert-mode nil)
   :bind
+  ("<tab>" . magit-section-toggle)
   ("M-g s" . magit-status)
   ("C-x g" . magit-status)
+)
+
+(use-package evil-magit
+  :ensure t
+  :init
+  (setq evil-magit-state 'normal)
+  (setq evil-magit-use-y-for-yank nil)
+  :config
+  (evil-magit-init)
+  (evil-define-key evil-magit-state magit-mode-map "<tab>" 'magit-section-toggle)
+  (evil-define-key evil-magit-state magit-mode-map "l" 'magit-log-popup)
+  (evil-define-key evil-magit-state magit-mode-map "j" 'evil-next-visual-line)
+  (evil-define-key evil-magit-state magit-mode-map "k" 'evil-previous-visual-line)
+  ;(evil-define-key evil-magit-state magit-diff-map "k" 'evil-previous-visual-line)
+  (evil-define-key evil-magit-state magit-staged-section-map "K" 'magit-discard)
+  (evil-define-key evil-magit-state magit-unstaged-section-map "K" 'magit-discard)
+  (evil-define-key evil-magit-state magit-unstaged-section-map "K" 'magit-discard)
+  (evil-define-key evil-magit-state magit-branch-section-map "K" 'magit-branch-delete)
+  (evil-define-key evil-magit-state magit-remote-section-map "K" 'magit-remote-remove)
+  (evil-define-key evil-magit-state magit-stash-section-map "K" 'magit-stash-drop)
+  (evil-define-key evil-magit-state magit-stashes-section-map "K" 'magit-stash-clear)
 )
 
 (use-package magit-todos
@@ -1204,18 +1251,6 @@ Example output:
   ("M-g t" . magit-todos-list)
   :config
   (magit-todos-mode)
-)
-
-(use-package evil-magit
-  :ensure t
-  :init
-  (setq evil-magit-state 'normal)
-  (setq evil-magit-use-y-for-yank nil)
-  :config
-  (evil-magit-init)
-  (evil-define-key evil-magit-state magit-mode-map "l" 'magit-log-popup)
-  (evil-define-key evil-magit-state magit-mode-map "j" 'evil-next-visual-line)
-  (evil-define-key evil-magit-state magit-mode-map "k" 'evil-previous-visual-line)
 )
 
 (use-package diff-hl
@@ -2700,6 +2735,7 @@ Example output:
 (use-package centaur-tabs
  :ensure t
  :hook
+ (after-init . centaur-tabs-mode)
  (dashboard-mode . centaur-tabs-local-mode)
  (term-mode . centaur-tabs-local-mode)
  (calendar-mode . centaur-tabs-local-mode)
@@ -2717,7 +2753,7 @@ Example output:
  :init
  :config
  ;; appearantly these dont work if put in :init
- (setq centaur-tabs-style "rounded") ; types available: (alternative, bar, box, chamfer, rounded, slang, wave, zigzag)
+ (setq centaur-tabs-style "box") ; types available: (alternative, bar, box, chamfer, rounded, slang, wave, zigzag)
  (setq centaur-tabs-height 25)
  (setq centaur-tabs-set-icons t) ;; display themed icons from all the icons
  (setq centaur-tabs-set-modified-marker t) ;; display a marker indicating that a buffer has been modified (atom-style)

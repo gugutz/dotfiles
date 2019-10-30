@@ -602,15 +602,18 @@ Enable documentation for programming languages
  | C-c ?   | ialign-show-help         |
  |---------+--------------------------|
 
+#+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package ialign
   :ensure t
   :bind
   ("C-x l" . ialign)
   :config
-  ialign-default-spacing
-  ialign-align-with-tabs  ;; default nil
-  ialign-auto-update ;; default t
+  ;;(setq ialign-default-spacing 32)
+  (setq ialign-align-with-tabs nil) ;; default nil
+  (setq ialign-auto-update t) ;; default t
 )
+#+END_SRC
+
 ** align.el
 
 align text to a specific column, by regexp
@@ -642,6 +645,24 @@ Example output:
 				1 1 nil))
 
 
+#+END_SRC
+
+** dumb-jump
+Emacs jump to definition tool
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package dumb-jump
+  :ensure t
+  :bind (("M-g o" . dumb-jump-go-other-window)
+         ("M-g j" . dumb-jump-go)
+         ("M-g b" . dumb-jump-back)
+         ("M-g i" . dumb-jump-go-prompt)
+         ("M-g x" . dumb-jump-go-prefer-external)
+         ("M-g z" . dumb-jump-go-prefer-external-other-window))
+  :config
+  (setq dumb-jump-selector 'helm)
+  ;; (setq dumb-jump-selector 'ivy)
+)
 #+END_SRC
 
 * Text editing settings
@@ -1306,9 +1327,11 @@ Align by operators
     (interactive)
     (setq org-latex-listings 'minted
           org-latex-packages-alist '(("" "minted"))
-          org-latex-pdf-process
-          '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-            "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")))
+          (setq org-latex-pdf-process
+          '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))))
+
+  (setq org-latex-pdf-process
+    '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
 
   (require 'org-habit)
   '(org-emphasis-alist
@@ -1757,8 +1780,33 @@ C-c g for any git related stuff other than magit's
   :custom
   (magit-auto-revert-mode nil)
   :bind
+  ("<tab>" . magit-section-toggle)
   ("M-g s" . magit-status)
   ("C-x g" . magit-status)
+)
+#+END_SRC
+
+** evil-magit
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package evil-magit
+  :ensure t
+  :init
+  (setq evil-magit-state 'normal)
+  (setq evil-magit-use-y-for-yank nil)
+  :config
+  (evil-magit-init)
+  (evil-define-key evil-magit-state magit-mode-map "<tab>" 'magit-section-toggle)
+  (evil-define-key evil-magit-state magit-mode-map "l" 'magit-log-popup)
+  (evil-define-key evil-magit-state magit-mode-map "j" 'evil-next-visual-line)
+  (evil-define-key evil-magit-state magit-mode-map "k" 'evil-previous-visual-line)
+  ;(evil-define-key evil-magit-state magit-diff-map "k" 'evil-previous-visual-line)
+  (evil-define-key evil-magit-state magit-staged-section-map "K" 'magit-discard)
+  (evil-define-key evil-magit-state magit-unstaged-section-map "K" 'magit-discard)
+  (evil-define-key evil-magit-state magit-unstaged-section-map "K" 'magit-discard)
+  (evil-define-key evil-magit-state magit-branch-section-map "K" 'magit-branch-delete)
+  (evil-define-key evil-magit-state magit-remote-section-map "K" 'magit-remote-remove)
+  (evil-define-key evil-magit-state magit-stash-section-map "K" 'magit-stash-drop)
+  (evil-define-key evil-magit-state magit-stashes-section-map "K" 'magit-stash-clear)
 )
 #+END_SRC
 
@@ -1773,21 +1821,6 @@ C-c g for any git related stuff other than magit's
   ("M-g t" . magit-todos-list)
   :config
   (magit-todos-mode)
-)
-#+END_SRC
-
-** evil-magit
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package evil-magit
-  :ensure t
-  :init
-  (setq evil-magit-state 'normal)
-  (setq evil-magit-use-y-for-yank nil)
-  :config
-  (evil-magit-init)
-  (evil-define-key evil-magit-state magit-mode-map "l" 'magit-log-popup)
-  (evil-define-key evil-magit-state magit-mode-map "j" 'evil-next-visual-line)
-  (evil-define-key evil-magit-state magit-mode-map "k" 'evil-previous-visual-line)
 )
 #+END_SRC
 
@@ -3675,6 +3708,7 @@ Zoom in selected window and resize othersAuto balance windows and frames
 (use-package centaur-tabs
  :ensure t
  :hook
+ (after-init . centaur-tabs-mode)
  (dashboard-mode . centaur-tabs-local-mode)
  (term-mode . centaur-tabs-local-mode)
  (calendar-mode . centaur-tabs-local-mode)
@@ -3692,7 +3726,7 @@ Zoom in selected window and resize othersAuto balance windows and frames
  :init
  :config
  ;; appearantly these dont work if put in :init
- (setq centaur-tabs-style "rounded") ; types available: (alternative, bar, box, chamfer, rounded, slang, wave, zigzag)
+ (setq centaur-tabs-style "box") ; types available: (alternative, bar, box, chamfer, rounded, slang, wave, zigzag)
  (setq centaur-tabs-height 25)
  (setq centaur-tabs-set-icons t) ;; display themed icons from all the icons
  (setq centaur-tabs-set-modified-marker t) ;; display a marker indicating that a buffer has been modified (atom-style)
