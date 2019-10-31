@@ -1304,6 +1304,9 @@ Align by operators
   (setq org-image-actual-width nil)
   (setq org-startup-with-inline-images t)
 
+  ;; make tab behave like it usually do (ie: indent) inside org source blocks
+  (setq org-src-tab-acts-natively t)
+
   (setq org-confirm-babel-evaluate 'nil)
   (setq org-todo-keywords
    '((sequence "TODO" "IN-PROGRESS" "REVIEW" "|" "DONE")))
