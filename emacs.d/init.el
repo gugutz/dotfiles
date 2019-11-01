@@ -1,8 +1,10 @@
 (setq user-full-name "Gustavo P Borges")
-(setq user-mail-address "gugutz@gmail.com")
-(setq work-mail-address "gugutz@stairs.studio")
-(setq gmail-address "gugutz@gmail.com")
-(setq nickname "gugutz")
+  (setq user-mail-address "gugutz@gmail.com")
+  (setq work-mail-address "gugutz@stairs.studio")
+  (setq gmail-address "gugutz@gmail.com")
+  (setq nickname "gugutz")
+;; my secrets
+;; (load-library "~/dotfiles/emacs.d/secrets.el.gpg")
 
 (defun /util/tangle-init ()
   (interactive)
@@ -81,6 +83,37 @@ tangled, and the tangled file is compiled."
   (setq auto-package-update-hide-results t)
   (auto-package-update-maybe)
 )
+
+(require 'epa-file)
+(custom-set-variables '(epg-gpg-program  "c:/Program Files (x86)/GNU/GnuPG/pub/gpg2"))
+(epa-file-enable)
+
+(require 'gnus)
+(setq user-mail-address "joshuafwolfe@gmail.com"
+      user-full-name "Josh Wolfe")
+
+(setq gnus-select-method
+      '(nnimap "gmail"
+         (nnimap-address "imap.gmail.com")
+         (nnimap-server-port 993)
+         (nnimap-stream ssl)))
+
+(setq smtpmail-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-service 587
+      gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
+
+(setq gnus-thread-sort-functions
+      '(gnus-thread-sort-by-most-recent-date
+        (not gnus-thread-sort-by-number)))
+
+(defun my-gnus-group-list-subscribed-groups ()
+  "List all subscribed groups with or without un-read messages"
+  (interactive)
+  (gnus-group-list-all-groups 5))
+
+(define-key gnus-group-mode-map
+  ;; list all the subscribed groups even they contain zero un-read messages
+  (kbd "o") 'my-gnus-group-list-subscribed-groups)
 
 ;; (use-package server
 ;;   :ensure nil
@@ -365,6 +398,7 @@ Example output:
 
 (use-package dumb-jump
   :ensure t
+  :after helm
   :bind (("M-g o" . dumb-jump-go-other-window)
          ("M-g j" . dumb-jump-go)
          ("M-g b" . dumb-jump-back)
@@ -372,6 +406,8 @@ Example output:
          ("M-g x" . dumb-jump-go-prefer-external)
          ("M-g z" . dumb-jump-go-prefer-external-other-window))
   :config
+  (eval-when-compile
+    (require 'helm-source nil t))
   (setq dumb-jump-selector 'helm)
   ;; (setq dumb-jump-selector 'ivy)
 )
@@ -710,6 +746,15 @@ Example output:
   (define-key evil-insert-state-map (kbd "C-r") 'search-backward)
 )
 
+(use-package evil-org
+  :after org
+  :hook
+  (org-mode . evil-org-mode)
+  :config
+  (lambda ()
+    (evil-org-set-key-theme))
+)
+
 (use-package evil-numbers
   :ensure t
   :after evil
@@ -855,74 +900,94 @@ Example output:
 )
 
 (use-package org
-  :ensure org-plus-contrib
-  :defer t
-  :bind
-  ("C-c l" . org-store-link)
-  ("C-c a" . org-agenda)
-  ("C-c c" . org-capture)
-  ("C-c b" . org-switch)
-  ;; this map is to delete de bellow commented lambda that does the same thing
-  ;; Resolve issue with Tab not working with ORG only in Normal VI Mode in terminal
-  ;; (something with TAB on terminals being related to C-i...)
-  (:map evil-normal-state-map
-  ("<tab>" . org-cycle)
+    :ensure org-plus-contrib
+    :defer t
+    :bind
+    ("C-c l" . org-store-link)
+    ("C-c a" . org-agenda)
+    ("C-c c" . org-capture)
+    ("C-c b" . org-switch)
+    ;; this map is to delete de bellow commented lambda that does the same thing
+    ;; Resolve issue with Tab not working with ORG only in Normal VI Mode in terminal
+    ;; (something with TAB on terminals being related to C-i...)
+    (:map evil-normal-state-map
+    ("<tab>" . org-cycle)
+    )
+    :init
+    ;; general org config variables
+    (setq org-log-done 'time)
+    (setq org-export-backends (quote (ascii html icalendar latex md odt)))
+    (setq org-use-speed-commands t)
+
+    ;; dont display atual width for images inline. set per-file with
+    ;; #+ATTR_HTML: :width 600px :height: auto
+    ;; #+ATTR_ORG: :width 600
+    ;; #+ATTR_LATEX: :width 5in
+    (setq org-image-actual-width nil)
+    (setq org-startup-with-inline-images t)
+
+    ;; make tab behave like it usually do (ie: indent) inside org source blocks
+    (setq org-src-tab-acts-natively t)
+
+    (setq org-confirm-babel-evaluate 'nil)
+    (setq org-todo-keywords
+     '((sequence "TODO" "IN-PROGRESS" "REVIEW" "|" "DONE")))
+    (setq org-agenda-window-setup 'other-window)
+    (setq org-log-done 'time) ;; Show CLOSED tag line in closed TODO items
+    (setq org-log-done 'note) ;; Prompt to leave a note when closing an item
+    (setq org-hide-emphasis-markers nil)
+
+    ;;ox-twbs (exporter to twitter bootstrap html)
+    (setq org-enable-bootstrap-support t)
+    :config
+  ;; make windmove work with org mode
+  (add-hook 'org-shiftup-final-hook 'windmove-up)
+(add-hook 'org-shiftleft-final-hook 'windmove-left)
+(add-hook 'org-shiftdown-final-hook 'windmove-down)
+(add-hook 'org-shiftright-final-hook 'windmove-right)
+    ;; org-capture - needs to be in :config because it assumes a variable is already defined: `org-directory'
+    (setq org-default-notes-file (concat org-directory "/notes.org"))
+
+    ;;(add-hook 'org-mode-hook
+    ;;          (lambda ()
+    ;;        (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
+
+    (defun org-export-turn-on-syntax-highlight()
+      "Setup variables to turn on syntax highlighting when calling `org-latex-export-to-pdf'"
+      (interactive)
+      (setq org-latex-listings 'minted
+            org-latex-packages-alist '(("" "minted"))
+            (setq org-latex-pdf-process
+            '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))))
+
+    (setq org-latex-pdf-process
+      '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
+
+  (setq org-emphasis-alist '(("*" bold)
+                         ("/" italic)
+                         ("_" underline)
+                         ("=" org-verbatim verbatim)
+                         ("~" org-code verbatim)))
+    (require 'org-habit)
+    '(org-emphasis-alist
+     (quote
+      (
+       ("!" org-habit-overdue-face)
+       ("%" org-habit-alert-face)
+       ("*" bold)
+       ("/" italic)
+       ("_" underline)
+       ("=" org-verbatim verbatim)
+       ("~" org-code verbatim)
+       ("+" (:strike-through t))
+       )))
   )
-  :init
-  ;; general org config variables
-  (setq org-log-done 'time)
-  (setq org-export-backends (quote (ascii html icalendar latex md odt)))
-  (setq org-use-speed-commands t)
 
-  ;; dont display atual width for images inline. set per-file with
-  ;; #+ATTR_HTML: :width 600px :height: auto
-  ;; #+ATTR_ORG: :width 600
-  ;; #+ATTR_LATEX: :width 5in
-  (setq org-image-actual-width nil)
-  (setq org-startup-with-inline-images t)
-
-  (setq org-confirm-babel-evaluate 'nil)
-  (setq org-todo-keywords
-   '((sequence "TODO" "IN-PROGRESS" "REVIEW" "|" "DONE")))
-  (setq org-agenda-window-setup 'other-window)
-  (setq org-log-done 'time) ;; Show CLOSED tag line in closed TODO items
-  (setq org-log-done 'note) ;; Prompt to leave a note when closing an item
-  (setq org-hide-emphasis-markers nil)
-
-  ;;ox-twbs (exporter to twitter bootstrap html)
-  (setq org-enable-bootstrap-support t)
-  :config
-  ;; org-capture - needs to be in :config because it assumes a variable is already defined: `org-directory'
-  (setq org-default-notes-file (concat org-directory "/notes.org"))
-
-  ;;(add-hook 'org-mode-hook
-  ;;          (lambda ()
-  ;;        (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
-
-  (defun org-export-turn-on-syntax-highlight()
-    "Setup variables to turn on syntax highlighting when calling `org-latex-export-to-pdf'"
-    (interactive)
-    (setq org-latex-listings 'minted
-          org-latex-packages-alist '(("" "minted"))
-          (setq org-latex-pdf-process
-          '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))))
-
-  (setq org-latex-pdf-process
-    '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
-
-  (require 'org-habit)
-  '(org-emphasis-alist
-   (quote
-    (
-     ("!" org-habit-overdue-face)
-     ("%" org-habit-alert-face)
-     ("*" bold)
-     ("/" italic)
-     ("_" underline)
-     ("=" org-verbatim verbatim)
-     ("~" org-code verbatim)
-     ("+" (:strike-through t))
-     )))
+(use-package org-sidebar
+:ensure t
+:after org
+:bind
+("S-<f8>" . org-sidebar-tree-toggle)
 )
 
 (use-package ox-extra
@@ -941,15 +1006,6 @@ Example output:
 
 (add-hook 'org-font-lock-set-keywords-hook #'org-add-my-extra-fonts)
 
-(use-package evil-org
-  :after org
-  :hook
-  (org-mode . evil-org-mode)
-  :config
-  (lambda ()
-    (evil-org-set-key-theme))
-)
-
 (use-package ox-pandoc
   :after (org ox)
   :config
@@ -967,18 +1023,12 @@ Example output:
 (use-package org-bullets
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  (setq org-bullets-bullet-list '("◉" "○" "●" "►" "•"))
 )
 
-(use-package org-jira
-  :ensure t
+(use-package ox-confluence
   :defer 3
-  :after org
-  :custom
-  (jiralib-url "https://stairscreativestudio.atlassian.net")
-)
-
-(use-package ox-jira
-  :defer 3
+  :ensure nil
   :after org
 )
 
@@ -998,6 +1048,11 @@ Example output:
   :defer t
   :after org
 )
+
+(use-package hydra)
+
+(use-package major-mode-hydra
+  :ensure nil)
 
 (use-package shell-pop
   :init
@@ -1054,6 +1109,141 @@ Example output:
 (define-key evil-normal-state-map (kbd "!") #'/eshell/new-window)
 (define-key evil-visual-state-map (kbd "!") #'/eshell/new-window)
 (define-key evil-motion-state-map (kbd "!") #'/eshell/new-window)
+
+(use-package projectile
+  :ensure t
+  :bind
+  (:map projectile-mode-map
+  ("s-p" . projectile-command-map)
+  ("C-c p" . projectile-command-map)
+  )
+:custom
+(projectile-completion-system 'helm)
+  :config
+  (projectile-mode +1)
+  (setq projectile-globally-ignored-files
+        (append '("~"
+                  ".swp"
+                  ".pyc")
+                projectile-globally-ignored-files))
+)
+
+(use-package helm-projectile
+  :ensure t
+;  :after projectile
+;  :demand t
+  :config
+  (helm-projectile-on)
+)
+
+(use-package org-kanban
+    :ensure t
+  :after org
+:commands  (org-kanban/initialize)
+    :config
+    )
+
+(use-package org-jira
+    :ensure t
+    :defer 3
+    :commands (org-jira-mode org-jira-get-issues org-jira-get-projects)
+    :after org
+    :custom
+    (jiralib-url "https://stairscreativestudio.atlassian.net")
+  :config
+(setq jiralib-token
+    `("Cookie" . ,(format "ajs_group_id=null; ajs_anonymous_id=%222e15ea7d-cb97-4d24-bfe2-348c4655df02%22; atlassian.xsrf.token=86ec43db-1a9e-48fa-892a-9210c6fee684_38750fda3fb7e52a86533ed838cb5688d745af60_lin; cloud.session.token=eyJraWQiOiJzZXNzaW9uLXNlcnZpY2VcL3Nlc3Npb24tc2VydmljZSIsImFsZyI6IlJTMjU2In0.eyJhc3NvY2lhdGlvbnMiOlt7ImFhSWQiOiI1YmE3ZjkyNDNjMDEzZDdiMTA1MTRjYmIiLCJzZXNzaW9uSWQiOiJhYWUwYmVkNC02MTY1LTQ4MjUtYThkYS03ZWEwNGIxMWQ3MzgiLCJlbWFpbCI6Imd1Z3V0ekBnbWFpbC5jb20ifV0sInN1YiI6IjVkOTM1MzI1MGMyYTVkMGRkODdhZmQ2MCIsImVtYWlsRG9tYWluIjoic3RhaXJzLnN0dWRpbyIsImltcGVyc29uYXRpb24iOltdLCJyZWZyZXNoVGltZW91dCI6MTU3MjYzODk5NywidmVyaWZpZWQiOnRydWUsImlzcyI6InNlc3Npb24tc2VydmljZSIsInNlc3Npb25JZCI6ImYwNTEwYzA5LWRmNGMtNGE2MC1iYTM4LTA2OTU2YzRiODRkMSIsImF1ZCI6ImF0bGFzc2lhbiIsIm5iZiI6MTU3MjYzODM5NywiZXhwIjoxNTc1MjMwMzk3LCJpYXQiOjE1NzI2MzgzOTcsImVtYWlsIjoiZ3VzdGF2b0BzdGFpcnMuc3R1ZGlvIiwianRpIjoiZjA1MTBjMDktZGY0Yy00YTYwLWJhMzgtMDY5NTZjNGI4NGQxIn0.naz3Vi6yvn0aoFX7nAMK-K7fff4zpkeUifPSrEj6a3so9pK6uPrMDZOIGd8Mg7pJJkCy8FJ9bC6eTCGdrbqll3v8Kg6NhThAQzx8tvcW4gFObJyL12HEvt9EBpwvGKW1mWLhb-S_ZGwoTCXk1QRpNHy6zNl3etwlhX9jk3KXXT5fIaO2oJJaFCovZRvQTJdyoCRiIBRPWwyh3tqrqJiZVD08NFY1bq_aCyfkxxN-owWP7KPJxmLtH-ZPpj24ky8Dv-4oVP_frUPkLW5ULvHstdhxkwCUWCpaTPPDBqijljTj5YvXFp_ulNyWqQHnPHeV3m6BszI9WxBxZF7mUwIBZw; _csrf=AMoq40Bo50JzeFptjXhUvsBl")))
+(define-key org-jira-map (kbd "C-c pg") 'org-jira-get-projects)
+(define-key org-jira-map (kbd "C-c ib") 'org-jira-browse-issue)
+(define-key org-jira-map (kbd "C-c ig") 'org-jira-get-issues)
+(define-key org-jira-map (kbd "C-c ij") 'org-jira-get-issues-from-custom-jql)
+(define-key org-jira-map (kbd "C-c ih") 'org-jira-get-issues-headonly)
+(define-key org-jira-map (kbd "C-c iu") 'org-jira-update-issue)
+(define-key org-jira-map (kbd "C-c iw") 'org-jira-progress-issue)
+(define-key org-jira-map (kbd "C-c in") 'org-jira-progress-issue-next)
+(define-key org-jira-map (kbd "C-c ia") 'org-jira-assign-issue)
+(define-key org-jira-map (kbd "C-c ir") 'org-jira-refresh-issue)
+(define-key org-jira-map (kbd "C-c iR") 'org-jira-refresh-issues-in-buffer)
+(define-key org-jira-map (kbd "C-c ic") 'org-jira-create-issue)
+(define-key org-jira-map (kbd "C-c ik") 'org-jira-copy-current-issue-key)
+(define-key org-jira-map (kbd "C-c sc") 'org-jira-create-subtask)
+(define-key org-jira-map (kbd "C-c sg") 'org-jira-get-subtasks)
+(define-key org-jira-map (kbd "C-c cc") 'org-jira-add-comment)
+(define-key org-jira-map (kbd "C-c cu") 'org-jira-update-comment)
+(define-key org-jira-map (kbd "C-c wu") 'org-jira-update-worklogs-from-org-clocks)
+(define-key org-jira-map (kbd "C-c tj") 'org-jira-todo-to-jira)
+(define-key org-jira-map (kbd "C-c if") 'org-jira-get-issues-by-fixversion)
+  )
+
+(defun tau/hydra-jira ()
+  (interactive)
+  (funcall
+      (pretty-hydra-define hydra-jira (:exit t :hint nil)
+        ("Get" (("p" org-jira-get-projects                "Get Projects")
+                ("g" org-jira-get-issues                  "Get Issues")
+                ("G" org-jira-get-subtasks                "Get Subtasks")
+                ("r" org-jira-refresh-issue               "Refresh Issue")
+                ("R" org-jira-refresh-issues-in-buffer    "Refresh Issues in Buffer"))
+
+         "Manage" (("b" org-jira-browse-issue             "Browse Issue")
+                   ("c" org-jira-create-issue             "Create Issue")
+                   ("s" org-jira-create-subtask           "Create Subtask")
+                   ("P" org-jira-progress-issue           "Update Issue Progress")
+                   ("a" org-jira-assign-issue             "Assign Issue"))
+
+         "Push" (("u" org-jira-update-issue                "Update Issue")
+                 ("y" org-jira-copy-current-issue-key      "Copy Current Issue Key")
+                 ("U" org-jira-update-comment              "Update Comment")
+                 ("t" org-jira-todo-to-jira                "Todo to Jira")))))
+)
+
+(use-package ox-jira
+  :defer 3
+  :after org
+)
+
+(use-package ejira
+  :ensure t
+  :disabled
+  :init
+  (setq jiralib2-url              "https://stairscreativestudio.atlassian.net"
+        jiralib2-auth             'basic
+        jiralib2-user-login-name  "gustavo@stairs.studio"
+        jiralib2-token            nil
+
+        ejira-org-directory       "~/jira"
+        ejira-projects            '("PEP" "QuexCash")
+
+        ejira-priorities-alist    '(("Highest" . ?A)
+                                    ("High"    . ?B)
+                                    ("Medium"  . ?C)
+                                    ("Low"     . ?D)
+                                    ("Lowest"  . ?E))
+        ejira-todo-states-alist   '(("To Do"       . 1)
+                                    ("In Progress" . 2)
+                                    ("Done"        . 3)))
+  :config
+  ;; Tries to auto-set custom fields by looking into /editmeta
+  ;; of an issue and an epic.
+  (add-hook 'jiralib2-post-login-hook #'ejira-guess-epic-sprint-fields)
+
+  ;; They can also be set manually if autoconfigure is not used.
+  ;; (setq ejira-sprint-field       'customfield_10001
+  ;;       ejira-epic-field         'customfield_10002
+  ;;       ejira-epic-summary-field 'customfield_10004)
+
+  (require 'ejira-agenda)
+
+  ;; Make the issues visisble in your agenda by adding `ejira-org-directory'
+  ;; into your `org-agenda-files'.
+  (add-to-list 'org-agenda-files ejira-org-directory)
+
+  ;; Add an agenda view to browse the issues that
+  (org-add-agenda-custom-command
+   '("j" "My JIRA issues"
+     ((ejira-jql "resolution = unresolved and assignee = currentUser()"
+                 ((org-agenda-overriding-header "Assigned to me"))))))
+)
 
 (use-package helm
   :ensure t
@@ -1131,6 +1321,91 @@ Example output:
   :after helm
   :config
   (helm-fuzzier-mode 1)
+)
+
+(use-package ivy
+:ensure t
+:custom
+(ivy-re-builders-alist
+'((t . ivy--regex-plus)))
+:config
+(ivy-mode)
+(setq ivy-display-style 'fancy
+   ivy-use-virtual-buffers t
+   enable-recursive-minibuffers t
+   ivy-use-selectable-prompt t)
+(ivy-set-actions
+t
+'(("I" insert "insert")))
+(ivy-set-occur 'ivy-switch-buffer 'ivy-switch-buffer-occur)
+)
+
+(use-package counsel
+:ensure t
+:hook
+(after-init . ivy-mode)
+(counsel-grep-post-action . better-jumper-set-jump)
+:diminish ivy-mode
+:config
+(setq counsel-find-file-ignore-regexp "\\(?:^[#.]\\)\\|\\(?:[#~]$\\)\\|\\(?:^Icon?\\)"
+   counsel-describe-function-function #'helpful-callable
+   counsel-describe-variable-function #'helpful-variable
+   ;; Add smart-casing (-S) to default command arguments:
+   counsel-rg-base-command "rg -S --no-heading --line-number --color never %s ."
+   counsel-ag-base-command "ag -S --nocolor --nogroup %s"
+   counsel-pt-base-command "pt -S --nocolor --nogroup -e %s"
+   counsel-find-file-at-point t)
+)
+
+(use-package ivy-rich
+:ensure t
+:config
+(ivy-rich-mode 1)
+(setq ivy-format-function #'ivy-format-function-line)
+)
+
+(use-package swiper
+  :ensure nil
+  :bind
+  (("C-s" . swiper-isearch)
+   :map swiper-map
+   ("M-q" . swiper-query-replace)
+   ("C-l". swiper-recenter-top-bottom)
+   ("C-'" . swiper-avy))
+  :custom
+  (counsel-grep-swiper-limit 20000)
+  (counsel-rg-base-command
+   "rg -i -M 120 --no-heading --line-number --color never %s .")
+  (counsel-grep-base-command
+   "rg -i -M 120 --no-heading --line-number --color never '%s' %s")
+)
+
+(use-package snails
+  :ensure nil
+  :if window-system
+  :bind
+  ("M-s s" . snails)
+  ("M-s g" . snails-current-project)
+  ("M-s b" . snails-active-recent-buffers)
+  ("M-s e" . snails-everywhere)
+  :custom-face
+  (snails-content-buffer-face ((t (:background "#111" :height 110))))
+  (snails-input-buffer-face ((t (:background "#222" :foreground "gold" :height 110))))
+  (snails-header-line-face ((t (:inherit font-lock-function-name-face :underline t :height 1.1))))
+  :config
+  (use-package exec-path-from-shell
+    :if (featurep 'cocoa) :defer t)
+
+  ;; Functions for specific backends
+  (defun snails-current-project ()
+    (interactive)
+    (snails '(snails-backend-projectile snails-backend-rg snails-backend-fd)))
+  (defun snails-active-recent-buffers ()
+    (interactive)
+    (snails '(snails-backend-buffer snails-backend-recentf)))
+  (defun snails-everywhere ()
+    (interactive)
+    (snails '(snails-backend-everything snails-backend-mdfind)))
 )
 
 (use-package flycheck
@@ -1336,30 +1611,6 @@ Example output:
           forge-pull-notifications t)
 )
 
-(use-package projectile
-  :ensure t
-  :bind
-  (:map projectile-mode-map
-  ("s-p" . projectile-command-map)
-  ("C-c p" . projectile-command-map)
-  )
-  :config
-  (projectile-mode +1)
-  (setq projectile-globally-ignored-files
-        (append '("~"
-                  ".swp"
-                  ".pyc")
-                projectile-globally-ignored-files))
-)
-
-(use-package helm-projectile
-  :ensure t
-;  :after projectile
-;  :demand t
-  :config
-  (helm-projectile-on)
-)
-
 (use-package restclient
   :ensure t
   :mode
@@ -1543,10 +1794,11 @@ Example output:
 )
 
 (use-package company-emoji
+  :disabled
   :ensure t
   :config
   (add-to-list 'company-backends 'company-emoji)
-)
+  )
 
 (use-package company-quickhelp          ; Documentation popups for Company
    :ensure t
@@ -1576,17 +1828,50 @@ Example output:
   ;;   (global-company-mode . company-box-mode)
   ;; )
 (use-package company-box
-  :ensure t
-  :hook
-  (company-mode . company-box-mode)
-  :init
-  (setq company-box-icons-alist 'company-box-icons-all-the-icons)
+  :functions (my-company-box--make-line
+              my-company-box-icons--elisp)
+  :commands (company-box--get-color
+             company-box--resolve-colors
+             company-box--add-icon
+             company-box--apply-color
+             company-box--make-line
+             company-box-icons--elisp)
+  :hook (company-mode . company-box-mode)
+  :custom
+  (company-box-backends-colors nil)
+  (company-box-show-single-candidate t)
+  (company-box-max-candidates 50)
+  (company-box-doc-delay 0.3)
   :config
-  (setq company-box-backends-colors nil)
-  (setq company-box-show-single-candidate t)
-  (setq company-box-max-candidates 50)
+  ;; Support `company-common'
+  (defun my-company-box--make-line (candidate)
+    (-let* (((candidate annotation len-c len-a backend) candidate)
+            (color (company-box--get-color backend))
+            ((c-color a-color i-color s-color) (company-box--resolve-colors color))
+            (icon-string (and company-box--with-icons-p (company-box--add-icon candidate)))
+            (candidate-string (concat (propertize (or company-common "") 'face 'company-tooltip-common)
+                                      (substring (propertize candidate 'face 'company-box-candidate) (length company-common) nil)))
+            (align-string (when annotation
+                            (concat " " (and company-tooltip-align-annotations
+                                             (propertize " " 'display `(space :align-to (- right-fringe ,(or len-a 0) 1)))))))
+            (space company-box--space)
+            (icon-p company-box-enable-icon)
+            (annotation-string (and annotation (propertize annotation 'face 'company-box-annotation)))
+            (line (concat (unless (or (and (= space 2) icon-p) (= space 0))
+                            (propertize " " 'display `(space :width ,(if (or (= space 1) (not icon-p)) 1 0.75))))
+                          (company-box--apply-color icon-string i-color)
+                          (company-box--apply-color candidate-string c-color)
+                          align-string
+                          (company-box--apply-color annotation-string a-color)))
+            (len (length line)))
+      (add-text-properties 0 len (list 'company-box--len (+ len-c len-a)
+                                       'company-box--color s-color)
+                           line)
+      line))
+  (advice-add #'company-box--make-line :override #'my-company-box--make-line)
 
-  (defun company-box-icons--elisp (candidate)
+  ;; Prettify icons
+  (defun my-company-box-icons--elisp (candidate)
     (when (derived-mode-p 'emacs-lisp-mode)
       (let ((sym (intern candidate)))
         (cond ((fboundp sym) 'Function)
@@ -1595,40 +1880,42 @@ Example output:
               ((boundp sym) 'Variable)
               ((symbolp sym) 'Text)
               (t . nil)))))
+  (advice-add #'company-box-icons--elisp :override #'my-company-box-icons--elisp)
 
-  (with-eval-after-load 'all-the-icons
+  (when (and (display-graphic-p)
+             (require 'all-the-icons nil t))
     (declare-function all-the-icons-faicon 'all-the-icons)
-    (declare-function all-the-icons-fileicon 'all-the-icons)
     (declare-function all-the-icons-material 'all-the-icons)
     (declare-function all-the-icons-octicon 'all-the-icons)
     (setq company-box-icons-all-the-icons
-          `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.7 :v-adjust -0.15))
-            (Text . ,(all-the-icons-faicon "book" :height 0.68 :v-adjust -0.15))
-            (Method . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
-            (Function . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
-            (Constructor . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
-            (Field . ,(all-the-icons-faicon "tags" :height 0.65 :v-adjust -0.15 :face 'font-lock-warning-face))
-            (Variable . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face))
-            (Class . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
-            (Interface . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01))
-            (Module . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.15))
-            (Property . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face)) ;; Golang module
-            (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.7 :v-adjust -0.15))
-            (Value . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'font-lock-constant-face))
-            (Enum . ,(all-the-icons-material "storage" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-orange))
-            (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.7 :v-adjust -0.15))
-            (Snippet . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face))
-            (Color . ,(all-the-icons-material "palette" :height 0.7 :v-adjust -0.15))
-            (File . ,(all-the-icons-faicon "file-o" :height 0.7 :v-adjust -0.05))
-            (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.7 :v-adjust -0.15))
-            (Folder . ,(all-the-icons-octicon "file-directory" :height 0.7 :v-adjust -0.05))
-            (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-blueb))
-            (Constant . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05))
-            (Struct . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
-            (Event . ,(all-the-icons-faicon "bolt" :height 0.7 :v-adjust -0.05 :face 'all-the-icons-orange))
-            (Operator . ,(all-the-icons-fileicon "typedoc" :height 0.65 :v-adjust 0.05))
-            (TypeParameter . ,(all-the-icons-faicon "hashtag" :height 0.65 :v-adjust 0.07 :face 'font-lock-const-face))
-            (Template . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face)))))
+          `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.85 :v-adjust -0.2))
+            (Text . ,(all-the-icons-faicon "text-width" :height 0.8 :v-adjust -0.05))
+            (Method . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+            (Function . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+            (Constructor . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+            (Field . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
+            (Variable . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
+            (Class . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+            (Interface . ,(all-the-icons-material "share" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+            (Module . ,(all-the-icons-material "view_module" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+            (Property . ,(all-the-icons-faicon "wrench" :height 0.8 :v-adjust -0.05))
+            (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.85 :v-adjust -0.2))
+            (Value . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+            (Enum . ,(all-the-icons-material "storage" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+            (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.85 :v-adjust -0.2))
+            (Snippet . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2))
+            (Color . ,(all-the-icons-material "palette" :height 0.85 :v-adjust -0.2))
+            (File . ,(all-the-icons-faicon "file-o" :height 0.85 :v-adjust -0.05))
+            (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.85 :v-adjust -0.2))
+            (Folder . ,(all-the-icons-faicon "folder-open" :height 0.85 :v-adjust -0.05))
+            (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+            (Constant . ,(all-the-icons-faicon "square-o" :height 0.85 :v-adjust -0.05))
+            (Struct . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+            (Event . ,(all-the-icons-faicon "bolt" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-orange))
+            (Operator . ,(all-the-icons-material "control_point" :height 0.85 :v-adjust -0.2))
+            (TypeParameter . ,(all-the-icons-faicon "arrows" :height 0.8 :v-adjust -0.05))
+            (Template . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2)))
+          company-box-icons-alist 'company-box-icons-all-the-icons))
 )
 
 (use-package company-go
@@ -2352,6 +2639,12 @@ Example output:
   :config (dimmer-mode)
 )
 
+(use-package emojify
+:ensure t
+:config
+(add-hook 'after-init-hook #'global-emojify-mode)
+)
+
 (line-number-mode t)
 (column-number-mode t)
 (size-indication-mode t)
@@ -2565,6 +2858,7 @@ Example output:
 
 (use-package dashboard
   :ensure t
+  :bind ("C-S-D" . open-dashboard)
   :preface
   (defun tau/dashboard-banner ()
     "Sets a dashboard banner including information on package initialization
@@ -2956,6 +3250,37 @@ Example output:
   (highlight-indent-guides-method 'character) ; column
 )
 
+(use-package highlight-context-line
+  :ensure t
+  :config
+  (highlight-context-line-mode 1)
+)
+
+(use-package scrollkeeper
+:ensure t
+:bind
+([remap scroll-up-command] . scrollkeeper-contents-up)
+([remap scroll-down-command] . scrollkeeper-contents-down)
+)
+
+(use-package fast-scroll
+    :ensure t
+    ;; If you would like to turn on/off other modes, like flycheck, add
+    ;; your own hooks.
+  :init
+  (setq fast-scroll-throttle 0.5)
+  :config
+    (add-hook 'fast-scroll-start-hook (lambda () (flycheck-mode -1)))
+    (add-hook 'fast-scroll-end-hook (lambda () (flycheck-mode 1)))
+    (fast-scroll-config)
+    (fast-scroll-mode 1)
+)
+
+(setq scroll-margin 10
+      scroll-step 1
+      scroll-conservatively 10000
+      scroll-preserve-screen-position 1)
+
 (use-package which-key
   :hook (after-init . which-key-mode))
   :config
@@ -3041,10 +3366,13 @@ Example output:
 )
 
 (use-package auctex-latexmk
-  :defer t
-  :init
-  (add-hook 'LaTeX-mode-hook 'auctex-latexmk-setup)
-)
+    :defer t
+    :init
+    (add-hook 'LaTeX-mode-hook 'auctex-latexmk-setup)
+  :hook
+;; example of lambda usage in :hooks
+  (LaTeX-mode . (lambda () (TeX-fold-mode t)))
+  )
 
 (use-package company-auctex
   :ensure t
@@ -3369,6 +3697,11 @@ Example output:
 
 )
 
+(use-package format-all
+:ensure t
+:bind ("C-c C-f" . format-all-buffer)
+)
+
 ;; json-mode: Major mode for editing JSON files with emacs
 ;; https://github.com/joshwnj/json-mode
 (use-package json-mode
@@ -3475,6 +3808,53 @@ Example output:
   :config
   (setq fireplace-toggle-smoke t)
   ;; (fireplace)
+)
+
+(defvar tetris-mode-map
+  (make-sparse-keymap 'tetris-mode-map))
+(define-key tetris-mode-map (kbd "C-p") 'tetris-rotate-prev)
+(define-key tetris-mode-map (kbd "C-n") 'tetris-move-down)
+(define-key tetris-mode-map (kbd "C-b") 'tetris-move-left)
+(define-key tetris-mode-map (kbd "C-f") 'tetris-move-right)
+(define-key tetris-mode-map (kbd "C-SPC") 'tetris-move-bottom)
+(defadvice tetris-end-game (around zap-scores activate)
+  (save-window-excursion ad-do-it))
+
+(use-package epaint
+  :if window-system
+  :commands (epaint)
+  :init
+  (with-eval-after-load (quote epaint-context)
+    (unless (boundp (quote cl-struct-epaint-drawable))
+      (defvar cl-struct-epaint-drawable (quote epaint-drawable)))
+    (unless (boundp (quote cl-struct-epaint-gc))
+      (defvar cl-struct-epaint-gc (quote epaint-gc))))
+)
+
+(use-package speed-type
+  :defer t)
+
+(use-package 2048-game
+:defer t)
+
+(use-package zone
+ :ensure nil
+ :defer 5
+ :config
+ ;; (zone-when-idle 600) ; in seconds
+ (defun zone-choose (pgm)
+   "Choose a PGM to run for `zone'."
+   (interactive
+    (list
+     (completing-read
+      "Program: "
+      (mapcar 'symbol-name zone-programs))))
+   (let ((zone-programs (list (intern pgm))))
+     (zone))))
+
+(use-package meme
+  :ensure nil
+  :commands (meme meme-file)
 )
 
 (defun copy-to-clipboard ()
