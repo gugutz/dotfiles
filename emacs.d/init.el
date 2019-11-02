@@ -26,52 +26,23 @@ tangled, and the tangled file is compiled."
 (package-initialize)
 
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
+;; custom-set-variables was added by Custom.
+;; If you edit it by hand, you could mess it up, so be careful.
+;; Your init file should contain only one such instance.
+;; If there is more than one, they won't work right.
+'(custom-safe-themes
    (quote
-    ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
- '(fci-rule-color "#3E4451")
- '(flycheck-display-errors-delay 1)
- '(jiralib-url "https://stairscreativestudio.atlassian.net" t)
- '(lsp-auto-guess-root t)
- '(lsp-document-sync-method (quote incremental))
- '(lsp-prefer-flymake t)
- '(lsp-print-io nil)
- '(lsp-print-performance nil)
- '(lsp-response-timeout 10)
- '(lsp-trace nil t)
- '(magit-auto-revert-mode nil)
- '(package-selected-packages
-   (quote
-    (keyfreq pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
-   
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(company-preview-common ((t (:foreground unspecified :background "#111111"))))
- '(company-scrollbar-bg ((t (:background "#111111"))))
- '(company-scrollbar-fg ((t (:background "#555555"))))
- '(company-tooltip ((t (:inherit default :background "#222222"))))
- '(company-tooltip-common ((t (:inherit font-lock-constant-face))))
- '(company-tooltip-selection ((t (:inherit company-tooltip-common :background "#2a2a2a"))))
- '(css-selector ((t (:inherit default :foreground "#66CCFF"))))
- '(diff-hl-change ((t (:foreground "darkseagreen2"))))
- '(diff-hl-delete ((t (:background "#ee6363"))))
- '(diff-hl-insert ((t (:background "#7ccd7c"))))
- '(evil-goggles-change-face ((t (:inherit diff-removed))))
- '(evil-goggles-delete-face ((t (:inherit diff-removed))))
- '(evil-goggles-paste-face ((t (:inherit diff-added))))
- '(evil-goggles-undo-redo-add-face ((t (:inherit diff-added))))
- '(evil-goggles-undo-redo-change-face ((t (:inherit diff-changed))))
- '(evil-goggles-undo-redo-remove-face ((t (:inherit diff-removed))))
- '(evil-goggles-yank-face ((t (:inherit diff-changed))))
- '(font-lock-comment-face ((t (:foreground "#828282"))))
- '(show-paren-match ((nil (:background "#44475a" :foreground "#f1fa8c")))))
+   ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
+   '(fci-rule-color "#3E4451")
+   '(package-selected-packages
+     (quote
+     (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
+   (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   )
 
 (add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
 ;; (add-to-list 'load-path "~/dotfiles/emacs.d/config")
@@ -912,8 +883,13 @@ Example output:
           org-latex-packages-alist '(("" "minted"))
           org-latex-pdf-process '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f")))
 
+;; compile with xelatex to use the Arial font
 (setq org-latex-pdf-process
-  '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
+  '("xelatex -interaction nonstopmode %f"
+     "xelatex -interaction nonstopmode %f")) ;; for multiple passes
+
+;; (setq org-latex-pdf-process
+;;   '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
 
   (require 'org-habit)
   '(org-emphasis-alist
@@ -3111,7 +3087,7 @@ Example output:
 (add-to-list 'org-latex-classes
              '("abntex2"
                "\\documentclass{abntex2}"
-               ("\\chapter{%s}" . "\\chapter*{%s}")
+               ;; ("\\chapter{%s}" . "\\chapter*{%s}")
                ("\\section{%s}" . "\\section*{%s}")
                ("\\subsection{%s}" . "\\subsection*{%s}")
                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")

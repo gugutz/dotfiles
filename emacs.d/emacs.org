@@ -1256,75 +1256,80 @@ Align by operators
 
 ** org-mode setup
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package org
-  :ensure org-plus-contrib
-  :defer t
-  :bind
-  ("C-c l" . org-store-link)
-  ("C-c a" . org-agenda)
-  ("C-c c" . org-capture)
-  ("C-c b" . org-switch)
-  ;; this map is to delete de bellow commented lambda that does the same thing
-  ;; Resolve issue with Tab not working with ORG only in Normal VI Mode in terminal
-  ;; (something with TAB on terminals being related to C-i...)
-  (:map evil-normal-state-map
-  ("<tab>" . org-cycle)
+  (use-package org
+    :ensure org-plus-contrib
+    :defer t
+    :bind
+    ("C-c l" . org-store-link)
+    ("C-c a" . org-agenda)
+    ("C-c c" . org-capture)
+    ("C-c b" . org-switch)
+    ;; this map is to delete de bellow commented lambda that does the same thing
+    ;; Resolve issue with Tab not working with ORG only in Normal VI Mode in terminal
+    ;; (something with TAB on terminals being related to C-i...)
+    (:map evil-normal-state-map
+    ("<tab>" . org-cycle)
+    )
+    :init
+    ;; general org config variables
+    (setq org-log-done 'time)
+    (setq org-export-backends (quote (ascii html icalendar latex md odt)))
+    (setq org-use-speed-commands t)
+
+    ;; dont display atual width for images inline. set per-file with
+    ;; #+ATTR_HTML: :width 600px :height: auto
+    ;; #+ATTR_ORG: :width 600
+    ;; #+ATTR_LATEX: :width 5in
+    (setq org-image-actual-width nil)
+    (setq org-startup-with-inline-images t)
+
+    (setq org-confirm-babel-evaluate 'nil)
+    (setq org-todo-keywords
+     '((sequence "TODO" "IN-PROGRESS" "REVIEW" "|" "DONE")))
+    (setq org-agenda-window-setup 'other-window)
+    (setq org-log-done 'time) ;; Show CLOSED tag line in closed TODO items
+    (setq org-log-done 'note) ;; Prompt to leave a note when closing an item
+    (setq org-hide-emphasis-markers nil)
+
+    ;;ox-twbs (exporter to twitter bootstrap html)
+    (setq org-enable-bootstrap-support t)
+    :config
+    ;; org-capture - needs to be in :config because it assumes a variable is already defined: `org-directory'
+    (setq org-default-notes-file (concat org-directory "/notes.org"))
+
+    ;;(add-hook 'org-mode-hook
+    ;;          (lambda ()
+    ;;        (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
+
+    (defun org-export-turn-on-syntax-highlight()
+      "Setup variables to turn on syntax highlighting when calling `org-latex-export-to-pdf'"
+      (interactive)
+      (setq org-latex-listings 'minted
+            org-latex-packages-alist '(("" "minted"))
+            org-latex-pdf-process '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f")))
+
+  ;; compile with xelatex to use the Arial font
+  (setq org-latex-pdf-process
+    '("xelatex -interaction nonstopmode %f"
+       "xelatex -interaction nonstopmode %f")) ;; for multiple passes
+
+  ;; (setq org-latex-pdf-process
+  ;;   '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
+
+    (require 'org-habit)
+    '(org-emphasis-alist
+     (quote
+      (
+       ("!" org-habit-overdue-face)
+       ("%" org-habit-alert-face)
+       ("*" bold)
+       ("/" italic)
+       ("_" underline)
+       ("=" org-verbatim verbatim)
+       ("~" org-code verbatim)
+       ("+" (:strike-through t))
+       )))
   )
-  :init
-  ;; general org config variables
-  (setq org-log-done 'time)
-  (setq org-export-backends (quote (ascii html icalendar latex md odt)))
-  (setq org-use-speed-commands t)
-
-  ;; dont display atual width for images inline. set per-file with
-  ;; #+ATTR_HTML: :width 600px :height: auto
-  ;; #+ATTR_ORG: :width 600
-  ;; #+ATTR_LATEX: :width 5in
-  (setq org-image-actual-width nil)
-  (setq org-startup-with-inline-images t)
-
-  (setq org-confirm-babel-evaluate 'nil)
-  (setq org-todo-keywords
-   '((sequence "TODO" "IN-PROGRESS" "REVIEW" "|" "DONE")))
-  (setq org-agenda-window-setup 'other-window)
-  (setq org-log-done 'time) ;; Show CLOSED tag line in closed TODO items
-  (setq org-log-done 'note) ;; Prompt to leave a note when closing an item
-  (setq org-hide-emphasis-markers nil)
-
-  ;;ox-twbs (exporter to twitter bootstrap html)
-  (setq org-enable-bootstrap-support t)
-  :config
-  ;; org-capture - needs to be in :config because it assumes a variable is already defined: `org-directory'
-  (setq org-default-notes-file (concat org-directory "/notes.org"))
-
-  ;;(add-hook 'org-mode-hook
-  ;;          (lambda ()
-  ;;        (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
-
-  (defun org-export-turn-on-syntax-highlight()
-    "Setup variables to turn on syntax highlighting when calling `org-latex-export-to-pdf'"
-    (interactive)
-    (setq org-latex-listings 'minted
-          org-latex-packages-alist '(("" "minted"))
-          org-latex-pdf-process '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f")))
-
-(setq org-latex-pdf-process
-  '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
-
-  (require 'org-habit)
-  '(org-emphasis-alist
-   (quote
-    (
-     ("!" org-habit-overdue-face)
-     ("%" org-habit-alert-face)
-     ("*" bold)
-     ("/" italic)
-     ("_" underline)
-     ("=" org-verbatim verbatim)
-     ("~" org-code verbatim)
-     ("+" (:strike-through t))
-     )))
-)
 #+END_SRC
 
 ** ox-extra (org-plus-contrib)
@@ -4242,7 +4247,7 @@ The Sections and Heading Levels gets configured as follows:
   (add-to-list 'org-latex-classes
                '("abntex2"
                  "\\documentclass{abntex2}"
-                 ("\\chapter{%s}" . "\\chapter*{%s}")
+                 ;; ("\\chapter{%s}" . "\\chapter*{%s}")
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
