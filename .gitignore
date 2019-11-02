@@ -49,6 +49,10 @@ flycheck_*.el
 .projectile
 projectile-*.eld
 
+# places files (dont know to what package it belongs yet)
+/emacs.d/.places
+emacs.d/.places
+
 # directory configuration
 .dir-locals.el
 
