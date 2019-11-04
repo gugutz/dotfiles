@@ -50,8 +50,11 @@ flycheck_*.el
 projectile-*.eld
 
 # places files (dont know to what package it belongs yet)
-/emacs.d/.places
-emacs.d/.places
+.places*
+
+
+# emojify emojis
+emojis/
 
 # directory configuration
 .dir-locals.el
