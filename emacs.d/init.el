@@ -271,27 +271,6 @@ tangled, and the tangled file is compiled."
   '(lambda () (interactive) (kill-buffer (current-buffer)))
 )
 
-(use-package smooth-scrolling
-  :disabled
-  :ensure t
-  :config
-  (smooth-scrolling-mode 1)
-)
-
-;; ;; Vertical Scroll
-;; (setq scroll-step 1)
-;; (setq scroll-margin 1)
-;; (setq scroll-conservatively 101)
-;; (setq scroll-up-aggressively 0.01)
-;; (setq scroll-down-aggressively 0.01)
-;; (setq auto-window-vscroll nil)
-;; (setq fast-but-imprecise-scrolling nil)
-;; (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
-;; (setq mouse-wheel-progressive-speed nil)
-;; ; Horizontal Scroll
-;; (setq hscroll-step 1)
-;; (setq hscroll-margin 1)
-
 (setq require-final-newline t)
 
 (setq-default fill-column 80)
@@ -1064,6 +1043,17 @@ Example output:
 (use-package major-mode-hydra
   :ensure t)
 
+(use-package hydra-posframe
+  :load-path "packages/hydra-posframe.el"
+  :custom
+  (hydra-posframe-parameters
+    '((left-fringe . 5)
+      (right-fringe . 5)))
+  :custom-face
+  (hydra-posframe-border-face ((t (:background "#6272a4"))))
+  :hook (after-init . hydra-posframe-enable)
+)
+
 (use-package shell-pop
   :init
   (setq shell-pop-full-span t)
@@ -1126,6 +1116,7 @@ Example output:
   (:map projectile-mode-map
   ("s-p" . projectile-command-map)
   ("C-c p" . projectile-command-map)
+  ("M-o p" . counsel-projectile-switch-project)
   )
 :custom
 (projectile-completion-system 'helm)
@@ -1258,8 +1249,7 @@ Example output:
 (use-package helm
   :ensure t
   :bind
-  ("M-x" . helm-M-x)
-  ("M-x" . helm-M-x)
+  ;; ("M-x" . helm-M-x)
   ("C-c h" . helm-command-prefix)
   ("C-x b" . helm-buffers-list)
   ("C-x C-b" . helm-mini)
@@ -1312,6 +1302,25 @@ Example output:
   :defer t
 )
 
+(use-package ag
+  :custom
+  (ag-highligh-search t)
+  (ag-reuse-buffers t)
+  (ag-reuse-window t)
+  :bind
+  ("M-s a" . ag-project)
+  :config
+  (use-package wgrep-ag)
+)
+
+(use-package wgrep
+  :defer t
+  :custom
+  (wgrep-enable-key "e")
+  (wgrep-auto-save-buffer t)
+  (wgrep-change-readonly-file t)
+)
+
 (use-package rg
   :ensure t
   :defer t
@@ -1334,8 +1343,6 @@ Example output:
 )
 
 (use-package ivy
-  :disabled
-  :ensure t
   :custom
   (ivy-re-builders-alist
   '((t . ivy--regex-plus)))
@@ -1352,21 +1359,112 @@ Example output:
 )
 
 (use-package counsel
+  :ensure t
+  :defines
+  (projectile-completion-system magit-completing-read-function)
+  :custom
+  (counsel-yank-pop-height 15)
+  (enable-recursive-minibuffers t)
+  (ivy-use-selectable-prompt t)
+  (ivy-use-virtual-buffers t)
+  (ivy-on-del-error-function nil)
+  (swiper-action-recenter t)
+  (counsel-grep-base-command "ag -S --noheading --nocolor --nofilename --numbers '%s' %s")
+  :hook
+  (after-init . ivy-mode)
+  (ivy-mode . counsel-mode)
+  ;; check out this better-jumper mode to see what it does
+  :preface
+  (defun ivy-format-function-pretty (cands)
+    "Transform CANDS into a string for minibuffer."
+    (ivy--format-function-generic
+     (lambda (str)
+       (concat
+           (all-the-icons-faicon "hand-o-right" :height .85 :v-adjust .05 :face 'font-lock-constant-face)
+           (ivy--add-face str 'ivy-current-match)))
+
+     (lambda (str)
+       (concat "  " str))
+     cands
+     "\n")) ;; (counsel-grep-post-action . better-jumper-set-jump)
+  :bind
+  ("C-M-x" . counsel-M-x)
+  ("M-s c" . counsel-ag)
+  ("C-s" . swiper)
+  ("M-s r" . ivy-resume)
+  ("C-c v p" . ivy-push-view)
+  ("C-c v o" . ivy-pop-view)
+  ("C-c v ." . ivy-switch-view)
+  ("M-s c" . counsel-ag)
+  ("M-o f" . counsel-fzf)
+  ("M-o r" . counsel-recentf)
+  ("M-y" . counsel-yank-pop)
+  (:map ivy-minibuffer-map
+  ("C-w" . ivy-backward-kill-word)
+  ("C-k" . ivy-kill-line)
+  ("C-j" . ivy-immediate-done)
+  ("RET" . ivy-alt-done)
+  ("C-h" . ivy-backward-delete-char))
+  :config
+  ;; NOTE: this variable do not work if defined in :custom
+  (setq ivy-format-function 'ivy-format-function-pretty)
+  (setq counsel-yank-pop-separator
+      (propertize "\n────────────────────────────────────────────────────────\n"
+             'face `(:foreground "#6272a4")))
+
+  (setq counsel-find-file-ignore-regexp "\\(?:^[#.]\\)\\|\\(?:[#~]$\\)\\|\\(?:^Icon?\\)"
+     counsel-describe-function-function #'helpful-callable
+     counsel-describe-variable-function #'helpful-variable
+     ;; Add smart-casing (-S) to default command arguments:
+     counsel-rg-base-command "rg -S --no-heading --line-number --color never %s ."
+     counsel-ag-base-command "ag -S --nocolor --nogroup %s"
+     counsel-pt-base-command "pt -S --nocolor --nogroup -e %s"
+    counsel-find-file-at-point t)
+
+  ;; Integration with `projectile'
+  (with-eval-after-load 'projectile
+    (setq projectile-completion-system 'ivy))
+
+  ;; Integration with `magit'
+  (with-eval-after-load 'magit
+    (setq magit-completing-read-function 'ivy-completing-read))
+)
+
+(use-package flx
+  :ensure t
+)
+
+(use-package amx
 :disabled
-:ensure t
-:hook
-(after-init . ivy-mode)
-;; check out this better-jumper mode to see what it does
-;; (counsel-grep-post-action . better-jumper-set-jump)
-:config
-(setq counsel-find-file-ignore-regexp "\\(?:^[#.]\\)\\|\\(?:[#~]$\\)\\|\\(?:^Icon?\\)"
-   counsel-describe-function-function #'helpful-callable
-   counsel-describe-variable-function #'helpful-variable
-   ;; Add smart-casing (-S) to default command arguments:
-   counsel-rg-base-command "rg -S --no-heading --line-number --color never %s ."
-   counsel-ag-base-command "ag -S --nocolor --nogroup %s"
-   counsel-pt-base-command "pt -S --nocolor --nogroup -e %s"
-   counsel-find-file-at-point t)
+  :ensure t
+)
+
+(use-package counsel-projectile
+  :ensure t
+  :config (counsel-projectile-mode 1)
+)
+
+(use-package ivy-posframe
+  :ensure t
+  :custom-face
+  (ivy-posframe ((t (:background "#282a36"))))
+  (ivy-posframe-border ((t (:background "#6272a4"))))
+  (ivy-posframe-cursor ((t (:background "#61bfff"))))
+  :hook
+  (ivy-mode . ivy-posframe-enable)
+  :config
+  ;; custom define height of post frame per function
+  (setq ivy-posframe-height-alist '((swiper . 20)
+                                    (t      . 40)))
+
+  ;; display at `ivy-posframe-style'
+  (setq ivy-posframe-display-functions-alist
+        '((swiper          . ivy-posframe-display-at-point)
+          (complete-symbol . ivy-posframe-display-at-point)
+          ;;(counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
+          (counsel-M-x     . ivy-posframe-display-at-window-center)
+          (t               . ivy-posframe-display)))
+  (ivy-posframe-mode 1)
 )
 
 (use-package ivy-rich
@@ -1853,9 +1951,12 @@ Example output:
 
 (use-package company-posframe
   :ensure t
-  :hook
-  (company-mode . company-posframe-mode)
-  (global-company-mode . company-posframe-mode)
+  :after company
+  :config
+  (company-posframe-mode 1)
+  ;;:hook
+  ;;(company-mode . company-posframe-mode)
+  ;;(global-company-mode . company-posframe-mode)
 )
 
 ;; (use-package company-box
@@ -1867,6 +1968,7 @@ Example output:
 (use-package company-box
   :functions (my-company-box--make-line
               my-company-box-icons--elisp)
+  :init (setq company-box-icons-alist 'company-box-icons-all-the-icons)
   :commands (company-box--get-color
              company-box--resolve-colors
              company-box--add-icon
@@ -2121,8 +2223,8 @@ Example output:
 ;; (define-key ac-completing-map [return] nil)
 ;; (define-key ac-completing-map "\r" nil)
 
-(require 'auto-complete)
-(global-auto-complete-mode t)
+;(require 'auto-complete)
+;(global-auto-complete-mode t)
 
 (use-package yasnippet
   :ensure t
@@ -2844,17 +2946,7 @@ Example output:
   :config
   ;;(setq sublimity-scroll-weight 10
   ;;    sublimity-scroll-drift-length 5)
-  ;; this is the only part of the config where i use `use-package' inside another package config.
-  ;; the oficial docs appears to suggest this way
   (sublimity-mode 1)
-)
-
-(use-package sublimity-scroll
-  :ensure nil
-  :config
-  (setq sublimity-scroll-weight 10)  ;; default 10
-  (setq sublimity-scroll-drift-length 5)  ;; default 5
-  (setq sublimity-scroll-hide-cursor t) ;; default t
 )
 
 (use-package sublimity-map
@@ -3289,15 +3381,37 @@ Example output:
 
 (use-package highlight-context-line
   :ensure t
+  :disabled
   :config
   (highlight-context-line-mode 1)
 )
 
+(use-package sublimity-scroll
+  :ensure nil
+  :config
+  (setq sublimity-scroll-weight 10)  ;; default 10
+  (setq sublimity-scroll-drift-length 5)  ;; default 5
+  (setq sublimity-scroll-hide-cursor t) ;; default t
+)
+
 (use-package scrollkeeper
+:disabled
 :ensure t
 :bind
 ([remap scroll-up-command] . scrollkeeper-contents-up)
 ([remap scroll-down-command] . scrollkeeper-contents-down)
+)
+
+(setq scroll-preserve-screen-position t
+      scroll-conservatively 0
+      maximum-scroll-margin 0.5
+      scroll-margin 99999)
+
+(use-package centered-cursor-mode
+  :ensure t
+  :init
+  (progn (require 'centered-cursor-mode)
+         (global-centered-cursor-mode))
 )
 
 (use-package fast-scroll

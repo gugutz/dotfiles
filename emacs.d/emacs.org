@@ -446,34 +446,6 @@ I almost always want to kill the current buffer, so this snippet helps in that.
 )
 #+END_SRC
 
-** smooth scrolling
-
-Disabled in favor of sublimity-scroll, which is better
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package smooth-scrolling
-  :disabled
-  :ensure t
-  :config
-  (smooth-scrolling-mode 1)
-)
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-  ;; ;; Vertical Scroll
-  ;; (setq scroll-step 1)
-  ;; (setq scroll-margin 1)
-  ;; (setq scroll-conservatively 101)
-  ;; (setq scroll-up-aggressively 0.01)
-  ;; (setq scroll-down-aggressively 0.01)
-  ;; (setq auto-window-vscroll nil)
-  ;; (setq fast-but-imprecise-scrolling nil)
-  ;; (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
-  ;; (setq mouse-wheel-progressive-speed nil)
-  ;; ; Horizontal Scroll
-  ;; (setq hscroll-step 1)
-  ;; (setq hscroll-margin 1)
-#+END_SRC
-
 
 ** add final newline
 
@@ -691,21 +663,21 @@ Example output:
 Emacs jump to definition tool
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package dumb-jump
-  :ensure t
-  :after helm
-  :bind (("M-g o" . dumb-jump-go-other-window)
-         ("M-g j" . dumb-jump-go)
-         ("M-g b" . dumb-jump-back)
-         ("M-g i" . dumb-jump-go-prompt)
-         ("M-g x" . dumb-jump-go-prefer-external)
-         ("M-g z" . dumb-jump-go-prefer-external-other-window))
-  :config
-  (eval-when-compile
-    (require 'helm-source nil t))
-  (setq dumb-jump-selector 'helm)
-  ;; (setq dumb-jump-selector 'ivy)
-)
+  (use-package dumb-jump
+    :ensure t
+    :after helm
+    :bind (("M-g o" . dumb-jump-go-other-window)
+           ("M-g j" . dumb-jump-go)
+           ("M-g b" . dumb-jump-back)
+           ("M-g i" . dumb-jump-go-prompt)
+           ("M-g x" . dumb-jump-go-prefer-external)
+           ("M-g z" . dumb-jump-go-prefer-external-other-window))
+    :config
+    (eval-when-compile
+      (require 'helm-source nil t))
+    (setq dumb-jump-selector 'helm)
+    ;; (setq dumb-jump-selector 'ivy)
+  )
 #+END_SRC
 
 * Text editing settings
@@ -1589,6 +1561,21 @@ is customized, please consider the following settings in your init file"
   :ensure t)
 #+END_SRC
 
+**  hydra-posframe
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package hydra-posframe
+  :load-path "packages/hydra-posframe.el"
+  :custom
+  (hydra-posframe-parameters
+    '((left-fringe . 5)
+      (right-fringe . 5)))
+  :custom-face
+  (hydra-posframe-border-face ((t (:background "#6272a4"))))
+  :hook (after-init . hydra-posframe-enable)
+)
+#+END_SRC
+
 * Shell
 
 ** shell-pop
@@ -1673,6 +1660,7 @@ is customized, please consider the following settings in your init file"
     (:map projectile-mode-map
     ("s-p" . projectile-command-map)
     ("C-c p" . projectile-command-map)
+    ("M-o p" . counsel-projectile-switch-project)
     )
   :custom
   (projectile-completion-system 'helm)
@@ -1834,8 +1822,7 @@ Org Mode Integration with Jira Projects
 (use-package helm
   :ensure t
   :bind
-  ("M-x" . helm-M-x)
-  ("M-x" . helm-M-x)
+  ;; ("M-x" . helm-M-x)
   ("C-c h" . helm-command-prefix)
   ("C-x b" . helm-buffers-list)
   ("C-x C-b" . helm-mini)
@@ -1877,23 +1864,50 @@ Org Mode Integration with Jira Projects
 )
 #+END_SRC
 
-* helm-ag
+** helm-ag
 
+ #+BEGIN_SRC emacs-lisp :tangle init.el
+ (use-package helm-ag
+   :ensure helm-ag
+   :bind ("M-p" . helm-projectile-ag)
+   :commands (helm-ag helm-projectile-ag)
+   :init (setq helm-ag-insert-at-point 'symbol
+	       helm-ag-command-option "--path-to-ignore ~/.agignore"))
+ #+END_SRC
+
+** helm-rg
+
+ #+BEGIN_SRC emacs-lisp :tangle init.el
+ (use-package helm-rg
+   :ensure t
+   :defer t
+ )
+ #+END_SRC
+
+
+* ag
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package helm-ag
-  :ensure helm-ag
-  :bind ("M-p" . helm-projectile-ag)
-  :commands (helm-ag helm-projectile-ag)
-  :init (setq helm-ag-insert-at-point 'symbol
-	      helm-ag-command-option "--path-to-ignore ~/.agignore"))
+ (use-package ag
+  :custom
+  (ag-highligh-search t)
+  (ag-reuse-buffers t)
+  (ag-reuse-window t)
+  :bind
+  ("M-s a" . ag-project)
+  :config
+  (use-package wgrep-ag)
+)
 #+END_SRC
 
-* helm-rg
+* wgrep
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package helm-rg
-  :ensure t
+ (use-package wgrep
   :defer t
+  :custom
+  (wgrep-enable-key "e")
+  (wgrep-auto-save-buffer t)
+  (wgrep-change-readonly-file t)
 )
 #+END_SRC
 
@@ -1913,6 +1927,7 @@ Org Mode Integration with Jira Projects
 
 )
 #+END_SRC
+
 
 * helm-fuzzier
 : supposed better fuzzy matching for helm
@@ -1934,8 +1949,6 @@ Org Mode Integration with Jira Projects
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package ivy
-  :disabled
-  :ensure t
   :custom
   (ivy-re-builders-alist
   '((t . ivy--regex-plus)))
@@ -1956,25 +1969,135 @@ Org Mode Integration with Jira Projects
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
   (use-package counsel
-  :disabled
-  :ensure t
-  :hook
-  (after-init . ivy-mode)
-  ;; check out this better-jumper mode to see what it does
-  ;; (counsel-grep-post-action . better-jumper-set-jump)
-  :config
-  (setq counsel-find-file-ignore-regexp "\\(?:^[#.]\\)\\|\\(?:[#~]$\\)\\|\\(?:^Icon?\\)"
-     counsel-describe-function-function #'helpful-callable
-     counsel-describe-variable-function #'helpful-variable
-     ;; Add smart-casing (-S) to default command arguments:
-     counsel-rg-base-command "rg -S --no-heading --line-number --color never %s ."
-     counsel-ag-base-command "ag -S --nocolor --nogroup %s"
-     counsel-pt-base-command "pt -S --nocolor --nogroup -e %s"
-     counsel-find-file-at-point t)
+    :ensure t
+    :defines
+    (projectile-completion-system magit-completing-read-function)
+    :custom
+    (counsel-yank-pop-height 15)
+    (enable-recursive-minibuffers t)
+    (ivy-use-selectable-prompt t)
+    (ivy-use-virtual-buffers t)
+    (ivy-on-del-error-function nil)
+    (swiper-action-recenter t)
+    (counsel-grep-base-command "ag -S --noheading --nocolor --nofilename --numbers '%s' %s")
+    :hook
+    (after-init . ivy-mode)
+    (ivy-mode . counsel-mode)
+    ;; check out this better-jumper mode to see what it does
+    :preface
+    (defun ivy-format-function-pretty (cands)
+      "Transform CANDS into a string for minibuffer."
+      (ivy--format-function-generic
+       (lambda (str)
+         (concat
+             (all-the-icons-faicon "hand-o-right" :height .85 :v-adjust .05 :face 'font-lock-constant-face)
+             (ivy--add-face str 'ivy-current-match)))
+
+       (lambda (str)
+         (concat "  " str))
+       cands
+       "\n")) ;; (counsel-grep-post-action . better-jumper-set-jump)
+    :bind
+    ("C-M-x" . counsel-M-x)
+    ("M-s c" . counsel-ag)
+    ("C-s" . swiper)
+    ("M-s r" . ivy-resume)
+    ("C-c v p" . ivy-push-view)
+    ("C-c v o" . ivy-pop-view)
+    ("C-c v ." . ivy-switch-view)
+    ("M-s c" . counsel-ag)
+    ("M-o f" . counsel-fzf)
+    ("M-o r" . counsel-recentf)
+    ("M-y" . counsel-yank-pop)
+    (:map ivy-minibuffer-map
+    ("C-w" . ivy-backward-kill-word)
+    ("C-k" . ivy-kill-line)
+    ("C-j" . ivy-immediate-done)
+    ("RET" . ivy-alt-done)
+    ("C-h" . ivy-backward-delete-char))
+    :config
+    ;; NOTE: this variable do not work if defined in :custom
+    (setq ivy-format-function 'ivy-format-function-pretty)
+    (setq counsel-yank-pop-separator
+        (propertize "\n────────────────────────────────────────────────────────\n"
+               'face `(:foreground "#6272a4")))
+
+    (setq counsel-find-file-ignore-regexp "\\(?:^[#.]\\)\\|\\(?:[#~]$\\)\\|\\(?:^Icon?\\)"
+       counsel-describe-function-function #'helpful-callable
+       counsel-describe-variable-function #'helpful-variable
+       ;; Add smart-casing (-S) to default command arguments:
+       counsel-rg-base-command "rg -S --no-heading --line-number --color never %s ."
+       counsel-ag-base-command "ag -S --nocolor --nogroup %s"
+       counsel-pt-base-command "pt -S --nocolor --nogroup -e %s"
+      counsel-find-file-at-point t)
+
+    ;; Integration with `projectile'
+    (with-eval-after-load 'projectile
+      (setq projectile-completion-system 'ivy))
+
+    ;; Integration with `magit'
+    (with-eval-after-load 'magit
+      (setq magit-completing-read-function 'ivy-completing-read))
   )
 #+END_SRC
 
+*** Enhance fuzzy matching
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package flx
+  :ensure t
+)
+#+END_SRC
+
+*** Enhance M-x
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (use-package amx
+  :disabled
+    :ensure t
+  )
+#+END_SRC
+
+*** Ivy integration for Projectile
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package counsel-projectile
+  :ensure t
+  :config (counsel-projectile-mode 1)
+)
+#+END_SRC
+
+** ivy-posframe
+
+Requires: Emacs >= 26
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package ivy-posframe
+  :ensure t
+  :custom-face
+  (ivy-posframe ((t (:background "#282a36"))))
+  (ivy-posframe-border ((t (:background "#202020"))))
+  (ivy-posframe-cursor ((t (:background "#61bfff"))))
+  :hook
+  (ivy-mode . ivy-posframe-enable)
+  :config
+  ;; custom define height of post frame per function
+  (setq ivy-posframe-height-alist '((swiper . 20)
+                                    (t      . 40)))
+
+  ;; display at `ivy-posframe-style'
+  (setq ivy-posframe-display-functions-alist
+        '((swiper          . ivy-posframe-display-at-point)
+          (complete-symbol . ivy-posframe-display-at-point)
+          ;;(counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
+          (counsel-M-x     . ivy-posframe-display-at-window-center)
+          (t               . ivy-posframe-display)))
+  (ivy-posframe-mode 1)
+)
+#+END_SRC
+
 ** ivy-rich
+
 #+BEGIN_SRC emacs-lisp :tangle init.el
   (use-package ivy-rich
   :disabled
@@ -2597,110 +2720,114 @@ Org source blocks and exporter for restclient
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package company-posframe
   :ensure t
-  :hook
-  (company-mode . company-posframe-mode)
-  (global-company-mode . company-posframe-mode)
+  :after company
+  :config
+  (company-posframe-mode 1)
+  ;;:hook
+  ;;(company-mode . company-posframe-mode)
+  ;;(global-company-mode . company-posframe-mode)
 )
 #+END_SRC
 
 ** Company Box (icons in suggestions)
 #+BEGIN_SRC emacs-lisp :tangle init.el
-  ;; (use-package company-box
-  ;;   :ensure t
-  ;;   :hook
-  ;;   (company-mode . company-box-mode)
-  ;;   (global-company-mode . company-box-mode)
-  ;; )
-(use-package company-box
-  :functions (my-company-box--make-line
-              my-company-box-icons--elisp)
-  :commands (company-box--get-color
-             company-box--resolve-colors
-             company-box--add-icon
-             company-box--apply-color
-             company-box--make-line
-             company-box-icons--elisp)
-  :hook (company-mode . company-box-mode)
-  :custom
-  (company-box-backends-colors nil)
-  (company-box-show-single-candidate t)
-  (company-box-max-candidates 50)
-  (company-box-doc-delay 0.3)
-  :config
-  ;; Support `company-common'
-  (defun my-company-box--make-line (candidate)
-    (-let* (((candidate annotation len-c len-a backend) candidate)
-            (color (company-box--get-color backend))
-            ((c-color a-color i-color s-color) (company-box--resolve-colors color))
-            (icon-string (and company-box--with-icons-p (company-box--add-icon candidate)))
-            (candidate-string (concat (propertize (or company-common "") 'face 'company-tooltip-common)
-                                      (substring (propertize candidate 'face 'company-box-candidate) (length company-common) nil)))
-            (align-string (when annotation
-                            (concat " " (and company-tooltip-align-annotations
-                                             (propertize " " 'display `(space :align-to (- right-fringe ,(or len-a 0) 1)))))))
-            (space company-box--space)
-            (icon-p company-box-enable-icon)
-            (annotation-string (and annotation (propertize annotation 'face 'company-box-annotation)))
-            (line (concat (unless (or (and (= space 2) icon-p) (= space 0))
-                            (propertize " " 'display `(space :width ,(if (or (= space 1) (not icon-p)) 1 0.75))))
-                          (company-box--apply-color icon-string i-color)
-                          (company-box--apply-color candidate-string c-color)
-                          align-string
-                          (company-box--apply-color annotation-string a-color)))
-            (len (length line)))
-      (add-text-properties 0 len (list 'company-box--len (+ len-c len-a)
-                                       'company-box--color s-color)
-                           line)
-      line))
-  (advice-add #'company-box--make-line :override #'my-company-box--make-line)
+    ;; (use-package company-box
+    ;;   :ensure t
+    ;;   :hook
+    ;;   (company-mode . company-box-mode)
+    ;;   (global-company-mode . company-box-mode)
+    ;; )
+  (use-package company-box
+    :functions (my-company-box--make-line
+                my-company-box-icons--elisp)
+    :init (setq company-box-icons-alist 'company-box-icons-all-the-icons)
+    :commands (company-box--get-color
+               company-box--resolve-colors
+               company-box--add-icon
+               company-box--apply-color
+               company-box--make-line
+               company-box-icons--elisp)
+    :hook (company-mode . company-box-mode)
+    :custom
+    (company-box-backends-colors nil)
+    (company-box-show-single-candidate t)
+    (company-box-max-candidates 50)
+    (company-box-doc-delay 0.3)
+    :config
+    ;; Support `company-common'
+    (defun my-company-box--make-line (candidate)
+      (-let* (((candidate annotation len-c len-a backend) candidate)
+              (color (company-box--get-color backend))
+              ((c-color a-color i-color s-color) (company-box--resolve-colors color))
+              (icon-string (and company-box--with-icons-p (company-box--add-icon candidate)))
+              (candidate-string (concat (propertize (or company-common "") 'face 'company-tooltip-common)
+                                        (substring (propertize candidate 'face 'company-box-candidate) (length company-common) nil)))
+              (align-string (when annotation
+                              (concat " " (and company-tooltip-align-annotations
+                                               (propertize " " 'display `(space :align-to (- right-fringe ,(or len-a 0) 1)))))))
+              (space company-box--space)
+              (icon-p company-box-enable-icon)
+              (annotation-string (and annotation (propertize annotation 'face 'company-box-annotation)))
+              (line (concat (unless (or (and (= space 2) icon-p) (= space 0))
+                              (propertize " " 'display `(space :width ,(if (or (= space 1) (not icon-p)) 1 0.75))))
+                            (company-box--apply-color icon-string i-color)
+                            (company-box--apply-color candidate-string c-color)
+                            align-string
+                            (company-box--apply-color annotation-string a-color)))
+              (len (length line)))
+        (add-text-properties 0 len (list 'company-box--len (+ len-c len-a)
+                                         'company-box--color s-color)
+                             line)
+        line))
+    (advice-add #'company-box--make-line :override #'my-company-box--make-line)
 
-  ;; Prettify icons
-  (defun my-company-box-icons--elisp (candidate)
-    (when (derived-mode-p 'emacs-lisp-mode)
-      (let ((sym (intern candidate)))
-        (cond ((fboundp sym) 'Function)
-              ((featurep sym) 'Module)
-              ((facep sym) 'Color)
-              ((boundp sym) 'Variable)
-              ((symbolp sym) 'Text)
-              (t . nil)))))
-  (advice-add #'company-box-icons--elisp :override #'my-company-box-icons--elisp)
+    ;; Prettify icons
+    (defun my-company-box-icons--elisp (candidate)
+      (when (derived-mode-p 'emacs-lisp-mode)
+        (let ((sym (intern candidate)))
+          (cond ((fboundp sym) 'Function)
+                ((featurep sym) 'Module)
+                ((facep sym) 'Color)
+                ((boundp sym) 'Variable)
+                ((symbolp sym) 'Text)
+                (t . nil)))))
+    (advice-add #'company-box-icons--elisp :override #'my-company-box-icons--elisp)
 
-  (when (and (display-graphic-p)
-             (require 'all-the-icons nil t))
-    (declare-function all-the-icons-faicon 'all-the-icons)
-    (declare-function all-the-icons-material 'all-the-icons)
-    (declare-function all-the-icons-octicon 'all-the-icons)
-    (setq company-box-icons-all-the-icons
-          `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.85 :v-adjust -0.2))
-            (Text . ,(all-the-icons-faicon "text-width" :height 0.8 :v-adjust -0.05))
-            (Method . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
-            (Function . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
-            (Constructor . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
-            (Field . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
-            (Variable . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
-            (Class . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
-            (Interface . ,(all-the-icons-material "share" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
-            (Module . ,(all-the-icons-material "view_module" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
-            (Property . ,(all-the-icons-faicon "wrench" :height 0.8 :v-adjust -0.05))
-            (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.85 :v-adjust -0.2))
-            (Value . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
-            (Enum . ,(all-the-icons-material "storage" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
-            (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.85 :v-adjust -0.2))
-            (Snippet . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2))
-            (Color . ,(all-the-icons-material "palette" :height 0.85 :v-adjust -0.2))
-            (File . ,(all-the-icons-faicon "file-o" :height 0.85 :v-adjust -0.05))
-            (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.85 :v-adjust -0.2))
-            (Folder . ,(all-the-icons-faicon "folder-open" :height 0.85 :v-adjust -0.05))
-            (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
-            (Constant . ,(all-the-icons-faicon "square-o" :height 0.85 :v-adjust -0.05))
-            (Struct . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
-            (Event . ,(all-the-icons-faicon "bolt" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-orange))
-            (Operator . ,(all-the-icons-material "control_point" :height 0.85 :v-adjust -0.2))
-            (TypeParameter . ,(all-the-icons-faicon "arrows" :height 0.8 :v-adjust -0.05))
-            (Template . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2)))
-          company-box-icons-alist 'company-box-icons-all-the-icons))
-)
+    (when (and (display-graphic-p)
+               (require 'all-the-icons nil t))
+      (declare-function all-the-icons-faicon 'all-the-icons)
+      (declare-function all-the-icons-material 'all-the-icons)
+      (declare-function all-the-icons-octicon 'all-the-icons)
+      (setq company-box-icons-all-the-icons
+            `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.85 :v-adjust -0.2))
+              (Text . ,(all-the-icons-faicon "text-width" :height 0.8 :v-adjust -0.05))
+              (Method . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+              (Function . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+              (Constructor . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+              (Field . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
+              (Variable . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
+              (Class . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+              (Interface . ,(all-the-icons-material "share" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+              (Module . ,(all-the-icons-material "view_module" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+              (Property . ,(all-the-icons-faicon "wrench" :height 0.8 :v-adjust -0.05))
+              (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.85 :v-adjust -0.2))
+              (Value . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+              (Enum . ,(all-the-icons-material "storage" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+              (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.85 :v-adjust -0.2))
+              (Snippet . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2))
+              (Color . ,(all-the-icons-material "palette" :height 0.85 :v-adjust -0.2))
+              (File . ,(all-the-icons-faicon "file-o" :height 0.85 :v-adjust -0.05))
+              (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.85 :v-adjust -0.2))
+              (Folder . ,(all-the-icons-faicon "folder-open" :height 0.85 :v-adjust -0.05))
+              (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+              (Constant . ,(all-the-icons-faicon "square-o" :height 0.85 :v-adjust -0.05))
+              (Struct . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+              (Event . ,(all-the-icons-faicon "bolt" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-orange))
+              (Operator . ,(all-the-icons-material "control_point" :height 0.85 :v-adjust -0.2))
+              (TypeParameter . ,(all-the-icons-faicon "arrows" :height 0.8 :v-adjust -0.05))
+              (Template . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2)))
+            company-box-icons-alist 'company-box-icons-all-the-icons))
+  )
 #+END_SRC
 
 
@@ -2894,9 +3021,11 @@ Org source blocks and exporter for restclient
 
 
 ** enable autocompletion engine
+
+Disabled in favor of company-mode
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(require 'auto-complete)
-(global-auto-complete-mode t)
+;(require 'auto-complete)
+;(global-auto-complete-mode t)
 #+END_SRC
 
 * Yasnippets
@@ -3869,22 +3998,11 @@ Zoom in selected window and resize othersAuto balance windows and frames
   :config
   ;;(setq sublimity-scroll-weight 10
   ;;    sublimity-scroll-drift-length 5)
-  ;; this is the only part of the config where i use `use-package' inside another package config.
-  ;; the oficial docs appears to suggest this way
   (sublimity-mode 1)
 )
    #+END_SRC
 
-*** sublimity-scroll
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package sublimity-scroll
-  :ensure nil
-  :config
-  (setq sublimity-scroll-weight 10)  ;; default 10
-  (setq sublimity-scroll-drift-length 5)  ;; default 5
-  (setq sublimity-scroll-hide-cursor t) ;; default t
-)
-#+END_SRC
+
 
 *** sublimity-map (experimental)
     This package ruins the scrolling from either sublimity-scroll or the smooth-scrolling package
@@ -4455,6 +4573,7 @@ The line of your Emacs buffer that is at the top of the window before you start 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package highlight-context-line
   :ensure t
+  :disabled
   :config
   (highlight-context-line-mode 1)
 )
@@ -4462,17 +4581,54 @@ The line of your Emacs buffer that is at the top of the window before you start 
 
 * Scrolling settings
 
+** sublimity-scroll
+This is part of the sublimity package.
+Therefore, sublimity needs to be required for this to work
+Make sure :ensure nil
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package sublimity-scroll
+  :ensure nil
+  :config
+  (setq sublimity-scroll-weight 10)  ;; default 10
+  (setq sublimity-scroll-drift-length 5)  ;; default 5
+  (setq sublimity-scroll-hide-cursor t) ;; default t
+)
+#+END_SRC
 ** scrollkeeper
 
 : i think this highlights scrolling stopping points? not sure though
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
   (use-package scrollkeeper
+  :disabled
   :ensure t
   :bind
   ([remap scroll-up-command] . scrollkeeper-contents-up)
   ([remap scroll-down-command] . scrollkeeper-contents-down)
   )
+#+END_SRC
+
+** centered-scrolling with pure emacs config
+
+Source: https://two-wrongs.com/centered-cursor-mode-in-vanilla-emacs
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(setq scroll-preserve-screen-position t
+      scroll-conservatively 0
+      maximum-scroll-margin 0.5
+      scroll-margin 99999)
+#+END_SRC
+
+** centered-cursor-mode
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package centered-cursor-mode
+  :ensure t
+  :init
+  (progn (require 'centered-cursor-mode)
+         (global-centered-cursor-mode))
+)
 #+END_SRC
 
 ** fast-scroll
@@ -4491,9 +4647,10 @@ The line of your Emacs buffer that is at the top of the window before you start 
   )
 #+END_SRC
 
+
 ** vim scrollof
 
-from: https://wolfecub.github.io/dotfiles/#orgff34878
+Source: https://wolfecub.github.io/dotfiles/#orgff34878
 
 This makes scrolling gradual rather than by half page. I find that the half page scroll really makes me lose where I am in the file so here I make sure to scroll one line at a time. In addition I want to keep what I'm working on centered so I start scrolling when the cursor is 10 lines away from the margin.
 
@@ -4505,6 +4662,7 @@ This behaviour in general emulates the scrolloff option in vim.
       scroll-conservatively 10000
       scroll-preserve-screen-position 1)
 #+END_SRC
+
 
 * Minor modes
 
