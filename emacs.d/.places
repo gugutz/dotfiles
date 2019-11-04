@@ -1,4 +1,5 @@
 ;;; -*- coding: utf-8 -*-
+<<<<<<< HEAD
 (("/home/gustavo/.emacs.d/elpa/org-plus-contrib-20191104/org-loaddefs.el" . 138790)
  ("/home/gustavo/.emacs.d/recentf" . 698)
  ("/home/gustavo/.emacs.d/elpa/org-jira-20190930.1406/org-jira-autoloads.el" . 5847)
@@ -102,3 +103,19 @@
  ("/home/gustavo/code/pep/src/app/pages/print/print.component.html" . 185)
  ("/home/gustavo/code/pep/package-lock.json" . 292493)
  ("/home/gustavo/code/pep/src/app/pages/home/block-soap-plano/block-soap-plano.component.html" . 146))
+=======
+(("/home/tau/ifsc/tcc/tcc-presentation/reset.css" . 871)
+ ("/home/tau/ifsc/tcc/tcc-presentation/reveal.css" . 56049)
+ ("/home/tau/ifsc/tcc/tcc.org" . 87945)
+ ("/home/tau/ifsc/tcc/tcc-presentation/reveal-configure.js" . 1007)
+ ("/home/tau/ifsc/tcc/tcc-presentation/slide.org" . 9974)
+ ("/home/tau/ifsc/tcc/tcc-presentation/slide.css" . 832)
+ ("/home/tau/.emacs.d/.cache/treemacs-persist" . 198)
+ ("/home/tau/ifsc/tcc/tcc-presentation/slide.html" . 762577)
+ ("/home/tau/.emacs.d/recentf" . 552)
+ ("/home/tau/ifsc/tcc/tcc-presentation/slide.tex" . 14309)
+ ("/home/tau/ifsc/tcc/tcc.tex" . 142126)
+ ("/home/tau/dotfiles/emacs.d/emacs.org" . 172230)
+ ("/home/tau/ifsc/tcc/ifsc-thesis.sty" . 1862)
+ ("/home/tau/ifsc/tcc/latex-packages.sty" . 886))
+>>>>>>> cdfceb9057abd4761b4292a83a02698d2fb3d876

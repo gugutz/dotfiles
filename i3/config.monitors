@@ -15,20 +15,20 @@
 # xrandr --current OR xrandr --listmonitors
 #
 # Home monitor config
-#set DP1 DVI-I-2
+#set DVI-I-2 DVI-I-2
 #set  DVI-I-1
 # STAIRS monitor config
-# set DP1  eDP1
+# set DVI-I-2  eDP1
 # set   DP1
 
-#exec_always --no-startup-id xrandr --output DP1 --main
+#exec_always --no-startup-id xrandr --output DVI-I-2 --main
 
 #exec --no-startup-id ~/dotfiles/i3/scripts/monitors-setup.sh
 
 # monitors set with my monitors-setup.sh script
-set $primary_monitor DP1
-set $secondary_monitor eDP1
+set $primary_monitor DVI-I-2
+set $secondary_monitor DVI-I-1
 
 # xrandr command to setup screens layout
-exec_always --no-startup-id xrandr --output $primary_monitor --primary --mode 1920x1080 --pos 0x0 --rotate normal --output $secondary_monitor --mode 1920x1080 --pos 1920x0 --rotate normal
+exec_always --no-startup-id xrandr --output $main_monitor --primary --mode 1920x1080 --pos 0x0 --rotate normal --output $secondary_monitor --mode 1280x1024 --pos 1920x56 --rotate normal
 
