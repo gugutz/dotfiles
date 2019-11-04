@@ -760,13 +760,13 @@ Example output:
   :after evil
   :bind
   (:map evil-normal-state-map
-  ("C-c +" . evil-numbers/inc-at-pt)
-  ("C-c -" . evil-numbers/dec-at-pt)
+  ("C-c C-+" . evil-numbers/inc-at-pt)
+  ("C-c C--" . evil-numbers/dec-at-pt)
   ("<kp-add>" . evil-numbers/inc-at-pt)
   ("<kp-subtract>" . evil-numbers/dec-at-pt))
   :config
-  (global-set-key (kbd "C-c +") 'evil-numbers/inc-at-pt)
-  (global-set-key (kbd "C-c -") 'evil-numbers/dec-at-pt)
+  (global-set-key (kbd "C-c C-+") 'evil-numbers/inc-at-pt)
+  (global-set-key (kbd "C-c C--") 'evil-numbers/dec-at-pt)
 )
 
 (use-package evil-leader
@@ -1057,10 +1057,12 @@ Example output:
   :after org
 )
 
-(use-package hydra)
+(use-package hydra
+  :ensure t
+)
 
 (use-package major-mode-hydra
-  :ensure nil)
+  :ensure t)
 
 (use-package shell-pop
   :init
@@ -1152,36 +1154,36 @@ Example output:
     )
 
 (use-package org-jira
-    :ensure t
-    :defer 3
-    :commands (org-jira-mode org-jira-get-issues org-jira-get-projects)
-    :after org
-    :custom
-    (jiralib-url "https://stairscreativestudio.atlassian.net")
-  :config
-(setq jiralib-token
-    `("Cookie" . ,(format "ajs_group_id=null; ajs_anonymous_id=%222e15ea7d-cb97-4d24-bfe2-348c4655df02%22; atlassian.xsrf.token=86ec43db-1a9e-48fa-892a-9210c6fee684_38750fda3fb7e52a86533ed838cb5688d745af60_lin; cloud.session.token=eyJraWQiOiJzZXNzaW9uLXNlcnZpY2VcL3Nlc3Npb24tc2VydmljZSIsImFsZyI6IlJTMjU2In0.eyJhc3NvY2lhdGlvbnMiOlt7ImFhSWQiOiI1YmE3ZjkyNDNjMDEzZDdiMTA1MTRjYmIiLCJzZXNzaW9uSWQiOiJhYWUwYmVkNC02MTY1LTQ4MjUtYThkYS03ZWEwNGIxMWQ3MzgiLCJlbWFpbCI6Imd1Z3V0ekBnbWFpbC5jb20ifV0sInN1YiI6IjVkOTM1MzI1MGMyYTVkMGRkODdhZmQ2MCIsImVtYWlsRG9tYWluIjoic3RhaXJzLnN0dWRpbyIsImltcGVyc29uYXRpb24iOltdLCJyZWZyZXNoVGltZW91dCI6MTU3MjYzODk5NywidmVyaWZpZWQiOnRydWUsImlzcyI6InNlc3Npb24tc2VydmljZSIsInNlc3Npb25JZCI6ImYwNTEwYzA5LWRmNGMtNGE2MC1iYTM4LTA2OTU2YzRiODRkMSIsImF1ZCI6ImF0bGFzc2lhbiIsIm5iZiI6MTU3MjYzODM5NywiZXhwIjoxNTc1MjMwMzk3LCJpYXQiOjE1NzI2MzgzOTcsImVtYWlsIjoiZ3VzdGF2b0BzdGFpcnMuc3R1ZGlvIiwianRpIjoiZjA1MTBjMDktZGY0Yy00YTYwLWJhMzgtMDY5NTZjNGI4NGQxIn0.naz3Vi6yvn0aoFX7nAMK-K7fff4zpkeUifPSrEj6a3so9pK6uPrMDZOIGd8Mg7pJJkCy8FJ9bC6eTCGdrbqll3v8Kg6NhThAQzx8tvcW4gFObJyL12HEvt9EBpwvGKW1mWLhb-S_ZGwoTCXk1QRpNHy6zNl3etwlhX9jk3KXXT5fIaO2oJJaFCovZRvQTJdyoCRiIBRPWwyh3tqrqJiZVD08NFY1bq_aCyfkxxN-owWP7KPJxmLtH-ZPpj24ky8Dv-4oVP_frUPkLW5ULvHstdhxkwCUWCpaTPPDBqijljTj5YvXFp_ulNyWqQHnPHeV3m6BszI9WxBxZF7mUwIBZw; _csrf=AMoq40Bo50JzeFptjXhUvsBl")))
-(define-key org-jira-map (kbd "C-c pg") 'org-jira-get-projects)
-(define-key org-jira-map (kbd "C-c ib") 'org-jira-browse-issue)
-(define-key org-jira-map (kbd "C-c ig") 'org-jira-get-issues)
-(define-key org-jira-map (kbd "C-c ij") 'org-jira-get-issues-from-custom-jql)
-(define-key org-jira-map (kbd "C-c ih") 'org-jira-get-issues-headonly)
-(define-key org-jira-map (kbd "C-c iu") 'org-jira-update-issue)
-(define-key org-jira-map (kbd "C-c iw") 'org-jira-progress-issue)
-(define-key org-jira-map (kbd "C-c in") 'org-jira-progress-issue-next)
-(define-key org-jira-map (kbd "C-c ia") 'org-jira-assign-issue)
-(define-key org-jira-map (kbd "C-c ir") 'org-jira-refresh-issue)
-(define-key org-jira-map (kbd "C-c iR") 'org-jira-refresh-issues-in-buffer)
-(define-key org-jira-map (kbd "C-c ic") 'org-jira-create-issue)
-(define-key org-jira-map (kbd "C-c ik") 'org-jira-copy-current-issue-key)
-(define-key org-jira-map (kbd "C-c sc") 'org-jira-create-subtask)
-(define-key org-jira-map (kbd "C-c sg") 'org-jira-get-subtasks)
-(define-key org-jira-map (kbd "C-c cc") 'org-jira-add-comment)
-(define-key org-jira-map (kbd "C-c cu") 'org-jira-update-comment)
-(define-key org-jira-map (kbd "C-c wu") 'org-jira-update-worklogs-from-org-clocks)
-(define-key org-jira-map (kbd "C-c tj") 'org-jira-todo-to-jira)
-(define-key org-jira-map (kbd "C-c if") 'org-jira-get-issues-by-fixversion)
-  )
+      :ensure t
+      :defer 3
+      :commands (org-jira-mode org-jira-get-issues org-jira-get-projects)
+      :after org
+      :custom
+      (jiralib-url "https://stairscreativestudio.atlassian.net")
+    :config
+    (setq jiralib-token
+      `("Cookie" . ,(format "ajs_group_id=null; ajs_anonymous_id=%222e15ea7d-cb97-4d24-bfe2-348c4655df02%22; atlassian.xsrf.token=86ec43db-1a9e-48fa-892a-9210c6fee684_38750fda3fb7e52a86533ed838cb5688d745af60_lin; cloud.session.token=eyJraWQiOiJzZXNzaW9uLXNlcnZpY2VcL3Nlc3Npb24tc2VydmljZSIsImFsZyI6IlJTMjU2In0.eyJhc3NvY2lhdGlvbnMiOlt7ImFhSWQiOiI1YmE3ZjkyNDNjMDEzZDdiMTA1MTRjYmIiLCJzZXNzaW9uSWQiOiJhYWUwYmVkNC02MTY1LTQ4MjUtYThkYS03ZWEwNGIxMWQ3MzgiLCJlbWFpbCI6Imd1Z3V0ekBnbWFpbC5jb20ifV0sInN1YiI6IjVkOTM1MzI1MGMyYTVkMGRkODdhZmQ2MCIsImVtYWlsRG9tYWluIjoic3RhaXJzLnN0dWRpbyIsImltcGVyc29uYXRpb24iOltdLCJyZWZyZXNoVGltZW91dCI6MTU3MjYzODk5NywidmVyaWZpZWQiOnRydWUsImlzcyI6InNlc3Npb24tc2VydmljZSIsInNlc3Npb25JZCI6ImYwNTEwYzA5LWRmNGMtNGE2MC1iYTM4LTA2OTU2YzRiODRkMSIsImF1ZCI6ImF0bGFzc2lhbiIsIm5iZiI6MTU3MjYzODM5NywiZXhwIjoxNTc1MjMwMzk3LCJpYXQiOjE1NzI2MzgzOTcsImVtYWlsIjoiZ3VzdGF2b0BzdGFpcnMuc3R1ZGlvIiwianRpIjoiZjA1MTBjMDktZGY0Yy00YTYwLWJhMzgtMDY5NTZjNGI4NGQxIn0.naz3Vi6yvn0aoFX7nAMK-K7fff4zpkeUifPSrEj6a3so9pK6uPrMDZOIGd8Mg7pJJkCy8FJ9bC6eTCGdrbqll3v8Kg6NhThAQzx8tvcW4gFObJyL12HEvt9EBpwvGKW1mWLhb-S_ZGwoTCXk1QRpNHy6zNl3etwlhX9jk3KXXT5fIaO2oJJaFCovZRvQTJdyoCRiIBRPWwyh3tqrqJiZVD08NFY1bq_aCyfkxxN-owWP7KPJxmLtH-ZPpj24ky8Dv-4oVP_frUPkLW5ULvHstdhxkwCUWCpaTPPDBqijljTj5YvXFp_ulNyWqQHnPHeV3m6BszI9WxBxZF7mUwIBZw; _csrf=AMoq40Bo50JzeFptjXhUvsBl")))
+  (define-key org-jira-map (kbd "C-c pg") 'org-jira-get-projects)
+  (define-key org-jira-map (kbd "C-c ib") 'org-jira-browse-issue)
+  (define-key org-jira-map (kbd "C-c ig") 'org-jira-get-issues)
+  (define-key org-jira-map (kbd "C-c ij") 'org-jira-get-issues-from-custom-jql)
+  (define-key org-jira-map (kbd "C-c ih") 'org-jira-get-issues-headonly)
+  (define-key org-jira-map (kbd "C-c iu") 'org-jira-update-issue)
+  (define-key org-jira-map (kbd "C-c iw") 'org-jira-progress-issue)
+  (define-key org-jira-map (kbd "C-c in") 'org-jira-progress-issue-next)
+  (define-key org-jira-map (kbd "C-c ia") 'org-jira-assign-issue)
+  (define-key org-jira-map (kbd "C-c ir") 'org-jira-refresh-issue)
+  (define-key org-jira-map (kbd "C-c iR") 'org-jira-refresh-issues-in-buffer)
+  (define-key org-jira-map (kbd "C-c ic") 'org-jira-create-issue)
+  (define-key org-jira-map (kbd "C-c ik") 'org-jira-copy-current-issue-key)
+  (define-key org-jira-map (kbd "C-c sc") 'org-jira-create-subtask)
+  (define-key org-jira-map (kbd "C-c sg") 'org-jira-get-subtasks)
+  (define-key org-jira-map (kbd "C-c cc") 'org-jira-add-comment)
+  (define-key org-jira-map (kbd "C-c cu") 'org-jira-update-comment)
+  (define-key org-jira-map (kbd "C-c wu") 'org-jira-update-worklogs-from-org-clocks)
+  (define-key org-jira-map (kbd "C-c tj") 'org-jira-todo-to-jira)
+  (define-key org-jira-map (kbd "C-c if") 'org-jira-get-issues-by-fixversion)
+)
 
 (defun tau/hydra-jira ()
   (interactive)
@@ -1193,11 +1195,11 @@ Example output:
                 ("r" org-jira-refresh-issue               "Refresh Issue")
                 ("R" org-jira-refresh-issues-in-buffer    "Refresh Issues in Buffer"))
 
-         "Manage" (("b" org-jira-browse-issue             "Browse Issue")
-                   ("c" org-jira-create-issue             "Create Issue")
-                   ("s" org-jira-create-subtask           "Create Subtask")
-                   ("P" org-jira-progress-issue           "Update Issue Progress")
-                   ("a" org-jira-assign-issue             "Assign Issue"))
+       "Manage" (("b" org-jira-browse-issue             "Browse Issue")
+                 ("c" org-jira-create-issue             "Create Issue")
+                 ("s" org-jira-create-subtask           "Create Subtask")
+                 ("P" org-jira-progress-issue           "Update Issue Progress")
+                 ("a" org-jira-assign-issue             "Assign Issue"))
 
          "Push" (("u" org-jira-update-issue                "Update Issue")
                  ("y" org-jira-copy-current-issue-key      "Copy Current Issue Key")
@@ -1332,28 +1334,30 @@ Example output:
 )
 
 (use-package ivy
-:ensure t
-:custom
-(ivy-re-builders-alist
-'((t . ivy--regex-plus)))
-:config
-(ivy-mode)
-(setq ivy-display-style 'fancy
-   ivy-use-virtual-buffers t
-   enable-recursive-minibuffers t
-   ivy-use-selectable-prompt t)
-(ivy-set-actions
-t
-'(("I" insert "insert")))
-(ivy-set-occur 'ivy-switch-buffer 'ivy-switch-buffer-occur)
+  :disabled
+  :ensure t
+  :custom
+  (ivy-re-builders-alist
+  '((t . ivy--regex-plus)))
+  :config
+  (ivy-mode)
+  (setq ivy-display-style 'fancy
+     ivy-use-virtual-buffers t
+     enable-recursive-minibuffers t
+     ivy-use-selectable-prompt t)
+  (ivy-set-actions  t
+  '(("I" insert "insert")))
+  (ivy-set-occur 'ivy-switch-buffer 'ivy-switch-buffer-occur)
+
 )
 
 (use-package counsel
+:disabled
 :ensure t
 :hook
 (after-init . ivy-mode)
-(counsel-grep-post-action . better-jumper-set-jump)
-:diminish ivy-mode
+;; check out this better-jumper mode to see what it does
+;; (counsel-grep-post-action . better-jumper-set-jump)
 :config
 (setq counsel-find-file-ignore-regexp "\\(?:^[#.]\\)\\|\\(?:[#~]$\\)\\|\\(?:^Icon?\\)"
    counsel-describe-function-function #'helpful-callable
@@ -1366,14 +1370,38 @@ t
 )
 
 (use-package ivy-rich
+:disabled
 :ensure t
 :config
 (ivy-rich-mode 1)
 (setq ivy-format-function #'ivy-format-function-line)
+
+;; use all-the-icons for `ivy-switch-buffer'
+(defun ivy-rich-switch-buffer-icon (candidate)
+   (with-current-buffer
+    (get-buffer candidate)
+    (let ((icon (all-the-icons-icon-for-mode major-mode)))
+      (if (symbolp icon)
+      (all-the-icons-icon-for-mode 'fundamental-mode)
+        icon))))
+;; add the above function to `ivy-rich--display-transformers-list'
+(setq ivy-rich--display-transformers-list
+    '(ivy-switch-buffer
+      (:columns
+       ((ivy-rich-switch-buffer-icon :width 2)
+        (ivy-rich-candidate (:width 30))
+        (ivy-rich-switch-buffer-size (:width 7))
+        (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
+        (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))
+        (ivy-rich-switch-buffer-project (:width 15 :face success))
+        (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
+       :predicate
+       (lambda (cand) (get-buffer cand)))))
 )
 
 (use-package swiper
-  :ensure nil
+  :disabled
+  :ensure t
   :bind
   (("C-s" . swiper-isearch)
    :map swiper-map
@@ -1389,6 +1417,7 @@ t
 )
 
 (use-package snails
+  :disabled
   :ensure nil
   :if window-system
   :bind
