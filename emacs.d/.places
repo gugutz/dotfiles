@@ -1,5 +1,5 @@
 ;;; -*- coding: utf-8 -*-
-(("/home/gustavo/.emacs.d/.cache/treemacs-persist" . 171)
+(("/home/gustavo/.emacs.d/elpa/org-plus-contrib-20191104/org-loaddefs.el" . 138790)
  ("/home/gustavo/.emacs.d/recentf" . 698)
  ("/home/gustavo/.emacs.d/elpa/org-jira-20190930.1406/org-jira-autoloads.el" . 5847)
  ("/home/gustavo/.emacs.d/elpa/request-20191022.615/request-autoloads.el" . 404)
@@ -51,8 +51,6 @@
  ("/home/gustavo/code/pep/src/app/pages/home/block-timeline/block-timeline.mocks.ts" . 906)
  ("/home/gustavo/.emacs.d/elpa/minimap-1.2/minimap-autoloads.el" . 826)
  ("/home/gustavo/code/pep/src/app/api-test/api-test.module.ts" . 148)
- ("/home/gustavo/.emacs.d/elpa/vscode-icon-20190610.17/vscode-icon-autoloads.el" . 498)
- ("/home/gustavo/.emacs.d/elpa/org-plus-contrib-20191028/org-loaddefs.el" . 138790)
  ("/home/gustavo/code/pep/src/app/services/questionarios/questionarios.service.spec.ts" . 33)
  ("/home/gustavo/code/pep/src/app/pages/home/block-changeable-default/block-changeable-default.component.scss" . 782)
  ("/home/gustavo/code/pep/src/app/pages/home/block-changeable-default/block-changeable-default.component.spec.ts" . 74)

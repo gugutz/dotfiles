@@ -2561,9 +2561,10 @@ Org source blocks and exporter for restclient
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package company-posframe
   :ensure t
-  :hook
-  (company-mode . company-posframe-mode)
-  (global-company-mode . company-posframe-mode)
+  :after company
+  ;;:hook
+  ;;(company-mode . company-posframe-mode)
+  ;;(global-company-mode . company-posframe-mode)
 )
 #+END_SRC
 
