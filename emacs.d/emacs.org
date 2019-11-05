@@ -104,9 +104,9 @@ emacs asks 2 annoying confirmations on every startup before actually starting
 (defvar my-init-el-start-time (current-time) "Time when init.el was started")
 
 ;; Faster startup
-;; (setq gc-cons-threshold 100000000)
+(setq gc-cons-threshold 100000000)
 ;; Defer garbage collection further back in the startup process
-(setq gc-cons-threshold (if (display-graphic-p) 400000000 100000000))
+;; (setq gc-cons-threshold (if (display-graphic-p) 400000000 100000000))
 #+END_SRC
 ** require use-package
 
@@ -1565,7 +1565,7 @@ is customized, please consider the following settings in your init file"
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package hydra-posframe
-  :load-path "packages/hydra-posframe.el"
+  :load-path "packages"
   :custom
   (hydra-posframe-parameters
     '((left-fringe . 5)
@@ -1948,21 +1948,24 @@ Org Mode Integration with Jira Projects
 * ivy
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package ivy
-  :custom
-  (ivy-re-builders-alist
-  '((t . ivy--regex-plus)))
-  :config
-  (ivy-mode)
-  (setq ivy-display-style 'fancy
-     ivy-use-virtual-buffers t
-     enable-recursive-minibuffers t
-     ivy-use-selectable-prompt t)
-  (ivy-set-actions  t
-  '(("I" insert "insert")))
-  (ivy-set-occur 'ivy-switch-buffer 'ivy-switch-buffer-occur)
+  (use-package ivy
+    :custom
+    (ivy-re-builders-alist
+    '((t . ivy--regex-plus)))
+    :config
+    (ivy-mode)
+  ;; display an arrow on the selected item in the list
+  (setf (cdr (assoc t ivy-format-functions-alist)) #'ivy-format-function-arrow)
 
-)
+    (setq ivy-display-style 'fancy
+       ivy-use-virtual-buffers t
+       enable-recursive-minibuffers t
+       ivy-use-selectable-prompt t)
+    (ivy-set-actions  t
+    '(("I" insert "insert")))
+    (ivy-set-occur 'ivy-switch-buffer 'ivy-switch-buffer-occur)
+
+  )
 #+END_SRC
 
 ** counsel
@@ -1984,6 +1987,7 @@ Org Mode Integration with Jira Projects
     (after-init . ivy-mode)
     (ivy-mode . counsel-mode)
     ;; check out this better-jumper mode to see what it does
+    ;; (counsel-grep-post-action . better-jumper-set-jump)
     :preface
     (defun ivy-format-function-pretty (cands)
       "Transform CANDS into a string for minibuffer."
@@ -1996,7 +2000,8 @@ Org Mode Integration with Jira Projects
        (lambda (str)
          (concat "  " str))
        cands
-       "\n")) ;; (counsel-grep-post-action . better-jumper-set-jump)
+       "\n"))
+
     :bind
     ("C-M-x" . counsel-M-x)
     ("M-s c" . counsel-ag)
@@ -2075,23 +2080,23 @@ Requires: Emacs >= 26
 (use-package ivy-posframe
   :ensure t
   :custom-face
-  (ivy-posframe ((t (:background "#282a36"))))
-  (ivy-posframe-border ((t (:background "#202020"))))
+  (ivy-posframe ((t (:background "#202020"))))
+  (ivy-posframe-border ((t (:background "#282a36"))))
   (ivy-posframe-cursor ((t (:background "#61bfff"))))
   :hook
-  (ivy-mode . ivy-posframe-enable)
+  (ivy-mode . ivy-posframe-mode)
   :config
   ;; custom define height of post frame per function
   (setq ivy-posframe-height-alist '((swiper . 20)
-                                    (t      . 40)))
+                                    (t      . 20)))
 
   ;; display at `ivy-posframe-style'
   (setq ivy-posframe-display-functions-alist
         '((swiper          . ivy-posframe-display-at-point)
           (complete-symbol . ivy-posframe-display-at-point)
           ;;(counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
-          (counsel-M-x     . ivy-posframe-display-at-window-center)
-          (t               . ivy-posframe-display)))
+          (counsel-M-x     . ivy-posframe-display-at-frame-center)
+          (t               . ivy-posframe-display-at-frame-center)))
   (ivy-posframe-mode 1)
 )
 #+END_SRC
@@ -2100,7 +2105,6 @@ Requires: Emacs >= 26
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
   (use-package ivy-rich
-  :disabled
   :ensure t
   :config
   (ivy-rich-mode 1)
@@ -2625,29 +2629,30 @@ Org source blocks and exporter for restclient
   :bind
   (:map evil-insert-state-map
   ;; ("<tab>" . company-indent-or-complete-common)
-  ("C-SPC" . company-indent-or-complete-common)
-  )
+  ("C-SPC" . company-indent-or-complete-common))
   (:map company-active-map
   ("M-n" . nil)
   ("M-p" . nil)
-  ("C-n" . company-select-next)
-  ("C-p" . company-select-previous)
+  ;; ("C-n" . company-select-next)
+  ;; ("C-p" . company-select-previous)
+  ("C-n" . company-select-next-or-abort)
+  ("C-p" . company-select-previous-or-abort)
   ("<tab>" . company-complete-common-or-cycle)
   ("S-<tab>" . company-select-previous)
   ("<backtab>" . company-select-previous)
-  ("C-d" . company-show-doc-buffer)
-  )
+  ("C-d" . company-show-doc-buffer))
   (:map company-search-map
-   ("C-p" . company-select-previous)
-   ("C-n" . company-select-next)
-  )
+  ;; ("C-p" . company-select-previous)
+  ;; ("C-n" . company-select-next)
+  ("C-p" . company-select-previous-or-abort)
+  ("C-n" . company-select-next-or-abort))
   :config
   ;; define company appearance
   (custom-set-faces
   '(company-preview-common ((t (:foreground unspecified :background "#111111"))))
   '(company-scrollbar-bg ((t (:background "#111111"))))
   '(company-scrollbar-fg ((t (:background "#555555"))))
-  '(company-tooltip ((t (:inherit default :background "#222222"))))
+  '(company-tooltip ((t (:inherit default :background "#202029"))))
   '(company-tooltip-common ((t (:inherit font-lock-constant-face))))
   '(company-tooltip-selection ((t (:inherit company-tooltip-common :background "#2a2a2a" )))))
 
@@ -4270,21 +4275,40 @@ Zoom in selected window and resize othersAuto balance windows and frames
  :init
  :config
  ;; appearantly these dont work if put in :init
- (setq centaur-tabs-style "box") ; types available: (alternative, bar, box, chamfer, rounded, slang, wave, zigzag)
+ (setq centaur-tabs-style "box")           ; types available: (alternative, bar, box, chamfer, rounded, slang, wave, zigzag)
  (setq centaur-tabs-height 25)
- (setq centaur-tabs-set-icons t) ;; display themed icons from all the icons
+ (setq centaur-tabs-set-icons t)           ;; display themed icons from all the icons
  (setq centaur-tabs-set-modified-marker t) ;; display a marker indicating that a buffer has been modified (atom-style)
  (setq centaur-tabs-modified-marker "*")
  (centaur-tabs-headline-match)
  (centaur-tabs-mode t)
 
- (setq centaur-tabs-set-bar 'over) ;; in previous config value was 'over
+ (setq centaur-tabs-set-bar 'over)         ;; in previous config value was 'over
  ;; (setq centaur-tabs-gray-out-icons 'buffer)
  ;; (centaur-tabs-enable-buffer-reordering)
  ;; (setq centaur-tabs-adjust-buffer-order t)
  (setq uniquify-separator "/")
  (setq uniquify-buffer-name-style 'forward)
  ;; (centaur-tabs-change-fonts "arial" 160)
+)
+#+END_SRC
+
+** hideshowvis
+
+Add clicable markers for foldable regions in the fringe
+This package is not on elpa, it has to be downloaded and installed locally
+
+Source:           https://emacs.stackexchange.com/questions/112/actionable-code-folding-in-emacs-fringe
+Package Download: https://github.com/emacsmirror/hideshowvis/blob/master/hideshowvis.el
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package hideshowvis
+  :ensure nil
+  :load-path "packages"
+  :hook
+  (display-line-numbers-mode . hideshowvis-enable)
+  :config
+  (hideshowvis-symbols) ; displaying a + symbol in the fringe for folded regions
 )
 #+END_SRC
 
@@ -4581,19 +4605,52 @@ The line of your Emacs buffer that is at the top of the window before you start 
 
 * Scrolling settings
 
+** native keyboard scrolling
+
+Several combinations can be made of this
+Bellow are some resources on how to combine them:
+
+Centered Scrolling: https://two-wrongs.com/centered-cursor-mode-in-vanilla-emacs
+Simulate Vim-Scrolof: https://wolfecub.github.io/dotfiles/#orgff34878
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;; (setq scroll-preserve-screen-position 1)  ;; centered screen scrolling
+;; (setq scroll-margin 10
+;; (setq maximum-scroll-margin 0.5)
+;; (setq scroll-step 1)
+;; (setq scroll-conservatively 10000) ;; scroll one line at a time when you move the cursor past the top or bottom of the window
+;; (setq scroll-step 1) ;; keyboard scroll one line at a time
+#+END_SRC
+
+** native mouse scrolling
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(setq mouse-wheel-progressive-speed nil)            ;; don't accelerate scrolling
+(setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ;; one line at a time
+(setq mouse-wheel-follow-mouse 't)                  ;; scroll window under mouse
+#+END_SRC
+
+*** Use Shift + MouseWheels for smooth scrolling
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(global-set-key (kbd "<S-mouse-4>") 'scroll-down-line)
+(global-set-key (kbd "<S-mouse-5>") 'scroll-up-line)
+#+END_SRC
+
 ** sublimity-scroll
 This is part of the sublimity package.
 Therefore, sublimity needs to be required for this to work
 Make sure :ensure nil
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package sublimity-scroll
-  :ensure nil
-  :config
-  (setq sublimity-scroll-weight 10)  ;; default 10
-  (setq sublimity-scroll-drift-length 5)  ;; default 5
-  (setq sublimity-scroll-hide-cursor t) ;; default t
-)
+  (use-package sublimity-scroll
+  :disabled
+    :ensure nil
+    :config
+    (setq sublimity-scroll-weight 10)  ;; default 10
+    (setq sublimity-scroll-drift-length 5)  ;; default 5
+    (setq sublimity-scroll-hide-cursor t) ;; default t
+  )
 #+END_SRC
 ** scrollkeeper
 
@@ -4609,31 +4666,10 @@ Make sure :ensure nil
   )
 #+END_SRC
 
-** centered-scrolling with pure emacs config
-
-Source: https://two-wrongs.com/centered-cursor-mode-in-vanilla-emacs
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(setq scroll-preserve-screen-position t
-      scroll-conservatively 0
-      maximum-scroll-margin 0.5
-      scroll-margin 99999)
-#+END_SRC
-
-** centered-cursor-mode
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package centered-cursor-mode
-  :ensure t
-  :init
-  (progn (require 'centered-cursor-mode)
-         (global-centered-cursor-mode))
-)
-#+END_SRC
-
 ** fast-scroll
 #+BEGIN_SRC emacs-lisp :tangle init.el
   (use-package fast-scroll
+  :disabled
       :ensure t
       ;; If you would like to turn on/off other modes, like flycheck, add
       ;; your own hooks.
@@ -4648,20 +4684,17 @@ Source: https://two-wrongs.com/centered-cursor-mode-in-vanilla-emacs
 #+END_SRC
 
 
-** vim scrollof
 
-Source: https://wolfecub.github.io/dotfiles/#orgff34878
-
-This makes scrolling gradual rather than by half page. I find that the half page scroll really makes me lose where I am in the file so here I make sure to scroll one line at a time. In addition I want to keep what I'm working on centered so I start scrolling when the cursor is 10 lines away from the margin.
-
-This behaviour in general emulates the scrolloff option in vim.
+** centered-cursor-mode
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(setq scroll-margin 10
-      scroll-step 1
-      scroll-conservatively 10000
-      scroll-preserve-screen-position 1)
+(use-package centered-cursor-mode
+  :ensure t
+  :config
+  (global-centered-cursor-mode)
+)
 #+END_SRC
+
 
 
 * Minor modes

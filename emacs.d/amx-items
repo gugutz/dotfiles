@@ -1,0 +1,22 @@
+
+;; ----- amx-history -----
+(
+ scss-mode
+ hideshowvis-enable
+ fast-scroll-mode
+ tide-fix
+ helm-M-x
+ eslintd-fix-mode
+ bug-hunter-init-file
+)
+
+;; ----- amx-data -----
+(
+ (bug-hunter-init-file . 1)
+ (scss-mode . 5)
+ (eslintd-fix-mode . 3)
+ (helm-M-x . 1)
+ (tide-fix . 3)
+ (fast-scroll-mode . 1)
+ (hideshowvis-enable . 1)
+)
