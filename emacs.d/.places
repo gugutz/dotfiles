@@ -1,8 +1,10 @@
 ;;; -*- coding: utf-8 -*-
-(("/home/tau/ifsc/tcc/tcc.org" . 89598)
+(("/home/tau/.emacs.d/elpa/org-20191104/org-loaddefs.el" . 110034)
+ ("/home/tau/.emacs.d/elpa/org-plus-contrib-20191104/org-loaddefs.el" . 138790)
+ ("/home/tau/.emacs.d/.cache/treemacs-persist" . 198)
+ ("/home/tau/ifsc/tcc/tcc.org" . 89598)
  ("/home/tau/ifsc/tcc/tcc-presentation/slide.css" . 1177)
  ("/home/tau/ifsc/tcc/tcc-presentation/slide.org" . 7197)
- ("/home/tau/.emacs.d/.cache/treemacs-persist" . 198)
  ("/home/tau/ifsc/tcc/tcc-presentation/slide.html" . 1628965)
  ("/home/tau/ifsc/tcc/tcc.tex" . 142271)
  ("/home/tau/ifsc/tcc/tcc-presentation/reset.css" . 871)
