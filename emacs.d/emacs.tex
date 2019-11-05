@@ -1,11 +1,71 @@
-(setq user-full-name "Gustavo P Borges")
-  (setq user-mail-address "gugutz@gmail.com")
-  (setq work-mail-address "gugutz@stairs.studio")
-  (setq gmail-address "gugutz@gmail.com")
-  (setq nickname "gugutz")
-;; my secrets
-;; (load-library "~/dotfiles/emacs.d/secrets.el.gpg")
+% Created 2019-11-01 sex 10:22
+% Intended LaTeX compiler: pdflatex
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\author{Gustavo P Borges}
+\date{\today}
+\title{gugutz emacs config\\\medskip
+\large ORGfied configuration for Emacs}
+\hypersetup{
+ pdfauthor={Gustavo P Borges},
+ pdftitle={gugutz emacs config},
+ pdfkeywords={},
+ pdfsubject={This file is compiled to init.el automatically on every save},
+ pdfcreator={Emacs 26.3 (Org mode 9.2.6)},
+ pdflang={English}}
+\begin{document}
 
+\maketitle
+\setcounter{tocdepth}{0}
+\tableofcontents
+
+
+\section*{Personal information}
+\label{sec:org76ecea5}
+
+\begin{verbatim}
+(setq user-full-name "Gustavo P Borges")
+(setq user-mail-address "gugutz@gmail.com")
+(setq work-mail-address "gugutz@stairs.studio")
+(setq gmail-address "gugutz@gmail.com")
+(setq nickname "gugutz")
+\end{verbatim}
+
+\section*{Observations about this config}
+\label{sec:orgcccf9cd}
+\begin{verbatim}
+Keybindings use the <kbd> macro, as recommended in Mastering Emacs:
+\end{verbatim}
+
+\url{https://www.masteringemacs.org/article/mastering-key-bindings-emacs}
+
+\begin{verbatim}
+For native packages that come with emacs, `:ensure nil` must be set or use-package will try to download those packages from melpa and break
+\end{verbatim}
+
+\section*{Recompile init.el everytime emacs.org is changed and saved}
+\label{sec:orgfc574e5}
+
+\begin{verbatim}
+Moved this to beggining of the file to avoid it not being parsed when theres an error in the middle of the file
+It was being recompiled without this function so i had to manually re-copy first-init.el to make it compile first time again and again
+\end{verbatim}
+
+
+
+\begin{verbatim}
 (defun /util/tangle-init ()
   (interactive)
   "If the current buffer is init.org' the code-blocks are
@@ -16,121 +76,122 @@ tangled, and the tangled file is compiled."
     (let ((prog-mode-hook nil))
       (org-babel-tangle)
       (byte-compile-file (concat user-emacs-directory "init.el")))))
+\end{verbatim}
 
+\begin{verbatim}
 (add-hook 'after-save-hook #'/util/tangle-init)
+\end{verbatim}
 
+\section*{Packages}
+\label{sec:org9ed8a4f}
+
+\subsection*{package repositories}
+\label{sec:org7c8cec6}
+
+\begin{verbatim}
 (require 'package)
 ;; add melpa stable emacs package repository
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
 (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t) ; Org-mode's repository
+\end{verbatim}
 
+\subsection*{initialize packages}
+\label{sec:org3fec0ec}
+\begin{verbatim}
 (package-initialize)
+\end{verbatim}
 
+moved this part to beggining of the file because if the
+custom-safe-themes variable is not set before smart-mode-line (sml) activates
+emacs asks 2 annoying confirmations on every startup before actually starting
+
+\begin{verbatim}
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ag-highligh-search t t)
- '(ag-reuse-buffers t t)
- '(ag-reuse-window t t)
- '(company-box-backends-colors nil t)
- '(company-box-doc-delay 0.3)
- '(company-box-max-candidates 50)
- '(company-box-show-single-candidate t)
- '(counsel-grep-base-command
-   "ag -S --noheading --nocolor --nofilename --numbers '%s' %s")
- '(counsel-yank-pop-height 15 t)
- '(custom-safe-themes
+;; custom-set-variables was added by Custom.
+;; If you edit it by hand, you could mess it up, so be careful.
+;; Your init file should contain only one such instance.
+;; If there is more than one, they won't work right.
+'(custom-safe-themes
    (quote
-    ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
- '(enable-recursive-minibuffers t)
- '(epg-gpg-program "c:/Program Files (x86)/GNU/GnuPG/pub/gpg2")
- '(fci-rule-color "#3E4451")
- '(flycheck-display-errors-delay 1)
- '(hydra-posframe-parameters (quote ((left-fringe . 5) (right-fringe . 5))) t)
- '(ivy-on-del-error-function nil)
- '(ivy-re-builders-alist (quote ((t . ivy--regex-plus))) t)
- '(ivy-use-selectable-prompt t)
- '(ivy-use-virtual-buffers t)
- '(jiralib-url "https://stairscreativestudio.atlassian.net" t)
- '(lsp-auto-guess-root t)
- '(lsp-document-sync-method (quote incremental))
- '(lsp-prefer-flymake nil)
- '(lsp-print-io nil)
- '(lsp-print-performance nil)
- '(lsp-response-timeout 10)
- '(lsp-trace nil t)
- '(magit-auto-revert-mode nil)
- '(package-selected-packages
-   (quote
-    (centered-cursor-mode pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org)))
- '(projectile-completion-system (quote helm))
- '(swiper-action-recenter t)
- '(wgrep-auto-save-buffer t t)
- '(wgrep-change-readonly-file t t)
- '(wgrep-enable-key "e" t))
+   ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
+   '(fci-rule-color "#3E4451")
+   '(package-selected-packages
+     (quote
+     (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
+   (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   )
+\end{verbatim}
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(company-preview-common ((t (:foreground unspecified :background "#111111"))))
- '(company-scrollbar-bg ((t (:background "#111111"))))
- '(company-scrollbar-fg ((t (:background "#555555"))))
- '(company-tooltip ((t (:inherit default :background "#222222"))))
- '(company-tooltip-common ((t (:inherit font-lock-constant-face))))
- '(company-tooltip-selection ((t (:inherit company-tooltip-common :background "#2a2a2a"))))
- '(css-selector ((t (:inherit default :foreground "#66CCFF"))))
- '(dashboard-heading ((t (:foreground "#f1fa8c" :weight bold))))
- '(diff-hl-change ((t (:foreground "darkseagreen2"))))
- '(diff-hl-delete ((t (:background "#ee6363"))))
- '(diff-hl-insert ((t (:background "#7ccd7c"))))
- '(evil-goggles-change-face ((t (:inherit diff-removed))))
- '(evil-goggles-delete-face ((t (:inherit diff-removed))))
- '(evil-goggles-paste-face ((t (:inherit diff-added))))
- '(evil-goggles-undo-redo-add-face ((t (:inherit diff-added))))
- '(evil-goggles-undo-redo-change-face ((t (:inherit diff-changed))))
- '(evil-goggles-undo-redo-remove-face ((t (:inherit diff-removed))))
- '(evil-goggles-yank-face ((t (:inherit diff-changed))))
- '(font-lock-comment-face ((t (:foreground "#828282"))))
- '(hydra-posframe-border-face ((t (:background "#6272a4"))))
- '(ivy-posframe ((t (:background "#282a36"))))
- '(ivy-posframe-border ((t (:background "#6272a4"))))
- '(ivy-posframe-cursor ((t (:background "#61bfff"))))
- '(show-paren-match ((nil (:background "#44475a" :foreground "#f1fa8c")))))
+\subsection*{Add the folder 'config' to emacs load-path so i can require stuff from there}
+\label{sec:org1b3acdc}
 
+\begin{verbatim}
 (add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
 ;; (add-to-list 'load-path "~/dotfiles/emacs.d/config")
+\end{verbatim}
 
+\subsection*{preparing environment to load stuff}
+\label{sec:org47beffb}
+
+\begin{verbatim}
 ;; Init time start
 (defvar my-init-el-start-time (current-time) "Time when init.el was started")
 
 ;; Faster startup
-(setq gc-cons-threshold 100000000)
+;; (setq gc-cons-threshold 100000000)
 ;; Defer garbage collection further back in the startup process
-;; (setq gc-cons-threshold (if (display-graphic-p) 400000000 100000000))
+(setq gc-cons-threshold (if (display-graphic-p) 400000000 100000000))
+\end{verbatim}
+\subsection*{require use-package}
+\label{sec:orga292658}
 
+\subsubsection*{Install use-package if not already installed}
+\label{sec:orgbdb834b}
+\begin{verbatim}
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package)
 )
+\end{verbatim}
 
+\subsubsection*{load use-package}
+\label{sec:org5dcd1eb}
+\begin{verbatim}
 (eval-when-compile
   (require 'use-package))
+\end{verbatim}
 
+\subsubsection*{Enable use-package extension `ensure-system-package`}
+\label{sec:org4cd4118}
+\begin{verbatim}
 (use-package use-package-ensure-system-package
   :ensure t
   :init
   ;; use sudo when needed
   (setq system-packages-use-sudo t)
 )
+\end{verbatim}
 
+\subsubsection*{Set `:ensure t` globally for all packages using use-package}
+\label{sec:org520f195}
+
+\begin{verbatim}
+this is disabled for now as i preffer to specify for each package
+\end{verbatim}
+
+\begin{verbatim}
 (require 'use-package-ensure)
 ;; (setq use-package-always-ensure t)
+\end{verbatim}
 
+\subsubsection*{Auto update packages}
+\label{sec:org4bb256c}
+\begin{verbatim}
 (use-package auto-package-update
   :config
   (setq auto-package-update-interval 7) ;; in days
@@ -139,49 +200,36 @@ tangled, and the tangled file is compiled."
   (setq auto-package-update-hide-results t)
   (auto-package-update-maybe)
 )
+\end{verbatim}
 
-(require 'epa-file)
 
-(epa-file-enable)
+\section*{General editor settings}
+\label{sec:org3a7c794}
 
-(require 'gnus)
-(setq user-mail-address "joshuafwolfe@gmail.com"
-      user-full-name "Josh Wolfe")
-
-(setq gnus-select-method
-      '(nnimap "gmail"
-         (nnimap-address "imap.gmail.com")
-         (nnimap-server-port 993)
-         (nnimap-stream ssl)))
-
-(setq smtpmail-smtp-server "smtp.gmail.com"
-      smtpmail-smtp-service 587
-      gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
-
-(setq gnus-thread-sort-functions
-      '(gnus-thread-sort-by-most-recent-date
-        (not gnus-thread-sort-by-number)))
-
-(defun my-gnus-group-list-subscribed-groups ()
-  "List all subscribed groups with or without un-read messages"
-  (interactive)
-  (gnus-group-list-all-groups 5))
-
-(define-key gnus-group-mode-map
-  ;; list all the subscribed groups even they contain zero un-read messages
-  (kbd "o") 'my-gnus-group-list-subscribed-groups)
-
+\subsection*{Emacs Server}
+\label{sec:org2ff0514}
+Allow access from emacsclient
+\begin{verbatim}
 ;; (use-package server
 ;;   :ensure nil
 ;;   :init
 ;;   (unless (or (daemonp) (server-running-p))
 ;;     (server-start))
 ;;   :hook (after-init . server-mode))
+\end{verbatim}
 
+\begin{verbatim}
 (require 'server)
 (unless (or (daemonp) (server-running-p))
   (server-start))
+\end{verbatim}
 
+\subsection*{set default font}
+\label{sec:org8868ef5}
+
+Find the first font in the list and use it
+
+\begin{verbatim}
 (require 'cl)
 (defun font-candidate (&rest fonts)
   "Return existing font which first match."
@@ -194,20 +242,47 @@ tangled, and the tangled file is compiled."
                                                         "Droid Sans Mono-10:weight=normal"
                                                         "DejaVu Sans Mono-10:weight=normal"
                                                         "Ubuntu Mono-12:weight=normal"))
+\end{verbatim}
 
+\subsection*{visual-line-mode (word wrap)}
+\label{sec:org004a685}
+\begin{verbatim}
 (use-package visual-line-mode
   :ensure nil
   :hook
   (prog-mode . visual-line-mode)
   (text-mode . visual-line-mode)
 )
+\end{verbatim}
 
+\subsection*{Prevent emacs to create lockfiles (.\#files\#).}
+\label{sec:org90af75b}
+
+PS: this also stops preventing editing colisions, so watch out
+\begin{verbatim}
 (setq create-lockfiles nil)
+\end{verbatim}
 
+\subsection*{Use the system clipboard}
+\label{sec:org75ffd60}
+
+Enable copy/past-ing from clipboard
+
+\begin{verbatim}
 (setq x-select-enable-clipboard t)
+\end{verbatim}
 
+\subsection*{Always follow symbolic links to edit the 'actual' file it points to}
+\label{sec:orgdd11057}
+
+\begin{verbatim}
 (setq vc-follow-symlinks t)
+\end{verbatim}
 
+\subsection*{Save all tempfiles in \$TMPDIR/emacs\$UID/}
+\label{sec:org074dfaf}
+
+\begin{verbatim}
 (defconst emacs-tmp-dir (expand-file-name (format "emacs%d" (user-uid)) temporary-file-directory))
 (setq backup-directory-alist
     `((".*" . ,emacs-tmp-dir)))
@@ -215,7 +290,12 @@ tangled, and the tangled file is compiled."
     `((".*" ,emacs-tmp-dir t)))
 (setq auto-save-list-file-prefix
     emacs-tmp-dir)
+\end{verbatim}
 
+\subsection*{dont make backup files}
+\label{sec:org892e052}
+
+\begin{verbatim}
 (use-package files
   :ensure nil
   :config
@@ -223,15 +303,42 @@ tangled, and the tangled file is compiled."
   ;; dont ask confirmation to kill processes
   ;;(setq confirm-kill-processes nil)
 )
+\end{verbatim}
 
+\subsection*{dont ask confirmation to kill processes}
+\label{sec:org8c5a04a}
+
+\begin{verbatim}
 (setq confirm-kill-processes nil)
+\end{verbatim}
 
+\subsection*{Disable the annoying Emacs bell ring (beep)}
+\label{sec:orgbdb3d09}
+
+\begin{verbatim}
 (setq ring-bell-function 'ignore)
+\end{verbatim}
 
+\subsection*{Create alias to yes-or-no anwsers (y-or-n-p}
+\label{sec:org038ec93}
+
+\begin{verbatim}
 (defalias 'yes-or-no-p 'y-or-n-p)
 (fset 'yes-or-no-p 'y-or-n-p)
+\end{verbatim}
 
+\subsection*{dont ask for confirmation for opening large files}
+\label{sec:org6a6d059}
+
+\begin{verbatim}
 (setq large-file-warning-threshold nil) ;; Don’t warn me about opening large files
+\end{verbatim}
+
+\subsection*{display-line-numbers}
+\label{sec:org5662c1e}
+
+Released with Emacs 26 (released in 2018-05)
+\begin{verbatim}
 
 (use-package display-line-numbers
   :if (version<= "26.0.50" emacs-version)
@@ -287,8 +394,19 @@ tangled, and the tangled file is compiled."
   (global-set-key (kbd "<left-margin> <drag-mouse-1>") 'mu-select-linum)
 )
 
-(savehist-mode 1)
+\end{verbatim}
 
+\subsection*{minibuffer history}
+\label{sec:org42b3f35}
+
+\begin{verbatim}
+(savehist-mode 1)
+\end{verbatim}
+
+\subsection*{Turn on auto-revert mode (auto updates files changed on disk)}
+\label{sec:orga5af9d1}
+
+\begin{verbatim}
 (use-package autorevert
   :ensure nil
   :hook
@@ -299,49 +417,165 @@ tangled, and the tangled file is compiled."
   (setq auto-revert-check-vc-info t)
   (setq auto-revert-verbose nil)
 )
+\end{verbatim}
 
+\subsection*{C-n insert newlines if the point is at the end of the buffer.}
+\label{sec:org008816a}
+
+\begin{verbatim}
+Useful, as it means you won’t have to reach for the return key to add newlines!
+\end{verbatim}
+
+\begin{verbatim}
 (setq next-line-add-newlines t)
+\end{verbatim}
 
+\subsection*{Remove the \^{}M characters from files that contains Unix and DOS line endings}
+\label{sec:org7c61946}
+
+\begin{verbatim}
 (defun remove-dos-eol ()
   "Do not show ^M in files containing mixed UNIX and DOS line endings."
   (interactive)
   (setq buffer-display-table (make-display-table))
   (aset buffer-display-table ?\^M [])
 )
+\end{verbatim}
 
+\subsubsection*{Hook it to text-mode and prog-mode}
+\label{sec:orga9239ff}
+\begin{verbatim}
 (add-hook 'text-mode-hook 'remove-dos-eol)
 (add-hook 'prog-mode-hook 'remove-dos-eol)
+\end{verbatim}
 
+\subsection*{Increase, decrease and adjust font size}
+\label{sec:org5c825a9}
+
+\begin{verbatim}
 (global-set-key (kbd "C-S-+") #'text-scale-increase)
 (global-set-key (kbd "C-S-_") #'text-scale-decrease)
 (global-set-key (kbd "C-S-)") #'text-scale-adjust)
+\end{verbatim}
 
+\subsection*{expand-region}
+\label{sec:orga39de64}
+\begin{verbatim}
 ;; (require 'expand-region)
 (global-set-key (kbd "C-S-<tab>") 'er/expand-region)
+\end{verbatim}
 
+\subsection*{refresh buffer with F5}
+\label{sec:orgdb294f6}
+\begin{verbatim}
 (global-set-key [f5] '(lambda () (interactive) (revert-buffer nil t nil)))
+\end{verbatim}
+\subsection*{C-k kills current buffer without having to select which buffer}
+\label{sec:orgf0b9f87}
 
+By default C-x k prompts to select which buffer should be selected.
+I almost always want to kill the current buffer, so this snippet helps in that.
+\begin{verbatim}
 ;; Kill current buffer; prompt only if
 ;; there are unsaved changes.
 (global-set-key (kbd "C-x k")
   '(lambda () (interactive) (kill-buffer (current-buffer)))
 )
+\end{verbatim}
 
+\subsection*{smooth scrolling}
+\label{sec:org028a235}
+
+Disabled in favor of sublimity-scroll, which is better
+\begin{verbatim}
+(use-package smooth-scrolling
+  :disabled
+  :ensure t
+  :config
+  (smooth-scrolling-mode 1)
+)
+\end{verbatim}
+
+\begin{verbatim}
+;; ;; Vertical Scroll
+;; (setq scroll-step 1)
+;; (setq scroll-margin 1)
+;; (setq scroll-conservatively 101)
+;; (setq scroll-up-aggressively 0.01)
+;; (setq scroll-down-aggressively 0.01)
+;; (setq auto-window-vscroll nil)
+;; (setq fast-but-imprecise-scrolling nil)
+;; (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
+;; (setq mouse-wheel-progressive-speed nil)
+;; ; Horizontal Scroll
+;; (setq hscroll-step 1)
+;; (setq hscroll-margin 1)
+\end{verbatim}
+
+\subsection*{add final newline}
+\label{sec:org08f5844}
+
+\begin{verbatim}
 (setq require-final-newline t)
+\end{verbatim}
 
+\subsection*{fill column}
+\label{sec:org381ddd8}
+
+Sets a 80 character line width
+
+\begin{verbatim}
 (setq-default fill-column 80)
+\end{verbatim}
 
+\subsection*{preffer UTF-8 coding system}
+\label{sec:org71335e3}
+\begin{verbatim}
 (prefer-coding-system 'utf-8) ;; Prefer UTF-8 encoding
+\end{verbatim}
 
+\subsection*{auto balance windows on opening and closing frames}
+\label{sec:org3ebd34c}
+
+\begin{verbatim}
 (setq window-combination-resize t)
+\end{verbatim}
 
+\subsection*{set default line spacing}
+\label{sec:org0709127}
+
+\begin{verbatim}
 ;; (setq-default line-spacing 1) ;; A nice line height
 (setq-default line-spacing 3)
+\end{verbatim}
 
+\subsection*{fix wierd color escape system}
+\label{sec:org2f718cb}
+
+\begin{verbatim}
 (setq system-uses-terminfo nil) ;; Fix weird color escape sequences
+\end{verbatim}
 
+\subsection*{confirm before closing emacs}
+\label{sec:orgb9138fa}
+
+\begin{verbatim}
 ;; (setq confirm-kill-emacs 'yes-or-no-p) ;; Ask for confirmation before closing emacs
+\end{verbatim}
 
+
+\section*{Code editing settings}
+\label{sec:org4faa648}
+\subsection*{subword-mode}
+\label{sec:org53bd712}
+
+\begin{verbatim}
+Alt+x subword-mode. It change all cursor movement/edit commands to stop in-between the “camelCase” words.
+subword-mode and superword-mode are mutally exclusive. Turning one on turns off the other.
+\end{verbatim}
+
+
+\begin{verbatim}
 (use-package subword
   :ensure nil
   :hook
@@ -350,20 +584,39 @@ tangled, and the tangled file is compiled."
   (enh-ruby-mode . subword-mode)
   (elixir-mode . subword-mode)
 )
+\end{verbatim}
 
+\subsection*{superword-mode}
+\label{sec:org6799a96}
+
+\begin{verbatim}
+Alt+x superword-mode (emacs 24.4) is similar. It treats text like “x_y” as one word. Useful for “snake_case”.
+subword-mode and superword-mode are mutally exclusive. Turning one on turns off the other.
+\end{verbatim}
+
+
+\begin{verbatim}
 (use-package superword
   :ensure nil
   :hook
   (js2-mode . superword-mode)
 )
+\end{verbatim}
 
+\subsection*{default indentation}
+\label{sec:orgc82118e}
+\begin{verbatim}
 (setq-default indent-tabs-mode nil)
 ;; C e C-like langs default indent size
 (setq-default tab-width 2)
 ;; Perl default indent size
 (setq-default cperl-basic-offset 2)
 (setq-default c-basic-offset 2)
+\end{verbatim}
 
+\subsection*{Use unix-conf-mode for .*rc files}
+\label{sec:org6a49976}
+\begin{verbatim}
 (use-package conf-mode
   :mode
   (;; systemd
@@ -381,14 +634,25 @@ tangled, and the tangled file is compiled."
     ("rc$"              . conf-mode))
 )
 ;; (add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode))
+\end{verbatim}
 
+\subsection*{iedit}
+\label{sec:orgbb76244}
+\begin{verbatim}
 (use-package iedit
   :config
   (set-face-background 'iedit-occurrence "Magenta")
   :bind
   ("C-;" . iedit-mode)
 )
+\end{verbatim}
 
+\subsection*{eldoc}
+\label{sec:org4e08aa1}
+
+Enable documentation for programming languages
+
+\begin{verbatim}
 (use-package eldoc
   :ensure nil
   :hook
@@ -400,7 +664,13 @@ tangled, and the tangled file is compiled."
   ;; (add-hook 'prog-mode-hook 'eldoc-mode)
   (setq eldoc-idle-delay 0.4)
 )
+\end{verbatim}
 
+
+\subsection*{aggressive-indent-mode}
+\label{sec:org9b5cfc5}
+
+\begin{verbatim}
 (use-package aggressive-indent
   :ensure t
   :hook
@@ -408,7 +678,34 @@ tangled, and the tangled file is compiled."
   (css-mode . aggressive-indent-mode)
   :config
 )
+\end{verbatim}
 
+\subsection*{interactive-align}
+\label{sec:org111e78c}
+
+Keymap used in the minibuffer when ialign command is executed.
+\begin{center}
+\begin{tabular}{ll}
+\hline
+Key & Command\\
+\hline
+C-c C-r & ialign-toggle-repeat\\
+C-c C-t & ialign-toggle-tabs\\
+C-c M-c & ialign-toggle-case-fold\\
+C-c + & ialign-increment-spacing\\
+C-c - & ialign-decrement-spacing\\
+C-c [ & ialign-decrement-group\\
+C-c ] & ialign-increment-group\\
+C-c C-f & ialign-set-group\\
+C-c C-s & ialign-set-spacing\\
+C-c RET & ialign-commit\\
+C-c C-c & ialign-update\\
+C-c ? & ialign-show-help\\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{verbatim}
 (use-package ialign
   :ensure t
   :bind
@@ -418,19 +715,47 @@ tangled, and the tangled file is compiled."
   (setq ialign-align-with-tabs nil) ;; default nil
   (setq ialign-auto-update t) ;; default t
 )
+\end{verbatim}
 
+\subsection*{align.el}
+\label{sec:orgdf7ae41}
+
+align text to a specific column, by regexp
+
+This mode allows you to align regions in a context-sensitive fashion.
+The classic use is to align assignments:
+
+int a = 1;
+short foo = 2;
+double blah = 4;
+
+becomes
+
+int    a    = 1;
+short  foo  = 2;
+double blah = 4;
+
+\begin{verbatim}
 (defun align-values (start end)
   "Vertically aligns region based on lengths of the first value of each line.
 Example output:
 
-	foo        bar
-	foofoo     bar
-	foofoofoo  bar"
+  foo        bar
+  foofoo     bar
+  foofoofoo  bar"
   (interactive "r")
   (align-regexp start end
-				"\\S-+\\(\\s-+\\)"
-				1 1 nil))
+        "\\S-+\\(\\s-+\\)"
+        1 1 nil))
 
+
+\end{verbatim}
+
+\subsection*{dumb-jump}
+\label{sec:org370b3f5}
+Emacs jump to definition tool
+
+\begin{verbatim}
 (use-package dumb-jump
   :ensure t
   :after helm
@@ -441,34 +766,57 @@ Example output:
          ("M-g x" . dumb-jump-go-prefer-external)
          ("M-g z" . dumb-jump-go-prefer-external-other-window))
   :config
-  (eval-when-compile
-    (require 'helm-source nil t))
   (setq dumb-jump-selector 'helm)
   ;; (setq dumb-jump-selector 'ivy)
 )
+\end{verbatim}
 
+\section*{Text editing settings}
+\label{sec:org34d0ab0}
+
+\subsection*{Helper functions for casing words}
+\label{sec:org9773b37}
+
+\begin{verbatim}
 (defun upcase-backward-word (arg)
   (interactive "p")
   (upcase-word (- arg))
 )
+\end{verbatim}
 
+\begin{verbatim}
 (defun downcase-backward-word (arg)
   (interactive "p")
   (downcase-word (- arg))
 )
+\end{verbatim}
 
+\begin{verbatim}
 (defun capitalize-backward-word (arg)
   (interactive "p")
   (capitalize-word (- arg))
 )
+\end{verbatim}
 
+\begin{verbatim}
 (global-set-key (kbd "C-M-u")	 'upcase-backward-word)
 (global-set-key (kbd "C-M-l")	 'downcase-backward-WORD)
 ;; this replaces native capitlize word!
 (global-set-key (kbd "M-c")	 'capitalize-backward-word)
+\end{verbatim}
 
+\subsection*{Spellchecking}
+\label{sec:org1ce2eac}
+
+\begin{verbatim}
 (defconst *spell-check-support-enabled* t) ;; Enable with t if you prefer
+\end{verbatim}
 
+
+\subsection*{move-text}
+\label{sec:org806abc5}
+
+\begin{verbatim}
 (use-package move-text
   :ensure t
   :after evil
@@ -493,7 +841,14 @@ Example output:
   (define-key evil-visual-state-map (kbd "M-j") 'move-text-region-up)
   (define-key evil-visual-state-map (kbd "M-k") 'move-text-region-down)
 )
+\end{verbatim}
 
+\subsection*{Flyspell}
+\label{sec:org11e4c08}
+
+Change dictionaries with F12
+
+\begin{verbatim}
 ;(defun fd-switch-dictionary()
 ;(interactive)
 ;(let* ((dic ispell-current-dictionary)
@@ -503,7 +858,9 @@ Example output:
 ;  ))
 
 ;(global-set-key (kbd "<f12>")   'fd-switch-dictionary)
+\end{verbatim}
 
+\begin{verbatim}
 ;; Change dictionaries with F12 (teste pt-br)
 (let ((langs '("american" "brasileiro")))
   (setq lang-ring (make-ring (length langs)))
@@ -518,7 +875,9 @@ Example output:
 )
 
 (global-set-key (kbd "<f12>")   'cycle-ispell-languages)
+\end{verbatim}
 
+\begin{verbatim}
 (use-package flyspell
   :defer 1
   :hook
@@ -564,7 +923,15 @@ Example output:
 ;;  )
 
 )
+\end{verbatim}
 
+\subsection*{guess-language}
+\label{sec:orgdb19ddb}
+
+Automatic guess the language of the paragraph im writing in
+Works with mutilang documents
+
+\begin{verbatim}
 (use-package guess-language         ; Automatically detect language for Flyspell
   :ensure t
   :defer t
@@ -578,7 +945,13 @@ Example output:
   guess-language-languages '(en br)
   guess-language-min-paragraph-length 45)
 )
+\end{verbatim}
 
+
+\section*{GPG Encryption}
+\label{sec:orgb2246d1}
+
+\begin{verbatim}
 (use-package epa-file
   :config
   (epa-file-enable)
@@ -591,7 +964,18 @@ Example output:
 )
 (require 'epa-file)
 (epa-file-enable)
+\end{verbatim}
 
+\section*{exec-path-from-shell}
+\label{sec:org478b65f}
+
+Make emacs use \$PATH defined in the systems shell
+
+\begin{verbatim}
+snippet taken from oficial use package github page
+\end{verbatim}
+
+\begin{verbatim}
 (use-package exec-path-from-shell
   :if (memq window-system '(mac ns x))
   :ensure t
@@ -607,14 +991,28 @@ Example output:
   ;; (exec-path-from-shell-copy-env "PYTHONPATH")
   ;; (setq exec-path-from-shell-variables '("PYTHONPATH" "GOPATH"))
 )
+\end{verbatim}
 
+\section*{Mouse configuration}
+\label{sec:org9c03fda}
+\subsection*{Enable mouse support in terminal mode}
+\label{sec:org029f738}
+
+\begin{verbatim}
 (when (eq window-system nil)
   (xterm-mouse-mode 1))
+\end{verbatim}
 
+\begin{verbatim}
 ;; (use-package mouse3
 ;;     :config
 ;; (global-set-key (kbd "<mouse-3>") 'mouse3-popup-menu))
+\end{verbatim}
 
+\subsection*{right-click-context-menu}
+\label{sec:orgb154e82}
+
+\begin{verbatim}
 (use-package right-click-context
   :ensure t
   :config
@@ -633,13 +1031,23 @@ Example output:
                 )))))
   (right-click-context-menu)))
 )
+\end{verbatim}
 
+\subsection*{zoom buffers with Mouse+Scroll<Up/Down> like in the browser}
+\label{sec:org8ff1f5c}
+
+\begin{verbatim}
 ;; zoom in/out like we do everywhere else.
 (global-set-key (kbd "C-=") 'text-scale-increase)
 (global-set-key (kbd "C--") 'text-scale-decrease)
 (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
 (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
+\end{verbatim}
 
+\section*{hippie-expand (native emacs expand function)}
+\label{sec:org7f90654}
+
+\begin{verbatim}
 (use-package hippie-exp
   ;;:ensure nil
   :defer t
@@ -659,7 +1067,13 @@ Example output:
           )
   )
 )
+\end{verbatim}
 
+
+\section*{Evil}
+\label{sec:org9f6af6e}
+
+\begin{verbatim}
 (use-package evil
     :ensure t
     :init
@@ -780,30 +1194,34 @@ Example output:
   (define-key evil-visual-state-map (kbd "Q") 'call-last-kbd-macro)
   (define-key evil-insert-state-map (kbd "C-r") 'search-backward)
 )
+\end{verbatim}
 
-(use-package evil-org
-  :after org
-  :hook
-  (org-mode . evil-org-mode)
-  :config
-  (lambda ()
-    (evil-org-set-key-theme))
-)
 
+\section*{Evil packages / plugins}
+\label{sec:org3371b48}
+
+\subsection*{evil-numbers}
+\label{sec:orgea45698}
+\begin{verbatim}
 (use-package evil-numbers
   :ensure t
   :after evil
   :bind
   (:map evil-normal-state-map
-  ("C-c C-+" . evil-numbers/inc-at-pt)
-  ("C-c C--" . evil-numbers/dec-at-pt)
+  ("C-c +" . evil-numbers/inc-at-pt)
+  ("C-c -" . evil-numbers/dec-at-pt)
   ("<kp-add>" . evil-numbers/inc-at-pt)
   ("<kp-subtract>" . evil-numbers/dec-at-pt))
   :config
-  (global-set-key (kbd "C-c C-+") 'evil-numbers/inc-at-pt)
-  (global-set-key (kbd "C-c C--") 'evil-numbers/dec-at-pt)
+  (global-set-key (kbd "C-c +") 'evil-numbers/inc-at-pt)
+  (global-set-key (kbd "C-c -") 'evil-numbers/dec-at-pt)
 )
+\end{verbatim}
 
+\subsection*{evil-leader}
+\label{sec:orgb03f243}
+
+\begin{verbatim}
 (use-package evil-leader
   :config
   (global-evil-leader-mode)
@@ -818,12 +1236,19 @@ Example output:
     "-" 'split-window-bellow
     "|" 'split-window-right)
 )
+\end{verbatim}
 
+\subsection*{Evil Surround}
+\label{sec:org15faf2e}
+
+\begin{verbatim}
 (use-package evil-surround
   :config
   (global-evil-surround-mode 1)
 )
+\end{verbatim}
 
+\begin{verbatim}
 (defun evil-surround-prog-mode-hook-setup ()
   "Documentation string, idk, put something here later."
   (push '(47 . ("/" . "/")) evil-surround-pairs-alist)
@@ -833,7 +1258,9 @@ Example output:
   (push '(93 . ("[" . "]")) evil-surround-pairs-alist)
 )
 (add-hook 'prog-mode-hook 'evil-surround-prog-mode-hook-setup)
+\end{verbatim}
 
+\begin{verbatim}
 (defun evil-surround-js-mode-hook-setup ()
   "ES6." ;  this is a documentation string, a feature in Lisp
   ;; I believe this is for auto closing pairs
@@ -844,7 +1271,9 @@ Example output:
   (push '(?3 . ("classNames(" . ")")) evil-surround-pairs-alist)
 )
 (add-hook 'js2-mode-hook 'evil-surround-js-mode-hook-setup)
+\end{verbatim}
 
+\begin{verbatim}
 (defun evil-surround-emacs-lisp-mode-hook-setup ()
   (push '(?` . ("`" . "'")) evil-surround-pairs-alist)
 )
@@ -856,23 +1285,57 @@ Example output:
   (push '(?= . ("=" . "=")) evil-surround-pairs-alist)
 )
 (add-hook 'org-mode-hook 'evil-surround-org-mode-hook-setup)
+\end{verbatim}
 
+\subsection*{evil-commentary}
+\label{sec:orgebbf974}
+
+\begin{verbatim}
 (use-package evil-commentary
   :config
   (evil-commentary-mode)
 )
+\end{verbatim}
 
+\subsection*{Evil-Matchit}
+\label{sec:orgd6bf0a4}
+\begin{verbatim}
 (use-package evil-matchit
   :config
   (global-evil-matchit-mode 1)
 )
+\end{verbatim}
 
+\subsection*{evil-paredit}
+\label{sec:org02a6e16}
+
+\begin{verbatim}
 (use-package evil-paredit
   :ensure t
   :hook
   (emacs-lisp-mode . evil-paredit-mode)
 )
+\end{verbatim}
 
+\subsection*{evil-mc}
+\label{sec:org93a0a77}
+
+Multiple cursors for evil mode
+
+\begin{center}
+\begin{tabular}{ll}
+\hline
+Key & action\\
+\hline
+C-t or grn & skip creating a cursor forward\\
+grp & skip creating a cursor backward\\
+gru & undo last addded cursor\\
+grq & remove all cursors\\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{verbatim}
 (use-package evil-mc
   :ensure t
   :after evil
@@ -885,7 +1348,12 @@ Example output:
   :config
   (global-evil-mc-mode  1)
 )
+\end{verbatim}
 
+\subsection*{evil-goggles}
+\label{sec:org0653787}
+
+\begin{verbatim}
 (use-package evil-goggles
   :ensure t
   :config
@@ -919,7 +1387,14 @@ Example output:
   ;; other faces such as `diff-added` will be used for other actions
   (evil-goggles-use-diff-faces)
 )
+\end{verbatim}
 
+\subsection*{evil-lion}
+\label{sec:org927918d}
+
+Align by operators
+
+\begin{verbatim}
 (use-package evil-lion
   :ensure t
   :bind
@@ -933,7 +1408,14 @@ Example output:
   (setq evil-lion-squeeze-spaces t) ;; default t
   (evil-lion-mode)
 )
+\end{verbatim}
 
+\section*{org-mode}
+\label{sec:org810bc70}
+
+\subsection*{org-mode setup}
+\label{sec:org5a460cc}
+\begin{verbatim}
 (use-package org
   :ensure org-plus-contrib
   :defer t
@@ -942,12 +1424,12 @@ Example output:
   ("C-c a" . org-agenda)
   ("C-c c" . org-capture)
   ("C-c b" . org-switch)
-
   ;; this map is to delete de bellow commented lambda that does the same thing
   ;; Resolve issue with Tab not working with ORG only in Normal VI Mode in terminal
   ;; (something with TAB on terminals being related to C-i...)
   (:map evil-normal-state-map
-  ("<tab>" . org-cycle))
+  ("<tab>" . org-cycle)
+  )
   :init
   ;; general org config variables
   (setq org-log-done 'time)
@@ -975,12 +1457,6 @@ Example output:
   ;;ox-twbs (exporter to twitter bootstrap html)
   (setq org-enable-bootstrap-support t)
   :config
-  ;; make windmove work with org mode
-  (add-hook 'org-shiftup-final-hook 'windmove-up)
-  (add-hook 'org-shiftleft-final-hook 'windmove-left)
-  (add-hook 'org-shiftdown-final-hook 'windmove-down)
-  (add-hook 'org-shiftright-final-hook 'windmove-right)
-
   ;; org-capture - needs to be in :config because it assumes a variable is already defined: `org-directory'
   (setq org-default-notes-file (concat org-directory "/notes.org"))
 
@@ -993,23 +1469,11 @@ Example output:
     (interactive)
     (setq org-latex-listings 'minted
           org-latex-packages-alist '(("" "minted"))
-          org-latex-pdf-process '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f")))
+          (setq org-latex-pdf-process
+          '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))))
 
-;; (setq org-latex-pdf-process
-;;     '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
-
-;; compile with xelatex to use the Arial font
-(setq org-latex-pdf-process
-  '("xelatex -interaction nonstopmode %f"
-     "xelatex -interaction nonstopmode %f")) ;; for multiple passes
-
-
-  (setq org-emphasis-alist '(("*" bold)
-                         ("/" italic)
-                         ("_" underline)
-                         ("=" org-verbatim verbatim)
-                         ("~" org-code verbatim)))
-
+  (setq org-latex-pdf-process
+    '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
 
   (require 'org-habit)
   '(org-emphasis-alist
@@ -1025,21 +1489,29 @@ Example output:
      ("+" (:strike-through t))
      )))
 )
+\end{verbatim}
 
-(use-package org-sidebar
-:ensure t
-:after org
-:bind
-("S-<f8>" . org-sidebar-tree-toggle)
-)
+\subsection*{ox-extra (org-plus-contrib)}
+\label{sec:org55493a6}
 
+ox-extras
+add suport for the ignore tag (ignores a headline without ignoring its content)
+
+\begin{verbatim}
 (use-package ox-extra
   :ensure nil
   :config
   (ox-extras-activate '(ignore-headlines))
   (ox-extras-activate '(latex-header-blocks ignore-headlines))
 )
+\end{verbatim}
 
+\subsection*{add more custom emacs emphasis characters}
+\label{sec:org9a8e811}
+
+
+first test
+\begin{verbatim}
 (require 'org-habit nil t)
 
 (defun org-add-my-extra-fonts ()
@@ -1048,7 +1520,36 @@ Example output:
   (add-to-list 'org-font-lock-extra-keywords '("\\(%\\)\\([^\n\r\t]+\\)\\(%\\)" (1 '(face org-habit-overdue-face invisible t)) (2 'org-habit-overdue-face) (3 '(face org-habit-overdue-face invisible t)))))
 
 (add-hook 'org-font-lock-set-keywords-hook #'org-add-my-extra-fonts)
+\end{verbatim}
 
+
+\subsection*{Evil-ORG}
+\label{sec:orgc0b7878}
+
+\begin{verbatim}
+(use-package evil-org
+  :after org
+  :hook
+  (org-mode . evil-org-mode)
+  :config
+  (lambda ()
+    (evil-org-set-key-theme))
+)
+\end{verbatim}
+
+\subsection*{ox-pandoc}
+\label{sec:org92298f7}
+
+\begin{NOTE}
+As pandoc supports many number of formats, initial org-export-dispatch
+shortcut menu does not show full of its supported formats. You can customize
+org-pandoc-menu-entry variable (and probably restart Emacs) to change its
+default menu entries.
+If you want delayed loading of `ox-pandoc’ when org-pandoc-menu-entry
+is customized, please consider the following settings in your init file"
+\end{NOTE}
+
+\begin{verbatim}
 (use-package ox-pandoc
   :after (org ox)
   :config
@@ -1062,54 +1563,87 @@ Example output:
   ;; special extensions for markdown_github output
   (setq org-pandoc-format-extensions '(markdown_github+pipe_tables+raw_html))
 )
+\end{verbatim}
 
+\subsection*{UTF8 pretty bullets in org mode}
+\label{sec:org02fa59f}
+\begin{verbatim}
 (use-package org-bullets
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-  (setq org-bullets-bullet-list '("◉" "○" "●" "►" "•"))
 )
+\end{verbatim}
 
-(use-package ox-confluence
+\subsection*{org-jira}
+\label{sec:org7b1e877}
+
+Org Mode Integration with Jira Projects
+
+\begin{verbatim}
+(use-package org-jira
+  :ensure t
   :defer 3
-  :ensure nil
+  :after org
+  :custom
+  (jiralib-url "https://stairscreativestudio.atlassian.net")
+)
+\end{verbatim}
+
+\subsubsection*{ox-jira exporter}
+\label{sec:org1319f35}
+\begin{verbatim}
+(use-package ox-jira
+  :defer 3
   :after org
 )
+\end{verbatim}
 
+
+\subsection*{ReveaJS org-reveal:}
+\label{sec:orgec86ce8}
+
+\begin{verbatim}
+This delay makes the options to export to RevealJS appear on the exporter menu (C-c C-e)
+\end{verbatim}
+
+
+\begin{verbatim}
 (use-package ox-reveal
   :after ox
   :config
   (setq org-reveal-root "https://cdn.jsdelivr.net/reveal.js/3.0.0/")
 )
+\end{verbatim}
 
+\subsection*{Org Exporters}
+\label{sec:orgc150b4a}
+
+\subsubsection*{markdown}
+\label{sec:org6f812fd}
+\begin{verbatim}
 (use-package ox-md
   :defer t
   :after org
 )
+\end{verbatim}
 
+\subsubsection*{github-flavored markdown}
+\label{sec:orged70e2b}
+\begin{verbatim}
 (use-package ox-gfm
   :ensure t
   :defer t
   :after org
 )
+\end{verbatim}
 
-(use-package hydra
-  :ensure t
-)
+\section*{Shell}
+\label{sec:orgdb4ff86}
 
-(use-package major-mode-hydra
-  :ensure t)
+\subsection*{shell-pop}
+\label{sec:org6c1f33d}
 
-(use-package hydra-posframe
-  :load-path "packages"
-  :custom
-  (hydra-posframe-parameters
-    '((left-fringe . 5)
-      (right-fringe . 5)))
-  :custom-face
-  (hydra-posframe-border-face ((t (:background "#6272a4"))))
-  :hook (after-init . hydra-posframe-enable)
-)
-
+\begin{verbatim}
 (use-package shell-pop
   :init
   (setq shell-pop-full-span t)
@@ -1123,7 +1657,14 @@ Example output:
   :bind
   ("C-c s" . shell-pop)
 )
+\end{verbatim}
 
+\subsection*{System Shell}
+\label{sec:orgab4e8a2}
+\subsubsection*{Make system shell open in a split-window buffer at the bottom of the screen}
+\label{sec:org0769584}
+
+\begin{verbatim}
 (defun /shell/new-window ()
     "Opens up a new shell in the directory associated with the current buffer's file."
     (interactive)
@@ -1144,7 +1685,16 @@ Example output:
 (define-key evil-normal-state-map (kbd "\"") #'/shell/new-window)
 (define-key evil-visual-state-map (kbd "\"") #'/shell/new-window)
 (define-key evil-motion-state-map (kbd "\"") #'/shell/new-window)
+\end{verbatim}
 
+
+\subsection*{Eshell}
+\label{sec:orgefd4be0}
+
+\subsubsection*{Make eshell open in a split-window buffer at the bottom of the screen}
+\label{sec:orgba4240a}
+
+\begin{verbatim}
 (defun /eshell/new-window ()
     "Opens up a new eshell in the directory associated with the current buffer's file.  The eshell is renamed to match that directory to make multiple eshell windows easier."
     (interactive)
@@ -1165,147 +1715,17 @@ Example output:
 (define-key evil-normal-state-map (kbd "!") #'/eshell/new-window)
 (define-key evil-visual-state-map (kbd "!") #'/eshell/new-window)
 (define-key evil-motion-state-map (kbd "!") #'/eshell/new-window)
+\end{verbatim}
 
-(use-package projectile
-  :ensure t
-  :bind
-  (:map projectile-mode-map
-  ("s-p" . projectile-command-map)
-  ("C-c p" . projectile-command-map)
-  ("M-o p" . counsel-projectile-switch-project)
-  )
-:custom
-(projectile-completion-system 'helm)
-  :config
-  (projectile-mode +1)
-  (setq projectile-globally-ignored-files
-        (append '("~"
-                  ".swp"
-                  ".pyc")
-                projectile-globally-ignored-files))
-)
+\section*{Helm}
+\label{sec:org717f631}
 
-(use-package helm-projectile
-  :ensure t
-;  :after projectile
-;  :demand t
-  :config
-  (helm-projectile-on)
-)
-
-(use-package org-kanban
-    :ensure t
-  :after org
-:commands  (org-kanban/initialize)
-    :config
-    )
-
-(use-package org-jira
-      :ensure t
-      :defer 3
-      :commands (org-jira-mode org-jira-get-issues org-jira-get-projects)
-      :after org
-      :custom
-      (jiralib-url "https://stairscreativestudio.atlassian.net")
-    :config
-    (setq jiralib-token
-      `("Cookie" . ,(format "ajs_group_id=null; ajs_anonymous_id=%222e15ea7d-cb97-4d24-bfe2-348c4655df02%22; atlassian.xsrf.token=86ec43db-1a9e-48fa-892a-9210c6fee684_38750fda3fb7e52a86533ed838cb5688d745af60_lin; cloud.session.token=eyJraWQiOiJzZXNzaW9uLXNlcnZpY2VcL3Nlc3Npb24tc2VydmljZSIsImFsZyI6IlJTMjU2In0.eyJhc3NvY2lhdGlvbnMiOlt7ImFhSWQiOiI1YmE3ZjkyNDNjMDEzZDdiMTA1MTRjYmIiLCJzZXNzaW9uSWQiOiJhYWUwYmVkNC02MTY1LTQ4MjUtYThkYS03ZWEwNGIxMWQ3MzgiLCJlbWFpbCI6Imd1Z3V0ekBnbWFpbC5jb20ifV0sInN1YiI6IjVkOTM1MzI1MGMyYTVkMGRkODdhZmQ2MCIsImVtYWlsRG9tYWluIjoic3RhaXJzLnN0dWRpbyIsImltcGVyc29uYXRpb24iOltdLCJyZWZyZXNoVGltZW91dCI6MTU3MjYzODk5NywidmVyaWZpZWQiOnRydWUsImlzcyI6InNlc3Npb24tc2VydmljZSIsInNlc3Npb25JZCI6ImYwNTEwYzA5LWRmNGMtNGE2MC1iYTM4LTA2OTU2YzRiODRkMSIsImF1ZCI6ImF0bGFzc2lhbiIsIm5iZiI6MTU3MjYzODM5NywiZXhwIjoxNTc1MjMwMzk3LCJpYXQiOjE1NzI2MzgzOTcsImVtYWlsIjoiZ3VzdGF2b0BzdGFpcnMuc3R1ZGlvIiwianRpIjoiZjA1MTBjMDktZGY0Yy00YTYwLWJhMzgtMDY5NTZjNGI4NGQxIn0.naz3Vi6yvn0aoFX7nAMK-K7fff4zpkeUifPSrEj6a3so9pK6uPrMDZOIGd8Mg7pJJkCy8FJ9bC6eTCGdrbqll3v8Kg6NhThAQzx8tvcW4gFObJyL12HEvt9EBpwvGKW1mWLhb-S_ZGwoTCXk1QRpNHy6zNl3etwlhX9jk3KXXT5fIaO2oJJaFCovZRvQTJdyoCRiIBRPWwyh3tqrqJiZVD08NFY1bq_aCyfkxxN-owWP7KPJxmLtH-ZPpj24ky8Dv-4oVP_frUPkLW5ULvHstdhxkwCUWCpaTPPDBqijljTj5YvXFp_ulNyWqQHnPHeV3m6BszI9WxBxZF7mUwIBZw; _csrf=AMoq40Bo50JzeFptjXhUvsBl")))
-  (define-key org-jira-map (kbd "C-c pg") 'org-jira-get-projects)
-  (define-key org-jira-map (kbd "C-c ib") 'org-jira-browse-issue)
-  (define-key org-jira-map (kbd "C-c ig") 'org-jira-get-issues)
-  (define-key org-jira-map (kbd "C-c ij") 'org-jira-get-issues-from-custom-jql)
-  (define-key org-jira-map (kbd "C-c ih") 'org-jira-get-issues-headonly)
-  (define-key org-jira-map (kbd "C-c iu") 'org-jira-update-issue)
-  (define-key org-jira-map (kbd "C-c iw") 'org-jira-progress-issue)
-  (define-key org-jira-map (kbd "C-c in") 'org-jira-progress-issue-next)
-  (define-key org-jira-map (kbd "C-c ia") 'org-jira-assign-issue)
-  (define-key org-jira-map (kbd "C-c ir") 'org-jira-refresh-issue)
-  (define-key org-jira-map (kbd "C-c iR") 'org-jira-refresh-issues-in-buffer)
-  (define-key org-jira-map (kbd "C-c ic") 'org-jira-create-issue)
-  (define-key org-jira-map (kbd "C-c ik") 'org-jira-copy-current-issue-key)
-  (define-key org-jira-map (kbd "C-c sc") 'org-jira-create-subtask)
-  (define-key org-jira-map (kbd "C-c sg") 'org-jira-get-subtasks)
-  (define-key org-jira-map (kbd "C-c cc") 'org-jira-add-comment)
-  (define-key org-jira-map (kbd "C-c cu") 'org-jira-update-comment)
-  (define-key org-jira-map (kbd "C-c wu") 'org-jira-update-worklogs-from-org-clocks)
-  (define-key org-jira-map (kbd "C-c tj") 'org-jira-todo-to-jira)
-  (define-key org-jira-map (kbd "C-c if") 'org-jira-get-issues-by-fixversion)
-)
-
-(defun tau/hydra-jira ()
-  (interactive)
-  (funcall
-      (pretty-hydra-define hydra-jira (:exit t :hint nil)
-        ("Get" (("p" org-jira-get-projects                "Get Projects")
-                ("g" org-jira-get-issues                  "Get Issues")
-                ("G" org-jira-get-subtasks                "Get Subtasks")
-                ("r" org-jira-refresh-issue               "Refresh Issue")
-                ("R" org-jira-refresh-issues-in-buffer    "Refresh Issues in Buffer"))
-
-       "Manage" (("b" org-jira-browse-issue             "Browse Issue")
-                 ("c" org-jira-create-issue             "Create Issue")
-                 ("s" org-jira-create-subtask           "Create Subtask")
-                 ("P" org-jira-progress-issue           "Update Issue Progress")
-                 ("a" org-jira-assign-issue             "Assign Issue"))
-
-         "Push" (("u" org-jira-update-issue                "Update Issue")
-                 ("y" org-jira-copy-current-issue-key      "Copy Current Issue Key")
-                 ("U" org-jira-update-comment              "Update Comment")
-                 ("t" org-jira-todo-to-jira                "Todo to Jira")))))
-)
-
-(use-package ox-jira
-  :defer 3
-  :after org
-)
-
-(use-package ejira
-  :ensure t
-  :disabled
-  :init
-  (setq jiralib2-url              "https://stairscreativestudio.atlassian.net"
-        jiralib2-auth             'basic
-        jiralib2-user-login-name  "gustavo@stairs.studio"
-        jiralib2-token            nil
-
-        ejira-org-directory       "~/jira"
-        ejira-projects            '("PEP" "QuexCash")
-
-        ejira-priorities-alist    '(("Highest" . ?A)
-                                    ("High"    . ?B)
-                                    ("Medium"  . ?C)
-                                    ("Low"     . ?D)
-                                    ("Lowest"  . ?E))
-        ejira-todo-states-alist   '(("To Do"       . 1)
-                                    ("In Progress" . 2)
-                                    ("Done"        . 3)))
-  :config
-  ;; Tries to auto-set custom fields by looking into /editmeta
-  ;; of an issue and an epic.
-  (add-hook 'jiralib2-post-login-hook #'ejira-guess-epic-sprint-fields)
-
-  ;; They can also be set manually if autoconfigure is not used.
-  ;; (setq ejira-sprint-field       'customfield_10001
-  ;;       ejira-epic-field         'customfield_10002
-  ;;       ejira-epic-summary-field 'customfield_10004)
-
-  (require 'ejira-agenda)
-
-  ;; Make the issues visisble in your agenda by adding `ejira-org-directory'
-  ;; into your `org-agenda-files'.
-  (add-to-list 'org-agenda-files ejira-org-directory)
-
-  ;; Add an agenda view to browse the issues that
-  (org-add-agenda-custom-command
-   '("j" "My JIRA issues"
-     ((ejira-jql "resolution = unresolved and assignee = currentUser()"
-                 ((org-agenda-overriding-header "Assigned to me"))))))
-)
-
+\begin{verbatim}
 (use-package helm
   :ensure t
   :bind
-  ;; ("M-x" . helm-M-x)
+  ("M-x" . helm-M-x)
+  ("M-x" . helm-M-x)
   ("C-c h" . helm-command-prefix)
   ("C-x b" . helm-buffers-list)
   ("C-x C-b" . helm-mini)
@@ -1345,38 +1765,34 @@ Example output:
   ;; helm bindings
   (global-unset-key (kbd "C-x c"))
 )
+\end{verbatim}
 
+\section*{helm-ag}
+\label{sec:org570535f}
+
+\begin{verbatim}
 (use-package helm-ag
   :ensure helm-ag
   :bind ("M-p" . helm-projectile-ag)
   :commands (helm-ag helm-projectile-ag)
   :init (setq helm-ag-insert-at-point 'symbol
-	      helm-ag-command-option "--path-to-ignore ~/.agignore"))
+        helm-ag-command-option "--path-to-ignore ~/.agignore"))
+\end{verbatim}
 
+\section*{helm-rg}
+\label{sec:org88c42e4}
+
+\begin{verbatim}
 (use-package helm-rg
   :ensure t
   :defer t
 )
+\end{verbatim}
 
-(use-package ag
-  :custom
-  (ag-highligh-search t)
-  (ag-reuse-buffers t)
-  (ag-reuse-window t)
-  :bind
-  ("M-s a" . ag-project)
-  :config
-  (use-package wgrep-ag)
-)
+\section*{ripgrep}
+\label{sec:org0fa1f23}
 
-(use-package wgrep
-  :defer t
-  :custom
-  (wgrep-enable-key "e")
-  (wgrep-auto-save-buffer t)
-  (wgrep-change-readonly-file t)
-)
-
+\begin{verbatim}
 (use-package rg
   :ensure t
   :defer t
@@ -1389,7 +1805,18 @@ Example output:
   ;;(rg-enable-menu)
 
 )
+\end{verbatim}
 
+\section*{helm-fuzzier}
+\label{sec:orga18c405}
+\begin{verbatim}
+supposed better fuzzy matching for helm
+for instance, plp, plpa, paclp, should all match package-list-packages
+\end{verbatim}
+
+
+
+\begin{verbatim}
 (use-package helm-fuzzier
   :disabled nil
   :ensure t
@@ -1397,212 +1824,12 @@ Example output:
   :config
   (helm-fuzzier-mode 1)
 )
+\end{verbatim}
 
-(use-package ivy
-  :custom
-  (ivy-re-builders-alist
-  '((t . ivy--regex-plus)))
-  :config
-  (ivy-mode)
-;; display an arrow on the selected item in the list
-(setf (cdr (assoc t ivy-format-functions-alist)) #'ivy-format-function-arrow)
+\section*{FlyCheck linter}
+\label{sec:org9616451}
 
-  (setq ivy-display-style 'fancy
-     ivy-use-virtual-buffers t
-     enable-recursive-minibuffers t
-     ivy-use-selectable-prompt t)
-  (ivy-set-actions  t
-  '(("I" insert "insert")))
-  (ivy-set-occur 'ivy-switch-buffer 'ivy-switch-buffer-occur)
-
-)
-
-(use-package counsel
-  :ensure t
-  :defines
-  (projectile-completion-system magit-completing-read-function)
-  :custom
-  (counsel-yank-pop-height 15)
-  (enable-recursive-minibuffers t)
-  (ivy-use-selectable-prompt t)
-  (ivy-use-virtual-buffers t)
-  (ivy-on-del-error-function nil)
-  (swiper-action-recenter t)
-  (counsel-grep-base-command "ag -S --noheading --nocolor --nofilename --numbers '%s' %s")
-  :hook
-  (after-init . ivy-mode)
-  (ivy-mode . counsel-mode)
-  ;; check out this better-jumper mode to see what it does
-  ;; (counsel-grep-post-action . better-jumper-set-jump)
-  :preface
-  (defun ivy-format-function-pretty (cands)
-    "Transform CANDS into a string for minibuffer."
-    (ivy--format-function-generic
-     (lambda (str)
-       (concat
-           (all-the-icons-faicon "hand-o-right" :height .85 :v-adjust .05 :face 'font-lock-constant-face)
-           (ivy--add-face str 'ivy-current-match)))
-
-     (lambda (str)
-       (concat "  " str))
-     cands
-     "\n"))
-
-  :bind
-  ("C-M-x" . counsel-M-x)
-  ("M-s c" . counsel-ag)
-  ("C-s" . swiper)
-  ("M-s r" . ivy-resume)
-  ("C-c v p" . ivy-push-view)
-  ("C-c v o" . ivy-pop-view)
-  ("C-c v ." . ivy-switch-view)
-  ("M-s c" . counsel-ag)
-  ("M-o f" . counsel-fzf)
-  ("M-o r" . counsel-recentf)
-  ("M-y" . counsel-yank-pop)
-  (:map ivy-minibuffer-map
-  ("C-w" . ivy-backward-kill-word)
-  ("C-k" . ivy-kill-line)
-  ("C-j" . ivy-immediate-done)
-  ("RET" . ivy-alt-done)
-  ("C-h" . ivy-backward-delete-char))
-  :config
-  ;; NOTE: this variable do not work if defined in :custom
-  (setq ivy-format-function 'ivy-format-function-pretty)
-  (setq counsel-yank-pop-separator
-      (propertize "\n────────────────────────────────────────────────────────\n"
-             'face `(:foreground "#6272a4")))
-
-  (setq counsel-find-file-ignore-regexp "\\(?:^[#.]\\)\\|\\(?:[#~]$\\)\\|\\(?:^Icon?\\)"
-     counsel-describe-function-function #'helpful-callable
-     counsel-describe-variable-function #'helpful-variable
-     ;; Add smart-casing (-S) to default command arguments:
-     counsel-rg-base-command "rg -S --no-heading --line-number --color never %s ."
-     counsel-ag-base-command "ag -S --nocolor --nogroup %s"
-     counsel-pt-base-command "pt -S --nocolor --nogroup -e %s"
-    counsel-find-file-at-point t)
-
-  ;; Integration with `projectile'
-  (with-eval-after-load 'projectile
-    (setq projectile-completion-system 'ivy))
-
-  ;; Integration with `magit'
-  (with-eval-after-load 'magit
-    (setq magit-completing-read-function 'ivy-completing-read))
-)
-
-(use-package flx
-  :ensure t
-)
-
-(use-package amx
-:disabled
-  :ensure t
-)
-
-(use-package counsel-projectile
-  :ensure t
-  :config (counsel-projectile-mode 1)
-)
-
-(use-package ivy-posframe
-  :ensure t
-  :custom-face
-  (ivy-posframe ((t (:background "#202020"))))
-  (ivy-posframe-border ((t (:background "#282a36"))))
-  (ivy-posframe-cursor ((t (:background "#61bfff"))))
-  :hook
-  (ivy-mode . ivy-posframe-mode)
-  :config
-  ;; custom define height of post frame per function
-  (setq ivy-posframe-height-alist '((swiper . 20)
-                                    (t      . 20)))
-
-  ;; display at `ivy-posframe-style'
-  (setq ivy-posframe-display-functions-alist
-        '((swiper          . ivy-posframe-display-at-point)
-          (complete-symbol . ivy-posframe-display-at-point)
-          ;;(counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
-          (counsel-M-x     . ivy-posframe-display-at-frame-center)
-          (t               . ivy-posframe-display-at-frame-center)))
-  (ivy-posframe-mode 1)
-)
-
-(use-package ivy-rich
-:ensure t
-:config
-(ivy-rich-mode 1)
-(setq ivy-format-function #'ivy-format-function-line)
-
-;; use all-the-icons for `ivy-switch-buffer'
-(defun ivy-rich-switch-buffer-icon (candidate)
-   (with-current-buffer
-    (get-buffer candidate)
-    (let ((icon (all-the-icons-icon-for-mode major-mode)))
-      (if (symbolp icon)
-      (all-the-icons-icon-for-mode 'fundamental-mode)
-        icon))))
-;; add the above function to `ivy-rich--display-transformers-list'
-(setq ivy-rich--display-transformers-list
-    '(ivy-switch-buffer
-      (:columns
-       ((ivy-rich-switch-buffer-icon :width 2)
-        (ivy-rich-candidate (:width 30))
-        (ivy-rich-switch-buffer-size (:width 7))
-        (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
-        (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))
-        (ivy-rich-switch-buffer-project (:width 15 :face success))
-        (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
-       :predicate
-       (lambda (cand) (get-buffer cand)))))
-)
-
-(use-package swiper
-  :disabled
-  :ensure t
-  :bind
-  (("C-s" . swiper-isearch)
-   :map swiper-map
-   ("M-q" . swiper-query-replace)
-   ("C-l". swiper-recenter-top-bottom)
-   ("C-'" . swiper-avy))
-  :custom
-  (counsel-grep-swiper-limit 20000)
-  (counsel-rg-base-command
-   "rg -i -M 120 --no-heading --line-number --color never %s .")
-  (counsel-grep-base-command
-   "rg -i -M 120 --no-heading --line-number --color never '%s' %s")
-)
-
-(use-package snails
-  :disabled
-  :ensure nil
-  :if window-system
-  :bind
-  ("M-s s" . snails)
-  ("M-s g" . snails-current-project)
-  ("M-s b" . snails-active-recent-buffers)
-  ("M-s e" . snails-everywhere)
-  :custom-face
-  (snails-content-buffer-face ((t (:background "#111" :height 110))))
-  (snails-input-buffer-face ((t (:background "#222" :foreground "gold" :height 110))))
-  (snails-header-line-face ((t (:inherit font-lock-function-name-face :underline t :height 1.1))))
-  :config
-  (use-package exec-path-from-shell
-    :if (featurep 'cocoa) :defer t)
-
-  ;; Functions for specific backends
-  (defun snails-current-project ()
-    (interactive)
-    (snails '(snails-backend-projectile snails-backend-rg snails-backend-fd)))
-  (defun snails-active-recent-buffers ()
-    (interactive)
-    (snails '(snails-backend-buffer snails-backend-recentf)))
-  (defun snails-everywhere ()
-    (interactive)
-    (snails '(snails-backend-everything snails-backend-mdfind)))
-)
-
+\begin{verbatim}
 (use-package flycheck
     :ensure t
     :defer t
@@ -1635,10 +1862,24 @@ Example output:
     (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t))
 )
 
+\end{verbatim}
+
+
+\subsection*{flycheck inline}
+\label{sec:orgd43be8a}
+
+\begin{verbatim}
+Quick peek is an extension that embelishes flycheck inline messages
+\end{verbatim}
+
+
+\begin{verbatim}
 (use-package quick-peek
   :ensure t
 )
+\end{verbatim}
 
+\begin{verbatim}
 (use-package flycheck-inline
   :ensure t
   :hook
@@ -1647,7 +1888,7 @@ Example output:
   ;; Set fringe style
   (setq flycheck-indication-mode 'right-fringe)
 
-  ;; (setq flycheck-mode-line-prefix "Syntax")
+  (setq flycheck-mode-line-prefix "Syntax")
 
   ;; (global-flycheck-inline-mode)
   (setq flycheck-inline-display-function
@@ -1658,7 +1899,20 @@ Example output:
                   (concat contents (when contents "\n") msg))
             (quick-peek-update ov)))
         flycheck-inline-clear-function #'quick-peek-hide))
+\end{verbatim}
 
+
+\subsection*{flycheck-pos-tip (show flycheck messages in tooltip)}
+\label{sec:org1a0439b}
+
+;;; Show Flycheck errors in tooltip
+
+\begin{verbatim}
+appearently depends on cask
+\end{verbatim}
+
+
+\begin{verbatim}
 (use-package flycheck-pos-tip
   :ensure t
   :disabled
@@ -1670,7 +1924,18 @@ Example output:
   (setq flycheck-pos-tip-timeout 30)
   (flycheck-pos-tip-mode)
 )
+\end{verbatim}
 
+\subsection*{flycheck-popup-tip (show flycheck messages in tooltip)}
+\label{sec:orgd428ea3}
+
+There is another official flycheck-pos-tip extension for displaying errors under point. However, it does not display popup if you run Emacs under TTY. It displays message on echo area and that is often used for ELDoc. Also, popups made by pos-tip library does not always look good, especially on macOS and Windows.
+\begin{verbatim}
+appearently depends on cask
+\end{verbatim}
+
+
+\begin{verbatim}
 ;;; Show Flycheck errors in tooltip
 (use-package flycheck-popup-tip
   :ensure t
@@ -1681,7 +1946,20 @@ Example output:
   (setq flycheck-popup-tip-error-prefix "\u27a4") ;;  display arrow like this: `➤'
   ;; (setq flycheck-popup-tip-error-prefix "* ")
 )
+\end{verbatim}
 
+
+\section*{Version Control}
+\label{sec:org7ab373e}
+
+Always try to make bindings like this:
+M-g for magit
+C-c g for any git related stuff other than magit's
+
+\subsection*{Magit}
+\label{sec:org8e4c88d}
+
+\begin{verbatim}
 (use-package magit
   :ensure t
   :custom
@@ -1691,7 +1969,11 @@ Example output:
   ("M-g s" . magit-status)
   ("C-x g" . magit-status)
 )
+\end{verbatim}
 
+\subsection*{evil-magit}
+\label{sec:orge8458d2}
+\begin{verbatim}
 (use-package evil-magit
   :ensure t
   :init
@@ -1712,7 +1994,12 @@ Example output:
   (evil-define-key evil-magit-state magit-stash-section-map "K" 'magit-stash-drop)
   (evil-define-key evil-magit-state magit-stashes-section-map "K" 'magit-stash-clear)
 )
+\end{verbatim}
 
+\subsection*{magit-todo}
+\label{sec:org1be0583}
+
+\begin{verbatim}
 (use-package magit-todos
   :ensure t
   :after magit
@@ -1722,7 +2009,12 @@ Example output:
   :config
   (magit-todos-mode)
 )
+\end{verbatim}
 
+\subsection*{diff-hl (highlights uncommited diffs in bar aside from the line numbers)}
+\label{sec:org72d96e1}
+
+\begin{verbatim}
 (use-package diff-hl
   :ensure t
     :custom-face (diff-hl-change ((t (:foreground ,(face-background 'highlight)))))
@@ -1774,7 +2066,12 @@ Example output:
 
   (global-diff-hl-mode 1) ;; Enable diff-hl globally
 )
+\end{verbatim}
 
+\subsection*{git-messenger}
+\label{sec:orgef0963e}
+
+\begin{verbatim}
 (use-package git-messenger
   :ensure t
   :bind
@@ -1786,26 +2083,83 @@ Example output:
   (progn
     (define-key git-messenger-map (kbd "RET") 'git-messenger:popup-close))
 )
+\end{verbatim}
 
+\subsection*{git-ignore mode}
+\label{sec:orgbf26fad}
+
+
+\subsection*{git-modes}
+\label{sec:orgaea4829}
+
+Major modes for git related files
+
+\begin{verbatim}
 ;; Mode for .gitignore files.
 (use-package gitignore-mode :ensure t :defer t)
 (use-package gitconfig-mode :ensure t :defer t)
 (use-package gitattributes-mode :ensure t :defer t)
+\end{verbatim}
 
+\subsection*{git-time-machine}
+\label{sec:org3362177}
+
+Navigation through the history of files
+
+\begin{verbatim}
 (use-package git-timemachine
   :ensure t
   :bind
   ("C-c g t" . git-timemachine-toggle)
 )
+\end{verbatim}
 
-(use-package forge
+
+\begin{verbatim}
+  (use-package forge
     :ensure t
     :after magit
     :config
     (setq forge-topic-list-limit '(30 . 5)
           forge-pull-notifications t)
 )
+\end{verbatim}
 
+
+\section*{Projectile}
+\label{sec:org3693f62}
+\begin{verbatim}
+(use-package projectile
+  :ensure t
+  :bind
+  (:map projectile-mode-map
+  ("s-p" . projectile-command-map)
+  ("C-c p" . projectile-command-map)
+  )
+  :config
+  (projectile-mode +1)
+  (setq projectile-globally-ignored-files
+        (append '("~"
+                  ".swp"
+                  ".pyc")
+                projectile-globally-ignored-files))
+)
+\end{verbatim}
+
+\begin{verbatim}
+(use-package helm-projectile
+  :ensure t
+;  :after projectile
+;  :demand t
+  :config
+  (helm-projectile-on)
+)
+\end{verbatim}
+
+\section*{restclient}
+\label{sec:orgb529589}
+
+\begin{verbatim}
 (use-package restclient
   :ensure t
   :mode
@@ -1820,7 +2174,14 @@ Example output:
                   (kbd "C-c C-c")
                   'restclient-http-send-current-stay-in-window))))
 )
+\end{verbatim}
 
+\subsection*{ob-restclient}
+\label{sec:org3308ef6}
+
+Org source blocks and exporter for restclient
+
+\begin{verbatim}
 (use-package ob-restclient
   :ensure t
   :mode "\\.rest$"
@@ -1830,14 +2191,22 @@ Example output:
    'org-babel-load-languages
    '((restclient . t)))
 )
+\end{verbatim}
 
+\section*{undo-tree}
+\label{sec:org427756e}
+\begin{verbatim}
 (use-package undo-tree
   :ensure t
   :init
   (global-undo-tree-mode)
 ;;  (undo-tree-mode)
 )
+\end{verbatim}
 
+\section*{corral - intelligent surround text with auto-guess suggestions}
+\label{sec:org7c54508}
+\begin{verbatim}
 (use-package corral
   :bind
   ("M-9" . corral-parentheses-backward)
@@ -1851,7 +2220,12 @@ Example output:
   (global-set-key (kbd "M-}") 'corral-braces-forward)
   (global-set-key (kbd "M-\"") 'corral-double-quotes-backward)
 )
+\end{verbatim}
 
+\section*{helpfull - a better replacement for emacs help system}
+\label{sec:org07d39a4}
+
+\begin{verbatim}
 (use-package helpful
   :ensure t
   :config
@@ -1876,7 +2250,11 @@ Example output:
   ;; look at interactive functions.
   (global-set-key (kbd "C-h C") #'helpful-command)
 )
+\end{verbatim}
+\section*{paredit}
+\label{sec:orgebe15b5}
 
+\begin{verbatim}
 (use-package paredit
   :ensure t
   :config
@@ -1888,9 +2266,14 @@ Example output:
   (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
   (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
 )
+\end{verbatim}
 
 
 
+\section*{parinfer-mode}
+\label{sec:orgbc15cbd}
+
+\begin{verbatim}
 (use-package parinfer
   :ensure t
   :bind
@@ -1916,11 +2299,21 @@ Example output:
     (setq parinfer-lighters '(" Parinfer:Indent" . "Parinfer:Paren"))
 
 )
+\end{verbatim}
 
+\section*{elisp-format}
+\label{sec:org1c31439}
+
+\begin{verbatim}
 (use-package elisp-format
   :ensure t
 )
+\end{verbatim}
 
+\section*{Company}
+\label{sec:orgbc740a0}
+
+\begin{verbatim}
 (use-package company
   :ensure t
   :defer t
@@ -1929,30 +2322,29 @@ Example output:
   :bind
   (:map evil-insert-state-map
   ;; ("<tab>" . company-indent-or-complete-common)
-  ("C-SPC" . company-indent-or-complete-common))
+  ("C-SPC" . company-indent-or-complete-common)
+  )
   (:map company-active-map
   ("M-n" . nil)
   ("M-p" . nil)
-  ;; ("C-n" . company-select-next)
-  ;; ("C-p" . company-select-previous)
-  ("C-n" . company-select-next-or-abort)
-  ("C-p" . company-select-previous-or-abort)
+  ("C-n" . company-select-next)
+  ("C-p" . company-select-previous)
   ("<tab>" . company-complete-common-or-cycle)
   ("S-<tab>" . company-select-previous)
   ("<backtab>" . company-select-previous)
-  ("C-d" . company-show-doc-buffer))
+  ("C-d" . company-show-doc-buffer)
+  )
   (:map company-search-map
-  ;; ("C-p" . company-select-previous)
-  ;; ("C-n" . company-select-next)
-  ("C-p" . company-select-previous-or-abort)
-  ("C-n" . company-select-next-or-abort))
+   ("C-p" . company-select-previous)
+   ("C-n" . company-select-next)
+  )
   :config
   ;; define company appearance
   (custom-set-faces
   '(company-preview-common ((t (:foreground unspecified :background "#111111"))))
   '(company-scrollbar-bg ((t (:background "#111111"))))
   '(company-scrollbar-fg ((t (:background "#555555"))))
-  '(company-tooltip ((t (:inherit default :background "#202029"))))
+  '(company-tooltip ((t (:inherit default :background "#222222"))))
   '(company-tooltip-common ((t (:inherit font-lock-constant-face))))
   '(company-tooltip-selection ((t (:inherit company-tooltip-common :background "#2a2a2a" )))))
 
@@ -1988,14 +2380,26 @@ Example output:
   ;; (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
   ;; (define-key company-active-map (kbd "<backtab>") 'company-select-previous)
 )
+\end{verbatim}
 
+\subsection*{Company emoji suport}
+\label{sec:org62a4b91}
+
+\begin{verbatim}
+use `:` to use emojis
+\end{verbatim}
+
+\begin{verbatim}
 (use-package company-emoji
-  :disabled
   :ensure t
   :config
   (add-to-list 'company-backends 'company-emoji)
-  )
+)
+\end{verbatim}
 
+\subsection*{Company-QuickHelp}
+\label{sec:org381139e}
+\begin{verbatim}
 (use-package company-quickhelp          ; Documentation popups for Company
    :ensure t
    ;; :defer t
@@ -2009,69 +2413,45 @@ Example output:
    (setq company-quickhelp-delay 0.7)
    (company-quickhelp-mode)
 )
+\end{verbatim}
 
+\subsection*{Company postframe}
+\label{sec:orgd51a39c}
+
+\begin{verbatim}
+PS: this looks exactly the same as the usual company popup, except it doesn't disturb other overlays (like line numbers) in the buffer.
+\end{verbatim}
+
+\begin{verbatim}
 (use-package company-posframe
   :ensure t
-  :after company
-  :config
-  (company-posframe-mode 1)
-  ;;:hook
-  ;;(company-mode . company-posframe-mode)
-  ;;(global-company-mode . company-posframe-mode)
+  :hook
+  (company-mode . company-posframe-mode)
+  (global-company-mode . company-posframe-mode)
 )
+\end{verbatim}
 
-;; (use-package company-box
+\subsection*{Company Box (icons in suggestions)}
+\label{sec:org8a7406a}
+\begin{verbatim}
+  ;; (use-package company-box
   ;;   :ensure t
   ;;   :hook
   ;;   (company-mode . company-box-mode)
   ;;   (global-company-mode . company-box-mode)
   ;; )
 (use-package company-box
-  :functions (my-company-box--make-line
-              my-company-box-icons--elisp)
-  :init (setq company-box-icons-alist 'company-box-icons-all-the-icons)
-  :commands (company-box--get-color
-             company-box--resolve-colors
-             company-box--add-icon
-             company-box--apply-color
-             company-box--make-line
-             company-box-icons--elisp)
-  :hook (company-mode . company-box-mode)
-  :custom
-  (company-box-backends-colors nil)
-  (company-box-show-single-candidate t)
-  (company-box-max-candidates 50)
-  (company-box-doc-delay 0.3)
+  :ensure t
+  :hook
+  (company-mode . company-box-mode)
+  :init
+  (setq company-box-icons-alist 'company-box-icons-all-the-icons)
   :config
-  ;; Support `company-common'
-  (defun my-company-box--make-line (candidate)
-    (-let* (((candidate annotation len-c len-a backend) candidate)
-            (color (company-box--get-color backend))
-            ((c-color a-color i-color s-color) (company-box--resolve-colors color))
-            (icon-string (and company-box--with-icons-p (company-box--add-icon candidate)))
-            (candidate-string (concat (propertize (or company-common "") 'face 'company-tooltip-common)
-                                      (substring (propertize candidate 'face 'company-box-candidate) (length company-common) nil)))
-            (align-string (when annotation
-                            (concat " " (and company-tooltip-align-annotations
-                                             (propertize " " 'display `(space :align-to (- right-fringe ,(or len-a 0) 1)))))))
-            (space company-box--space)
-            (icon-p company-box-enable-icon)
-            (annotation-string (and annotation (propertize annotation 'face 'company-box-annotation)))
-            (line (concat (unless (or (and (= space 2) icon-p) (= space 0))
-                            (propertize " " 'display `(space :width ,(if (or (= space 1) (not icon-p)) 1 0.75))))
-                          (company-box--apply-color icon-string i-color)
-                          (company-box--apply-color candidate-string c-color)
-                          align-string
-                          (company-box--apply-color annotation-string a-color)))
-            (len (length line)))
-      (add-text-properties 0 len (list 'company-box--len (+ len-c len-a)
-                                       'company-box--color s-color)
-                           line)
-      line))
-  (advice-add #'company-box--make-line :override #'my-company-box--make-line)
+  (setq company-box-backends-colors nil)
+  (setq company-box-show-single-candidate t)
+  (setq company-box-max-candidates 50)
 
-  ;; Prettify icons
-  (defun my-company-box-icons--elisp (candidate)
+  (defun company-box-icons--elisp (candidate)
     (when (derived-mode-p 'emacs-lisp-mode)
       (let ((sym (intern candidate)))
         (cond ((fboundp sym) 'Function)
@@ -2080,44 +2460,47 @@ Example output:
               ((boundp sym) 'Variable)
               ((symbolp sym) 'Text)
               (t . nil)))))
-  (advice-add #'company-box-icons--elisp :override #'my-company-box-icons--elisp)
 
-  (when (and (display-graphic-p)
-             (require 'all-the-icons nil t))
+  (with-eval-after-load 'all-the-icons
     (declare-function all-the-icons-faicon 'all-the-icons)
+    (declare-function all-the-icons-fileicon 'all-the-icons)
     (declare-function all-the-icons-material 'all-the-icons)
     (declare-function all-the-icons-octicon 'all-the-icons)
     (setq company-box-icons-all-the-icons
-          `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.85 :v-adjust -0.2))
-            (Text . ,(all-the-icons-faicon "text-width" :height 0.8 :v-adjust -0.05))
-            (Method . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
-            (Function . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
-            (Constructor . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
-            (Field . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
-            (Variable . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
-            (Class . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
-            (Interface . ,(all-the-icons-material "share" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
-            (Module . ,(all-the-icons-material "view_module" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
-            (Property . ,(all-the-icons-faicon "wrench" :height 0.8 :v-adjust -0.05))
-            (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.85 :v-adjust -0.2))
-            (Value . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
-            (Enum . ,(all-the-icons-material "storage" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
-            (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.85 :v-adjust -0.2))
-            (Snippet . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2))
-            (Color . ,(all-the-icons-material "palette" :height 0.85 :v-adjust -0.2))
-            (File . ,(all-the-icons-faicon "file-o" :height 0.85 :v-adjust -0.05))
-            (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.85 :v-adjust -0.2))
-            (Folder . ,(all-the-icons-faicon "folder-open" :height 0.85 :v-adjust -0.05))
-            (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
-            (Constant . ,(all-the-icons-faicon "square-o" :height 0.85 :v-adjust -0.05))
-            (Struct . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
-            (Event . ,(all-the-icons-faicon "bolt" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-orange))
-            (Operator . ,(all-the-icons-material "control_point" :height 0.85 :v-adjust -0.2))
-            (TypeParameter . ,(all-the-icons-faicon "arrows" :height 0.8 :v-adjust -0.05))
-            (Template . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2)))
-          company-box-icons-alist 'company-box-icons-all-the-icons))
+          `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.7 :v-adjust -0.15))
+            (Text . ,(all-the-icons-faicon "book" :height 0.68 :v-adjust -0.15))
+            (Method . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
+            (Function . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
+            (Constructor . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
+            (Field . ,(all-the-icons-faicon "tags" :height 0.65 :v-adjust -0.15 :face 'font-lock-warning-face))
+            (Variable . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face))
+            (Class . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
+            (Interface . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01))
+            (Module . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.15))
+            (Property . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face)) ;; Golang module
+            (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.7 :v-adjust -0.15))
+            (Value . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'font-lock-constant-face))
+            (Enum . ,(all-the-icons-material "storage" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-orange))
+            (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.7 :v-adjust -0.15))
+            (Snippet . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face))
+            (Color . ,(all-the-icons-material "palette" :height 0.7 :v-adjust -0.15))
+            (File . ,(all-the-icons-faicon "file-o" :height 0.7 :v-adjust -0.05))
+            (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.7 :v-adjust -0.15))
+            (Folder . ,(all-the-icons-octicon "file-directory" :height 0.7 :v-adjust -0.05))
+            (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-blueb))
+            (Constant . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05))
+            (Struct . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
+            (Event . ,(all-the-icons-faicon "bolt" :height 0.7 :v-adjust -0.05 :face 'all-the-icons-orange))
+            (Operator . ,(all-the-icons-fileicon "typedoc" :height 0.65 :v-adjust 0.05))
+            (TypeParameter . ,(all-the-icons-faicon "hashtag" :height 0.65 :v-adjust 0.07 :face 'font-lock-const-face))
+            (Template . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face)))))
 )
+\end{verbatim}
 
+
+\subsection*{company-go}
+\label{sec:org4a609c9}
+\begin{verbatim}
 (use-package company-go
   :ensure t
   :defer t
@@ -2125,7 +2508,16 @@ Example output:
   (with-eval-after-load 'company
     (add-to-list 'company-backends 'company-go))
 )
+\end{verbatim}
 
+\subsection*{Company TabNine}
+\label{sec:orgd966fe9}
+\begin{verbatim}
+this part is commented because TabNine is paid software
+and not sure if i want to use it
+\end{verbatim}
+
+\begin{verbatim}
 ;; (use-package company-tabnine
 ;;   :demand
 ;;   :custom
@@ -2161,7 +2553,15 @@ Example output:
 ;;               (setq company-tabnine-max-num-results 3)
 ;;               (add-to-list 'company-transformers 'company//sort-by-tabnine t)
 ;;               (add-to-list 'company-backends '(company-lsp :with company-tabnine :separate)))))
+\end{verbatim}
 
+\section*{LSP}
+\label{sec:orgc32415b}
+
+\subsection*{LSP (language server protocol implementation for emacs)}
+\label{sec:orgef7fddc}
+
+\begin{verbatim}
 (use-package lsp-mode
   :ensure t
   :commands lsp
@@ -2183,6 +2583,9 @@ Example output:
   (enh-ruby-mode . lsp)
 )
 
+\end{verbatim}
+
+\begin{verbatim}
 (use-package company-lsp
   :ensure t
   :custom
@@ -2203,7 +2606,9 @@ Example output:
   (setq company-lsp-cache-candidates 'auto)
   (setq company-lsp-enable-recompletion t)
 )
+\end{verbatim}
 
+\begin{verbatim}
 (use-package lsp-ui
   :ensure t
   :hook
@@ -2280,13 +2685,27 @@ Example output:
       ("C-c u" . lsp-ui-imenu)
     )
 )
+\end{verbatim}
 
+\subsection*{Disable <RET> for autocomplete and leave on TAB}
+\label{sec:orgd54f4b0}
+\begin{verbatim}
 ;; (define-key ac-completing-map [return] nil)
 ;; (define-key ac-completing-map "\r" nil)
+\end{verbatim}
 
-;(require 'auto-complete)
-;(global-auto-complete-mode t)
 
+\subsection*{enable autocompletion engine}
+\label{sec:org9ab53f9}
+\begin{verbatim}
+(require 'auto-complete)
+(global-auto-complete-mode t)
+\end{verbatim}
+
+\section*{Yasnippets}
+\label{sec:org25509b2}
+
+\begin{verbatim}
 (use-package yasnippet
   :ensure t
   :hook
@@ -2313,11 +2732,21 @@ Example output:
   ;; disabled global mode in favor or hooks in prog and text modes only
   ;; (yas-global-mode 1)
 )
+\end{verbatim}
 
+\begin{verbatim}
 (use-package yasnippet-snippets         ; Collection of snippets
   :ensure t
 )
+\end{verbatim}
 
+
+\section*{File Explorers}
+\label{sec:orgf884f24}
+\subsection*{Dired}
+\label{sec:org4410698}
+
+\begin{verbatim}
 (use-package dired-k
   :after dired
   :config
@@ -2326,15 +2755,25 @@ Example output:
   (setq dired-dwin-target t)
   (add-hook 'dired-initial-position-hook #'dired-k)
 )
+\end{verbatim}
 
-(use-package all-the-icons-dired
+\begin{verbatim}
+ (use-package all-the-icons-dired
   :ensure t
   :defer t
   :hook
   (dired-mode . all-the-icons-dired-mode)
 )
+\end{verbatim}
 
-(use-package treemacs
+\subsection*{Treemacs (neotree like navigation)}
+\label{sec:orgdc99c63}
+
+
+\subsubsection*{Treemacs itself}
+\label{sec:orgd23273f}
+\begin{verbatim}
+ (use-package treemacs
    :ensure t
    :defer t
    :hook
@@ -2531,25 +2970,46 @@ Example output:
    (treemacs-resize-icons 18) ;; usefull on high dpi monitors.  default icon size is 22
 
 )
+\end{verbatim}
 
+\subsubsection*{Treemacs Evil}
+\label{sec:orgeab1d9c}
+\begin{verbatim}
 (use-package treemacs-evil
   :after treemacs evil
   :ensure t)
+\end{verbatim}
 
+\subsubsection*{Treemacs Projectile}
+\label{sec:org653b661}
+\begin{verbatim}
 (use-package treemacs-projectile
   :after treemacs projectile
   :ensure t)
+\end{verbatim}
 
+\subsubsection*{Treemacs Dired}
+\label{sec:orgebc4169}
+\begin{verbatim}
 (use-package treemacs-icons-dired
   :after treemacs dired
   :ensure t
   :config (treemacs-icons-dired-mode)
 )
+\end{verbatim}
 
+\subsubsection*{Treemacs Magit}
+\label{sec:org40803f9}
+\begin{verbatim}
 (use-package treemacs-magit
   :after treemacs magit
   :ensure t)
+\end{verbatim}
 
+\subsection*{Neotree}
+\label{sec:orge2d4e7b}
+
+\begin{verbatim}
 (use-package neotree
   :bind
   ("<f7>" . neotree-toggle)
@@ -2587,7 +3047,12 @@ Example output:
               (define-key evil-normal-state-local-map (kbd "u") 'neotree-refresh)
               (define-key evil-normal-state-local-map (kbd "C") 'neotree-change-root)
               (define-key evil-normal-state-local-map (kbd "c") 'neotree-create-node))))
+\end{verbatim}
 
+\subsection*{dired-sidebar}
+\label{sec:orge04e152}
+
+\begin{verbatim}
 (use-package dired-sidebar
   :ensure t
   :commands (dired-sidebar-toggle-sidebar)
@@ -2607,7 +3072,12 @@ Example output:
   (setq dired-sidebar-use-term-integration t)
   (setq dired-sidebar-use-custom-font t)
 )
+\end{verbatim}
 
+\subsection*{ranger}
+\label{sec:orgee0f0c1}
+
+\begin{verbatim}
 (use-package ranger
   :ensure t
   :bind
@@ -2615,7 +3085,12 @@ Example output:
   :config
   (setq ranger-show-hidden t) ;; show hidden files
 )
+\end{verbatim}
 
+
+\section*{eyebrowse}
+\label{sec:org389f4c6}
+\begin{verbatim}
 (use-package eyebrowse
   :bind
   (:map eyebrowse-mode-map
@@ -2635,7 +3110,11 @@ Example output:
   (eyebrowse-mode t)
   (setq eyebrowse-new-workspace t)
 )
+\end{verbatim}
 
+\section*{windmove}
+\label{sec:org9366841}
+\begin{verbatim}
 (use-package windmove
   :ensure t
   :config
@@ -2647,34 +3126,71 @@ Example output:
   (global-set-key (kbd "C-S-K") 'windmove-up)
   (global-set-key (kbd "C-S-J") 'windmove-down)
 )
+\end{verbatim}
 
+\section*{emacs-rotate}
+\label{sec:org9f3cfab}
+
+\begin{verbatim}
 (use-package rotate
   :ensure t
   :bind
   ("C-c C-r w" . rotate-window)
   ("C-c C-r l" . rotate-layout)
 )
+\end{verbatim}
 
+\section*{ace jump mode}
+\label{sec:org002094c}
+
+\begin{verbatim}
 (use-package ace-jump-mode
   :ensure t
   :bind
   ("C-." . ace-jump-mode)
 )
+\end{verbatim}
 
+\section*{PDF Tools}
+\label{sec:org47a17c1}
+
+\subsection*{Install pdf-tools if its not already installed}
+\label{sec:org2cf7ed2}
+\begin{verbatim}
 ;; (pdf-tools-install)
 ;; the docs say if i care about startup time, i should use pdf-loader-install instead of pdf-tools-install, but doenst say why
 ;; (pdf-loader-install)
+\end{verbatim}
 
+\subsection*{Make buffer refresh every 1 second to PDF-tools updates the changed pdf}
+\label{sec:org66bbd17}
+\begin{verbatim}
 (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
 ;; (add-hook 'pdf-view-mode-hook 'auto-revert-mode)
 ;; (add-hook 'doc-view-mode-hook 'auto-revert-mode)
+\end{verbatim}
 
+\subsection*{PDF tools evil keybindings}
+\label{sec:org0c559a9}
+\begin{verbatim}
 (evil-define-key 'normal pdf-view-mode-map
   "h" 'pdf-view-previous-page-command
   "j" (lambda () (interactive) (pdf-view-next-line-or-next-page 5))
   "k" (lambda () (interactive) (pdf-view-previous-line-or-previous-page 5))
   "l" 'pdf-view-next-page-command)
+\end{verbatim}
 
+
+
+\section*{Browsers integrations}
+\label{sec:orga03591f}
+
+\subsection*{edit-server}
+\label{sec:org1cf89ef}
+
+Edit stuff in browsers with emacs
+Used in adition with the Edit in Emacs plugin for Chrome
+\begin{verbatim}
 (use-package edit-server
   :if (and window-system
            (not alternate-emacs))
@@ -2685,14 +3201,29 @@ Example output:
   :config
   (edit-server-start)
 )
+\end{verbatim}
 
+\subsection*{atomic-chrome}
+\label{sec:org2631ac8}
+
+\begin{verbatim}
 (use-package atomic-chrome
   :ensure t
   :disabled
   :config
   (atomic-chrome-start-server)
 )
+\end{verbatim}
 
+
+\section*{Appearance}
+\label{sec:orgd4dcdf9}
+
+
+\subsection*{startup stuff (splash and start screen, scratch message, etc\ldots{})}
+\label{sec:org2d2ca91}
+
+\begin{verbatim}
 ;; appearantly the `inhibit-splash-screen' was deprecaded. uses `inhibit-startup-screen' now
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-screen t)
@@ -2713,15 +3244,33 @@ Example output:
 (setq-default indicate-empty-lines t)
 
 (setq frame-title-format '("Emacs"))
+\end{verbatim}
 
+\subsection*{scroll bars from frames}
+\label{sec:orgb562bde}
+\begin{verbatim}
 (scroll-bar-mode -1)
+\end{verbatim}
 
+\subsection*{Remove menu bar and tool bar}
+\label{sec:org9799607}
+\begin{verbatim}
 (tool-bar-mode -1)
 (menu-bar-mode -1)
+\end{verbatim}
 
+\subsection*{set background and foreground color}
+\label{sec:org011c495}
+
+\begin{verbatim}
 (set-background-color "#111111")
 (set-foreground-color "#dddddd")
+\end{verbatim}
 
+\subsection*{Applying my theme}
+\label{sec:org048232f}
+
+\begin{verbatim}
 (add-to-list 'custom-theme-load-path "~/dotfiles/emacs.d/themes/")
   ; theme options:
   ; atom-one-dark (doenst work well with emacsclient, ugly blue bg)
@@ -2733,8 +3282,16 @@ Example output:
   ; base16-default-dark-theme -- this one is good
 
 (setq my-theme 'darkplus)
+\end{verbatim}
 
+Load the theme
+
+\begin{verbatim}
 (load-theme my-theme t)
+\end{verbatim}
+
+
+\begin{verbatim}
 
 (defun load-my-theme (frame)
   "Function to load the theme in current FRAME.
@@ -2748,7 +3305,12 @@ Example output:
 ; resolves issue with the theme not loading properly in terminal mode on emacsclient
 ;; NOTE this if was breaking my emacs!!!!!
 ;; (add-hook 'after-make-frame-functions #'load-my-theme)
+\end{verbatim}
 
+
+\subsection*{doom themes}
+\label{sec:org507e85b}
+\begin{verbatim}
 (use-package doom-themes
   :ensure t
   :disabled
@@ -2763,7 +3325,14 @@ Example output:
   ;; Enable custom treemacs theme (all-the-icons must be installed!)
   (doom-themes-treemacs-config)
 )
+\end{verbatim}
 
+\subsection*{Uniquify (unique files names in buffers)}
+\label{sec:orga4ace43}
+
+This package is included in emacs, so `:ensure nil` prevents use-package from trying to download it on Melpa
+
+\begin{verbatim}
 (use-package uniquify
   :defer 1
   :ensure nil
@@ -2772,16 +3341,43 @@ Example output:
   (uniquify-buffer-name-style 'post-forward)
   (uniquify-strip-common-suffix t)
 )
+\end{verbatim}
 
+\subsection*{All The Icons - Icon package}
+\label{sec:org28af1a0}
+
+\begin{verbatim}
 (use-package all-the-icons
   :ensure t
 )
+\end{verbatim}
 
+\subsection*{vscode-icons}
+\label{sec:org954da37}
+
+\begin{verbatim}
 (use-package vscode-icon
   :ensure t
   :commands (vscode-icon-for-file)
 )
+\end{verbatim}
 
+\subsection*{parrot-mode}
+\label{sec:org60d5ae2}
+
+Type of parrots available:
+
+\begin{itemize}
+\item default
+\item confused
+\item emacs
+\item nyan
+\item rotating
+\item science
+\item thumbsup
+\end{itemize}
+
+\begin{verbatim}
 (use-package parrot
   :ensure t
   :config
@@ -2797,7 +3393,12 @@ Example output:
   (define-key evil-normal-state-map (kbd "]r") 'parrot-rotate-next-word-at-point)
   (add-hook 'mu4e-index-updated-hook #'parrot-start-animation)
 )
+\end{verbatim}
 
+\subsection*{nyan-mode}
+\label{sec:orge35b057}
+
+\begin{verbatim}
 (use-package nyan-mode
    :if window-system
    :hook
@@ -2807,7 +3408,16 @@ Example output:
    (setq nyan-animate-nyancat t)
    (setq nyan-wavy-trail t)
    (nyan-start-animation))
+\end{verbatim}
 
+\subsection*{solaire-mode}
+\label{sec:orgada7d9b}
+
+solaire-mode is an aesthetic plugin that helps visually distinguish
+file-visiting windows from other types of windows (like popups or sidebars)
+by giving them a slightly different -- often brighter -- background.
+
+\begin{verbatim}
 ;; (use-package solaire-mode
 ;;   :config
 ;;   (solaire-mode)
@@ -2826,34 +3436,55 @@ Example output:
 ;;   ;; This should be used *after* you load the active theme!
 ;;   ;;  NOTE: This is necessary for themes in the doom-themes package!
 ;;   (solaire-mode-swap-bg))
+\end{verbatim}
 
+\subsection*{fancy-battery-mode}
+\label{sec:org1e3774d}
+\begin{verbatim}
 (use-package fancy-battery
   :ensure t
   :config
   (add-hook 'after-init-hook #'fancy-battery-mode)
 )
+\end{verbatim}
+\subsection*{dimmer}
+\label{sec:org10ebee5}
 
+Dim unused frames and windows
+Focus current window and dim unused ones
+
+\begin{verbatim}
 (use-package dimmer
   :disabled
   :ensure t
   :config (dimmer-mode)
 )
+\end{verbatim}
 
-(use-package emojify
-:ensure t
-:config
-(add-hook 'after-init-hook #'global-emojify-mode)
-)
-
+\section*{mode line}
+\label{sec:orgf655e29}
+\begin{verbatim}
 (line-number-mode t)
 (column-number-mode t)
 (size-indication-mode t)
+\end{verbatim}
 
+\subsection*{doom-modeline}
+\label{sec:org6b38f26}
+
+Require and enable the doom-modeline
+\begin{verbatim}
 (require 'doom-modeline)
 (doom-modeline-mode 1)
+\end{verbatim}
 
+Don’t compact font caches during GC (garbage collection).
+\begin{verbatim}
 ;; (setq inhibit-compacting-font-caches t)
+\end{verbatim}
 
+Customize the doom-modeline (convert the comments to org later)
+\begin{verbatim}
 ;; How tall the mode-line should be. It's only respected in GUI.
 ;; If the actual char height is larger, it respects the actual height.
 (setq doom-modeline-height 23)
@@ -2956,7 +3587,17 @@ Example output:
 
 ;; Function to stylize the irc buffer names.
 (setq doom-modeline-irc-stylize 'identity)
+\end{verbatim}
 
+
+this was commented with C-c ; so it doenst get exported in favor of doom-modeline
+\section*{Interface Enhancement}
+\label{sec:org7a3ef4f}
+
+\subsection*{discover}
+\label{sec:org25b119e}
+
+\begin{verbatim}
 (require 'discover)
 (when (featurep 'discover)
   (discover-add-context-menu
@@ -2986,9 +3627,21 @@ Example output:
     :mode-hook 'dired-mode-hook
   )
 )
+\end{verbatim}
 
+\subsection*{auto balance windows area}
+\label{sec:org0e282ce}
+
+\begin{verbatim}
 (global-set-key (kbd "C-M-+") 'balance-windows-area)
+\end{verbatim}
 
+\subsection*{zoom}
+\label{sec:orgd1e3d19}
+
+Zoom in selected window and resize othersAuto balance windows and frames
+
+\begin{verbatim}
 (use-package zoom
   :ensure t
   :bind
@@ -3001,15 +3654,39 @@ Example output:
   :config
   (zoom-mode t)
 )
+\end{verbatim}
 
+\subsection*{sublimity}
+\label{sec:org2378677}
+
+\begin{verbatim}
 (use-package sublimity
   :ensure t
   :config
   ;;(setq sublimity-scroll-weight 10
   ;;    sublimity-scroll-drift-length 5)
+  ;; this is the only part of the config where i use `use-package' inside another package config.
+  ;; the oficial docs appears to suggest this way
   (sublimity-mode 1)
 )
+\end{verbatim}
 
+\subsubsection*{sublimity-scroll}
+\label{sec:org78513e2}
+\begin{verbatim}
+(use-package sublimity-scroll
+  :ensure nil
+  :config
+  (setq sublimity-scroll-weight 10)  ;; default 10
+  (setq sublimity-scroll-drift-length 5)  ;; default 5
+  (setq sublimity-scroll-hide-cursor t) ;; default t
+)
+\end{verbatim}
+
+\subsubsection*{sublimity-map (experimental)}
+\label{sec:org9002bc8}
+This package ruins the scrolling from either sublimity-scroll or the smooth-scrolling package
+\begin{verbatim}
 (use-package sublimity-map
   :disabled
   :ensure nil
@@ -3026,7 +3703,11 @@ Example output:
 ;;            (buffer-face-mode)))
 
 )
+\end{verbatim}
 
+\subsubsection*{sublimity-attractive}
+\label{sec:org4e9d67a}
+\begin{verbatim}
 (use-package sublimity-attractive
   :disabled
   :ensure nil
@@ -3040,15 +3721,26 @@ Example output:
   ;; (sublimity-attractive-hide-modelines)
 )
 
+\end{verbatim}
+
+
+\subsection*{goto-line-preview}
+\label{sec:orgbcf1969}
+
+\begin{verbatim}
 (use-package goto-line-preview
   :ensure t
   :config
   (global-set-key [remap goto-line] 'goto-line-preview)
 )
+\end{verbatim}
 
+\subsection*{dashboard}
+\label{sec:org3f70116}
+
+\begin{verbatim}
 (use-package dashboard
   :ensure t
-  :bind ("C-S-D" . open-dashboard)
   :preface
   (defun tau/dashboard-banner ()
     "Sets a dashboard banner including information on package initialization
@@ -3119,9 +3811,14 @@ Example output:
 
   (dashboard-setup-startup-hook)
 )
+\end{verbatim}
 
+\subsubsection*{add fireplace as a widged in the dashboard}
+\label{sec:org528a152}
+\subsection*{toggle window transparency}
+\label{sec:org0e7d506}
 
-
+\begin{verbatim}
 (defun tau/toggle-window-transparency ()
   "Cycle the frame transparency from default to transparent."
   (interactive)
@@ -3133,7 +3830,12 @@ Example output:
       (set-frame-parameter nil 'alpha transparency))))
 
 (global-set-key (kbd "M-<f12> t") 'tau/toggle-window-transparency)
+\end{verbatim}
 
+\subsection*{minimap}
+\label{sec:org6c9f088}
+
+\begin{verbatim}
 (use-package minimap
   :ensure t
   :disabled t
@@ -3159,7 +3861,12 @@ Example output:
     ((((background dark)) (:background "#555555555555"))
       (t (:background "#C847D8FEFFFF"))) :group 'minimap))
 )
+\end{verbatim}
 
+\subsection*{pulse}
+\label{sec:org2861b3c}
+
+\begin{verbatim}
 ;; Visualize TAB, (HARD) SPACE, NEWLINE
 ;; Pulse current line
 (use-package pulse
@@ -3200,7 +3907,16 @@ Example output:
                  goto-last-change))
     (advice-add cmd :after #'my-recenter-and-pulse))
 )
+\end{verbatim}
 
+\subsection*{prettify symbols}
+\label{sec:org97239cc}
+
+\begin{verbatim}
+this is built-in with emacs >= v24
+\end{verbatim}
+
+\begin{verbatim}
 (global-prettify-symbols-mode 1)
 (defun add-pretty-lambda ()
   "Make some word or string show as pretty Unicode symbols. See https://unicodelookup.com for more."
@@ -3215,7 +3931,12 @@ Example output:
           )))
 (add-hook 'prog-mode-hook 'add-pretty-lambda)
 (add-hook 'org-mode-hook 'add-pretty-lambda)
+\end{verbatim}
 
+\subsection*{centaur-tabs}
+\label{sec:orga0721c8}
+
+\begin{verbatim}
 (use-package centaur-tabs
  :ensure t
  :hook
@@ -3237,15 +3958,15 @@ Example output:
  :init
  :config
  ;; appearantly these dont work if put in :init
- (setq centaur-tabs-style "box")           ; types available: (alternative, bar, box, chamfer, rounded, slang, wave, zigzag)
+ (setq centaur-tabs-style "box") ; types available: (alternative, bar, box, chamfer, rounded, slang, wave, zigzag)
  (setq centaur-tabs-height 25)
- (setq centaur-tabs-set-icons t)           ;; display themed icons from all the icons
+ (setq centaur-tabs-set-icons t) ;; display themed icons from all the icons
  (setq centaur-tabs-set-modified-marker t) ;; display a marker indicating that a buffer has been modified (atom-style)
  (setq centaur-tabs-modified-marker "*")
  (centaur-tabs-headline-match)
  (centaur-tabs-mode t)
 
- (setq centaur-tabs-set-bar 'over)         ;; in previous config value was 'over
+ (setq centaur-tabs-set-bar 'over) ;; in previous config value was 'over
  ;; (setq centaur-tabs-gray-out-icons 'buffer)
  ;; (centaur-tabs-enable-buffer-reordering)
  ;; (setq centaur-tabs-adjust-buffer-order t)
@@ -3253,16 +3974,17 @@ Example output:
  (setq uniquify-buffer-name-style 'forward)
  ;; (centaur-tabs-change-fonts "arial" 160)
 )
+\end{verbatim}
 
-(use-package hideshowvis
-  :ensure nil
-  :load-path "packages"
-  :hook
-  (display-line-numbers-mode . hideshowvis-enable)
-  :config
-  (hideshowvis-symbols) ; displaying a + symbol in the fringe for folded regions
-)
+\section*{Highlights}
+\label{sec:orgb4206d6}
 
+\subsection*{show paren mode}
+\label{sec:orgdee0e80}
+
+Highlight matching parenthesis
+
+\begin{verbatim}
 (use-package paren
   :ensure nil
   :hook
@@ -3276,31 +3998,61 @@ Example output:
   (setq show-paren-when-point-in-periphery t)
   (show-paren-mode +1)
 )
+\end{verbatim}
 
+\subsection*{Highlighting numbers}
+\label{sec:orgbc71d21}
+
+\begin{verbatim}
 (use-package highlight-numbers
     :ensure t
     :hook
     (prog-mode . highlight-numbers-mode)
 )
+\end{verbatim}
 
+\subsection*{Highlighting operators}
+\label{sec:org6a67b12}
+
+\begin{verbatim}
 (use-package highlight-operators
   :ensure t
   :hook
   (prog-mode . highlight-operators-mode)
 )
+\end{verbatim}
 
+\subsection*{Highlighting escape sequences}
+\label{sec:org34185a5}
+
+\begin{verbatim}
 (use-package highlight-escape-sequences
   :ensure t
   :hook
   (prog-mode . hes-mode)
 )
+\end{verbatim}
 
+\subsection*{Highlighting parentheses}
+\label{sec:org5f1a662}
+
+\begin{verbatim}
 (use-package highlight-parentheses
   :ensure t
   :hook
   (prog-mode . highlight-parentheses-mode)
 )
+\end{verbatim}
 
+\subsection*{Highlight TODO}
+\label{sec:orgb21c940}
+
+Basic support todos.
+By default these include:
+TODO NEXT THEM PROG OKAY DONT FAIL DONE NOTE KLUDGE HACK TEMP FIXME
+and any sequence of X's or ?'s of length at least 3: XXX, XXXX, XXXXX, …, ???, ????, ????, ….
+
+\begin{verbatim}
 ;; NOTE that the highlighting works even in comments.
 (use-package hl-todo
   :ensure t
@@ -3316,7 +4068,21 @@ Example output:
   (add-to-list 'hl-todo-keyword-faces '("NOTE" . "#ffff00"))
   (add-to-list 'hl-todo-keyword-faces '("DONE" . "#00ff00"))
 )
+\end{verbatim}
 
+\subsection*{hi-lock mode}
+\label{sec:org1439661}
+
+Highlight regexp
+
+From Mastering Emacs:
+There is a mechanism for storing and restoring the Hi-Locks you’ve created. If you create highlights interactively you can tell Emacs to insert those patterns into the active buffer by running M-s h w. Emacs will wrap the elisp patterns in the comment format used by the buffer (if one is defined) or ask if you no comment format is defined.
+
+The patterns should be added to the top of the file, as Emacs will only search the first 10,000 characters (customize hi-lock-file-patterns-range to change that amount) for the patterns before giving up.
+
+Emacs will not highlight patterns found in a file automatically. You must explicitly tell it to do so by manually invoking M-x hi-lock-mode or globally with global-hi-lock-mode.
+
+\begin{verbatim}
 (use-package hi-lock
   :init
   (global-hi-lock-mode 1)
@@ -3330,7 +4096,14 @@ Example output:
   ;; always highlight patterns found in files without confirmation
   (setq hi-lock-file-patterns-policy #'(lambda (dummy) t))
 )
+\end{verbatim}
 
+\subsection*{hl-anything}
+\label{sec:orga408c36}
+
+Highlight portions of text
+
+\begin{verbatim}
 (use-package hl-anything
   :ensure t
   :after evil
@@ -3359,7 +4132,11 @@ Example output:
     "hr"  'hl-restore-highlights
     "hs"  'hl-save-highlights)
 )
+\end{verbatim}
 
+\subsection*{beacon - flash light where cursor is}
+\label{sec:org3d91ae5}
+\begin{verbatim}
 (use-package beacon
   :ensure t
   :init
@@ -3377,14 +4154,32 @@ Example output:
   :config
   (beacon-mode 1)
 )
+\end{verbatim}
 
+\subsection*{Rainbow Delimiters}
+\label{sec:org3e798bc}
+
+This highlights matching parentheses acording to their depth
+Helps editing lisp code
+
+\begin{verbatim}
 (use-package rainbow-delimiters
   :ensure t
   ;;:hook
   ;;(emacs-lisp-mode . rainbow-delimiters-mode)
   ;;(prog-mode . rainbow-delimiters-mode)
 )
+\end{verbatim}
 
+\subsection*{rainbow mode}
+\label{sec:org3148cc7}
+
+\begin{verbatim}
+Colorize hex, rgb and named color codes
+\end{verbatim}
+
+
+\begin{verbatim}
 (use-package rainbow-mode
   :ensure t
   :hook
@@ -3395,14 +4190,29 @@ Example output:
   (html-mode . rainbow-mode)
   (web-mode . rainbow-mode)
   (js2-mode . rainbow-mode))
+\end{verbatim}
 
+\subsection*{Highlight lines}
+\label{sec:org100260c}
+
+\begin{verbatim}
+built-in package
+\end{verbatim}
+
+
+\begin{verbatim}
 (use-package hl-line
   :ensure nil
   :defer nil
   :config
   (global-hl-line-mode)
 )
+\end{verbatim}
 
+\subsection*{{\bfseries\sffamily TODO} Highlight columns}
+\label{sec:org72dd254}
+
+\begin{verbatim}
 (use-package col-highlight
   :disabled
   :defer nil
@@ -3410,14 +4220,26 @@ Example output:
   (col-highlight-toggle-when-idle)
   (col-highlight-set-interval 2)
 )
+\end{verbatim}
 
+\subsection*{Highlight crosshair}
+\label{sec:orgddf568c}
+
+Highlight crosshair (combination of hl-lines and hl-columns
+
+\begin{verbatim}
 (use-package crosshairs
   :disabled
   :defer nil
   :config
   (crosshairs-mode)
 )
+\end{verbatim}
 
+\subsection*{volatile-highlights}
+\label{sec:org080a0df}
+
+\begin{verbatim}
 (use-package volatile-highlights
   :ensure t
   :disabled
@@ -3438,7 +4260,10 @@ Example output:
   (vhl/define-extension 'undo-tree 'undo-tree-yank 'undo-tree-move)
   (vhl/install-extension 'undo-tree)
 )
+\end{verbatim}
 
+
+\begin{verbatim}
 (use-package highlight-indent-guides
   :ensure t
   :hook
@@ -3448,65 +4273,16 @@ Example output:
   (highlight-indent-guides-responsive t)
   (highlight-indent-guides-method 'character) ; column
 )
+\end{verbatim}
 
-(use-package highlight-context-line
-  :ensure t
-  :disabled
-  :config
-  (highlight-context-line-mode 1)
-)
 
-;; (setq scroll-preserve-screen-position 1)  ;; centered screen scrolling
-;; (setq scroll-margin 10
-;; (setq maximum-scroll-margin 0.5)
-;; (setq scroll-step 1)
-;; (setq scroll-conservatively 10000) ;; scroll one line at a time when you move the cursor past the top or bottom of the window
-;; (setq scroll-step 1) ;; keyboard scroll one line at a time
+\section*{Minor modes}
+\label{sec:orgfcd4d6a}
 
-(setq mouse-wheel-progressive-speed nil)            ;; don't accelerate scrolling
-(setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ;; one line at a time
-(setq mouse-wheel-follow-mouse 't)                  ;; scroll window under mouse
+\subsection*{which-key}
+\label{sec:orge950add}
 
-(global-set-key (kbd "<S-mouse-4>") 'scroll-down-line)
-(global-set-key (kbd "<S-mouse-5>") 'scroll-up-line)
-
-(use-package sublimity-scroll
-:disabled
-  :ensure nil
-  :config
-  (setq sublimity-scroll-weight 10)  ;; default 10
-  (setq sublimity-scroll-drift-length 5)  ;; default 5
-  (setq sublimity-scroll-hide-cursor t) ;; default t
-)
-
-(use-package scrollkeeper
-:disabled
-:ensure t
-:bind
-([remap scroll-up-command] . scrollkeeper-contents-up)
-([remap scroll-down-command] . scrollkeeper-contents-down)
-)
-
-(use-package fast-scroll
-:disabled
-    :ensure t
-    ;; If you would like to turn on/off other modes, like flycheck, add
-    ;; your own hooks.
-  :init
-  (setq fast-scroll-throttle 0.5)
-  :config
-    (add-hook 'fast-scroll-start-hook (lambda () (flycheck-mode -1)))
-    (add-hook 'fast-scroll-end-hook (lambda () (flycheck-mode 1)))
-    (fast-scroll-config)
-    (fast-scroll-mode 1)
-)
-
-(use-package centered-cursor-mode
-  :ensure t
-  :config
-  (global-centered-cursor-mode)
-)
-
+\begin{verbatim}
 (use-package which-key
   :hook (after-init . which-key-mode))
   :config
@@ -3514,14 +4290,23 @@ Example output:
   (setq which-key-min-display-lines 3)
   (setq which-key-max-description-length 20)
   (setq which-key-max-display-columns 6)
+\end{verbatim}
 
+\subsection*{key-frequency}
+\label{sec:org23afdbe}
+
+\begin{verbatim}
 (use-package keyfreq
   :ensure t
   :init
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1)
 )
+\end{verbatim}
 
+\subsection*{smartparens}
+\label{sec:org84784eb}
+\begin{verbatim}
 (use-package smartparens
   :ensure t
   :hook
@@ -3532,21 +4317,48 @@ Example output:
   (sp-pair "+" "+" :actions '(wrap))
   (sp-pair "<" ">" :actions '(wrap))
   (sp-pair "$" "$" :actions '(wrap)))
+\end{verbatim}
 
+\subsubsection*{evil-smartparens helps avoid conflicts between evil and smartparens}
+\label{sec:org3d72e9b}
+
+\begin{verbatim}
 (use-package evil-smartparens
   :ensure t
   :hook
   (smartparens-enabled . evil-smartparens-mode)
 )
+\end{verbatim}
 
+\subsection*{Smartscan mode}
+\label{sec:orgd51defa}
+\begin{verbatim}
+Usage:
+M-n and M-p move between symbols
+M-' to replace all symbols in the buffer matching the one under point
+C-u M-' to replace symbols in your current defun only (as used by narrow-to-defun.)
+\end{verbatim}
+
+
+\begin{verbatim}
 (smartscan-mode 1)
+\end{verbatim}
 
+\subsection*{editorconfig}
+\label{sec:orgc83b443}
+
+\begin{verbatim}
 (use-package editorconfig
   :ensure t
   :config
   (editorconfig-mode 1)
 )
+\end{verbatim}
 
+\subsection*{hide mode line mode}
+\label{sec:orgdcb1684}
+
+\begin{verbatim}
 (use-package hide-mode-line
   :ensure t
   :hook
@@ -3554,7 +4366,10 @@ Example output:
   (neotree-mode . hide-mode-line-mode)
   (treemacs-mode . hide-mode-line-mode)
 )
+\end{verbatim}
 
+
+\begin{verbatim}
 (use-package saveplace
   :ensure t
   :hook
@@ -3563,7 +4378,12 @@ Example output:
   (setq-default save-place t)
   (setq save-place-file (expand-file-name ".places" user-emacs-directory))
 )
+\end{verbatim}
 
+\section*{multiple cursors}
+\label{sec:orgbfaf68b}
+
+\begin{verbatim}
 (use-package multiple-cursors
   :after evil
   ;; step 1, select thing in visual-mode (OPTIONAL)
@@ -3584,29 +4404,42 @@ Example output:
   (define-key evil-visual-state-map (kbd "mm") 'ace-mc-add-multiple-cursors)
   (define-key evil-visual-state-map (kbd "ms") 'ace-mc-add-single-cursor)
 )
+\end{verbatim}
 
+
+\section*{quickrun (compile and execute code)}
+\label{sec:org537525c}
+\begin{verbatim}
 (use-package quickrun
   :bind
   ("C-<f5>" . quickrun)
   ("M-<f5>" . quickrun-shell)
 )
+\end{verbatim}
 
+
+\section*{\LaTeX{}}
+\label{sec:orgc35276f}
+
+\begin{verbatim}
 (use-package auctex-latexmk
-    :defer t
-    :init
-    (add-hook 'LaTeX-mode-hook 'auctex-latexmk-setup)
-  :hook
-;; example of lambda usage in :hooks
-  (LaTeX-mode . (lambda () (TeX-fold-mode t)))
-  )
+  :defer t
+  :init
+  (add-hook 'LaTeX-mode-hook 'auctex-latexmk-setup)
+)
+\end{verbatim}
 
+
+\begin{verbatim}
 (use-package company-auctex
   :ensure t
   :defer t
   :init
   (add-hook 'LaTeX-mode-hook 'company-auctex-init)
 )
+\end{verbatim}
 
+\begin{verbatim}
 (use-package tex
   :ensure auctex
   :defer t
@@ -3637,14 +4470,42 @@ Example output:
         (setq TeX-source-correlate-start-server t)))
 )
 
-(add-to-list 'org-latex-classes
-	      '("beamer"
-	        "\\documentclass\[presentation\]\{beamer\}"
-	        ("\\section\{%s\}" . "\\section*\{%s\}")
-	        ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
-	        ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}"))
-)
+\end{verbatim}
 
+\subsection*{Add the beamer presentation class template to org}
+\label{sec:org06fea09}
+\begin{verbatim}
+(add-to-list 'org-latex-classes
+        '("beamer"
+          "\\documentclass\[presentation\]\{beamer\}"
+          ("\\section\{%s\}" . "\\section*\{%s\}")
+          ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
+          ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}"))
+)
+\end{verbatim}
+
+
+\subsection*{Add the memoir class template to org}
+\label{sec:orga3841fc}
+
+The Sections and Heading Levels gets configured as follows:
+
+\begin{center}
+\begin{tabular}{lrl}
+Division & <c>Level & <c>org-equivalent\\
+\book & -2 & *\\
+\part & -1 & **\\
+\chapter & 0 & \textbf{*}\\
+\section & 1 & \textbf{**}\\
+\subsection & 2 & \textbf{\textbf{*}}\\
+\subsubsection & 3 & \textbf{\textbf{**}}\\
+\paragraph & 4 & \textbf{\textbf{\textbf{*}}}\\
+\subparagraph & 5 & \textbf{\textbf{\textbf{**}}}\\
+\end{tabular}
+\end{center}
+
+
+\begin{verbatim}
 ;(add-to-list 'org-latex-classes
 ;        '("memoir"
 ;          "\\documentclass\[a4paper\]\{memoir\}"
@@ -3655,7 +4516,26 @@ Example output:
 ;          ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
 ;          ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}"))
 ;)
+\end{verbatim}
 
+\subsection*{{\bfseries\sffamily TODO} Add abntex2 class to org list of latex classes}
+\label{sec:org889ce80}
+This class is based on the Memoir class
+The Sections and Heading Levels gets configured as follows:
+
+\begin{center}
+\begin{tabular}{lrl}
+Division & <c>Level & <c>org-equivalent\\
+\part & -1 & *\\
+\chapter & 0 & **\\
+\section & 1 & \textbf{*}\\
+\subsection & 2 & \textbf{**}\\
+\subsubsection & 3 & \textbf{\textbf{*}}\\
+\paragraph & 4 & \textbf{\textbf{**}}\\
+\subparagraph & 5 & \textbf{\textbf{\textbf{*}}}\\
+\end{tabular}
+\end{center}
+\begin{verbatim}
 ;(add-to-list 'org-latex-classes
 ;             '("abntex2"
 ;               "\\documentclass{abntex2}"
@@ -3671,25 +4551,43 @@ Example output:
 (add-to-list 'org-latex-classes
              '("abntex2"
                "\\documentclass{abntex2}"
-               ;; ("\\chapter{%s}" . "\\chapter*{%s}")
                ("\\section{%s}" . "\\section*{%s}")
                ("\\subsection{%s}" . "\\subsection*{%s}")
                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                ("\\subsubsubsection{%s}" . "\\subsubsubsection*{%s}")
                ("\\paragraph{%s}" . "\\paragraph*{%s}"))
 )
+\end{verbatim}
 
+\section*{HTML}
+\label{sec:orge3ab266}
+
+\subsection*{Set HTML indentation to 4 spaces by default (only on html-mode)}
+\label{sec:orge2773a1}
+\begin{verbatim}
 (add-hook 'html-mode-hook
   (lambda ()
     (set (make-local-variable 'sgml-basic-offset) 4)))
+\end{verbatim}
 
+\section*{CSS and SCSS}
+\label{sec:orgcf9c04c}
+
+\subsection*{CSS}
+\label{sec:org8f4e220}
+
+\begin{verbatim}
 (use-package css-mode
   :ensure t
   :mode "\\.css\\'"
   :init
   (setq css-indent-offset 2)
 )
+\end{verbatim}
 
+\subsection*{SCSS}
+\label{sec:org3366b68}
+\begin{verbatim}
 (use-package scss-mode
   :ensure t
   ;; this mode doenst load using :mode from use-package, dunno why
@@ -3701,7 +4599,9 @@ Example output:
    (add-to-list 'auto-mode-alist '("\\.scss$\\'" . scss-mode))
    (add-to-list 'auto-mode-alist '("\\.component.scss$\\'" . scss-mode))
 )
+\end{verbatim}
 
+\begin{verbatim}
 (use-package helm-css-scss
   :ensure t
   :bind (
@@ -3721,15 +4621,28 @@ Example output:
         helm-css-scss-split-with-multiple-windows t
         helm-css-scss-split-direction 'split-window-vertically)
 )
+\end{verbatim}
 
+\section*{YAML}
+\label{sec:org6c4b7ec}
+\begin{verbatim}
 (use-package yaml-mode
   :ensure t
 )
+\end{verbatim}
 
+\section*{TOML}
+\label{sec:org8990fd7}
+\begin{verbatim}
 (use-package toml-mode
   :ensure t
 )
+\end{verbatim}
 
+\section*{Emmet}
+\label{sec:org659daf9}
+
+\begin{verbatim}
 (use-package emmet-mode
   :ensure t
   :commands emmet-mode
@@ -3747,7 +4660,13 @@ Example output:
   (unbind-key "C-M-<left>" emmet-mode-keymap)
   (unbind-key "C-M-<right>" emmet-mode-keymap)
   (setq emmet-expand-jsx-className? nil)) ;; use emmet with JSX markup
+\end{verbatim}
 
+
+\section*{Ruby}
+\label{sec:org93c7cdb}
+
+\begin{verbatim}
 (use-package ruby-mode
   :mode "\\.rb\\'"
   :interpreter "ruby"
@@ -3774,7 +4693,11 @@ Example output:
               (hs-minor-mode 1) ;; Enables folding
               (modify-syntax-entry ?: "."))) ;; Adds ":" to the word definition
 )
+\end{verbatim}
 
+\subsection*{ruby refactor}
+\label{sec:org58a278a}
+\begin{verbatim}
 ;; Functions to help with refactoring
 (use-package ruby-refactor
   :ensure t
@@ -3782,23 +4705,57 @@ Example output:
   :hook
   (ruby-mode . ruby.refactor-mode-launch)
 )
+\end{verbatim}
 
+\subsection*{ruby hash syntax}
+\label{sec:org6dc07fc}
+
+Easily toggle ruby's hash syntax
+
+\begin{verbatim}
 (use-package ruby-hash-syntax
   :ensure t
 )
+\end{verbatim}
 
+\subsection*{ruby additional}
+\label{sec:org52aa48e}
+
+Ruby rdoc helpers mostly
+
+\begin{verbatim}
 (use-package ruby-additional
   :ensure t
 )
+\end{verbatim}
 
+\subsection*{ruby-tools}
+\label{sec:org1c738f9}
+
+\begin{verbatim}
 (use-package ruby-tools
   :ensure t
 )
+\end{verbatim}
 
+\subsection*{rspec-mode}
+\label{sec:org8aafbe8}
+
+Support for running rspec tests
+
+\begin{verbatim}
 (use-package rspec-mode
   :ensure t
 )
+\end{verbatim}
 
+\subsection*{ruby-blocks}
+\label{sec:org8824daf}
+
+Highlights ruby def/end blocks
+Unfortunatelly this package has to be installed manually, as its not available on MELPA
+
+\begin{verbatim}
 (use-package ruby-block
   :disabled
   :ensure t
@@ -3812,18 +4769,34 @@ Example output:
   :config
   (ruby-block-mode t)
 )
+\end{verbatim}
 
+\subsection*{ruby-extra-highlights}
+\label{sec:orgf4d9566}
+
+\begin{verbatim}
 (use-package ruby-extra-highlight
   :ensure t
   :hook
   (ruby-mode . ruby-extra-highlight-mode)
 )
+\end{verbatim}
 
+
+\section*{Go}
+\label{sec:org8aaba47}
+
+\begin{verbatim}
 (use-package go-mode
   :mode "\\.go\\'"
   :hook (before-save . gofmt-before-save)
 )
+\end{verbatim}
 
+
+\section*{Web-Mode}
+\label{sec:org38d57da}
+\begin{verbatim}
 (use-package web-mode
   :custom-face
   (css-selector ((t (:inherit default :foreground "#66CCFF"))))
@@ -3841,7 +4814,12 @@ Example output:
   (eval-after-load 'flycheck
      '(flycheck-add-mode 'html-tidy 'web-mode))
 )
+\end{verbatim}
 
+\section*{JavaScript JS2-mode}
+\label{sec:orgf66f5d1}
+
+\begin{verbatim}
 ;; js2-mode: enhanced JavaScript editing mode
 ;; https://github.com/mooz/js2-mode
 (use-package js2-mode
@@ -3870,7 +4848,12 @@ Example output:
   (setq js2-mode-show-strict-warnings nil)
   (setq js2-strict-missing-semi-warning nil)
 )
+\end{verbatim}
 
+\section*{PrettierJS}
+\label{sec:org93e512b}
+
+\begin{verbatim}
 ;; prettier-emacs: minor-mode to prettify javascript files on save
 ;; https://github.com/prettier/prettier-emacs
 (use-package prettier-js
@@ -3923,12 +4906,13 @@ Example output:
   (add-hook 'prettier-js-mode-hook #'tau/use-prettier-if-in-node-modules)
 
 )
+\end{verbatim}
 
-(use-package format-all
-:ensure t
-:bind ("C-c C-f" . format-all-buffer)
-)
 
+\section*{JSON Mode}
+\label{sec:org21805da}
+
+\begin{verbatim}
 ;; json-mode: Major mode for editing JSON files with emacs
 ;; https://github.com/joshwnj/json-mode
 (use-package json-mode
@@ -3938,7 +4922,15 @@ Example output:
   (setq json-reformat:indent-width 2)
   (setq json-reformat:pretty-string? t)
   (setq js-indent-level 2))
+\end{verbatim}
 
+\section*{ESLint}
+\label{sec:org780a90f}
+
+eslintd-fix: Emacs minor-mode to automatically fix javascript with eslint\textsubscript{d}.
+\url{https://github.com/aaronjensen/eslintd-fix/tree/master}
+
+\begin{verbatim}
 (use-package eslintd-fix
   :ensure t
   :ensure-system-package
@@ -3965,7 +4957,14 @@ Example output:
                                      (concat "bin/" module ".js"))
                                    package-directory)))))))
 )
+\end{verbatim}
 
+\section*{RJSX Mode}
+\label{sec:org5f19f57}
+
+\url{https://github.com/felipeochoa/rjsx-mode}
+
+\begin{verbatim}
 (use-package rjsx-mode
     :after js2-mode
     :mode
@@ -3984,13 +4983,23 @@ Example output:
           ad-do-it)
         ad-do-it))
 )
+\end{verbatim}
 
+\section*{Typescript}
+\label{sec:org8f6a14d}
+
+\subsection*{Typescript mode}
+\label{sec:org8b10feb}
+
+\begin{verbatim}
 (use-package typescript-mode
   :ensure t
   :mode (("\\.ts\\'" . typescript-mode)
          ("\\.tsx\\'" . typescript-mode))
 )
+\end{verbatim}
 
+\begin{verbatim}
 (defun setup-tide-mode ()
   (interactive)
   (tide-setup)
@@ -4000,7 +5009,11 @@ Example output:
   (tide-hl-identifier-mode +1)
   (company-mode +1)
 )
+\end{verbatim}
 
+\subsection*{Tide}
+\label{sec:org37b014d}
+\begin{verbatim}
 (use-package tide
   :ensure t
   :config
@@ -4011,20 +5024,44 @@ Example output:
   )
 )
 
+\end{verbatim}
+
+\section*{Angular}
+\label{sec:org00ce184}
+\begin{verbatim}
 (use-package ng2-mode
   :defer
   :hook
   (ng2-mode . prettier-js-mode)
 )
+\end{verbatim}
 
+\section*{Docker}
+\label{sec:org9682473}
+
+\begin{verbatim}
 (use-package dockerfile-mode
   :mode "\\Dockerfile\\'"
 )
+\end{verbatim}
 
+
+\section*{fun packages}
+\label{sec:org20398ad}
+
+\subsection*{xkcd}
+\label{sec:orgc98f017}
+
+\begin{verbatim}
 (use-package xkcd
 :ensure t
 )
+\end{verbatim}
 
+\subsection*{fireplaces}
+\label{sec:org8d0d17d}
+
+\begin{verbatim}
 (use-package fireplace
   :ensure t
   :init (defvar fireplace-mode-map)
@@ -4036,54 +5073,17 @@ Example output:
   (setq fireplace-toggle-smoke t)
   ;; (fireplace)
 )
+\end{verbatim}
 
-(defvar tetris-mode-map
-  (make-sparse-keymap 'tetris-mode-map))
-(define-key tetris-mode-map (kbd "C-p") 'tetris-rotate-prev)
-(define-key tetris-mode-map (kbd "C-n") 'tetris-move-down)
-(define-key tetris-mode-map (kbd "C-b") 'tetris-move-left)
-(define-key tetris-mode-map (kbd "C-f") 'tetris-move-right)
-(define-key tetris-mode-map (kbd "C-SPC") 'tetris-move-bottom)
-(defadvice tetris-end-game (around zap-scores activate)
-  (save-window-excursion ad-do-it))
+\section*{Copy/Paste To/From System's Clipboard =D}
+\label{sec:orgda0ba5b}
+this was supposed to be on the helper functions and macro section at the beggining of the file
+but it has evil defined keybindings and had to be put after the evil section or emacs would complain it didnt know what evil is
 
-(use-package epaint
-  :if window-system
-  :commands (epaint)
-  :init
-  (with-eval-after-load (quote epaint-context)
-    (unless (boundp (quote cl-struct-epaint-drawable))
-      (defvar cl-struct-epaint-drawable (quote epaint-drawable)))
-    (unless (boundp (quote cl-struct-epaint-gc))
-      (defvar cl-struct-epaint-gc (quote epaint-gc))))
-)
+\subsubsection*{Copy to system clipboard}
+\label{sec:orgd70597a}
 
-(use-package speed-type
-  :defer t)
-
-(use-package 2048-game
-:defer t)
-
-(use-package zone
- :ensure nil
- :defer 5
- :config
- ;; (zone-when-idle 600) ; in seconds
- (defun zone-choose (pgm)
-   "Choose a PGM to run for `zone'."
-   (interactive
-    (list
-     (completing-read
-      "Program: "
-      (mapcar 'symbol-name zone-programs))))
-   (let ((zone-programs (list (intern pgm))))
-     (zone))))
-
-(use-package meme
-  :ensure nil
-  :commands (meme meme-file)
-)
-
+\begin{verbatim}
 (defun copy-to-clipboard ()
 "Make F8 and F9 Copy and Paste to/from OS Clipboard.  Super usefull."
 (interactive)
@@ -4099,7 +5099,12 @@ Example output:
         (deactivate-mark))
     (message "No region active; can't yank to clipboard!")))
 )
+\end{verbatim}
 
+\subsubsection*{Paste}
+\label{sec:org9e71dd3}
+
+\begin{verbatim}
 (evil-define-command paste-from-clipboard()
 (if (display-graphic-p)
     (progn
@@ -4107,10 +5112,17 @@ Example output:
         (message "graphics active")
         )
     (insert (shell-command-to-string "xsel -o -b")) ) )
+\end{verbatim}
 
+\begin{verbatim}
 (global-set-key [f9] 'copy-to-clipboard)
 (global-set-key [f10] 'paste-from-clipboard)
+\end{verbatim}
 
+
+\section*{End init.el file}
+\label{sec:org10cc525}
+\begin{verbatim}
 ;; Local Variables:
 ;; coding: utf-8
 ;; no-byte-compile: t
@@ -4119,4 +5131,6 @@ Example output:
 
 (provide 'init)
 ;;; .emacs ends here
-(put 'upcase-region 'disabled nil)
+
+\end{verbatim}
+\end{document}
