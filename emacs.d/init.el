@@ -1,10 +1,25 @@
 (setq user-full-name "Gustavo P Borges")
-  (setq user-mail-address "gugutz@gmail.com")
-  (setq work-mail-address "gugutz@stairs.studio")
-  (setq gmail-address "gugutz@gmail.com")
-  (setq nickname "gugutz")
+(setq user-mail-address "gugutz@gmail.com")
+(setq work-mail-address "gugutz@stairs.studio")
+(setq gmail-address "gugutz@gmail.com")
+(setq nickname "gugutz")
 ;; my secrets
+
+(let ((secret.el (expand-file-name ".secret.el" user-emacs-directory)))
+  (when (file-exists-p secret.el)
+    (load secret.el)))
 ;; (load-library "~/dotfiles/emacs.d/secrets.el.gpg")
+
+(defvar tau/erc-nick               nil        "The ERC nick to use.")
+(defvar tau/erc-password           nil        "The ERC password to use.")
+(defvar tau/erc-port               nil        "The ERC port to use.")
+(defvar tau/erc-server             nil        "The ERC server to use.")
+(defvar tau/font-family            "Courier"  "The font to use.")
+(defvar tau/font-size-default      110        "The font size to use for default text.")
+(defvar tau/font-size-header-line  120        "The font size to use for the header-line.")
+(defvar tau/font-size-mode-line    110        "The font size to use for the mode-line.")
+(defvar tau/font-size-small        100        "The font size to use for smaller text.")
+(defvar tau/font-size-title        140        "The font size to use for titles.")
 
 (defun /util/tangle-init ()
   (interactive)
@@ -82,6 +97,10 @@ tangled, and the tangled file is compiled."
   (setq auto-package-update-delete-old-versions t)
   (setq auto-package-update-hide-results t)
   (auto-package-update-maybe)
+)
+
+(use-package diminish
+  :ensure t
 )
 
 (require 'epa-file)
@@ -347,9 +366,14 @@ tangled, and the tangled file is compiled."
 
 (use-package aggressive-indent
   :ensure t
+  :custom
+  (aggressive-indent-comments-too t)
   :hook
   (emacs-lisp-mode . aggressive-indent-mode)
+  (js2-mode . aggressive-indent-mode)
+  (typescript-mode . aggressive-indent-mode)
   (css-mode . aggressive-indent-mode)
+  (sgml-mode . aggressive-indent-mode)
   :config
 )
 
@@ -409,7 +433,7 @@ Example output:
 (global-set-key (kbd "C-M-u")	 'upcase-backward-word)
 (global-set-key (kbd "C-M-l")	 'downcase-backward-WORD)
 ;; this replaces native capitlize word!
-(global-set-key (kbd "M-c")	 'capitalize-backward-word)
+(global-set-key (kbd "C-M-c")	 'capitalize-backward-word)
 
 (defconst *spell-check-support-enabled* t) ;; Enable with t if you prefer
 
@@ -749,11 +773,13 @@ Example output:
 )
 
 (use-package evil-leader
+  :ensure t
+  :after evil
   :config
   (global-evil-leader-mode)
   (evil-leader/set-leader ",")
   (evil-leader/set-key
-    "e" 'find-file
+    ;;"e" 'find-file  ;; removed in favor of counsel-find-file
     "q" 'evil-quit
     "w" 'save-buffer
     "d" 'delete-frame
@@ -1112,6 +1138,7 @@ Example output:
 
 (use-package projectile
   :ensure t
+  :diminish projectile-mode
   :bind
   (:map projectile-mode-map
   ("s-p" . projectile-command-map)
@@ -1248,6 +1275,7 @@ Example output:
 
 (use-package helm
   :ensure t
+  :diminish helm-mode
   :bind
   ;; ("M-x" . helm-M-x)
   ("C-c h" . helm-command-prefix)
@@ -1343,6 +1371,8 @@ Example output:
 )
 
 (use-package ivy
+  :ensure t
+  :diminish ivy-mode
   :custom
   (ivy-re-builders-alist
   '((t . ivy--regex-plus)))
@@ -1363,6 +1393,7 @@ Example output:
 
 (use-package counsel
   :ensure t
+  :diminish counsel-mode
   :defines
   (projectile-completion-system magit-completing-read-function)
   :custom
@@ -1411,6 +1442,11 @@ Example output:
   ("RET" . ivy-alt-done)
   ("C-h" . ivy-backward-delete-char))
   :config
+  (evil-leader/set-key
+    "e" 'counsel-find-file
+    "f" 'counsel-projectile-find-file
+    "g" 'counsel-ag
+    "r" 'counsel-rg)
   ;; NOTE: this variable do not work if defined in :custom
   (setq ivy-format-function 'ivy-format-function-pretty)
   (setq counsel-yank-pop-separator
@@ -1451,6 +1487,7 @@ Example output:
 
 (use-package ivy-posframe
   :ensure t
+  :diminish ivy-posframe-mode
   :custom-face
   (ivy-posframe ((t (:background "#202020"))))
   (ivy-posframe-border ((t (:background "#282a36"))))
@@ -1549,6 +1586,7 @@ Example output:
 
 (use-package flycheck
     :ensure t
+    :diminish flycheck-mode
     :defer t
     :hook
     (prog-mode . flycheck-mode)
@@ -1777,6 +1815,7 @@ Example output:
 
 (use-package undo-tree
   :ensure t
+  :diminish undo-tree-mode
   :init
   (global-undo-tree-mode)
 ;;  (undo-tree-mode)
@@ -1867,6 +1906,7 @@ Example output:
 
 (use-package company
   :ensure t
+  :diminish company-mode
   :defer t
   :init
   (global-company-mode)
@@ -1956,6 +1996,7 @@ Example output:
 
 (use-package company-posframe
   :ensure t
+  :diminish company-posframe-mode
   :after company
   :config
   (company-posframe-mode 1)
@@ -1971,6 +2012,8 @@ Example output:
   ;;   (global-company-mode . company-box-mode)
   ;; )
 (use-package company-box
+  :ensure t
+  :diminish company-box-mode
   :functions (my-company-box--make-line
               my-company-box-icons--elisp)
   :init (setq company-box-icons-alist 'company-box-icons-all-the-icons)
@@ -2233,6 +2276,7 @@ Example output:
 
 (use-package yasnippet
   :ensure t
+  :diminish yas-minor-mode
   :hook
   (prog-mode . yas-minor-mode)
   (text-mode . yas-minor-mode)
@@ -2793,113 +2837,138 @@ Example output:
 (column-number-mode t)
 (size-indication-mode t)
 
-(require 'doom-modeline)
-(doom-modeline-mode 1)
+(use-package anzu
+  :ensure t
+  :bind
+  (:map isearch-mode-map
+  ([remap isearch-query-replace] . anzu-isearch-query-replace)
+  ([remap isearch-query-replace-regexp] . anzu-isearch-query-replace-regexp))
+  :config
+  (global-anzu-mode +1)
 
-;; (setq inhibit-compacting-font-caches t)
+  (setq anzu-mode-lighter "")
+  (setq anzu-deactivate-region t)
+  (setq anzu-search-threshold 1000)
+  (setq anzu-replace-threshold 50)
+  (setq anzu-replace-to-string-separator " => ")
 
-;; How tall the mode-line should be. It's only respected in GUI.
-;; If the actual char height is larger, it respects the actual height.
-(setq doom-modeline-height 23)
+  (set-face-attribute 'anzu-mode-line nil
+                      :foreground "yellow" :weight 'bold)
 
-;; How wide the mode-line bar should be. It's only respected in GUI.
-(setq doom-modeline-bar-width 3)
+;;  (define-key isearch-mode-map [remap isearch-query-replace]  #'anzu-isearch-query-replace)
+;;  (define-key isearch-mode-map [remap isearch-query-replace-regexp] #'anzu-isearch-query-replace-regexp)
+)
 
-;; Determines the style used by `doom-modeline-buffer-file-name'.
-;;
-;; Given ~/Projects/FOSS/emacs/lisp/comint.el
-;;   truncate-upto-project = ~/P/F/emacs/lisp/comint.el
-;;   truncate-from-project = ~/Projects/FOSS/emacs/l/comint.el
-;;   truncate-with-project = emacs/l/comint.el
-;;   truncate-except-project = ~/P/F/emacs/l/comint.el
-;;   truncate-upto-root = ~/P/F/e/lisp/comint.el
-;;   truncate-all = ~/P/F/e/l/comint.el
-;;   relative-from-project = emacs/lisp/comint.el
-;;   relative-to-project = lisp/comint.el
-;;   file-name = comint.el
-;;   buffer-name = comint.el<2> (uniquify buffer name)
-;;
-;; If you are expereicing the laggy issue, especially while editing remote files
-;; with tramp, please try `file-name' style.
-;; Please refer to https://github.com/bbatsov/projectile/issues/657.
-(setq doom-modeline-buffer-file-name-style 'truncate-upto-project)
+(set-face-attribute 'mode-line nil :height tau/font-size-mode-line)
+(set-face-attribute 'mode-line nil
+                    :background "#eee8d5"
+                    :foreground "#657b83"
+                    :box '(:line-width 4 :color "#eee8d5")
+                    :overline nil
+                    :underline nil)
 
-;; Whether display icons in mode-line or not.
-(setq doom-modeline-icon t)
+(set-face-attribute 'mode-line-inactive nil
+                    :background "#fdf6e3"
+                    :foreground "#93a1a1"
+                    :box '(:line-width 4 :color "#eee8d5")
+                    :overline nil
+                    :underline nil)
 
-;; Whether display the icon for major mode. It respects `doom-modeline-icon'.
-(setq doom-modeline-major-mode-icon t)
+(use-package mini-modeline
+  :after doom-modeline
+  :config
+  ;;(setq mini-modeline-l-format) ;; Left part of mini-modeline, same format with mode-line-format.
+  ;;(setq mini-modeline-r-format) ;; Right part of mini-modeline, same format with mode-line-format.
+  (setq mini-modeline-color "#202020") ;; Background of mini-modeline. Will be set if mini-modeline-enhance-visual is t.
+  (setq mini-modeline-enhance-visual t) ;; Enhance minibuffer and window's visibility. This will enable window-divider-mode since without the mode line, two continuous windows are nearly indistinguishable.
+  (setq mini-modeline-echo-duration 4) ;; default 2 ; Duration to keep display echo. mini-modeline will display the message which has been echoed to echo area as part of mode line. Those echo will be automatically clear after this interval. Check out the gif to see it in action.
+  (setq mini-modeline-update-interval 0.1) ;; default 0.1 ; The minimum interval to update mini-modeline. If you found mini-modeline is being updated to frequently, you can customize this variable.
+  (setq mini-modeline-frame nil) ;; default nil ; Frame to display mini-modeline on. nil means current selected frame.
+  (setq mini-modeline-truncate-p nil) ;; Truncates the mini-modeline to fit in one line.
+  ;;(mini-modeline-mode t)
+)
 
-;; Whether display color icons for `major-mode'. It respects
-;; `doom-modeline-icon' and `all-the-icons-color-icons'.
-(setq doom-modeline-major-mode-color-icon t)
+(use-package feebleline
+  :ensure t
+  :config
+  (setq feebleline-msg-functions
+        '((feebleline-line-number         :post "" :fmt "%5s")
+          (feebleline-column-number       :pre ":" :fmt "%-2s")
+          (feebleline-file-directory      :face feebleline-dir-face :post "")
+          (feebleline-file-or-buffer-name :face font-lock-keyword-face :post "")
+          (feebleline-file-modified-star  :face font-lock-warning-face :post "")
+          (feebleline-git-branch          :face feebleline-git-face :pre " : ")
+          (feebleline-project-name        :align right)))
+  (feebleline-mode 1)
+)
 
-;; Whether display icons for buffer states. It respects `doom-modeline-icon'.
-(setq doom-modeline-buffer-state-icon t)
+(use-package doom-modeline
+  :ensure t
+  :init
+  :config
+  (doom-modeline-mode 1)
+  ;; (setq inhibit-compacting-font-caches t)      ;; Don’t compact font caches during GC (garbage collection).
+  (setq doom-modeline-height 23)                  ;; modeline height. only respected in GUI
+  (setq doom-modeline-bar-width 3)                ;; How wide the mode-line bar should be. It's only respected in GUI.
+  (setq doom-modeline-icon t)                     ;; display icons in the modeline
+  (setq doom-modeline-major-mode-icon t)          ;; display the icon for the major mode. it respects `doom-modeline-icon'
+  (setq doom-modeline-major-mode-color-icon t)    ;; display color icons for `major-mode'. It respects `doom-modeline-icon' and `all-the-icons-color-icons'.
+  (setq doom-modeline-buffer-state-icon t)        ;; Whether display icons for buffer states. It respects `doom-modeline-icon'.
+  (setq doom-modeline-buffer-modification-icon t) ;; Whether display buffer modification icon. It respects `doom-modeline-icon' and `doom-modeline-buffer-state-icon'.
+  (setq doom-modeline-minor-modes nil)            ;; Whether display minor modes in mode-line or not.
+  (setq doom-modeline-enable-word-count nil)      ;; If non-nil, a word count will be added to the selection-info modeline segment.
+  (setq doom-modeline-buffer-encoding t)          ;; Whether display buffer encoding.
+  (setq doom-modeline-indent-info nil)            ;; Whether display indentation information.
+  (setq doom-modeline-checker-simple-format t)    ;; If non-nil, only display one number for checker information if applicable.
+  (setq doom-modeline-vcs-max-length 12)          ;; The maximum displayed length of the branch name of version control.
+  (setq doom-modeline-persp-name t)               ;; Whether display perspective name or not. Non-nil to display in mode-line.
+  (setq doom-modeline-persp-name-icon nil)        ;; Whether display icon for persp name. Nil to display a # sign. It respects `doom-modeline-icon'
+  (setq doom-modeline-lsp t)                      ;; Whether display `lsp' state or not. Non-nil to display in mode-line.
+  (setq doom-modeline-github nil)                 ;; Whether display github notifications or not. Requires `ghub` package.
+  (setq doom-modeline-github-interval (* 30 60))  ;; The interval of checking github.
+  (setq doom-modeline-mu4e t)                     ;; Whether display mu4e notifications or not. Requires `mu4e-alert' package.
+  (setq doom-modeline-irc t)                      ;; Whether display irc notifications or not. Requires `circe' package.
+  (setq doom-modeline-irc-stylize 'identity)      ;; Function to stylize the irc buffer names.
 
-;; Whether display buffer modification icon. It respects `doom-modeline-icon'
-;; and `doom-modeline-buffer-state-icon'.
-(setq doom-modeline-buffer-modification-icon t)
+  ;; Determines the style used by `doom-modeline-buffer-file-name'.
+  ;;
+  ;; Given ~/Projects/FOSS/emacs/lisp/comint.el
+  ;;   truncate-upto-project = ~/P/F/emacs/lisp/comint.el
+  ;;   truncate-from-project = ~/Projects/FOSS/emacs/l/comint.el
+  ;;   truncate-with-project = emacs/l/comint.el
+  ;;   truncate-except-project = ~/P/F/emacs/l/comint.el
+  ;;   truncate-upto-root = ~/P/F/e/lisp/comint.el
+  ;;   truncate-all = ~/P/F/e/l/comint.el
+  ;;   relative-from-project = emacs/lisp/comint.el
+  ;;   relative-to-project = lisp/comint.el
+  ;;   file-name = comint.el
+  ;;   buffer-name = comint.el<2> (uniquify buffer name)
+  ;;
+  ;; If you are expereicing the laggy issue, especially while editing remote files
+  ;; with tramp, please try `file-name' style.
+  ;; Please refer to https://github.com/bbatsov/projectile/issues/657.
+  (setq doom-modeline-buffer-file-name-style 'truncate-upto-project)
 
-;; Whether display minor modes in mode-line or not.
-(setq doom-modeline-minor-modes nil)
+  ;; Whether display environment version or not
+  (setq doom-modeline-env-version t)
+  ;; Or for individual languages
+  ;; (setq doom-modeline-env-enable-python t)
+  ;; (setq doom-modeline-env-enable-ruby t)
+  ;; (setq doom-modeline-env-enable-perl t)
+  ;; (setq doom-modeline-env-enable-go t)
+  ;; (setq doom-modeline-env-enable-elixir t)
+  ;; (setq doom-modeline-env-enable-rust t)
 
-;; If non-nil, a word count will be added to the selection-info modeline segment.
-(setq doom-modeline-enable-word-count nil)
+  ;; Change the executables to use for the language version string
+  (setq doom-modeline-env-python-executable "python")
+  (setq doom-modeline-env-ruby-executable "ruby")
+  (setq doom-modeline-env-perl-executable "perl")
+  (setq doom-modeline-env-go-executable "go")
+  (setq doom-modeline-env-elixir-executable "iex")
+  (setq doom-modeline-env-rust-executable "rustc")
 
-;; Whether display buffer encoding.
-(setq doom-modeline-buffer-encoding t)
 
-;; Whether display indentation information.
-(setq doom-modeline-indent-info nil)
-
-;; If non-nil, only display one number for checker information if applicable.
-(setq doom-modeline-checker-simple-format t)
-
-;; The maximum displayed length of the branch name of version control.
-(setq doom-modeline-vcs-max-length 12)
-
-;; Whether display perspective name or not. Non-nil to display in mode-line.
-(setq doom-modeline-persp-name t)
-
-;; Whether display icon for persp name. Nil to display a # sign. It respects `doom-modeline-icon'
-(setq doom-modeline-persp-name-icon nil)
-
-;; Whether display `lsp' state or not. Non-nil to display in mode-line.
-(setq doom-modeline-lsp t)
-
-;; Whether display github notifications or not. Requires `ghub` package.
-(setq doom-modeline-github nil)
-
-;; The interval of checking github.
-(setq doom-modeline-github-interval (* 30 60))
-
-;; Whether display environment version or not
-(setq doom-modeline-env-version t)
-;; Or for individual languages
-;; (setq doom-modeline-env-enable-python t)
-;; (setq doom-modeline-env-enable-ruby t)
-;; (setq doom-modeline-env-enable-perl t)
-;; (setq doom-modeline-env-enable-go t)
-;; (setq doom-modeline-env-enable-elixir t)
-;; (setq doom-modeline-env-enable-rust t)
-
-;; Change the executables to use for the language version string
-(setq doom-modeline-env-python-executable "python")
-(setq doom-modeline-env-ruby-executable "ruby")
-(setq doom-modeline-env-perl-executable "perl")
-(setq doom-modeline-env-go-executable "go")
-(setq doom-modeline-env-elixir-executable "iex")
-(setq doom-modeline-env-rust-executable "rustc")
-
-;; Whether display mu4e notifications or not. Requires `mu4e-alert' package.
-(setq doom-modeline-mu4e t)
-
-;; Whether display irc notifications or not. Requires `circe' package.
-(setq doom-modeline-irc t)
-
-;; Function to stylize the irc buffer names.
-(setq doom-modeline-irc-stylize 'identity)
+  )
 
 (require 'discover)
 (when (featurep 'discover)
@@ -3407,9 +3476,15 @@ Example output:
 ;; (setq scroll-conservatively 10000) ;; scroll one line at a time when you move the cursor past the top or bottom of the window
 ;; (setq scroll-step 1) ;; keyboard scroll one line at a time
 
-(setq mouse-wheel-progressive-speed nil)            ;; don't accelerate scrolling
-(setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ;; one line at a time
-(setq mouse-wheel-follow-mouse 't)                  ;; scroll window under mouse
+(use-package mwheel
+  :ensure nil
+  :custom
+  :config
+  (setq mouse-wheel-progressive-speed nil)            ;; don't accelerate scrolling
+  (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ;; one line at a time
+  (setq mouse-wheel-scroll-amount '(1 ((control) . 5))))
+  (setq mouse-wheel-follow-mouse 't)                  ;; scroll window under mouse
+)
 
 (global-set-key (kbd "<S-mouse-4>") 'scroll-down-line)
 (global-set-key (kbd "<S-mouse-5>") 'scroll-up-line)
@@ -3487,6 +3562,7 @@ Example output:
 
 (use-package editorconfig
   :ensure t
+  :diminish editorconfig-mode
   :config
   (editorconfig-mode 1)
 )
