@@ -1,14 +1,14 @@
 (setq user-full-name "Gustavo P Borges")
-(setq user-mail-address "gugutz@gmail.com")
-(setq work-mail-address "gugutz@stairs.studio")
-(setq gmail-address "gugutz@gmail.com")
-(setq nickname "gugutz")
-;; my secrets
+  (setq user-mail-address "gugutz@gmail.com")
+  (setq work-mail-address "gugutz@stairs.studio")
+  (setq gmail-address "gugutz@gmail.com")
+  (setq nickname "gugutz")
 
+  ;; my secrets
 (let ((secret.el (expand-file-name ".secret.el" user-emacs-directory)))
   (when (file-exists-p secret.el)
     (load secret.el)))
-;; (load-library "~/dotfiles/emacs.d/secrets.el.gpg")
+  ;; (load-library "~/dotfiles/emacs.d/secrets.el.gpg")
 
 (defvar tau/erc-nick               nil        "The ERC nick to use.")
 (defvar tau/erc-password           nil        "The ERC password to use.")
@@ -16,8 +16,8 @@
 (defvar tau/erc-server             nil        "The ERC server to use.")
 (defvar tau/font-family            "Courier"  "The font to use.")
 (defvar tau/font-size-default      110        "The font size to use for default text.")
-(defvar tau/font-size-header-line  120        "The font size to use for the header-line.")
-(defvar tau/font-size-mode-line    110        "The font size to use for the mode-line.")
+(defvar tau/font-size-header-line  80        "The font size to use for the header-line.")
+(defvar tau/font-size-mode-line    100        "The font size to use for the mode-line.")
 (defvar tau/font-size-small        100        "The font size to use for smaller text.")
 (defvar tau/font-size-title        140        "The font size to use for titles.")
 
@@ -33,6 +33,31 @@ tangled, and the tangled file is compiled."
       (byte-compile-file (concat user-emacs-directory "init.el")))))
 
 (add-hook 'after-save-hook #'/util/tangle-init)
+
+;; First save the current value of gc-cons-threshold to restore it after the init file is loaded at the very bottom of this file
+(setq gc-threshold-original gc-cons-threshold)
+
+(setq gc-cons-threshold (* 511 1024 1024))
+(setq gc-cons-percentage 0.5) ;; GC only with 500mb of data allocated
+
+(run-with-idle-timer 5 t #'garbage-collect) ;; GC after 5s idle time
+(setq garbage-collection-messages t)
+
+;; Restore original gc value after init
+;; (add-hook 'after-init-hook (lambda () (setq gc-cons-threshold gc-threshold-original)))
+
+(setq inhibit-compacting-font-caches t)      ;; Don’t compact font caches during GC (garbage collection).
+
+;; First save the current value of gc-cons-threshold to restore it after the init file is loaded at the very bottom of this file
+;;  (setq gc-threshold-original gc-cons-threshold)
+  ;; Show gc messages in the messages buffer
+;;  (setq garbage-collection-messages t)
+  ;; Set high gc-cons-threshold
+;;  (setq gc-cons-threshold 100000000)
+  ;; Restore original gc value after init
+;;  (add-hook 'after-init-hook (lambda () (setq gc-cons-threshold gc-threshold-original)))
+  ;; Defer garbage collection further back in the startup process
+  ;; (setq gc-cons-threshold (if (display-graphic-p) 400000000 100000000))
 
 (require 'package)
 ;; add melpa stable emacs package repository
@@ -67,11 +92,6 @@ tangled, and the tangled file is compiled."
 ;; Init time start
 (defvar my-init-el-start-time (current-time) "Time when init.el was started")
 
-;; Faster startup
-(setq gc-cons-threshold 100000000)
-;; Defer garbage collection further back in the startup process
-;; (setq gc-cons-threshold (if (display-graphic-p) 400000000 100000000))
-
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package)
@@ -103,11 +123,20 @@ tangled, and the tangled file is compiled."
   :ensure t
 )
 
-(require 'epa-file)
-(custom-set-variables '(epg-gpg-program  "c:/Program Files (x86)/GNU/GnuPG/pub/gpg2"))
-(epa-file-enable)
+(use-package epa-file
+  :config
+  (epa-file-enable)
+  (setq epa-file-encrypt-to '("gugutz@gmail.com"))
 
-(require 'gnus)
+  ;; Control whether or not to pop up the key selection dialog.
+  (setq epa-file-select-keys 0)
+  ;; Cache passphrase for symmetric encryption.
+  (setq epa-file-cache-passphrase-for-symmetric-encryption t)
+)
+
+(use-package gnus
+  :ensure nil
+  :config
 (setq user-mail-address "joshuafwolfe@gmail.com"
       user-full-name "Josh Wolfe")
 
@@ -132,7 +161,8 @@ tangled, and the tangled file is compiled."
 
 (define-key gnus-group-mode-map
   ;; list all the subscribed groups even they contain zero un-read messages
-  (kbd "o") 'my-gnus-group-list-subscribed-groups)
+      (kbd "o") 'my-gnus-group-list-subscribed-groups)
+)
 
 ;; (use-package server
 ;;   :ensure nil
@@ -293,6 +323,7 @@ tangled, and the tangled file is compiled."
 (setq require-final-newline t)
 
 (setq-default fill-column 80)
+(setq auto-fill-mode 1)
 
 (prefer-coding-system 'utf-8) ;; Prefer UTF-8 encoding
 
@@ -304,6 +335,8 @@ tangled, and the tangled file is compiled."
 (setq system-uses-terminfo nil) ;; Fix weird color escape sequences
 
 ;; (setq confirm-kill-emacs 'yes-or-no-p) ;; Ask for confirmation before closing emacs
+
+(setq help-window-select t)
 
 (use-package subword
   :ensure nil
@@ -547,19 +580,6 @@ Example output:
   guess-language-min-paragraph-length 45)
 )
 
-(use-package epa-file
-  :config
-  (epa-file-enable)
-  (setq epa-file-encrypt-to '("gugutz@gmail.com"))
-
-  ;; Control whether or not to pop up the key selection dialog.
-  (setq epa-file-select-keys 0)
-  ;; Cache passphrase for symmetric encryption.
-  (setq epa-file-cache-passphrase-for-symmetric-encryption t)
-)
-(require 'epa-file)
-(epa-file-enable)
-
 (use-package exec-path-from-shell
   :if (memq window-system '(mac ns x))
   :ensure t
@@ -609,7 +629,7 @@ Example output:
 (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
 
 (use-package hippie-exp
-  ;;:ensure nil
+  :ensure nil
   :defer t
   :bind
   ("<tab>" . hippie-expand)
@@ -624,8 +644,7 @@ Example output:
           indent-according-to-mode
           emmet-expand-line
           company-indent-or-complete-common
-          )
-  )
+          ))
 )
 
 (use-package evil
@@ -711,8 +730,6 @@ Example output:
 
   ;; recover native emacs commands that are overriden by evil
   ;; this gives priority to native emacs behaviour rathen than Vim's
-  (define-key evil-normal-state-map (kbd "SPC") 'ace-jump-mode)
-  (define-key evil-visual-state-map (kbd "SPC") 'ace-jump-mode)
   (define-key evil-normal-state-map (kbd "C-e") 'evil-end-of-line)
   (define-key evil-insert-state-map (kbd "C-e") 'move-end-of-line)
   (define-key evil-visual-state-map (kbd "C-e") 'evil-end-of-line)
@@ -750,7 +767,7 @@ Example output:
 )
 
 (use-package evil-org
-  :after org
+  :after org evil
   :hook
   (org-mode . evil-org-mode)
   :config
@@ -861,7 +878,7 @@ Example output:
   :config
   (evil-goggles-mode)
   (setq evil-goggles-pulse t) ;; default is to pulse when running in a graphic display
-  (setq evil-goggles-duration 0.100) ;; default is 0.200
+  (setq evil-goggles-duration 0.200) ;; default is 0.200
 
 ;; list of all on/off variables, their default value is `t`:
 
@@ -907,6 +924,9 @@ Example output:
 (use-package org
   :ensure org-plus-contrib
   :defer t
+:hook
+(org-mode . diff-hl-mode)
+(org-mode . rainbow-mode)
   :bind
   ("C-c l" . org-store-link)
   ("C-c a" . org-agenda)
@@ -1060,24 +1080,6 @@ Example output:
   :ensure t
   :defer t
   :after org
-)
-
-(use-package hydra
-  :ensure t
-)
-
-(use-package major-mode-hydra
-  :ensure t)
-
-(use-package hydra-posframe
-  :load-path "packages"
-  :custom
-  (hydra-posframe-parameters
-    '((left-fringe . 5)
-      (right-fringe . 5)))
-  :custom-face
-  (hydra-posframe-border-face ((t (:background "#6272a4"))))
-  :hook (after-init . hydra-posframe-enable)
 )
 
 (use-package shell-pop
@@ -1273,106 +1275,11 @@ Example output:
                  ((org-agenda-overriding-header "Assigned to me"))))))
 )
 
-(use-package helm
-  :ensure t
-  :diminish helm-mode
-  :bind
-  ;; ("M-x" . helm-M-x)
-  ("C-c h" . helm-command-prefix)
-  ("C-x b" . helm-buffers-list)
-  ("C-x C-b" . helm-mini)
-  ("C-x C-f" . helm-find-files)
-  ("C-x r b" . helm-bookmarks)
-  ("M-y" . helm-show-kill-ring)
-  ("M-:" . helm-eval-expression-with-eldoc)
-  (:map helm-map
-  ("C-z" . helm-select-action)
-  ("C-h a" . helm-apropos)
-  ("C-c h" . helm-execute-persistent-action)
-  ("<tab>" . helm-execute-persistent-action)
-  )
-  :init
-  (setq helm-autoresize-mode t)
-  (setq helm-buffer-max-length 40)
-  (setq helm-bookmark-show-location t)
-  (setq helm-buffer-max-length 40)
-  (setq helm-split-window-inside-p t)
-
-  ;; turn on helm fuzzy matching
-  (setq helm-M-x-fuzzy-match t)
-  (setq helm-mode-fuzzy-match t)
-
-  (setq helm-ff-file-name-history-use-recentf t)
-  (setq helm-ff-skip-boring-files t)
-  (setq helm-follow-mode-persistent t)
-  ;; take between 10-30% of screen space
-  (setq helm-autoresize-min-height 10)
-  (setq helm-autoresize-max-height 30)
-  :config
-  (require 'helm-config)
-  (helm-mode 1)
-  ;; Make helm replace the default Find-File and M-x
-  (global-set-key [remap execute-extended-command] #'helm-M-x)
-  (global-set-key [remap find-file] #'helm-find-files)
-  ;; helm bindings
-  (global-unset-key (kbd "C-x c"))
-)
-
-(use-package helm-ag
-  :ensure helm-ag
-  :bind ("M-p" . helm-projectile-ag)
-  :commands (helm-ag helm-projectile-ag)
-  :init (setq helm-ag-insert-at-point 'symbol
-	      helm-ag-command-option "--path-to-ignore ~/.agignore"))
-
-(use-package helm-rg
-  :ensure t
-  :defer t
-)
-
-(use-package ag
-  :custom
-  (ag-highligh-search t)
-  (ag-reuse-buffers t)
-  (ag-reuse-window t)
-  :bind
-  ("M-s a" . ag-project)
-  :config
-  (use-package wgrep-ag)
-)
-
-(use-package wgrep
-  :defer t
-  :custom
-  (wgrep-enable-key "e")
-  (wgrep-auto-save-buffer t)
-  (wgrep-change-readonly-file t)
-)
-
-(use-package rg
-  :ensure t
-  :defer t
-  :ensure-system-package
-  (rg . ripgrep)
-  :config
-  ;; choose between default keybindings or magit like menu interface.
-  ;; both options are mutually exclusive
-  (rg-enable-default-bindings)
-  ;;(rg-enable-menu)
-
-)
-
-(use-package helm-fuzzier
-  :disabled nil
-  :ensure t
-  :after helm
-  :config
-  (helm-fuzzier-mode 1)
-)
-
 (use-package ivy
   :ensure t
   :diminish ivy-mode
+  :hook
+  (after-init . ivy-mode)
   :custom
   (ivy-re-builders-alist
   '((t . ivy--regex-plus)))
@@ -1405,7 +1312,6 @@ Example output:
   (swiper-action-recenter t)
   (counsel-grep-base-command "ag -S --noheading --nocolor --nofilename --numbers '%s' %s")
   :hook
-  (after-init . ivy-mode)
   (ivy-mode . counsel-mode)
   ;; check out this better-jumper mode to see what it does
   ;; (counsel-grep-post-action . better-jumper-set-jump)
@@ -1538,50 +1444,68 @@ Example output:
        (lambda (cand) (get-buffer cand)))))
 )
 
-(use-package swiper
-  :disabled
+(use-package helm
   :ensure t
-  :bind
-  (("C-s" . swiper-isearch)
-   :map swiper-map
-   ("M-q" . swiper-query-replace)
-   ("C-l". swiper-recenter-top-bottom)
-   ("C-'" . swiper-avy))
-  :custom
-  (counsel-grep-swiper-limit 20000)
-  (counsel-rg-base-command
-   "rg -i -M 120 --no-heading --line-number --color never %s .")
-  (counsel-grep-base-command
-   "rg -i -M 120 --no-heading --line-number --color never '%s' %s")
+  :config
+  (require 'helm-config)
+  (helm-mode 1)
 )
 
-(use-package snails
-  :disabled
-  :ensure nil
-  :if window-system
-  :bind
-  ("M-s s" . snails)
-  ("M-s g" . snails-current-project)
-  ("M-s b" . snails-active-recent-buffers)
-  ("M-s e" . snails-everywhere)
-  :custom-face
-  (snails-content-buffer-face ((t (:background "#111" :height 110))))
-  (snails-input-buffer-face ((t (:background "#222" :foreground "gold" :height 110))))
-  (snails-header-line-face ((t (:inherit font-lock-function-name-face :underline t :height 1.1))))
-  :config
-  (use-package exec-path-from-shell
-    :if (featurep 'cocoa) :defer t)
+(use-package helm-ag
+  :ensure helm-ag
+  :bind ("M-p" . helm-projectile-ag)
+  :commands (helm-ag helm-projectile-ag)
+  :init (setq helm-ag-insert-at-point 'symbol
+	      helm-ag-command-option "--path-to-ignore ~/.agignore"))
 
-  ;; Functions for specific backends
-  (defun snails-current-project ()
-    (interactive)
-    (snails '(snails-backend-projectile snails-backend-rg snails-backend-fd)))
-  (defun snails-active-recent-buffers ()
-    (interactive)
-    (snails '(snails-backend-buffer snails-backend-recentf)))
-  (defun snails-everywhere ()
-    (interactive)
-    (snails '(snails-backend-everything snails-backend-mdfind)))
+(use-package hydra
+  :ensure t
+)
+
+(use-package major-mode-hydra
+  :ensure t)
+
+(use-package hydra-posframe
+  :load-path "packages"
+  :custom
+  (hydra-posframe-parameters
+    '((left-fringe . 5)
+      (right-fringe . 5)))
+  :custom-face
+  (hydra-posframe-border-face ((t (:background "#6272a4"))))
+  :hook (after-init . hydra-posframe-enable)
+)
+
+(use-package ag
+  :custom
+  (ag-highligh-search t)
+  (ag-reuse-buffers t)
+  (ag-reuse-window t)
+  :bind
+  ("M-s a" . ag-project)
+  :config
+  (use-package wgrep-ag)
+)
+
+(use-package wgrep
+  :defer t
+  :custom
+  (wgrep-enable-key "e")
+  (wgrep-auto-save-buffer t)
+  (wgrep-change-readonly-file t)
+)
+
+(use-package rg
+  :ensure t
+  :defer t
+  :ensure-system-package
+  (rg . ripgrep)
+  :config
+  ;; choose between default keybindings or magit like menu interface.
+  ;; both options are mutually exclusive
+  (rg-enable-default-bindings)
+  ;;(rg-enable-menu)
+
 )
 
 (use-package flycheck
@@ -1705,58 +1629,6 @@ Example output:
   (magit-todos-mode)
 )
 
-(use-package diff-hl
-  :ensure t
-    :custom-face (diff-hl-change ((t (:foreground ,(face-background 'highlight)))))
-  :hook
-  (prog-mode . diff-hl-mode)
-  (org-mode . diff-hl-mode)
-  (dired-mode . diff-hl-mode)
-  (magit-post-refresh . diff-hl-mode)
-  :init
-  ;; (add-hook 'prog-mode-hook #'diff-hl-mode)
-  ;; (add-hook 'org-mode-hook #'diff-hl-mode)
-  ;; (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
-  ;; (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
-
-  ;; Better looking colours for diff indicators
-  (custom-set-faces
-    '(diff-hl-change ((t (:background "#3a81c3"))))
-    '(diff-hl-insert ((t (:background "#7ccd7c"))))
-    '(diff-hl-delete ((t (:background "#ee6363"))))
-  )
-
-  :config
-
-  (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
-  (setq diff-hl-side 'left)
-  (setq diff-hl-margin-side 'left)
-  ;; Set fringe style
-  (setq-default fringes-outside-margins t)
-
-
-  (diff-hl-margin-mode 1) ;; show the indicators in the margin
-  (diff-hl-flydiff-mode 1) ;;  ;; On-the-fly diff updates
-
-
-  (unless (display-graphic-p)
-  (setq diff-hl-margin-symbols-alist
-        '((insert . " ") (delete . " ") (change . " ")
-          (unknown . " ") (ignored . " ")))
-  ;; Fall back to the display margin since the fringe is unavailable in tty
-  (diff-hl-margin-mode 1)
-  ;; Avoid restoring `diff-hl-margin-mode'
-  (with-eval-after-load 'desktop
-    (add-to-list 'desktop-minor-mode-table
-                 '(diff-hl-margin-mode nil))))
-
-    ;; Integration with magit
-  (with-eval-after-load 'magit
-    (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
-
-  (global-diff-hl-mode 1) ;; Enable diff-hl globally
-)
-
 (use-package git-messenger
   :ensure t
   :bind
@@ -1822,6 +1694,7 @@ Example output:
 )
 
 (use-package corral
+  :ensure t
   :bind
   ("M-9" . corral-parentheses-backward)
   :config
@@ -2306,6 +2179,13 @@ Example output:
   :ensure t
 )
 
+(use-package ivy-explorer
+  :ensure t
+  :config
+  ;; use ivy explorer for all file dialogs
+  (ivy-explorer-mode 1)
+)
+
 (use-package dired-k
   :after dired
   :config
@@ -2624,18 +2504,6 @@ Example output:
   (setq eyebrowse-new-workspace t)
 )
 
-(use-package windmove
-  :ensure t
-  :config
-  ;; use shift + arrow keys to switch between visible buffers
-  ;; (windmove-default-keybindings)
-  (windmove-default-keybindings 'control)
-  (global-set-key (kbd "C-S-H") 'windmove-left)
-  (global-set-key (kbd "C-S-L") 'windmove-right)
-  (global-set-key (kbd "C-S-K") 'windmove-up)
-  (global-set-key (kbd "C-S-J") 'windmove-down)
-)
-
 (use-package rotate
   :ensure t
   :bind
@@ -2643,43 +2511,19 @@ Example output:
   ("C-c C-r l" . rotate-layout)
 )
 
-(use-package ace-jump-mode
-  :ensure t
-  :bind
-  ("C-." . ace-jump-mode)
-)
+(setq echo-keystrokes 0.02)
 
-;; (pdf-tools-install)
-;; the docs say if i care about startup time, i should use pdf-loader-install instead of pdf-tools-install, but doenst say why
-;; (pdf-loader-install)
+;; Hilight trailing whitespace
+;; like this -->
+;;
+(setq-default show-trailing-whitespace t)
+(set-face-background 'trailing-whitespace "orange1")
 
-(add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
-;; (add-hook 'pdf-view-mode-hook 'auto-revert-mode)
-;; (add-hook 'doc-view-mode-hook 'auto-revert-mode)
+(setq-default indicate-buffer-boundaries 'left)
+(setq-default indicate-empty-lines t)
 
-(evil-define-key 'normal pdf-view-mode-map
-  "h" 'pdf-view-previous-page-command
-  "j" (lambda () (interactive) (pdf-view-next-line-or-next-page 5))
-  "k" (lambda () (interactive) (pdf-view-previous-line-or-previous-page 5))
-  "l" 'pdf-view-next-page-command)
-
-(use-package edit-server
-  :if (and window-system
-           (not alternate-emacs))
-  ;; :if window-system
-  :ensure t
-  :defer 5
-  :disabled
-  :config
-  (edit-server-start)
-)
-
-(use-package atomic-chrome
-  :ensure t
-  :disabled
-  :config
-  (atomic-chrome-start-server)
-)
+(setq display-time-24hr-format t)
+(display-time-mode +1)
 
 ;; appearantly the `inhibit-splash-screen' was deprecaded. uses `inhibit-startup-screen' now
 (setq inhibit-splash-screen t)
@@ -2691,6 +2535,7 @@ Example output:
 ;; Makes *scratch* empty.
 (setq initial-scratch-message nil)
 ;; Don't show *Buffer list* when opening multiple files at the same time.
+(setq initial-major-mode 'org-mode)  ;;start in org-mode
 (setq inhibit-startup-buffer-menu t)
 ;; Make the buffer that opens on startup your init file ("~/.emacs" or
 ;; "~/.emacs.d/init.el").
@@ -2770,32 +2615,6 @@ Example output:
   :commands (vscode-icon-for-file)
 )
 
-(use-package parrot
-  :ensure t
-  :config
-  ;; To see the party parrot in the modeline, turn on parrot mode:
-  (parrot-mode)
-  (parrot-set-parrot-type 'default)
-  ;; Rotate the parrot when clicking on it (this can also be used to execute any function when clicking the parrot, like 'flyspell-buffer)
-  (add-hook 'parrot-click-hook #'parrot-start-animation)
-  ;; Rotate parrot when buffer is saved
-  (add-hook 'after-save-hook #'parrot-start-animation)
-  ;;/Rotation function keybindings for evil users
-  (define-key evil-normal-state-map (kbd "[r") 'parrot-rotate-prev-word-at-point)
-  (define-key evil-normal-state-map (kbd "]r") 'parrot-rotate-next-word-at-point)
-  (add-hook 'mu4e-index-updated-hook #'parrot-start-animation)
-)
-
-(use-package nyan-mode
-   :if window-system
-   :hook
-   (after-init . nyan-mode)
-   :config
-   (setq nyan-cat-face-number 4)
-   (setq nyan-animate-nyancat t)
-   (setq nyan-wavy-trail t)
-   (nyan-start-animation))
-
 ;; (use-package solaire-mode
 ;;   :config
 ;;   (solaire-mode)
@@ -2833,9 +2652,90 @@ Example output:
 (add-hook 'after-init-hook #'global-emojify-mode)
 )
 
+(dolist (frame (frame-list))
+  (set-frame-parameter frame 'bottom-divider-width 1)
+  (set-frame-parameter frame 'right-divider-width 1))
+
+
+           (push (cons 'bottom-divider-width 1) default-frame-alist)
+           (push (cons 'right-divider-width 1) default-frame-alist)
+
+(setq resize-mini-windows t)
+(setq max-mini-window-height 0.33)
+
+(use-package swiper
+  :disabled
+  :ensure t
+  :bind
+  (("C-s" . swiper-isearch)
+   :map swiper-map
+   ("M-q" . swiper-query-replace)
+   ("C-l". swiper-recenter-top-bottom)
+   ("C-'" . swiper-avy))
+  :custom
+  (counsel-grep-swiper-limit 20000)
+  (counsel-rg-base-command
+   "rg -i -M 120 --no-heading --line-number --color never %s .")
+  (counsel-grep-base-command
+   "rg -i -M 120 --no-heading --line-number --color never '%s' %s")
+)
+
+(use-package avy
+  :ensure t
+  :bind
+  ("M-j" . avy-goto-char-2)
+  ("C-:" . avy-goto-char)
+  ("C-'" . avy-goto-char-2)
+  ;; replace native M-g g `goto-line' with `avy-goto-line'
+  ("M-g f" .  avy-goto-line)
+  ("M-g g" .  avy-goto-line)
+  ("M-g w" . avy-goto-word-1)
+  ("M-g e" . avy-goto-word-0)
+  (:map isearch-mode-map
+  ("C-'" . avy-search))
+  (:map evil-normal-state-map
+  ("SPC" . avy-goto-char))
+  (:map evil-visual-state-map
+  ("SPC" . avy-goto-char))
+  :config
+  (setq avy-background t) ;; default nil ;; gray background will be added during the selection.
+  (setq avy-highlight-first t) ;; When non-nil highlight the first decision char with avy-lead-face-0. Do this even when the char is terminating.
+
+  ;; nil: use only the selected window
+  ;; t: use all windows on the selected frame
+  ;; all-frames: use all windows on all frames
+  (setq avy-all-windows nil) ;;
+)
+
+(use-package ace-jump-mode
+  :disabled
+  :ensure t
+  :bind
+  ("C-." . ace-jump-mode)
+)
+
+(use-package windmove
+  :ensure t
+  :config
+  ;; use shift + arrow keys to switch between visible buffers
+  ;; (windmove-default-keybindings)
+  (windmove-default-keybindings 'control)
+  (global-set-key (kbd "C-S-H") 'windmove-left)
+  (global-set-key (kbd "C-S-L") 'windmove-right)
+  (global-set-key (kbd "C-S-K") 'windmove-up)
+  (global-set-key (kbd "C-S-J") 'windmove-down)
+)
+
 (line-number-mode t)
 (column-number-mode t)
 (size-indication-mode t)
+
+(use-package show-point-mode
+  :ensure nil
+  :load-path "packages/show-point-mode"
+  :config
+ (show-point-mode t)
+)
 
 (use-package anzu
   :ensure t
@@ -2859,23 +2759,37 @@ Example output:
 ;;  (define-key isearch-mode-map [remap isearch-query-replace-regexp] #'anzu-isearch-query-replace-regexp)
 )
 
+(setq mode-line-format
+      (list
+       ;; value of `mode-name'
+       "%m: "
+       ;; value of current buffer name
+       "buffer %b, "
+       ;; value of current line number
+       "line %l "
+       "-- user: "
+       ;; value of user
+       (getenv "USER"))
+)
+
 (set-face-attribute 'mode-line nil :height tau/font-size-mode-line)
 (set-face-attribute 'mode-line nil
-                    :background "#eee8d5"
-                    :foreground "#657b83"
-                    :box '(:line-width 4 :color "#eee8d5")
+                    :background "#007ad3"
+                    :foreground "#ffffff"
+                    :box '(:line-width 4 :color "#007ad3") ;; modeline border
                     :overline nil
                     :underline nil)
 
+;; for now the inactive modeline looks the same as the active one
 (set-face-attribute 'mode-line-inactive nil
-                    :background "#fdf6e3"
-                    :foreground "#93a1a1"
-                    :box '(:line-width 4 :color "#eee8d5")
+                    :background "#007ad3"
+                    :foreground "#ffffff"
+                    :box '(:line-width 4 :color "#007ad3") ;; modeline border
                     :overline nil
                     :underline nil)
 
 (use-package mini-modeline
-  :after doom-modeline
+  :ensure t
   :config
   ;;(setq mini-modeline-l-format) ;; Left part of mini-modeline, same format with mode-line-format.
   ;;(setq mini-modeline-r-format) ;; Right part of mini-modeline, same format with mode-line-format.
@@ -2902,13 +2816,53 @@ Example output:
   (feebleline-mode 1)
 )
 
+(use-package lunar-mode-line
+  :ensure nil
+  :load-path "packages/lunar-mode-line"
+)
+
+(use-package celestial-mode-line
+  :ensure t
+  :config
+  (setq calendar-longitude 25.5)
+  (setq calendar-latitude 17.5)
+  (setq calendar-location-name "Some place")
+  ;; Icons customization
+  (defvar celestial-mode-line-phase-representation-alist '((0 . "○") (1 . "☽") (2 . "●") (3 . "☾")))
+  (defvar celestial-mode-line-sunrise-sunset-alist '((sunrise . "☀↑") (sunset . "☀↓")))
+  ;; add to end of global-mode-string
+  (if (null global-mode-string)
+      (setq global-mode-string '("" celestial-mode-line-string))
+  (add-to-list 'global-mode-string 'celestial-mode-line-string t))
+  ;; Start the timer, to update every few minutes:
+  (celestial-mode-line-start-timer)
+)
+
+(use-package common-header-mode-line
+  :load-path "packages/common-header-mode-line"
+  :disabled
+  :ensure nil
+  ;;:hook
+  ;; (after-init . (lambda () (common-header-line-mode 1)))
+  ;; (after-init . (lambda () (common-mode-line-mode 1)))
+  :config
+  ;;(with-eval-after-load "common-header-mode-line-autoloads"
+  ;;  (common-mode-line-mode 1)
+  ;;  (common-header-line-mode 1))
+)
+
+(use-package minions
+  :ensure t
+  :config
+  (minions-mode 1)
+)
+
 (use-package doom-modeline
   :ensure t
   :init
   :config
   (doom-modeline-mode 1)
-  ;; (setq inhibit-compacting-font-caches t)      ;; Don’t compact font caches during GC (garbage collection).
-  (setq doom-modeline-height 23)                  ;; modeline height. only respected in GUI
+  (setq doom-modeline-height 20)                  ;; modeline height. only respected in GUI
   (setq doom-modeline-bar-width 3)                ;; How wide the mode-line bar should be. It's only respected in GUI.
   (setq doom-modeline-icon t)                     ;; display icons in the modeline
   (setq doom-modeline-major-mode-icon t)          ;; display the icon for the major mode. it respects `doom-modeline-icon'
@@ -2966,9 +2920,33 @@ Example output:
   (setq doom-modeline-env-go-executable "go")
   (setq doom-modeline-env-elixir-executable "iex")
   (setq doom-modeline-env-rust-executable "rustc")
+)
 
+(use-package parrot
+  :ensure t
+  :config
+  ;; To see the party parrot in the modeline, turn on parrot mode:
+  (parrot-mode)
+  (parrot-set-parrot-type 'default)
+  ;; Rotate the parrot when clicking on it (this can also be used to execute any function when clicking the parrot, like 'flyspell-buffer)
+  (add-hook 'parrot-click-hook #'parrot-start-animation)
+  ;; Rotate parrot when buffer is saved
+  (add-hook 'after-save-hook #'parrot-start-animation)
+  ;;/Rotation function keybindings for evil users
+  (define-key evil-normal-state-map (kbd "[r") 'parrot-rotate-prev-word-at-point)
+  (define-key evil-normal-state-map (kbd "]r") 'parrot-rotate-next-word-at-point)
+  (add-hook 'mu4e-index-updated-hook #'parrot-start-animation)
+)
 
-  )
+(use-package nyan-mode
+   :if window-system
+   :hook
+   (after-init . nyan-mode)
+   :config
+   (setq nyan-cat-face-number 4)
+   (setq nyan-animate-nyancat t)
+   (setq nyan-wavy-trail t)
+   (nyan-start-animation))
 
 (require 'discover)
 (when (featurep 'discover)
@@ -3017,9 +2995,8 @@ Example output:
 
 (use-package sublimity
   :ensure t
+  :disabled
   :config
-  ;;(setq sublimity-scroll-weight 10
-  ;;    sublimity-scroll-drift-length 5)
   (sublimity-mode 1)
 )
 
@@ -3230,41 +3207,56 @@ Example output:
 (add-hook 'org-mode-hook 'add-pretty-lambda)
 
 (use-package centaur-tabs
- :ensure t
- :hook
- (after-init . centaur-tabs-mode)
- (dashboard-mode . centaur-tabs-local-mode)
- (term-mode . centaur-tabs-local-mode)
- (calendar-mode . centaur-tabs-local-mode)
- (org-agenda-mode . centaur-tabs-local-mode)
- (helpful-mode . centaur-tabs-local-mode)
- :bind
- ("C-<prior>" . centaur-tabs-backward)
- ("C-<next>" . centaur-tabs-forward)
- ("C-c t s" . centaur-tabs-counsel-switch-group)
- ("C-c t p" . centaur-tabs-group-by-projectile-project)
- ("C-c t g" . centaur-tabs-group-buffer-groups)
- (:map evil-normal-state-map
- ("g t" . centaur-tabs-forward)
- ("g T" . centaur-tabs-backward))
- :init
- :config
- ;; appearantly these dont work if put in :init
- (setq centaur-tabs-style "box")           ; types available: (alternative, bar, box, chamfer, rounded, slang, wave, zigzag)
- (setq centaur-tabs-height 25)
- (setq centaur-tabs-set-icons t)           ;; display themed icons from all the icons
- (setq centaur-tabs-set-modified-marker t) ;; display a marker indicating that a buffer has been modified (atom-style)
- (setq centaur-tabs-modified-marker "*")
- (centaur-tabs-headline-match)
- (centaur-tabs-mode t)
-
- (setq centaur-tabs-set-bar 'over)         ;; in previous config value was 'over
- ;; (setq centaur-tabs-gray-out-icons 'buffer)
- ;; (centaur-tabs-enable-buffer-reordering)
- ;; (setq centaur-tabs-adjust-buffer-order t)
- (setq uniquify-separator "/")
- (setq uniquify-buffer-name-style 'forward)
- ;; (centaur-tabs-change-fonts "arial" 160)
+  :ensure t
+  :hook
+  (after-init . centaur-tabs-mode)
+  (dashboard-mode . centaur-tabs-local-mode)
+  (term-mode . centaur-tabs-local-mode)
+  (calendar-mode . centaur-tabs-local-mode)
+  (org-agenda-mode . centaur-tabs-local-mode)
+  (helpful-mode . centaur-tabs-local-mode)
+  :custom
+  ;; appearantly these dont work if put in :init
+  (centaur-tabs-style "bar")           ; types available: (alternative, bar, box, chamfer, rounded, slang, wave, zigzag)
+  (centaur-tabs-height 28)
+  (centaur-tabs-set-icons t)           ;; display themed icons from all the icons
+  (centaur-tabs-set-modified-marker t) ;; display a marker indicating that a buffer has been modified (atom-style)
+  (centaur-tabs-modified-marker "*")
+  (centaur-tabs-set-close-button t)
+  (centaur-tabs-close-button "X")
+  (centaur-tabs-set-bar 'over)         ;; in previous config value was 'over
+  (centaur-tabs-gray-out-icons 'buffer)
+  (centaur-tabs-adjust-buffer-order t)
+  (uniquify-separator "/")
+  (uniquify-buffer-name-style 'forward)
+  :custom-face
+  (centaur-tabs-active-bar-face ((t (:background "cyan"))))
+  (centaur-tabs-default ((t (:background "black" :foreground "black"))))
+  (centaur-tabs-unselected ((t (:background "#292929" :foreground "grey50"))))
+  (centaur-tabs-selected ((t (:background "#181818" :foreground "white"))))
+  (centaur-tabs-unselected-modified ((t (:background "#3D3C3D" :foreground "grey50"))))
+  (centaur-tabs-selected-modified ((t (:background "#181818" :foreground "white"))))
+  (centaur-tabs-close-unselected ((t (:inherit centaur-tabs-unselected))))
+  (centaur-tabs-close-selected ((t (:inherit centaur-tabs-selected))))
+  (centaur-tabs-close-mouse-face ((t (:inherit underline))))
+  (centaur-tabs-modified-marker-selected ((t (:inherit centaur-tabs-selected))))
+  (centaur-tabs-modified-marker-unselected ((t (:inherit centaur-tabs-unselected))))
+  :bind
+  ("C-<prior>" . centaur-tabs-backward)
+  ("C-<next>" . centaur-tabs-forward)
+  ("C-c t s" . centaur-tabs-counsel-switch-group)
+  ("C-c t p" . centaur-tabs-group-by-projectile-project)
+  ("C-c t g" . centaur-tabs-group-buffer-groups)
+  (:map evil-normal-state-map
+  ("g t" . centaur-tabs-forward)
+  ("g T" . centaur-tabs-backward))
+;;  :init
+  :config
+  ;; functions
+  ;; (centaur-tabs-change-fonts "arial" 160)
+  (centaur-tabs-headline-match)
+  (centaur-tabs-enable-buffer-reordering)
+  (centaur-tabs-mode t)
 )
 
 (use-package hideshowvis
@@ -3283,6 +3275,8 @@ Example output:
   :custom-face
   (show-paren-match ((nil (:background "#44475a" :foreground "#f1fa8c")))) ;; :box t
   :config
+  (set-face-background 'show-paren-mismatch "red")
+  (set-face-background 'show-paren-match "#4445e0")
   (setq show-paren-delay 0)
   (setq show-paren-style 'mixed)
   (setq show-paren-when-point-inside-paren t)
@@ -3312,6 +3306,57 @@ Example output:
   :ensure t
   :hook
   (prog-mode . highlight-parentheses-mode)
+)
+
+(use-package diff-hl
+  :ensure t
+    :custom-face (diff-hl-change ((t (:foreground ,(face-background 'highlight)))))
+  :hook
+  (prog-mode . diff-hl-mode)
+  (dired-mode . diff-hl-mode)
+  (magit-post-refresh . diff-hl-mode)
+  :init
+  ;; (add-hook 'prog-mode-hook #'diff-hl-mode)
+  ;; (add-hook 'org-mode-hook #'diff-hl-mode)
+  ;; (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+  ;; (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+
+  ;; Better looking colours for diff indicators
+  (custom-set-faces
+    '(diff-hl-change ((t (:background "#3a81c3"))))
+    '(diff-hl-insert ((t (:background "#7ccd7c"))))
+    '(diff-hl-delete ((t (:background "#ee6363"))))
+  )
+
+  :config
+
+  (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
+  (setq diff-hl-side 'left)
+  (setq diff-hl-margin-side 'left)
+  ;; Set fringe style
+  (setq-default fringes-outside-margins t)
+
+
+  (diff-hl-margin-mode 1) ;; show the indicators in the margin
+  (diff-hl-flydiff-mode 1) ;;  ;; On-the-fly diff updates
+
+
+  (unless (display-graphic-p)
+  (setq diff-hl-margin-symbols-alist
+        '((insert . " ") (delete . " ") (change . " ")
+          (unknown . " ") (ignored . " ")))
+  ;; Fall back to the display margin since the fringe is unavailable in tty
+  (diff-hl-margin-mode 1)
+  ;; Avoid restoring `diff-hl-margin-mode'
+  (with-eval-after-load 'desktop
+    (add-to-list 'desktop-minor-mode-table
+                 '(diff-hl-margin-mode nil))))
+
+    ;; Integration with magit
+  (with-eval-after-load 'magit
+    (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
+
+  (global-diff-hl-mode 1) ;; Enable diff-hl globally
 )
 
 ;; NOTE that the highlighting works even in comments.
@@ -3401,7 +3446,6 @@ Example output:
 (use-package rainbow-mode
   :ensure t
   :hook
-  (org-mode . rainbow-mode)
   (css-mode . rainbow-mode)
   (scss-mode . rainbow-mode)
   (php-mode . rainbow-mode)
@@ -3469,20 +3513,20 @@ Example output:
   (highlight-context-line-mode 1)
 )
 
-;; (setq scroll-preserve-screen-position 1)  ;; centered screen scrolling
-;; (setq scroll-margin 10
-;; (setq maximum-scroll-margin 0.5)
-;; (setq scroll-step 1)
-;; (setq scroll-conservatively 10000) ;; scroll one line at a time when you move the cursor past the top or bottom of the window
-;; (setq scroll-step 1) ;; keyboard scroll one line at a time
+;;(setq redisplay-dont-pause t)
+  ;; (setq scroll-preserve-screen-position 1)  ;; centered screen scrolling
+  ;; (setq scroll-margin 10
+  ;; (setq maximum-scroll-margin 0.5)
+  ;; (setq scroll-step 1)
+  ;; (setq scroll-conservatively 10000) ;; scroll one line at a time when you move the cursor past the top or bottom of the window
+  ;; (setq scroll-step 1) ;; keyboard scroll one line at a time
 
 (use-package mwheel
   :ensure nil
-  :custom
   :config
   (setq mouse-wheel-progressive-speed nil)            ;; don't accelerate scrolling
   (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ;; one line at a time
-  (setq mouse-wheel-scroll-amount '(1 ((control) . 5))))
+  (setq mouse-wheel-scroll-amount '(1 ((control) . 5)))
   (setq mouse-wheel-follow-mouse 't)                  ;; scroll window under mouse
 )
 
@@ -3508,20 +3552,21 @@ Example output:
 
 (use-package fast-scroll
 :disabled
-    :ensure t
-    ;; If you would like to turn on/off other modes, like flycheck, add
-    ;; your own hooks.
-  :init
-  (setq fast-scroll-throttle 0.5)
-  :config
-    (add-hook 'fast-scroll-start-hook (lambda () (flycheck-mode -1)))
-    (add-hook 'fast-scroll-end-hook (lambda () (flycheck-mode 1)))
-    (fast-scroll-config)
-    (fast-scroll-mode 1)
+:ensure t
+;; If you would like to turn on/off other modes, like flycheck, add
+;; your own hooks.
+:init
+(setq fast-scroll-throttle 0.5)
+:config
+(add-hook 'fast-scroll-start-hook (lambda () (flycheck-mode -1)))
+(add-hook 'fast-scroll-end-hook (lambda () (flycheck-mode 1)))
+(fast-scroll-config)
+(fast-scroll-mode 1)
 )
 
 (use-package centered-cursor-mode
   :ensure t
+  :disabled
   :config
   (global-centered-cursor-mode)
 )
