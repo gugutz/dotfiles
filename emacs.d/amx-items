@@ -1,13 +1,13 @@
 
 ;; ----- amx-history -----
 (
- ripgrep-regexp
  package-install
- snails-current-project
+ snake
+ animate-birthday-present
+ butterfly
+ ripgrep-regexp
  sublimity-mode
  smooth-scrolling-mode
- flycheck-mode
- org-bullets-mode
 )
 
 ;; ----- amx-data -----
@@ -22,7 +22,7 @@
  (counsel-projectile-mode . 2)
  (swiper-avy . 2)
  (align-regexp . 3)
- (package-install . 7)
+ (package-install . 9)
  (package-refresh-contents . 2)
  (package-delete . 4)
  (electric-indent-mode . 1)
@@ -51,4 +51,7 @@
  (sublimity-mode . 1)
  (snails-current-project . 1)
  (ripgrep-regexp . 1)
+ (butterfly . 1)
+ (animate-birthday-present . 1)
+ (snake . 2)
 )

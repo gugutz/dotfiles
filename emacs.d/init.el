@@ -1553,7 +1553,7 @@ Example output:
   ;; Set fringe style
   (setq flycheck-indication-mode 'right-fringe)
 
-  ;; (setq flycheck-mode-line-prefix "Syntax")
+  (setq flycheck-mode-line-prefix "Syntax")
 
   ;; (global-flycheck-inline-mode)
   (setq flycheck-inline-display-function
@@ -2707,6 +2707,97 @@ Example output:
   (setq avy-all-windows nil) ;;
 )
 
+(use-package ace-window
+  :functions hydra-frame-window/body
+  :bind
+  ("C-M-o" . hydra-frame-window/body)
+  ("M-t m" . ladicle/toggle-window-maximize)
+  :custom
+  (aw-keys '(?j ?k ?l ?i ?o ?h ?y ?u ?p))
+  :custom-face
+  (aw-leading-char-face ((t (:height 4.0 :foreground "#f1fa8c"))))
+  :preface
+  (defvar is-window-maximized nil)
+  (defun ladicle/toggle-window-maximize ()
+      (interactive)
+      (progn
+        (if is-window-maximized
+            (balance-windows)
+          (maximize-window))
+        (setq is-window-maximized
+              (not is-window-maximized))))
+  (defun hydra-title(title) (propertize title 'face `(:inherit font-lock-warning-face :weight bold)))
+  (defun command-name(title) (propertize title 'face `(:foreground "#f8f8f2")))
+  (defun spacer() (propertize "." 'face `(:foreground "#282a36")))
+  :config
+  (use-package rotate
+      :load-path "~/Developments/src/github.com/Ladicle/dotfiles/common/emacs.d/elisp/emacs-rotate"
+      :bind
+      ("M-o SPC" . rotate-layout))
+  (with-eval-after-load 'hydra
+      (defhydra hydra-frame-window (:color blue :hint nil)
+      (format
+       (format "%s" (propertize "                                                                       ╔════════╗
+  ((%s))^^^^^^^^   ((%s))^^^^  ((%s))^^  ((%s))^^  ((%s))^^^^^^  ((%s))^   ║ Window ║
+^^^^^^ ──────────────────────────────────────────────────────────────────────╨────────╜
+      ^_k_^        %s_+_         _-_       %s     _,_ ← %s → _._^  %s
+      ^^↑^^          ^↑^         ^↑^       %s
+  _h_ ←   → _l_   ^^%s%s^^^^^    ^%s    ^^^%s^^^^     %s
+      ^^↓^^          ^↓^         ^↓^       %s^^       %s
+      ^_j_^        %s_=_         _/_       %s
+^^^^^^ ┌──────────────────────────────────────────────────────────────────────────────┘
+                         [_q_]: %s, [_<SPC>_]: %s" 'face `(:inherit font-lock-doc-face)))
+                         (hydra-title "Size")
+                         (hydra-title "Zoom")
+                         (hydra-title "Split")
+                         (hydra-title "Window")
+                         (hydra-title "Buffer")
+                         (hydra-title "Misc")
+                         (all-the-icons-material "zoom_in" :height .85 :face 'font-lock-doc-face)
+                         (command-name "_o_ther")
+                         (command-name "page")
+                         (command-name "_r_centf")
+                         (command-name "_s_wap")
+                         (all-the-icons-faicon "slideshare" :height .85 :face 'font-lock-doc-face)
+                         (command-name "_p_mode")
+                         (command-name "w_i_ndow")
+                         (command-name "_m_aximize")
+                         (command-name "_s_witch")
+                         (command-name "_d_elete")
+                         (command-name "_D_elete")
+                         (all-the-icons-material "zoom_out" :height .85 :face 'font-lock-doc-face)
+                         (command-name "del_O_thers")
+                         (command-name "quit")
+                         (command-name "rotate")
+                         )
+
+        ("K" kill-current-buffer :exit t)
+        ("D" kill-buffer-and-window :exit t)
+        ("O" delete-other-windows  :exit t)
+        ("F" toggle-frame-fullscreen)
+        ("i" ace-window)
+        ("s" ace-swap-window :exit t)
+        ("d" ace-delete-window)
+        ("m" ladicle/toggle-window-maximize :exit t)
+        ("=" text-scale-decrease)
+        ("+" text-scale-increase)
+        ("-" split-window-vertically)
+        ("/" split-window-horizontally)
+        ("h" shrink-window-horizontally)
+        ("k" shrink-window)
+        ("j" enlarge-window)
+        ("l" enlarge-window-horizontally)
+        ("," previous-buffer)
+        ("." next-buffer)
+        ("o" other-window)
+        ("p" presentation-mode)
+        ("r" counsel-recentf :exit t)
+        ("s" switch-to-buffer :exit t)
+        ("D" kill-buffer-and-window)
+        ("<SPC>" rotate-layout)
+        ("q" nil)))
+        )
+
 (use-package ace-jump-mode
   :disabled
   :ensure t
@@ -2770,6 +2861,23 @@ Example output:
        "-- user: "
        ;; value of user
        (getenv "USER"))
+)
+
+(use-package hide-mode-line
+  :ensure t
+  :hook
+  (completion-list-mode . hide-mode-line-mode)
+  (neotree-mode . hide-mode-line-mode)
+  (treemacs-mode . hide-mode-line-mode)
+)
+
+(use-package saveplace
+  :ensure t
+  :hook
+  (after-init . save-place-mode)
+  :init
+  (setq-default save-place t)
+  (setq save-place-file (expand-file-name ".places" user-emacs-directory))
 )
 
 (set-face-attribute 'mode-line nil :height tau/font-size-mode-line)
@@ -3418,6 +3526,12 @@ Example output:
     "hs"  'hl-save-highlights)
 )
 
+(use-package highlight-tail
+  :ensure t
+  :config
+  (highlight-tail-mode)
+)
+
 (use-package beacon
   :ensure t
   :init
@@ -3437,7 +3551,8 @@ Example output:
 )
 
 (use-package rainbow-delimiters
-  :ensure t
+  :load-path "packages/highlight-tail"
+  :ensure nil
   ;;:hook
   ;;(emacs-lisp-mode . rainbow-delimiters-mode)
   ;;(prog-mode . rainbow-delimiters-mode)
@@ -3603,30 +3718,17 @@ Example output:
   (smartparens-enabled . evil-smartparens-mode)
 )
 
-(smartscan-mode 1)
+(use-package smartscan
+  :ensure t
+  :config
+  (smartscan-mode 1)
+)
 
 (use-package editorconfig
   :ensure t
   :diminish editorconfig-mode
   :config
   (editorconfig-mode 1)
-)
-
-(use-package hide-mode-line
-  :ensure t
-  :hook
-  (completion-list-mode . hide-mode-line-mode)
-  (neotree-mode . hide-mode-line-mode)
-  (treemacs-mode . hide-mode-line-mode)
-)
-
-(use-package saveplace
-  :ensure t
-  :hook
-  (after-init . save-place-mode)
-  :init
-  (setq-default save-place t)
-  (setq save-place-file (expand-file-name ".places" user-emacs-directory))
 )
 
 (use-package multiple-cursors
@@ -3763,6 +3865,8 @@ Example output:
   :init
   (setq scss-compile-at-save 'nil)
   :config
+  (autoload 'scss-mode "scss-mode")
+  (setq scss-compile-at-save 'nil)
    (add-to-list 'auto-mode-alist '("\\.scss$\\'" . scss-mode))
    (add-to-list 'auto-mode-alist '("\\.component.scss$\\'" . scss-mode))
 )
@@ -4086,6 +4190,25 @@ Example output:
   :mode "\\Dockerfile\\'"
 )
 
+(defun animated-self-insert ()
+  (let* ((undo-entry (car buffer-undo-list))
+         (beginning (and (consp undo-entry) (car undo-entry)))
+         (end (and (consp undo-entry) (cdr undo-entry)))
+         (str (when (and (numberp beginning)
+                       (numberp end))
+                (buffer-substring-no-properties beginning end)))
+         (animate-n-steps 3))
+    (when str
+      (delete-region beginning end)
+      (animate-string str (1- (line-number-at-pos)) (current-column)))))
+
+;; to disable simply comment this hook
+(add-hook 'post-self-insert-hook 'animated-self-insert)
+
+(use-package c-c-combo
+  :ensure t
+)
+
 (use-package xkcd
 :ensure t
 )
@@ -4102,6 +4225,10 @@ Example output:
   ;; (fireplace)
 )
 
+(use-package selectric-mode
+  :ensure t
+)
+
 (defvar tetris-mode-map
   (make-sparse-keymap 'tetris-mode-map))
 (define-key tetris-mode-map (kbd "C-p") 'tetris-rotate-prev)
@@ -4111,6 +4238,10 @@ Example output:
 (define-key tetris-mode-map (kbd "C-SPC") 'tetris-move-bottom)
 (defadvice tetris-end-game (around zap-scores activate)
   (save-window-excursion ad-do-it))
+
+(use-package pacmacs
+  :ensure t
+)
 
 (use-package epaint
   :if window-system
@@ -4147,6 +4278,14 @@ Example output:
 (use-package meme
   :ensure nil
   :commands (meme meme-file)
+)
+
+(use-package zone-nyan
+  :ensure t
+)
+
+(use-package zone-nyan
+  :ensure t
 )
 
 (defun copy-to-clipboard ()
