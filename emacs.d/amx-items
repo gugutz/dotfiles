@@ -1,22 +1,57 @@
 
 ;; ----- amx-history -----
 (
- scss-mode
- hideshowvis-enable
- fast-scroll-mode
- tide-fix
- helm-M-x
- eslintd-fix-mode
- bug-hunter-init-file
+ package-install
+ snake
+ animate-birthday-present
+ butterfly
+ ripgrep-regexp
+ sublimity-mode
+ smooth-scrolling-mode
 )
 
 ;; ----- amx-data -----
 (
- (bug-hunter-init-file . 1)
- (scss-mode . 5)
+ (bug-hunter-init-file . 2)
+ (scss-mode . 11)
  (eslintd-fix-mode . 3)
  (helm-M-x . 1)
- (tide-fix . 3)
+ (tide-fix . 6)
  (fast-scroll-mode . 1)
  (hideshowvis-enable . 1)
+ (counsel-projectile-mode . 2)
+ (swiper-avy . 2)
+ (align-regexp . 3)
+ (package-install . 9)
+ (package-refresh-contents . 2)
+ (package-delete . 4)
+ (electric-indent-mode . 1)
+ (aggressive-indent-mode . 1)
+ (customize-variable . 1)
+ (exit-recursive-edit . 2)
+ (ivy-mode . 3)
+ (centaur-tabs-group-by-projectile-project . 1)
+ (package-install-file . 2)
+ (fundamental-mode . 1)
+ (treemacs . 1)
+ (make-frame . 1)
+ (helm-rg . 1)
+ (org-indent-mode . 2)
+ (org-bullets-mode . 3)
+ (avy-goto-char . 2)
+ (avy-goto-char-2 . 1)
+ (rainbow-mode . 1)
+ (profiler-start . 1)
+ (profiler-report . 1)
+ (evil-mode . 2)
+ (visual-line-mode . 2)
+ (display-line-numbers-mode . 1)
+ (flycheck-mode . 2)
+ (smooth-scrolling-mode . 2)
+ (sublimity-mode . 1)
+ (snails-current-project . 1)
+ (ripgrep-regexp . 1)
+ (butterfly . 1)
+ (animate-birthday-present . 1)
+ (snake . 2)
 )

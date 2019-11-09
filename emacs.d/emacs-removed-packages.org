@@ -1,0 +1,196 @@
+* snails
+
+Keymap:
+| Key         | Description               |
+| C-n         | Select next candidate     |
+| C-p         | Select previous candidate |
+| M-n         | Select next candidate     |
+| M-p         | Select previous candidate |
+| C-v         | Select next backend       |
+| M-v         | Select previous backend   |
+| M-j         | Select next backend       |
+| M-k         | Select previous backend   |
+| C-m         | Confirm candiate          |
+| RET         | Confirm candiate          |
+| M-w         | Copy candidate            |
+| C-g         | Quit snails               |
+| ESC ESC ESC | Quit snails               |
+| M-h         | Quit snails               |
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (use-package snails
+  :ensure nil
+  :load-path "packages/snails"
+  :if window-system
+  :bind
+  ("M-s s" . snails)
+  ("M-s g" . snails-current-project)
+  ("M-s b" . snails-active-recent-buffers)
+  ("M-s e" . snails-everywhere)
+  :custom-face
+  (snails-content-buffer-face ((t (:background "#111" :height 110))))
+  (snails-input-buffer-face ((t (:background "#222" :foreground "gold" :height 110))))
+  (snails-header-line-face ((t (:inherit font-lock-function-name-face :underline t :height 1.1))))
+  :config
+  (use-package exec-path-from-shell
+    :if (featurep 'cocoa) :defer t)
+
+  ;; Functions for specific backends
+  (defun snails-current-project ()
+    (interactive)
+    (snails '(snails-backend-projectile snails-backend-rg snails-backend-fd)))
+  (defun snails-active-recent-buffers ()
+    (interactive)
+    (snails '(snails-backend-buffer snails-backend-recentf)))
+  (defun snails-everywhere ()
+    (interactive)
+    (snails '(snails-backend-everything snails-backend-mdfind)))
+)
+#+END_SRC
+
+#+RESULTS:
+: snails-everywhere
+
+
+* Helm
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package helm
+  :ensure t
+  :diminish helm-mode
+  :bind
+  ;; ("M-x" . helm-M-x)
+  ("C-c h" . helm-command-prefix)
+  ("C-x b" . helm-buffers-list)
+  ("C-x C-b" . helm-mini)
+  ("C-x C-f" . helm-find-files)
+  ("C-x r b" . helm-bookmarks)
+  ("M-y" . helm-show-kill-ring)
+  ("M-:" . helm-eval-expression-with-eldoc)
+  (:map helm-map
+  ("C-z" . helm-select-action)
+  ("C-h a" . helm-apropos)
+  ("C-c h" . helm-execute-persistent-action)
+  ("<tab>" . helm-execute-persistent-action)
+  )
+  :init
+  (setq helm-autoresize-mode t)
+  (setq helm-buffer-max-length 40)
+  (setq helm-bookmark-show-location t)
+  (setq helm-buffer-max-length 40)
+  (setq helm-split-window-inside-p t)
+
+  ;; turn on helm fuzzy matching
+  (setq helm-M-x-fuzzy-match t)
+  (setq helm-mode-fuzzy-match t)
+
+  (setq helm-ff-file-name-history-use-recentf t)
+  (setq helm-ff-skip-boring-files t)
+  (setq helm-follow-mode-persistent t)
+  ;; take between 10-30% of screen space
+  (setq helm-autoresize-min-height 10)
+  (setq helm-autoresize-max-height 30)
+  :config
+  (require 'helm-config)
+  (helm-mode 1)
+  ;; Make helm replace the default Find-File and M-x
+  (global-set-key [remap execute-extended-command] #'helm-M-x)
+  (global-set-key [remap find-file] #'helm-find-files)
+  ;; helm bindings
+  (global-unset-key (kbd "C-x c"))
+)
+#+END_SRC
+
+** helm-ag
+
+ #+BEGIN_SRC emacs-lisp :tangle init.el
+ (use-package helm-ag
+   :ensure helm-ag
+   :bind ("M-p" . helm-projectile-ag)
+   :commands (helm-ag helm-projectile-ag)
+   :init (setq helm-ag-insert-at-point 'symbol
+	       helm-ag-command-option "--path-to-ignore ~/.agignore"))
+ #+END_SRC
+
+** helm-rg
+
+ #+BEGIN_SRC emacs-lisp :tangle init.el
+ (use-package helm-rg
+   :ensure t
+   :defer t
+ )
+ #+END_SRC
+
+** helm-fuzzier
+ : supposed better fuzzy matching for helm
+ : for instance, plp, plpa, paclp, should all match package-list-packages
+
+
+ #+BEGIN_SRC emacs-lisp :tangle init.el
+ (use-package helm-fuzzier
+   :disabled nil
+   :ensure t
+   :after helm
+   :config
+   (helm-fuzzier-mode 1)
+ )
+ #+END_SRC
+
+
+* PDF Tools
+
+** Install pdf-tools if its not already installed
+   #+BEGIN_SRC emacs-lisp :tangle init.el
+  ;; (pdf-tools-install)
+  ;; the docs say if i care about startup time, i should use pdf-loader-install instead of pdf-tools-install, but doenst say why
+  ;; (pdf-loader-install)
+   #+END_SRC
+
+** Make buffer refresh every 1 second to PDF-tools updates the changed pdf
+   #+BEGIN_SRC emacs-lisp :tangle init.el
+  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+  ;; (add-hook 'pdf-view-mode-hook 'auto-revert-mode)
+  ;; (add-hook 'doc-view-mode-hook 'auto-revert-mode)
+   #+END_SRC
+
+** PDF tools evil keybindings
+   #+BEGIN_SRC emacs-lisp :tangle init.el
+  (evil-define-key 'normal pdf-view-mode-map
+    "h" 'pdf-view-previous-page-command
+    "j" (lambda () (interactive) (pdf-view-next-line-or-next-page 5))
+    "k" (lambda () (interactive) (pdf-view-previous-line-or-previous-page 5))
+    "l" 'pdf-view-next-page-command)
+   #+END_SRC
+
+
+
+
+* Browsers integrations
+
+** edit-server
+
+Edit stuff in browsers with emacs
+Used in adition with the Edit in Emacs plugin for Chrome
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package edit-server
+  :if (and window-system
+           (not alternate-emacs))
+  ;; :if window-system
+  :ensure t
+  :defer 5
+  :disabled
+  :config
+  (edit-server-start)
+)
+#+END_SRC
+
+** atomic-chrome
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package atomic-chrome
+  :ensure t
+  :disabled
+  :config
+  (atomic-chrome-start-server)
+)
+#+END_SRC
