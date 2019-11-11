@@ -1703,7 +1703,7 @@ is customized, please consider the following settings in your init file"
     (:map projectile-mode-map
     ("s-p" . projectile-command-map)
     ("C-c p" . projectile-command-map)
-    ("M-o p" . counsel-projectile-switch-project)
+    ("M-S-O p" . counsel-projectile-switch-project)
     )
   :custom
   (projectile-completion-system 'helm)
@@ -1862,111 +1862,128 @@ Org Mode Integration with Jira Projects
 * Ivy
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-  (use-package ivy
-    :ensure t
-    :diminish ivy-mode
-    :hook
-    (after-init . ivy-mode)
-    :custom
-    (ivy-re-builders-alist
-    '((t . ivy--regex-plus)))
-    :config
-    (ivy-mode)
+(use-package ivy
+  :ensure t
+  :diminish ivy-mode
+  :hook
+  (after-init . ivy-mode)
+  :custom
+  (ivy-re-builders-alist
+  '((t . ivy--regex-plus)))
+  :config
+  (ivy-mode)
   ;; display an arrow on the selected item in the list
   (setf (cdr (assoc t ivy-format-functions-alist)) #'ivy-format-function-arrow)
 
-    (setq ivy-display-style 'fancy
-       ivy-use-virtual-buffers t
-       enable-recursive-minibuffers t
-       ivy-use-selectable-prompt t)
-    (ivy-set-actions  t
-    '(("I" insert "insert")))
-    (ivy-set-occur 'ivy-switch-buffer 'ivy-switch-buffer-occur)
-
-  )
+  (setq ivy-display-style 'fancy
+     ivy-use-virtual-buffers t
+     enable-recursive-minibuffers t
+     ivy-use-selectable-prompt t)
+  (ivy-set-actions  t
+  '(("I" insert "insert")))
+  (ivy-set-occur 'ivy-switch-buffer 'ivy-switch-buffer-occur)
+)
 #+END_SRC
 
 ** counsel
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-  (use-package counsel
-    :ensure t
-    :diminish counsel-mode
-    :defines
-    (projectile-completion-system magit-completing-read-function)
-    :custom
-    (counsel-yank-pop-height 15)
-    (enable-recursive-minibuffers t)
-    (ivy-use-selectable-prompt t)
-    (ivy-use-virtual-buffers t)
-    (ivy-on-del-error-function nil)
-    (swiper-action-recenter t)
-    (counsel-grep-base-command "ag -S --noheading --nocolor --nofilename --numbers '%s' %s")
-    :hook
-    (ivy-mode . counsel-mode)
-    ;; check out this better-jumper mode to see what it does
-    ;; (counsel-grep-post-action . better-jumper-set-jump)
-    :preface
-    (defun ivy-format-function-pretty (cands)
-      "Transform CANDS into a string for minibuffer."
-      (ivy--format-function-generic
-       (lambda (str)
-         (concat
-             (all-the-icons-faicon "hand-o-right" :height .85 :v-adjust .05 :face 'font-lock-constant-face)
-             (ivy--add-face str 'ivy-current-match)))
+(use-package counsel
+  :ensure t
+  :after ivy
+  :diminish counsel-mode
+  :defines
+  (projectile-completion-system magit-completing-read-function)
+  :custom
+  (counsel-yank-pop-height 15)
+  (enable-recursive-minibuffers t)
+  (ivy-use-selectable-prompt t)
+  (ivy-use-virtual-buffers t)
+  (ivy-on-del-error-function nil)
+  (swiper-action-recenter t)
+  (counsel-grep-base-command "ag -S --noheading --nocolor --nofilename --numbers '%s' %s")
+  :hook
+  (ivy-mode . counsel-mode)
+  ;; check out this better-jumper mode to see what it does
+  ;; (counsel-grep-post-action . better-jumper-set-jump)
+  :preface
+  (defun ivy-format-function-pretty (cands)
+    "Transform CANDS into a string for minibuffer."
+    (ivy--format-function-generic
+     (lambda (str)
+       (concat
+           (all-the-icons-faicon "hand-o-right" :height .85 :v-adjust .05 :face 'font-lock-constant-face)
+           (ivy--add-face str 'ivy-current-match)))
 
-       (lambda (str)
-         (concat "  " str))
-       cands
-       "\n"))
-
-    :bind
-    ("C-M-x" . counsel-M-x)
-    ("M-s c" . counsel-ag)
-    ("C-s" . swiper)
-    ("M-s r" . ivy-resume)
-    ("C-c v p" . ivy-push-view)
-    ("C-c v o" . ivy-pop-view)
-    ("C-c v ." . ivy-switch-view)
-    ("M-s c" . counsel-ag)
-    ("M-o f" . counsel-fzf)
-    ("M-o r" . counsel-recentf)
-    ("M-y" . counsel-yank-pop)
-    (:map ivy-minibuffer-map
-    ("C-w" . ivy-backward-kill-word)
-    ("C-k" . ivy-kill-line)
-    ("C-j" . ivy-immediate-done)
-    ("RET" . ivy-alt-done)
-    ("C-h" . ivy-backward-delete-char))
-    :config
-    (evil-leader/set-key
-      "e" 'counsel-find-file
-      "f" 'counsel-projectile-find-file
-      "g" 'counsel-ag
-      "r" 'counsel-rg)
-    ;; NOTE: this variable do not work if defined in :custom
-    (setq ivy-format-function 'ivy-format-function-pretty)
-    (setq counsel-yank-pop-separator
-        (propertize "\n────────────────────────────────────────────────────────\n"
-               'face `(:foreground "#6272a4")))
-
-    (setq counsel-find-file-ignore-regexp "\\(?:^[#.]\\)\\|\\(?:[#~]$\\)\\|\\(?:^Icon?\\)"
-       counsel-describe-function-function #'helpful-callable
-       counsel-describe-variable-function #'helpful-variable
-       ;; Add smart-casing (-S) to default command arguments:
-       counsel-rg-base-command "rg -S --no-heading --line-number --color never %s ."
-       counsel-ag-base-command "ag -S --nocolor --nogroup %s"
-       counsel-pt-base-command "pt -S --nocolor --nogroup -e %s"
-      counsel-find-file-at-point t)
-
-    ;; Integration with `projectile'
-    (with-eval-after-load 'projectile
-      (setq projectile-completion-system 'ivy))
-
-    ;; Integration with `magit'
-    (with-eval-after-load 'magit
-      (setq magit-completing-read-function 'ivy-completing-read))
+     (lambda (str)
+       (concat "  " str))
+     cands
+     "\n")
   )
+  :bind
+  ([remap execute-extended-command] . counsel-M-x)
+  ([remap find-file] . counsel-find-file)
+  ("C-s" . swiper)
+  ("C-c C-r" . ivy-resume)
+  ("<f6>" . ivy-resume)
+  ("M-x" . counsel-M-x)
+  ("C-x C-f" . counsel-find-file)
+  ("<f1> f" . counsel-describe-function)
+  ("<f1> v" . counsel-describe-variable)
+  ("<f1> l" . counsel-find-library)
+  ("<f2> i" . counsel-info-lookup-symbol)
+  ("<f2> u" . counsel-unicode-char)
+  ("C-c g g" . counsel-git)
+  ("C-c j" . counsel-git-grep)
+  ("C-c k" . counsel-ag)
+  ("M-s c" . counsel-ag)
+  ("C-x l" . counsel-locate)
+  ("C-S-o" . counsel-rhythmbox)
+  ;; ladicle keys
+  ("M-s r" . ivy-resume)
+  ("C-c v p" . ivy-push-view)
+  ("C-c v o" . ivy-pop-view)
+  ("C-c v ." . ivy-switch-view)
+  ("M-s f" . counsel-fzf)
+  ("M-s r" . counsel-recentf)
+  ("M-y" . counsel-yank-pop)
+  (:map ivy-minibuffer-map
+  ("C-w" . ivy-backward-kill-word)
+  ("C-k" . ivy-kill-line)
+  ("C-j" . ivy-immediate-done)
+  ("RET" . ivy-alt-done)
+  ("C-h" . ivy-backward-delete-char))
+  (:map minibuffer-local-map
+  ("C-r" . counsel-minibuffer-history))
+  :config
+  (evil-leader/set-key
+    "e" 'counsel-find-file
+    "f" 'counsel-projectile-find-file
+    "g" 'counsel-ag
+    "r" 'counsel-rg)
+  ;; NOTE: this variable do not work if defined in :custom
+  (setq ivy-format-function 'ivy-format-function-pretty)
+  (setq counsel-yank-pop-separator
+      (propertize "\n────────────────────────────────────────────────────────\n"
+             'face `(:foreground "#6272a4")))
+
+  (setq counsel-find-file-ignore-regexp "\\(?:^[#.]\\)\\|\\(?:[#~]$\\)\\|\\(?:^Icon?\\)"
+     counsel-describe-function-function #'helpful-callable
+     counsel-describe-variable-function #'helpful-variable
+     ;; Add smart-casing (-S) to default command arguments:
+     counsel-rg-base-command "rg -S --no-heading --line-number --color never %s ."
+     counsel-ag-base-command "ag -S --nocolor --nogroup %s"
+     counsel-pt-base-command "pt -S --nocolor --nogroup -e %s"
+    counsel-find-file-at-point t)
+
+  ;; Integration with `projectile'
+  (with-eval-after-load 'projectile
+    (setq projectile-completion-system 'ivy))
+
+  ;; Integration with `magit'
+  (with-eval-after-load 'magit
+    (setq magit-completing-read-function 'ivy-completing-read))
+)
 #+END_SRC
 
 *** Enhance fuzzy matching
@@ -2060,13 +2077,50 @@ Requires: Emacs >= 26
 
 * Helm
 
-I kept helm  ONLY to be able to use helm-css-scss and helm-ag
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package helm
   :ensure t
+  :diminish helm-mode
+  :bind
+  ;; ("M-x" . helm-M-x)
+  ("C-c h" . helm-command-prefix)
+  ("C-x b" . helm-buffers-list)
+  ("C-x C-b" . helm-mini)
+  ("C-x C-f" . helm-find-files)
+  ("C-x r b" . helm-bookmarks)
+  ("M-y" . helm-show-kill-ring)
+  ("M-:" . helm-eval-expression-with-eldoc)
+  (:map helm-map
+  ("C-z" . helm-select-action)
+  ("C-h a" . helm-apropos)
+  ("C-c h" . helm-execute-persistent-action)
+  ("<tab>" . helm-execute-persistent-action)
+  )
+  :init
+  (setq helm-autoresize-mode t)
+  (setq helm-buffer-max-length 40)
+  (setq helm-bookmark-show-location t)
+  (setq helm-buffer-max-length 40)
+  (setq helm-split-window-inside-p t)
+
+  ;; turn on helm fuzzy matching
+  (setq helm-M-x-fuzzy-match t)
+  (setq helm-mode-fuzzy-match t)
+
+  (setq helm-ff-file-name-history-use-recentf t)
+  (setq helm-ff-skip-boring-files t)
+  (setq helm-follow-mode-persistent t)
+  ;; take between 10-30% of screen space
+  (setq helm-autoresize-min-height 10)
+  (setq helm-autoresize-max-height 30)
   :config
   (require 'helm-config)
   (helm-mode 1)
+  ;; Make helm replace the default Find-File and M-x
+  ;;(global-set-key [remap execute-extended-command] #'helm-M-x)
+  ;; (global-set-key [remap find-file] #'helm-find-files)
+  ;; helm bindings
+  (global-unset-key (kbd "C-x c"))
 )
 #+END_SRC
 
@@ -2074,12 +2128,38 @@ I kept helm  ONLY to be able to use helm-css-scss and helm-ag
 
  #+BEGIN_SRC emacs-lisp :tangle init.el
  (use-package helm-ag
-   :ensure helm-ag
-   :bind ("M-p" . helm-projectile-ag)
-   :commands (helm-ag helm-projectile-ag)
-   :init (setq helm-ag-insert-at-point 'symbol
-	       helm-ag-command-option "--path-to-ignore ~/.agignore"))
+  :ensure helm-ag
+  :bind ("M-p" . helm-projectile-ag)
+  :commands (helm-ag helm-projectile-ag)
+  :init
+  (setq helm-ag-insert-at-point 'symbol)
+  (setq  helm-ag-command-option "--path-to-ignore ~/.agignore")
+)
  #+END_SRC
+
+** helm-rg
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package helm-rg
+  :ensure t
+  :defer t
+)
+#+END_SRC
+
+** helm-fuzzier
+: supposed better fuzzy matching for helm
+: for instance, plp, plpa, paclp, should all match package-list-packages
+
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package helm-fuzzier
+  :disabled nil
+  :ensure t
+  :after helm
+  :config
+  (helm-fuzzier-mode 1)
+)
+#+END_SRC
 
 
 * Hydra
@@ -2859,7 +2939,7 @@ Org source blocks and exporter for restclient
   :hook
   (lsp-mode . lsp-ui-mode)
   :preface
-  (defun ladicle/toggle-lsp-ui-doc ()
+  (defun tau/toggle-lsp-ui-doc ()
     (interactive)
     (if lsp-ui-doc-mode
       (progn
@@ -2874,9 +2954,8 @@ Org source blocks and exporter for restclient
   (set-face-attribute 'lsp-ui-doc-background  nil :background "#f9f2d9")
   (add-hook 'lsp-ui-doc-frame-hook
     (lambda (frame _w)
-      (set-face-attribute 'default frame :font "Overpass Mono 11")
-    )
-  )
+      (set-face-attribute 'default frame :font "Overpass Mono 11")))
+
   (set-face-attribute 'lsp-ui-sideline-global nil
                       :inherit 'shadow
                       :background "#f9f2d9")
@@ -2912,23 +2991,22 @@ Org source blocks and exporter for restclient
         lsp-ui-peek-fontify 'on-demand) ;; never, on-demand, or always
   :bind
     (:map lsp-mode-map
-      ("C-c C-r" . lsp-ui-peek-find-references)
-      ("C-c C-j" . lsp-ui-peek-find-definitions)
+      ("C-c u f r" . lsp-ui-peek-find-references)
+      ("C-c u f d" . lsp-ui-peek-find-definitions)
+      ("C-c u f i" . lsp-ui-peek-find-implementation)
       ("C-c g d" . lsp-goto-type-definition)
       ("C-c f d" . lsp-find-definition)
       ("C-c g i" . lsp-goto-implementation)
       ("C-c f i" . lsp-find-implementation)
-      ("C-c i"   . lsp-ui-peek-find-implementation)
       ("C-c m"   . lsp-ui-imenu)
       ("C-c s"   . lsp-ui-sideline-mode)
-      ("C-c d"   . ladicle/toggle-lsp-ui-doc)
+      ("C-c d"   . tau/toggle-lsp-ui-doc)
     )
     ;; remap native find-definitions and references to use lsp-ui
     (:map lsp-ui-mode-map
       ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
       ([remap xref-find-references] . lsp-ui-peek-find-references)
-      ("C-c u" . lsp-ui-imenu)
-    )
+      ("C-c u" . lsp-ui-imenu))
 )
 #+END_SRC
 
@@ -2991,6 +3069,7 @@ Disabled in favor of company-mode
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package ivy-explorer
   :ensure t
+  :after ivy
   :config
   ;; use ivy explorer for all file dialogs
   (ivy-explorer-mode 1)
@@ -3361,8 +3440,8 @@ Disabled in favor of company-mode
 (use-package rotate
   :ensure t
   :bind
-  ("C-c C-r w" . rotate-window)
-  ("C-c C-r l" . rotate-layout)
+  ("C-c r w" . rotate-window)
+  ("C-c r l" . rotate-layout)
 )
 #+END_SRC
 
@@ -3667,17 +3746,31 @@ Swiper is an alternative to isearch that uses ivy to show an overview of all mat
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package ace-window
+  :ensure t
   :functions hydra-frame-window/body
   :bind
-  ("C-M-o" . hydra-frame-window/body)
-  ("M-t m" . ladicle/toggle-window-maximize)
-  :custom
-  (aw-keys '(?j ?k ?l ?i ?o ?h ?y ?u ?p))
+  ("M-o" . ace-window)
   :custom-face
   (aw-leading-char-face ((t (:height 4.0 :foreground "#f1fa8c"))))
+  :config
+  ;; (setq aw-keys '(?j ?k ?l ?i ?o ?h ?y ?u ?p))
+  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)) ;; set the window labels in the home row
+)
+#+END_SRC
+** emacs-rotate
+
+This shares bindings with ace-window
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package rotate
+  :ensure t
+  :bind
+  ("M-S-O SPC" . rotate-layout)
+  ("M-S-O m" . tau/toggle-window-maximize)
+  ("C-M-o" . hydra-frame-window/body)
   :preface
   (defvar is-window-maximized nil)
-  (defun ladicle/toggle-window-maximize ()
+  (defun tau/toggle-window-maximize ()
       (interactive)
       (progn
         (if is-window-maximized
@@ -3689,10 +3782,6 @@ Swiper is an alternative to isearch that uses ivy to show an overview of all mat
   (defun command-name(title) (propertize title 'face `(:foreground "#f8f8f2")))
   (defun spacer() (propertize "." 'face `(:foreground "#282a36")))
   :config
-  (use-package rotate
-      :load-path "~/Developments/src/github.com/Ladicle/dotfiles/common/emacs.d/elisp/emacs-rotate"
-      :bind
-      ("M-o SPC" . rotate-layout))
   (with-eval-after-load 'hydra
       (defhydra hydra-frame-window (:color blue :hint nil)
       (format
@@ -3737,7 +3826,7 @@ Swiper is an alternative to isearch that uses ivy to show an overview of all mat
         ("i" ace-window)
         ("s" ace-swap-window :exit t)
         ("d" ace-delete-window)
-        ("m" ladicle/toggle-window-maximize :exit t)
+        ("m" tau/toggle-window-maximize :exit t)
         ("=" text-scale-decrease)
         ("+" text-scale-increase)
         ("-" split-window-vertically)
@@ -3755,7 +3844,8 @@ Swiper is an alternative to isearch that uses ivy to show an overview of all mat
         ("D" kill-buffer-and-window)
         ("<SPC>" rotate-layout)
         ("q" nil)))
-        )
+)
+
 #+END_SRC
 
 ** ace jump mode
@@ -4380,79 +4470,78 @@ This package ruins the scrolling from either sublimity-scroll or the smooth-scro
 ** dashboard
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-  (use-package dashboard
-    :ensure t
-    :bind ("C-S-D" . open-dashboard)
-    :preface
-    (defun tau/dashboard-banner ()
-      "Sets a dashboard banner including information on package initialization
-       time and garbage collections."
-      (setq dashboard-banner-logo-title
-            (format "Emacs ready in %.2f seconds with %d garbage collections."
-                    (float-time
-                     (time-subtract after-init-time before-init-time)) gcs-done)))
-    :custom-face
-    (dashboard-heading ((t (:foreground "#f1fa8c" :weight bold))))
-    :init
-
-    ;; set widgets to show
-    (setq dashboard-items '((recents  . 5)
-                           (bookmarks . 5)
-                           (projects . 5)
-                           (agenda . 5)
-                           (fireplace . 1)
-                           (registers . 5))
-    )
-
-    ;; sets dashboard as emacs initial buffer on startup
-    (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
-
-    ;; Set the title
-    (setq dashboard-banner-logo-title "Hi 😊 ")
+(use-package dashboard
+  :ensure t
+  :bind ("C-S-D" . open-dashboard)
+  :preface
+  (defun tau/dashboard-banner ()
+    "Sets a dashboard banner including information on package initialization
+     time and garbage collections."
     (setq dashboard-banner-logo-title
-            (message " ★ Emacs initialized in %.2fs ★ "
-                     (float-time (time-subtract (current-time) my-init-el-start-time))))
+          (format "Emacs ready in %.2f seconds with %d garbage collections."
+                  (float-time
+                   (time-subtract after-init-time before-init-time)) gcs-done)))
+  :custom-face
+  (dashboard-heading ((t (:foreground "#f1fa8c" :weight bold))))
+  :init
 
-    ;; Set the banner
-    (setq dashboard-startup-banner 'logo) ;; values: ('oficial, 'logo, 1, 2, 3, or "path/to/image.png")
-
-    ;; Content is not centered by default. To center, set
-    (setq dashboard-center-content t)
-
-    ;; To disable shortcut "jump" indicators for each section, set
-    (setq dashboard-show-shortcuts t)
-
-    ;; To add icons to the widget headings and their items:
-    (setq dashboard-set-heading-icons t)
-    (setq dashboard-set-file-icons t)
-
-    ;; To show navigator below the banner:
-    (setq dashboard-set-navigator t)
-
-    ;;To show info about the packages loaded and the init time:
-    (setq dashboard-set-init-info t)
-
-    ;; A randomly selected footnote will be displayed. To disable it:
-    ;;(setq dashboard-set-footer nil)
-
-    :config
-    ;; Org mode’s agenda
-    ;; To display today’s agenda items on the dashboard, add agenda to dashboard-items:
-    (add-to-list 'dashboard-items '(agenda) t)
-    ;; To show agenda for the upcoming seven days set the variable show-week-agenda-p to t.
-    (setq show-week-agenda-p t)
-    ;; Note that setting list-size for the agenda list is intentionally ignored; all agenda items for the current day will be displayed.
-    ;; To customize which categories from the agenda items should be visible in the dashboard set the dashboard-org-agenda-categories to the list of categories you need.
-    (setq dashboard-org-agenda-categories '("Tasks" "Appointments"))
-
-    ;; adds fireplace as a widget
-  ;;  (defun dashboard-insert-custom (list-size)
-  ;;    (fireplace))
-  ;;  (add-to-list 'dashboard-item-generators  '(fireplace . dashboard-insert-custom))
-  ;;  (add-to-list 'dashboard-items '(fireplace) t)
-
-    (dashboard-setup-startup-hook)
+  ;; set widgets to show
+  (setq dashboard-items '((recents  . 5)
+                         (bookmarks . 5)
+                         (projects . 5)
+                         (agenda . 5)
+                         (registers . 5))
   )
+
+  ;; sets dashboard as emacs initial buffer on startup
+  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+
+  ;; Set the title
+  (setq dashboard-banner-logo-title "Hi 😊 ")
+  (setq dashboard-banner-logo-title
+          (message " ★ Emacs initialized in %.2fs ★ "
+                   (float-time (time-subtract (current-time) my-init-el-start-time))))
+
+  ;; Set the banner
+  (setq dashboard-startup-banner 'logo) ;; values: ('oficial, 'logo, 1, 2, 3, or "path/to/image.png")
+
+  ;; Content is not centered by default. To center, set
+  (setq dashboard-center-content t)
+
+  ;; To disable shortcut "jump" indicators for each section, set
+  (setq dashboard-show-shortcuts t)
+
+  ;; To add icons to the widget headings and their items:
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+
+  ;; To show navigator below the banner:
+  (setq dashboard-set-navigator t)
+
+  ;;To show info about the packages loaded and the init time:
+  (setq dashboard-set-init-info t)
+
+  ;; A randomly selected footnote will be displayed. To disable it:
+  ;;(setq dashboard-set-footer nil)
+
+  :config
+  ;; Org mode’s agenda
+  ;; To display today’s agenda items on the dashboard, add agenda to dashboard-items:
+  (add-to-list 'dashboard-items '(agenda) t)
+  ;; To show agenda for the upcoming seven days set the variable show-week-agenda-p to t.
+  (setq show-week-agenda-p t)
+  ;; Note that setting list-size for the agenda list is intentionally ignored; all agenda items for the current day will be displayed.
+  ;; To customize which categories from the agenda items should be visible in the dashboard set the dashboard-org-agenda-categories to the list of categories you need.
+  (setq dashboard-org-agenda-categories '("Tasks" "Appointments"))
+
+  ;; adds fireplace as a widget
+;;  (defun dashboard-insert-custom (list-size)
+;;    (fireplace))
+;;  (add-to-list 'dashboard-item-generators  '(fireplace . dashboard-insert-custom))
+;;  (add-to-list 'dashboard-items '(fireplace) t)
+
+  (dashboard-setup-startup-hook)
+)
 #+END_SRC
 
 *** add fireplace as a widged in the dashboard
@@ -4856,8 +4945,15 @@ Highlight portions of text
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package highlight-tail
-  :ensure t
+  :load-path "packages/highlight-tail-modified"
+  :ensure nil
   :config
+  (setq highlight-tail-colors '(("black" . 0)
+                                 ("#DDA0DD" . 25)
+                                 ("#9370DB" . 66)))
+  (setq highlight-tail-steps 12)
+  (setq highlight-tail-timer 0.1)
+  (setq highlight-tail-posterior-type 'const)
   (highlight-tail-mode)
 )
 #+END_SRC
@@ -5836,7 +5932,7 @@ Source;
       (animate-string str (1- (line-number-at-pos)) (current-column)))))
 
 ;; to disable simply comment this hook
-(add-hook 'post-self-insert-hook 'animated-self-insert)
+;;; (add-hook 'post-self-insert-hook 'animated-self-insert)
 #+END_SRC
 
 ** c-c-combo

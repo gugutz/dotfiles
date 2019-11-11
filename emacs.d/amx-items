@@ -1,13 +1,13 @@
 
 ;; ----- amx-history -----
 (
+ rainbow-mode
+ c-c-combo-mode
  package-install
  snake
  animate-birthday-present
  butterfly
  ripgrep-regexp
- sublimity-mode
- smooth-scrolling-mode
 )
 
 ;; ----- amx-data -----
@@ -40,7 +40,7 @@
  (org-bullets-mode . 3)
  (avy-goto-char . 2)
  (avy-goto-char-2 . 1)
- (rainbow-mode . 1)
+ (rainbow-mode . 2)
  (profiler-start . 1)
  (profiler-report . 1)
  (evil-mode . 2)
@@ -54,4 +54,5 @@
  (butterfly . 1)
  (animate-birthday-present . 1)
  (snake . 2)
+ (c-c-combo-mode . 2)
 )

@@ -1145,7 +1145,7 @@ Example output:
   (:map projectile-mode-map
   ("s-p" . projectile-command-map)
   ("C-c p" . projectile-command-map)
-  ("M-o p" . counsel-projectile-switch-project)
+  ("M-S-O p" . counsel-projectile-switch-project)
   )
 :custom
 (projectile-completion-system 'helm)
@@ -1285,8 +1285,8 @@ Example output:
   '((t . ivy--regex-plus)))
   :config
   (ivy-mode)
-;; display an arrow on the selected item in the list
-(setf (cdr (assoc t ivy-format-functions-alist)) #'ivy-format-function-arrow)
+  ;; display an arrow on the selected item in the list
+  (setf (cdr (assoc t ivy-format-functions-alist)) #'ivy-format-function-arrow)
 
   (setq ivy-display-style 'fancy
      ivy-use-virtual-buffers t
@@ -1295,11 +1295,11 @@ Example output:
   (ivy-set-actions  t
   '(("I" insert "insert")))
   (ivy-set-occur 'ivy-switch-buffer 'ivy-switch-buffer-occur)
-
 )
 
 (use-package counsel
   :ensure t
+  :after ivy
   :diminish counsel-mode
   :defines
   (projectile-completion-system magit-completing-read-function)
@@ -1327,19 +1327,34 @@ Example output:
      (lambda (str)
        (concat "  " str))
      cands
-     "\n"))
-
+     "\n")
+  )
   :bind
-  ("C-M-x" . counsel-M-x)
-  ("M-s c" . counsel-ag)
+  ([remap execute-extended-command] . counsel-M-x)
+  ([remap find-file] . counsel-find-file)
   ("C-s" . swiper)
+  ("C-c C-r" . ivy-resume)
+  ("<f6>" . ivy-resume)
+  ("M-x" . counsel-M-x)
+  ("C-x C-f" . counsel-find-file)
+  ("<f1> f" . counsel-describe-function)
+  ("<f1> v" . counsel-describe-variable)
+  ("<f1> l" . counsel-find-library)
+  ("<f2> i" . counsel-info-lookup-symbol)
+  ("<f2> u" . counsel-unicode-char)
+  ("C-c g g" . counsel-git)
+  ("C-c j" . counsel-git-grep)
+  ("C-c k" . counsel-ag)
+  ("M-s c" . counsel-ag)
+  ("C-x l" . counsel-locate)
+  ("C-S-o" . counsel-rhythmbox)
+  ;; ladicle keys
   ("M-s r" . ivy-resume)
   ("C-c v p" . ivy-push-view)
   ("C-c v o" . ivy-pop-view)
   ("C-c v ." . ivy-switch-view)
-  ("M-s c" . counsel-ag)
-  ("M-o f" . counsel-fzf)
-  ("M-o r" . counsel-recentf)
+  ("M-s f" . counsel-fzf)
+  ("M-s r" . counsel-recentf)
   ("M-y" . counsel-yank-pop)
   (:map ivy-minibuffer-map
   ("C-w" . ivy-backward-kill-word)
@@ -1347,6 +1362,8 @@ Example output:
   ("C-j" . ivy-immediate-done)
   ("RET" . ivy-alt-done)
   ("C-h" . ivy-backward-delete-char))
+  (:map minibuffer-local-map
+  ("C-r" . counsel-minibuffer-history))
   :config
   (evil-leader/set-key
     "e" 'counsel-find-file
@@ -1446,17 +1463,70 @@ Example output:
 
 (use-package helm
   :ensure t
+  :diminish helm-mode
+  :bind
+  ;; ("M-x" . helm-M-x)
+  ("C-c h" . helm-command-prefix)
+  ("C-x b" . helm-buffers-list)
+  ("C-x C-b" . helm-mini)
+  ("C-x C-f" . helm-find-files)
+  ("C-x r b" . helm-bookmarks)
+  ("M-y" . helm-show-kill-ring)
+  ("M-:" . helm-eval-expression-with-eldoc)
+  (:map helm-map
+  ("C-z" . helm-select-action)
+  ("C-h a" . helm-apropos)
+  ("C-c h" . helm-execute-persistent-action)
+  ("<tab>" . helm-execute-persistent-action)
+  )
+  :init
+  (setq helm-autoresize-mode t)
+  (setq helm-buffer-max-length 40)
+  (setq helm-bookmark-show-location t)
+  (setq helm-buffer-max-length 40)
+  (setq helm-split-window-inside-p t)
+
+  ;; turn on helm fuzzy matching
+  (setq helm-M-x-fuzzy-match t)
+  (setq helm-mode-fuzzy-match t)
+
+  (setq helm-ff-file-name-history-use-recentf t)
+  (setq helm-ff-skip-boring-files t)
+  (setq helm-follow-mode-persistent t)
+  ;; take between 10-30% of screen space
+  (setq helm-autoresize-min-height 10)
+  (setq helm-autoresize-max-height 30)
   :config
   (require 'helm-config)
   (helm-mode 1)
+  ;; Make helm replace the default Find-File and M-x
+  ;;(global-set-key [remap execute-extended-command] #'helm-M-x)
+  ;; (global-set-key [remap find-file] #'helm-find-files)
+  ;; helm bindings
+  (global-unset-key (kbd "C-x c"))
 )
 
 (use-package helm-ag
   :ensure helm-ag
   :bind ("M-p" . helm-projectile-ag)
   :commands (helm-ag helm-projectile-ag)
-  :init (setq helm-ag-insert-at-point 'symbol
-	      helm-ag-command-option "--path-to-ignore ~/.agignore"))
+  :init
+  (setq helm-ag-insert-at-point 'symbol)
+  (setq  helm-ag-command-option "--path-to-ignore ~/.agignore")
+)
+
+(use-package helm-rg
+  :ensure t
+  :defer t
+)
+
+(use-package helm-fuzzier
+  :disabled nil
+  :ensure t
+  :after helm
+  :config
+  (helm-fuzzier-mode 1)
+)
 
 (use-package hydra
   :ensure t
@@ -2069,7 +2139,7 @@ Example output:
   :hook
   (lsp-mode . lsp-ui-mode)
   :preface
-  (defun ladicle/toggle-lsp-ui-doc ()
+  (defun tau/toggle-lsp-ui-doc ()
     (interactive)
     (if lsp-ui-doc-mode
       (progn
@@ -2084,9 +2154,8 @@ Example output:
   (set-face-attribute 'lsp-ui-doc-background  nil :background "#f9f2d9")
   (add-hook 'lsp-ui-doc-frame-hook
     (lambda (frame _w)
-      (set-face-attribute 'default frame :font "Overpass Mono 11")
-    )
-  )
+      (set-face-attribute 'default frame :font "Overpass Mono 11")))
+
   (set-face-attribute 'lsp-ui-sideline-global nil
                       :inherit 'shadow
                       :background "#f9f2d9")
@@ -2122,23 +2191,22 @@ Example output:
         lsp-ui-peek-fontify 'on-demand) ;; never, on-demand, or always
   :bind
     (:map lsp-mode-map
-      ("C-c C-r" . lsp-ui-peek-find-references)
-      ("C-c C-j" . lsp-ui-peek-find-definitions)
+      ("C-c u f r" . lsp-ui-peek-find-references)
+      ("C-c u f d" . lsp-ui-peek-find-definitions)
+      ("C-c u f i" . lsp-ui-peek-find-implementation)
       ("C-c g d" . lsp-goto-type-definition)
       ("C-c f d" . lsp-find-definition)
       ("C-c g i" . lsp-goto-implementation)
       ("C-c f i" . lsp-find-implementation)
-      ("C-c i"   . lsp-ui-peek-find-implementation)
       ("C-c m"   . lsp-ui-imenu)
       ("C-c s"   . lsp-ui-sideline-mode)
-      ("C-c d"   . ladicle/toggle-lsp-ui-doc)
+      ("C-c d"   . tau/toggle-lsp-ui-doc)
     )
     ;; remap native find-definitions and references to use lsp-ui
     (:map lsp-ui-mode-map
       ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
       ([remap xref-find-references] . lsp-ui-peek-find-references)
-      ("C-c u" . lsp-ui-imenu)
-    )
+      ("C-c u" . lsp-ui-imenu))
 )
 
 ;; (define-key ac-completing-map [return] nil)
@@ -2181,6 +2249,7 @@ Example output:
 
 (use-package ivy-explorer
   :ensure t
+  :after ivy
   :config
   ;; use ivy explorer for all file dialogs
   (ivy-explorer-mode 1)
@@ -2507,8 +2576,8 @@ Example output:
 (use-package rotate
   :ensure t
   :bind
-  ("C-c C-r w" . rotate-window)
-  ("C-c C-r l" . rotate-layout)
+  ("C-c r w" . rotate-window)
+  ("C-c r l" . rotate-layout)
 )
 
 (setq echo-keystrokes 0.02)
@@ -2708,17 +2777,26 @@ Example output:
 )
 
 (use-package ace-window
+  :ensure t
   :functions hydra-frame-window/body
   :bind
-  ("C-M-o" . hydra-frame-window/body)
-  ("M-t m" . ladicle/toggle-window-maximize)
-  :custom
-  (aw-keys '(?j ?k ?l ?i ?o ?h ?y ?u ?p))
+  ("M-o" . ace-window)
   :custom-face
   (aw-leading-char-face ((t (:height 4.0 :foreground "#f1fa8c"))))
+  :config
+  ;; (setq aw-keys '(?j ?k ?l ?i ?o ?h ?y ?u ?p))
+  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)) ;; set the window labels in the home row
+)
+
+(use-package rotate
+  :ensure t
+  :bind
+  ("M-S-O SPC" . rotate-layout)
+  ("M-S-O m" . tau/toggle-window-maximize)
+  ("C-M-o" . hydra-frame-window/body)
   :preface
   (defvar is-window-maximized nil)
-  (defun ladicle/toggle-window-maximize ()
+  (defun tau/toggle-window-maximize ()
       (interactive)
       (progn
         (if is-window-maximized
@@ -2730,10 +2808,6 @@ Example output:
   (defun command-name(title) (propertize title 'face `(:foreground "#f8f8f2")))
   (defun spacer() (propertize "." 'face `(:foreground "#282a36")))
   :config
-  (use-package rotate
-      :load-path "~/Developments/src/github.com/Ladicle/dotfiles/common/emacs.d/elisp/emacs-rotate"
-      :bind
-      ("M-o SPC" . rotate-layout))
   (with-eval-after-load 'hydra
       (defhydra hydra-frame-window (:color blue :hint nil)
       (format
@@ -2778,7 +2852,7 @@ Example output:
         ("i" ace-window)
         ("s" ace-swap-window :exit t)
         ("d" ace-delete-window)
-        ("m" ladicle/toggle-window-maximize :exit t)
+        ("m" tau/toggle-window-maximize :exit t)
         ("=" text-scale-decrease)
         ("+" text-scale-increase)
         ("-" split-window-vertically)
@@ -2796,7 +2870,7 @@ Example output:
         ("D" kill-buffer-and-window)
         ("<SPC>" rotate-layout)
         ("q" nil)))
-        )
+)
 
 (use-package ace-jump-mode
   :disabled
@@ -3164,7 +3238,6 @@ Example output:
                          (bookmarks . 5)
                          (projects . 5)
                          (agenda . 5)
-                         (fireplace . 1)
                          (registers . 5))
   )
 
@@ -3527,8 +3600,15 @@ Example output:
 )
 
 (use-package highlight-tail
-  :ensure t
+  :load-path "packages/highlight-tail-modified"
+  :ensure nil
   :config
+  (setq highlight-tail-colors '(("black" . 0)
+                                 ("#DDA0DD" . 25)
+                                 ("#9370DB" . 66)))
+  (setq highlight-tail-steps 12)
+  (setq highlight-tail-timer 0.1)
+  (setq highlight-tail-posterior-type 'const)
   (highlight-tail-mode)
 )
 
@@ -4203,7 +4283,7 @@ Example output:
       (animate-string str (1- (line-number-at-pos)) (current-column)))))
 
 ;; to disable simply comment this hook
-(add-hook 'post-self-insert-hook 'animated-self-insert)
+;;; (add-hook 'post-self-insert-hook 'animated-self-insert)
 
 (use-package c-c-combo
   :ensure t
