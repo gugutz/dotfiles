@@ -68,79 +68,23 @@ tangled, and the tangled file is compiled."
 (package-initialize)
 
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ag-highligh-search t t)
- '(ag-reuse-buffers t t)
- '(ag-reuse-window t t)
- '(company-box-backends-colors nil t)
- '(company-box-doc-delay 0.3)
- '(company-box-max-candidates 50)
- '(company-box-show-single-candidate t)
- '(counsel-grep-base-command
-   "ag -S --noheading --nocolor --nofilename --numbers '%s' %s")
- '(counsel-yank-pop-height 15 t)
- '(custom-safe-themes
+;; custom-set-variables was added by Custom.
+;; If you edit it by hand, you could mess it up, so be careful.
+;; Your init file should contain only one such instance.
+;; If there is more than one, they won't work right.
+'(custom-safe-themes
    (quote
-    ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
- '(enable-recursive-minibuffers t)
- '(epg-gpg-program "c:/Program Files (x86)/GNU/GnuPG/pub/gpg2")
- '(fci-rule-color "#3E4451")
- '(flycheck-display-errors-delay 1)
- '(hydra-posframe-parameters (quote ((left-fringe . 5) (right-fringe . 5))) t)
- '(ivy-on-del-error-function nil)
- '(ivy-re-builders-alist (quote ((t . ivy--regex-plus))) t)
- '(ivy-use-selectable-prompt t)
- '(ivy-use-virtual-buffers t)
- '(jiralib-url "https://stairscreativestudio.atlassian.net" t)
- '(lsp-auto-guess-root t)
- '(lsp-document-sync-method (quote incremental))
- '(lsp-prefer-flymake nil)
- '(lsp-print-io nil)
- '(lsp-print-performance nil)
- '(lsp-response-timeout 10)
- '(lsp-trace nil t)
- '(magit-auto-revert-mode nil)
- '(package-selected-packages
-   (quote
-    (centered-cursor-mode pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org)))
- '(projectile-completion-system (quote helm))
- '(swiper-action-recenter t)
- '(wgrep-auto-save-buffer t t)
- '(wgrep-change-readonly-file t t)
- '(wgrep-enable-key "e" t))
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(company-preview-common ((t (:foreground unspecified :background "#111111"))))
- '(company-scrollbar-bg ((t (:background "#111111"))))
- '(company-scrollbar-fg ((t (:background "#555555"))))
- '(company-tooltip ((t (:inherit default :background "#222222"))))
- '(company-tooltip-common ((t (:inherit font-lock-constant-face))))
- '(company-tooltip-selection ((t (:inherit company-tooltip-common :background "#2a2a2a"))))
- '(css-selector ((t (:inherit default :foreground "#66CCFF"))))
- '(dashboard-heading ((t (:foreground "#f1fa8c" :weight bold))))
- '(diff-hl-change ((t (:foreground "darkseagreen2"))))
- '(diff-hl-delete ((t (:background "#ee6363"))))
- '(diff-hl-insert ((t (:background "#7ccd7c"))))
- '(evil-goggles-change-face ((t (:inherit diff-removed))))
- '(evil-goggles-delete-face ((t (:inherit diff-removed))))
- '(evil-goggles-paste-face ((t (:inherit diff-added))))
- '(evil-goggles-undo-redo-add-face ((t (:inherit diff-added))))
- '(evil-goggles-undo-redo-change-face ((t (:inherit diff-changed))))
- '(evil-goggles-undo-redo-remove-face ((t (:inherit diff-removed))))
- '(evil-goggles-yank-face ((t (:inherit diff-changed))))
- '(font-lock-comment-face ((t (:foreground "#828282"))))
- '(hydra-posframe-border-face ((t (:background "#6272a4"))))
- '(ivy-posframe ((t (:background "#282a36"))))
- '(ivy-posframe-border ((t (:background "#6272a4"))))
- '(ivy-posframe-cursor ((t (:background "#61bfff"))))
- '(show-paren-match ((nil (:background "#44475a" :foreground "#f1fa8c")))))
+   ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
+   '(fci-rule-color "#3E4451")
+   '(package-selected-packages
+     (quote
+     (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
+   (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   )
 
 (add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
 ;; (add-to-list 'load-path "~/dotfiles/emacs.d/config")
@@ -175,11 +119,6 @@ tangled, and the tangled file is compiled."
   (auto-package-update-maybe)
 )
 
-<<<<<<< HEAD
-(require 'epa-file)
-
-(epa-file-enable)
-=======
 (use-package diminish
   :ensure t
 )
@@ -194,7 +133,6 @@ tangled, and the tangled file is compiled."
   ;; Cache passphrase for symmetric encryption.
   (setq epa-file-cache-passphrase-for-symmetric-encryption t)
 )
->>>>>>> e09ff4f24b3be091f7c2d2aab102c065f95bfefc
 
 (use-package gnus
   :ensure nil
@@ -2773,6 +2711,8 @@ Example output:
   :functions hydra-frame-window/body
   :bind
   ("C-M-o" . hydra-frame-window/body)
+  ;; first disassociate M-t with 
+  ("M-t" . nil)
   ("M-t m" . ladicle/toggle-window-maximize)
   :custom
   (aw-keys '(?j ?k ?l ?i ?o ?h ?y ?u ?p))
@@ -3691,7 +3631,7 @@ Example output:
 )
 
 ;;(setq redisplay-dont-pause t)
-  ;; (setq scroll-preserve-screen-position 1)  ;; centered screen scrolling
+(setq scroll-preserve-screen-position 1)  ;; centered screen scrolling
   ;; (setq scroll-margin 10
   ;; (setq maximum-scroll-margin 0.5)
   ;; (setq scroll-step 1)
@@ -4385,4 +4325,3 @@ Example output:
 
 (provide 'init)
 ;;; .emacs ends here
-(put 'upcase-region 'disabled nil)

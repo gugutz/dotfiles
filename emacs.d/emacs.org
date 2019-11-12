@@ -3670,6 +3670,8 @@ Swiper is an alternative to isearch that uses ivy to show an overview of all mat
   :functions hydra-frame-window/body
   :bind
   ("C-M-o" . hydra-frame-window/body)
+  ;; first disassociate M-t with 
+  ("M-t" . nil)
   ("M-t m" . ladicle/toggle-window-maximize)
   :custom
   (aw-keys '(?j ?k ?l ?i ?o ?h ?y ?u ?p))
@@ -5016,7 +5018,7 @@ Simulate Vim-Scrolof: https://wolfecub.github.io/dotfiles/#orgff34878
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 ;;(setq redisplay-dont-pause t)
-  ;; (setq scroll-preserve-screen-position 1)  ;; centered screen scrolling
+(setq scroll-preserve-screen-position 1)  ;; centered screen scrolling
   ;; (setq scroll-margin 10
   ;; (setq maximum-scroll-margin 0.5)
   ;; (setq scroll-step 1)
