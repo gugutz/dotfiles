@@ -37,27 +37,22 @@ tangled, and the tangled file is compiled."
 ;; First save the current value of gc-cons-threshold to restore it after the init file is loaded at the very bottom of this file
 (setq gc-threshold-original gc-cons-threshold)
 
-(setq gc-cons-threshold (* 511 1024 1024))
-(setq gc-cons-percentage 0.5) ;; GC only with 500mb of data allocated
+;; reduce the frequency of garbage collection by making it happen on
+;; each 50MB of allocated data (the default is on every 0.76MB)
+(setq gc-cons-threshold 50000000) ;; 50mb
+;;(setq gc-cons-threshold 100000000) ;; 100mb
 
-(run-with-idle-timer 5 t #'garbage-collect) ;; GC after 5s idle time
+;; GC only with 500mb of data allocated
+;; (setq gc-cons-percentage 0.5)
+
+;; GC after 5s idle time
+;; (run-with-idle-timer 5 t #'garbage-collect)
+
 (setq garbage-collection-messages t)
+(setq inhibit-compacting-font-caches t)      ;; Don’t compact font caches during GC (garbage collection).
 
 ;; Restore original gc value after init
 ;; (add-hook 'after-init-hook (lambda () (setq gc-cons-threshold gc-threshold-original)))
-
-(setq inhibit-compacting-font-caches t)      ;; Don’t compact font caches during GC (garbage collection).
-
-;; First save the current value of gc-cons-threshold to restore it after the init file is loaded at the very bottom of this file
-;;  (setq gc-threshold-original gc-cons-threshold)
-  ;; Show gc messages in the messages buffer
-;;  (setq garbage-collection-messages t)
-  ;; Set high gc-cons-threshold
-;;  (setq gc-cons-threshold 100000000)
-  ;; Restore original gc value after init
-;;  (add-hook 'after-init-hook (lambda () (setq gc-cons-threshold gc-threshold-original)))
-  ;; Defer garbage collection further back in the startup process
-  ;; (setq gc-cons-threshold (if (display-graphic-p) 400000000 100000000))
 
 (require 'package)
 ;; add melpa stable emacs package repository
@@ -137,31 +132,31 @@ tangled, and the tangled file is compiled."
 (use-package gnus
   :ensure nil
   :config
-(setq user-mail-address "joshuafwolfe@gmail.com"
-      user-full-name "Josh Wolfe")
+  (setq user-mail-address "joshuafwolfe@gmail.com"
+        user-full-name "Josh Wolfe")
 
-(setq gnus-select-method
-      '(nnimap "gmail"
-         (nnimap-address "imap.gmail.com")
-         (nnimap-server-port 993)
-         (nnimap-stream ssl)))
+  (setq gnus-select-method
+        '(nnimap "gmail"
+           (nnimap-address "imap.gmail.com")
+           (nnimap-server-port 993)
+           (nnimap-stream ssl)))
 
-(setq smtpmail-smtp-server "smtp.gmail.com"
-      smtpmail-smtp-service 587
-      gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
+  (setq smtpmail-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-service 587
+        gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
 
-(setq gnus-thread-sort-functions
-      '(gnus-thread-sort-by-most-recent-date
-        (not gnus-thread-sort-by-number)))
+  (setq gnus-thread-sort-functions
+        '(gnus-thread-sort-by-most-recent-date
+          (not gnus-thread-sort-by-number)))
 
-(defun my-gnus-group-list-subscribed-groups ()
-  "List all subscribed groups with or without un-read messages"
-  (interactive)
-  (gnus-group-list-all-groups 5))
+  (defun my-gnus-group-list-subscribed-groups ()
+    "List all subscribed groups with or without un-read messages"
+    (interactive)
+    (gnus-group-list-all-groups 5))
 
-(define-key gnus-group-mode-map
-  ;; list all the subscribed groups even they contain zero un-read messages
-      (kbd "o") 'my-gnus-group-list-subscribed-groups)
+  (define-key gnus-group-mode-map
+    ;; list all the subscribed groups even they contain zero un-read messages
+        (kbd "o") 'my-gnus-group-list-subscribed-groups)
 )
 
 ;; (use-package server
@@ -320,6 +315,9 @@ tangled, and the tangled file is compiled."
   '(lambda () (interactive) (kill-buffer (current-buffer)))
 )
 
+;; warn when opening files bigger than 100MB
+(setq large-file-warning-threshold 100000000)
+
 (setq require-final-newline t)
 
 (setq-default fill-column 80)
@@ -432,6 +430,9 @@ Example output:
 				"\\S-+\\(\\s-+\\)"
 				1 1 nil))
 
+;; align code in a pretty way
+(global-set-key (kbd "C-x \\") #'align-regexp)
+
 (use-package dumb-jump
   :ensure t
   :after helm
@@ -474,12 +475,12 @@ Example output:
   :ensure t
   :after evil
   :bind
-  ([(meta shift up)] . move-text-up)
-  ([(meta shift down)] . move-text-down)
   ([(meta k)] . move-text-up)
   ([(meta j)] . move-text-down)
   ([(meta shift k)] . move-text-line-up)
   ([(meta shift j)] . move-text-line-down)
+  ([(meta shift up)] . move-text-up)
+  ([(meta shift down)] . move-text-down)
   :init
   ;; free the bindings used by this plugin from windmove and other areas that use the same keys
   (global-unset-key (kbd "M-j"))
@@ -689,7 +690,7 @@ Example output:
   )
   (:map evil-insert-state-map
   ;; this is also defined globally above in the config
-  ("C-S-<tab>" . er/expand-region)
+  ("C-S-<backtab>" . er/expand-region)
   )
   (:map evil-visual-state-map
   ;; this is also defined globally above in the config
@@ -1174,15 +1175,16 @@ Example output:
     )
 
 (use-package org-jira
-      :ensure t
-      :defer 3
-      :commands (org-jira-mode org-jira-get-issues org-jira-get-projects)
-      :after org
-      :custom
-      (jiralib-url "https://stairscreativestudio.atlassian.net")
-    :config
-    (setq jiralib-token
-      `("Cookie" . ,(format "ajs_group_id=null; ajs_anonymous_id=%222e15ea7d-cb97-4d24-bfe2-348c4655df02%22; atlassian.xsrf.token=86ec43db-1a9e-48fa-892a-9210c6fee684_38750fda3fb7e52a86533ed838cb5688d745af60_lin; cloud.session.token=eyJraWQiOiJzZXNzaW9uLXNlcnZpY2VcL3Nlc3Npb24tc2VydmljZSIsImFsZyI6IlJTMjU2In0.eyJhc3NvY2lhdGlvbnMiOlt7ImFhSWQiOiI1YmE3ZjkyNDNjMDEzZDdiMTA1MTRjYmIiLCJzZXNzaW9uSWQiOiJhYWUwYmVkNC02MTY1LTQ4MjUtYThkYS03ZWEwNGIxMWQ3MzgiLCJlbWFpbCI6Imd1Z3V0ekBnbWFpbC5jb20ifV0sInN1YiI6IjVkOTM1MzI1MGMyYTVkMGRkODdhZmQ2MCIsImVtYWlsRG9tYWluIjoic3RhaXJzLnN0dWRpbyIsImltcGVyc29uYXRpb24iOltdLCJyZWZyZXNoVGltZW91dCI6MTU3MjYzODk5NywidmVyaWZpZWQiOnRydWUsImlzcyI6InNlc3Npb24tc2VydmljZSIsInNlc3Npb25JZCI6ImYwNTEwYzA5LWRmNGMtNGE2MC1iYTM4LTA2OTU2YzRiODRkMSIsImF1ZCI6ImF0bGFzc2lhbiIsIm5iZiI6MTU3MjYzODM5NywiZXhwIjoxNTc1MjMwMzk3LCJpYXQiOjE1NzI2MzgzOTcsImVtYWlsIjoiZ3VzdGF2b0BzdGFpcnMuc3R1ZGlvIiwianRpIjoiZjA1MTBjMDktZGY0Yy00YTYwLWJhMzgtMDY5NTZjNGI4NGQxIn0.naz3Vi6yvn0aoFX7nAMK-K7fff4zpkeUifPSrEj6a3so9pK6uPrMDZOIGd8Mg7pJJkCy8FJ9bC6eTCGdrbqll3v8Kg6NhThAQzx8tvcW4gFObJyL12HEvt9EBpwvGKW1mWLhb-S_ZGwoTCXk1QRpNHy6zNl3etwlhX9jk3KXXT5fIaO2oJJaFCovZRvQTJdyoCRiIBRPWwyh3tqrqJiZVD08NFY1bq_aCyfkxxN-owWP7KPJxmLtH-ZPpj24ky8Dv-4oVP_frUPkLW5ULvHstdhxkwCUWCpaTPPDBqijljTj5YvXFp_ulNyWqQHnPHeV3m6BszI9WxBxZF7mUwIBZw; _csrf=AMoq40Bo50JzeFptjXhUvsBl")))
+  :ensure t
+  :disabled
+  :defer 3
+  :commands (org-jira-mode org-jira-get-issues org-jira-get-projects)
+  :after org
+  :custom
+  (jiralib-url "https://stairscreativestudio.atlassian.net")
+  :config
+  (setq jiralib-token
+  `("Cookie" . ,(format "ajs_group_id=null; ajs_anonymous_id=%222e15ea7d-cb97-4d24-bfe2-348c4655df02%22; atlassian.xsrf.token=86ec43db-1a9e-48fa-892a-9210c6fee684_38750fda3fb7e52a86533ed838cb5688d745af60_lin; cloud.session.token=eyJraWQiOiJzZXNzaW9uLXNlcnZpY2VcL3Nlc3Npb24tc2VydmljZSIsImFsZyI6IlJTMjU2In0.eyJhc3NvY2lhdGlvbnMiOlt7ImFhSWQiOiI1YmE3ZjkyNDNjMDEzZDdiMTA1MTRjYmIiLCJzZXNzaW9uSWQiOiJhYWUwYmVkNC02MTY1LTQ4MjUtYThkYS03ZWEwNGIxMWQ3MzgiLCJlbWFpbCI6Imd1Z3V0ekBnbWFpbC5jb20ifV0sInN1YiI6IjVkOTM1MzI1MGMyYTVkMGRkODdhZmQ2MCIsImVtYWlsRG9tYWluIjoic3RhaXJzLnN0dWRpbyIsImltcGVyc29uYXRpb24iOltdLCJyZWZyZXNoVGltZW91dCI6MTU3MjYzODk5NywidmVyaWZpZWQiOnRydWUsImlzcyI6InNlc3Npb24tc2VydmljZSIsInNlc3Npb25JZCI6ImYwNTEwYzA5LWRmNGMtNGE2MC1iYTM4LTA2OTU2YzRiODRkMSIsImF1ZCI6ImF0bGFzc2lhbiIsIm5iZiI6MTU3MjYzODM5NywiZXhwIjoxNTc1MjMwMzk3LCJpYXQiOjE1NzI2MzgzOTcsImVtYWlsIjoiZ3VzdGF2b0BzdGFpcnMuc3R1ZGlvIiwianRpIjoiZjA1MTBjMDktZGY0Yy00YTYwLWJhMzgtMDY5NTZjNGI4NGQxIn0.naz3Vi6yvn0aoFX7nAMK-K7fff4zpkeUifPSrEj6a3so9pK6uPrMDZOIGd8Mg7pJJkCy8FJ9bC6eTCGdrbqll3v8Kg6NhThAQzx8tvcW4gFObJyL12HEvt9EBpwvGKW1mWLhb-S_ZGwoTCXk1QRpNHy6zNl3etwlhX9jk3KXXT5fIaO2oJJaFCovZRvQTJdyoCRiIBRPWwyh3tqrqJiZVD08NFY1bq_aCyfkxxN-owWP7KPJxmLtH-ZPpj24ky8Dv-4oVP_frUPkLW5ULvHstdhxkwCUWCpaTPPDBqijljTj5YvXFp_ulNyWqQHnPHeV3m6BszI9WxBxZF7mUwIBZw; _csrf=AMoq40Bo50JzeFptjXhUvsBl")))
   (define-key org-jira-map (kbd "C-c pg") 'org-jira-get-projects)
   (define-key org-jira-map (kbd "C-c ib") 'org-jira-browse-issue)
   (define-key org-jira-map (kbd "C-c ig") 'org-jira-get-issues)
@@ -1865,7 +1867,7 @@ Example output:
   ("C-n" . company-select-next-or-abort)
   ("C-p" . company-select-previous-or-abort)
   ("<tab>" . company-complete-common-or-cycle)
-  ("S-<tab>" . company-select-previous)
+  ("S-<backtab>" . company-select-previous)
   ("<backtab>" . company-select-previous)
   ("C-d" . company-show-doc-buffer))
   (:map company-search-map
@@ -2716,9 +2718,9 @@ Example output:
 )
 
 (use-package emojify
-:ensure t
-:config
-(add-hook 'after-init-hook #'global-emojify-mode)
+  :ensure t
+  :config
+  (add-hook 'after-init-hook #'global-emojify-mode)
 )
 
 (dolist (frame (frame-list))
@@ -2731,6 +2733,129 @@ Example output:
 
 (setq resize-mini-windows t)
 (setq max-mini-window-height 0.33)
+
+(defconst tau-savefile-dir (expand-file-name "savefile" user-emacs-directory))
+
+;; create the savefile dir if it doesn't exist
+(unless (file-exists-p tau-savefile-dir)
+  (make-directory tau-savefile-dir))
+
+(use-package desktop
+:ensure nil
+:bind
+("C-c s" . desktop-save-in-desktop-dir)
+:init
+;; use only one desktop
+(setq desktop-path '("~/.emacs.d/"))
+(setq desktop-dirname "~/.emacs.d/")
+(setq desktop-base-file-name "emacs-desktop")
+
+(setq desktop-restore-eager 5) ;; restore 5 buffers immediately. the others restore lazily
+(setq desktop-load-locked-desktop t)
+(setq desktop-files-not-to-save "^$")
+(setq desktop-save t)
+(setq desktop-buffers-not-to-save
+     (concat "\\("
+             "^nn\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
+             "\\|\\.emacs.*\\|\\.diary\\|\\.newsrc-dribble\\|\\.bbdb"
+       "\\)$"))
+:config
+(desktop-save-mode t)
+(add-to-list 'desktop-modes-not-to-save 'dired-mode)
+(add-to-list 'desktop-modes-not-to-save 'Info-mode)
+(add-to-list 'desktop-modes-not-to-save 'info-lookup-mode)
+(add-to-list 'desktop-modes-not-to-save 'fundamental-mode)
+(add-to-list 'desktop-modes-not-to-save 'completion-list-mode)
+
+;; remove desktop after it's been read
+(add-hook 'desktop-after-read-hook
+    '(lambda ()
+       ;; desktop-remove clears desktop-dirname
+       (setq desktop-dirname-tmp desktop-dirname)
+       (desktop-remove)
+       (setq desktop-dirname desktop-dirname-tmp)))
+
+(defun saved-session ()
+  (file-exists-p (concat desktop-dirname "/" desktop-base-file-name)))
+
+;; use session-restore to restore the desktop manually
+(defun session-restore ()
+  "Restore a saved emacs session."
+  (interactive)
+  (if (saved-session)
+      (desktop-read)
+    (message "No desktop found.")))
+
+;; use session-save to save the desktop manually
+(defun session-save ()
+  "Save an emacs session."
+  (interactive)
+  (if (saved-session)
+      (if (y-or-n-p "Overwrite existing desktop? ")
+    (desktop-save-in-desktop-dir)
+  (message "Session not saved."))
+  (desktop-save-in-desktop-dir)))
+
+;; ask user whether to restore desktop at start-up
+(add-hook 'after-init-hook
+    '(lambda ()
+       (if (saved-session)
+     (if (y-or-n-p "Restore desktop? ")
+         (session-restore)))))
+)
+
+(use-package auto-save-mode
+  :ensure nil
+  :config
+  (setq auto-save-default nil)  ;; dont auto save files
+)
+
+(use-package saveplace
+  :ensure nil
+  :config
+  (defconst savefile-dir (expand-file-name "savefile" user-emacs-directory))
+
+  ;; create the savefile dir if it doesn't exist
+  (unless (file-exists-p savefile-dir)
+    (make-directory savefile-dir))
+
+  (setq save-place-file (expand-file-name "saveplace" savefile-dir))
+  ;; activate it for all buffers
+  (setq-default save-place t)
+  (save-place-mode t)
+)
+
+(use-package savehist
+  :ensure nil
+  :config
+  (setq savehist-save-minibuffer-history t)
+  (setq savehist-additional-variables
+        '(kill-ring
+          search-ring
+          regexp-search-ring
+          last-kbd-macro
+          kmacro-ring
+          shell-command-history))
+  (savehist-mode)
+)
+
+(use-package recentf
+  :ensure t
+  :config
+  (setq recentf-save-file (expand-file-name "recentf" user-emacs-directory)
+        recentf-max-saved-items 500
+        recentf-max-menu-items 15
+        ;; disable recentf-cleanup on Emacs start, because it can cause
+        ;; problems with remote files
+        recentf-auto-cleanup 'never)
+  (recentf-mode +1)
+)
+
+(use-package auto-save-visited-mode
+  :ensure nil
+  :config
+  (auto-save-visited-mode)
+)
 
 (use-package swiper
   :disabled
@@ -2752,7 +2877,7 @@ Example output:
 (use-package avy
   :ensure t
   :bind
-  ("M-j" . avy-goto-char-2)
+  ("M-g j" . avy-goto-char-2)
   ("C-:" . avy-goto-char)
   ("C-'" . avy-goto-char-2)
   ;; replace native M-g g `goto-line' with `avy-goto-line'
@@ -4169,7 +4294,8 @@ Example output:
           (message "Prettier not found in %s. Not enabling prettier-js-mode" root)
           (message "Falling back to aggressive-indent-mode")
           (aggressive-indent-mode 1)))))
-  (add-hook 'prettier-js-mode-hook #'tau/use-prettier-if-in-node-modules)
+  ;; disabled cause my current project doenst have prettier local
+  ;; (add-hook 'prettier-js-mode-hook #'tau/use-prettier-if-in-node-modules)
 
 )
 
@@ -4368,20 +4494,32 @@ Example output:
   :ensure t
 )
 
+(defun duplicate-line()
+  "Duplicate current line."
+  (interactive)
+  (move-beginning-of-line 1)
+  (kill-line)
+  (yank)
+  (open-line 1)
+  (next-line 1)
+  (yank))
+
+(global-set-key (kbd "M-S-D") 'duplicate-line)
+
 (defun copy-to-clipboard ()
-"Make F8 and F9 Copy and Paste to/from OS Clipboard.  Super usefull."
-(interactive)
-(if (display-graphic-p)
-    (progn
-        (message "Yanked region to x-clipboard!")
-        (call-interactively 'clipboard-kill-ring-save)
-        )
-    (if (region-active-p)
-        (progn
-        (shell-command-on-region (region-beginning) (region-end) "xsel -i -b")
-        (message "Yanked region to clipboard!")
-        (deactivate-mark))
-    (message "No region active; can't yank to clipboard!")))
+  "Make F8 and F9 Copy and Paste to/from OS Clipboard.  Super usefull."
+  (interactive)
+  (if (display-graphic-p)
+      (progn
+          (message "Yanked region to x-clipboard!")
+          (call-interactively 'clipboard-kill-ring-save)
+          )
+      (if (region-active-p)
+          (progn
+          (shell-command-on-region (region-beginning) (region-end) "xsel -i -b")
+          (message "Yanked region to clipboard!")
+          (deactivate-mark))
+      (message "No region active; can't yank to clipboard!")))
 )
 
 (evil-define-command paste-from-clipboard()
