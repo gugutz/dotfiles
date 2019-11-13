@@ -539,6 +539,19 @@ Sets a 80 character line width
 (prefer-coding-system 'utf-8) ;; Prefer UTF-8 encoding
 #+END_SRC
 
+** delete selection mode
+
+Delete Selection mode lets you treat an Emacs region much like a typical text selection outside of Emacs: You can replace the active region just by typing text, and you can delete the selected text just by hitting the Backspace key (‘DEL’).
+
+According to the Emacs manual,
+#+begin_quote
+If you enable Delete Selection mode, a minor mode, then inserting text while the mark is active causes the selected text to be deleted first. This also deactivates the mark. Many graphical applications follow this convention, but Emacs does not.
+#+end_quote
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(delete-selection-mode 1)
+#+END_SRC
+
 ** auto balance windows on opening and closing frames
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -659,6 +672,21 @@ Enable documentation for programming languages
 )
 #+END_SRC
 
+*** eldoc-box
+
+Show eldoc info in a childframe
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package eldoc
+  :ensure t
+  :custom-face
+  (eldoc-box-border (t (:background "#202020"))))
+  (eldoc-box-body (t (:background "#202020"))))
+  :config
+  ;; (eldoc-box-hover-mode)
+  (eldoc-box-hover-at-point-mode)
+)
+#+END_SRC
 
 ** aggressive-indent-mode
 
@@ -768,6 +796,13 @@ Emacs jump to definition tool
     (setq dumb-jump-selector 'helm)
     ;; (setq dumb-jump-selector 'ivy)
   )
+#+END_SRC
+
+* Global Hooks
+
+Delete trailing whitespace on save
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+END_SRC
 
 * Text editing settings
@@ -1399,6 +1434,7 @@ fifteen = 15
   :hook
   (org-mode . diff-hl-mode)
   (org-mode . rainbow-mode)
+  (org-mode . visual-line-mode)
     :bind
     ("C-c l" . org-store-link)
     ("C-c a" . org-agenda)
@@ -2286,12 +2322,14 @@ Requires: Emacs >= 26
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package quick-peek
   :ensure t
+  :disabled
 )
 #+END_SRC
 
    #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package flycheck-inline
   :ensure t
+  :disabled
   :hook
   (flycheck-mode . flycheck-inline-mode)
   :config
@@ -2311,6 +2349,31 @@ Requires: Emacs >= 26
         flycheck-inline-clear-function #'quick-peek-hide))
 #+END_SRC
 
+** flycheck posframe
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package flycheck-posframe
+  :ensure t
+  :after flycheck
+  :custom-face
+  (flycheck-posframe-error-face (nil (:inherit 'error)))
+  (flycheck-posframe-background-face (nil (:inherit 'error)))
+  (flycheck-posframe-border-face nil (:inherit 'error)))
+  (flycheck-posframe-border-width (nil (:inherit 'error)))
+  :hook
+  (flycheck-mode . flycheck-posframe-mode)
+  :config
+  ;;(set-face-attribute 'flycheck-posframe-error-face nil :inherit 'error)
+  ;;(set-face-attribute 'flycheck-posframe-background-face nil :inherit 'error)
+  ;;(set-face-attribute 'flycheck-posframe-border-face nil :inherit 'error)
+  ;;(set-face-attribute 'flycheck-posframe-border-width nil :inherit 'error)
+  (setq flycheck-posframe-warning-prefix "\u26a0 ") ;; default: ➤
+  (setq flycheck-posframe-position 'window-bottom-left-corner)
+
+  ;; Calling (flycheck-posframe-configure-pretty-defaults) will configure flycheck-posframe to show warnings and errors with nicer faces (inheriting from warning and error respectively), and set the prefix for each to nicer unicode characters.
+  (flycheck-posframe-configure-pretty-defaults)
+)
+#+END_SRC
 
 ** flycheck-pos-tip (show flycheck messages in tooltip)
 
@@ -2341,6 +2404,7 @@ There is another official flycheck-pos-tip extension for displaying errors under
 ;;; Show Flycheck errors in tooltip
 (use-package flycheck-popup-tip
   :ensure t
+  :disabled
   :after flycheck
   :hook
   (flycheck-mode . flycheck-popup-tip-mode)
@@ -3033,33 +3097,36 @@ Disabled in favor of company-mode
 * Yasnippets
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-  (use-package yasnippet
-    :ensure t
-    :diminish yas-minor-mode
-    :hook
-    (prog-mode . yas-minor-mode)
-    (text-mode . yas-minor-mode)
-    :bind
-    ;; ("<tab>" . yas-maybe-expand)
-    ("C-<tab>" . yas-maybe-expand)
-    (:map yas-minor-mode-map
-    ;; yas-maybe-expand only expands if there are candidates.
-    ;; if not, acts like binding is unbound and run whatever command is bound to that key normally
-    ;; ("<tab>" . yas-maybe-expand)
-    ;; Bind `C-c y' to `yas-expand' ONLY.
-    ("C-c y" . yas-expand)
-    ("C-SPC" . yas-expand)
-    )
-    :config
-    ;; set snippets directory
-    ;; (with-eval-after-load 'yasnippet
-    ;;  (setq yas-snippet-dirs '(yasnippet-snippets-dir)))
-    (setq yas-verbosity 1)                      ; No need to be so verbose
-    (setq yas-wrap-around-region t)
-    (yas-reload-all)
-    ;; disabled global mode in favor or hooks in prog and text modes only
-    ;; (yas-global-mode 1)
+(use-package yasnippet
+  :ensure t
+  :diminish yas-minor-mode
+  ;;:hook
+  ;;(prog-mode . yas-minor-mode)
+  ;;(text-mode . yas-minor-mode)
+  :bind
+  ;; ("<tab>" . yas-maybe-expand)
+  ("C-<tab>" . yas-maybe-expand)
+  (:map yas-minor-mode-map
+  ;; yas-maybe-expand only expands if there are candidates.
+  ;; if not, acts like binding is unbound and run whatever command is bound to that key normally
+  ;; ("<tab>" . yas-maybe-expand)
+  ;; Bind `C-c y' to `yas-expand' ONLY.
+  ("C-c y" . yas-expand)
+  ("C-SPC" . yas-expand)
   )
+  :config
+  ;; set snippets directory
+  ;;  (setq yas-snippet-dirs '(yasnippet-snippets-dir))
+  ;; add angular snippets folder
+  (with-eval-after-load 'yasnippets-snippets
+  (setq yas-snippet-dirs (append yas-snippet-dirs
+                                 '("~/dotfiles/emacs.d/snippets/angular/"))))
+  (setq yas-verbosity 1)                      ; No need to be so verbose
+  (setq yas-wrap-around-region t)
+  (yas-reload-all)
+  ;; disabled global mode in favor or hooks in prog and text modes only
+  (yas-global-mode 1)
+)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -4043,7 +4110,24 @@ This shares bindings with ace-window
 
 * mode line and headerline
 
-** Diplay file info (line and column number and size)
+** My personal modeline
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(setq mode-line-format
+      (list
+       ;; value of `mode-name'
+       "%m: "
+       ;; value of current buffer name
+       "buffer %b, "
+       ;; value of current line number
+       "line %l "
+       "-- user: "
+       ;; value of user
+       (getenv "USER"))
+)
+#+END_SRC
+
+*** Diplay file info (line and column number and size)
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (line-number-mode t)
@@ -4058,10 +4142,39 @@ Display the value of point in the mode line. It is displayed in brackets, adjace
   :ensure nil
   :load-path "packages/show-point-mode"
   :config
- (show-point-mode t)
+  (show-point-mode t)
 )
 #+END_SRC
+
+*** mode line personal customizations
+
+Cool background colors
+#fdf6e3
+#eee8d5
+Cool foreground colors
+#93a1a1
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(set-face-attribute 'mode-line nil :height tau/font-size-mode-line)
+(set-face-attribute 'mode-line nil
+                    :background "#007ad3"
+                    :foreground "#ffffff"
+                    :box '(:line-width 4 :color "#007ad3") ;; modeline border
+                    :overline nil
+                    :underline nil)
+
+;; for now the inactive modeline looks the same as the active one
+(set-face-attribute 'mode-line-inactive nil
+                    :background "#007ad3"
+                    :foreground "#ffffff"
+                    :box '(:line-width 4 :color "#007ad3") ;; modeline border
+                    :overline nil
+                    :underline nil)
+#+END_SRC
+
+
 ** anzu
+
 anzu.el is an Emacs port of anzu.vim. anzu.el provides a minor mode which displays current match and total matches information in the mode-line in various search modes.
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -4085,23 +4198,6 @@ anzu.el is an Emacs port of anzu.vim. anzu.el provides a minor mode which displa
 
 ;;  (define-key isearch-mode-map [remap isearch-query-replace]  #'anzu-isearch-query-replace)
 ;;  (define-key isearch-mode-map [remap isearch-query-replace-regexp] #'anzu-isearch-query-replace-regexp)
-)
-#+END_SRC
-
-** My personal modeline
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(setq mode-line-format
-      (list
-       ;; value of `mode-name'
-       "%m: "
-       ;; value of current buffer name
-       "buffer %b, "
-       ;; value of current line number
-       "line %l "
-       "-- user: "
-       ;; value of user
-       (getenv "USER"))
 )
 #+END_SRC
 
@@ -4193,32 +4289,6 @@ Source: http://emacs-fu.blogspot.com/2011/08/customizing-mode-line.html
     "%-" ;; fill with '-'
     ))
 
-** mode line personal customizations
-
-Cool background colors
-#fdf6e3
-#eee8d5
-Cool foreground colors
-#93a1a1
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(set-face-attribute 'mode-line nil :height tau/font-size-mode-line)
-(set-face-attribute 'mode-line nil
-                    :background "#007ad3"
-                    :foreground "#ffffff"
-                    :box '(:line-width 4 :color "#007ad3") ;; modeline border
-                    :overline nil
-                    :underline nil)
-
-;; for now the inactive modeline looks the same as the active one
-(set-face-attribute 'mode-line-inactive nil
-                    :background "#007ad3"
-                    :foreground "#ffffff"
-                    :box '(:line-width 4 :color "#007ad3") ;; modeline border
-                    :overline nil
-                    :underline nil)
-#+END_SRC
-
 ** examples of mode-line-format lists
   ;; (setq-default mode-line-format
     ;;               (list
@@ -4263,6 +4333,7 @@ put it here to test it to see what is best
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package feebleline
   :ensure t
+  :disabled
   :config
   (setq feebleline-msg-functions
         '((feebleline-line-number         :post "" :fmt "%5s")
@@ -4417,8 +4488,6 @@ Require and enable the doom-modeline
 
 #+END_SRC
 
-this was commented with C-c ; so it doenst get exported in favor of doom-modeline
-
 ** parrot-mode
 
 Type of parrots available:
@@ -4464,6 +4533,9 @@ Type of parrots available:
 #+END_SRC
 
 ** COMMENT smart-mode-line
+
+this was commented with C-c ; so it doenst get exported in favor of doom-modeline
+
 #+BEGIN_SRC emacs-lisp :tangle init.el
  (require 'smart-mode-line)
  (if (require 'smart-mode-line nil 'noerror)
@@ -5843,6 +5915,14 @@ Unfortunatelly this package has to be installed manually, as its not available o
   (setq web-mode-markup-indent-offset 4)
   (setq web-mode-css-indent-offset 2)
   (setq web-mode-code-indent-offset 2)
+  (setq web-mode-enable-auto-pairing t)
+  (setq web-mode-enable-current-element-highlight t)
+  (setq web-mode-enable-block-face t)
+  (setq web-mode-enable-part-face t)
+
+  ;; add flycheck linter for webmode
+  (add-to-list 'web-mode-hook 'flycheck-mode)
+  (flycheck-add-mode 'javascript-eslint 'web-mode)
 
   ;; Use tidy to check HTML buffers with web-mode.
   (eval-after-load 'flycheck
@@ -6065,7 +6145,10 @@ https://github.com/felipeochoa/rjsx-mode
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package ng2-mode
   :defer
+  :mode
+  ("\\.component.ts$\\'" "\\.component.html$\\'")
   :hook
+  (ng2-mode . rainbow-mode)
   (ng2-mode . prettier-js-mode)
 )
 #+END_SRC
