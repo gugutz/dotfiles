@@ -397,12 +397,15 @@ tangled, and the tangled file is compiled."
   (setq eldoc-idle-delay 0.4)
 )
 
-(use-package eldoc
+(use-package eldoc-box
   :ensure t
   :custom-face
-  (eldoc-box-border (t (:background "#202020"))))
-  (eldoc-box-body (t (:background "#202020"))))
+  ;;(eldoc-box-border (t (:background "#202020"))))
+  ;;(eldoc-box-body (t (:background "#202020"))))
   :config
+  ;;(setq eldoc-box-max-pixel-width)
+  ;;(setq eldoc-box-max-pixel-height)
+  ;;(setq eldoc-box-only-multi-line)   ;;  Set this to non-nil and eldoc-box only display multi-line message in childframe. One line messages are left in minibuffer.
   ;; (eldoc-box-hover-mode)
   (eldoc-box-hover-at-point-mode)
 )
@@ -1658,16 +1661,16 @@ Example output:
   :ensure t
   :after flycheck
   :custom-face
-  (flycheck-posframe-error-face (nil (:inherit 'error)))
-  (flycheck-posframe-background-face (nil (:inherit 'error)))
-  (flycheck-posframe-border-face nil (:inherit 'error)))
-  (flycheck-posframe-border-width (nil (:inherit 'error)))
+  ;;(flycheck-posframe-error-face (nil (:inherit 'error)))
+  ;;(flycheck-posframe-background-face (nil (:inherit 'error)))
+  ;;(flycheck-posframe-border-face nil (:inherit 'error)))
+  ;;(flycheck-posframe-border-width (nil (:inherit 'error)))
   :hook
   (flycheck-mode . flycheck-posframe-mode)
   :config
-  ;;(set-face-attribute 'flycheck-posframe-error-face nil :inherit 'error)
-  ;;(set-face-attribute 'flycheck-posframe-background-face nil :inherit 'error)
-  ;;(set-face-attribute 'flycheck-posframe-border-face nil :inherit 'error)
+  (set-face-attribute 'flycheck-posframe-error-face nil :inherit 'error)
+  (set-face-attribute 'flycheck-posframe-background-face nil :inherit 'error)
+  (set-face-attribute 'flycheck-posframe-border-face nil :inherit 'error)
   ;;(set-face-attribute 'flycheck-posframe-border-width nil :inherit 'error)
   (setq flycheck-posframe-warning-prefix "\u26a0 ") ;; default: ➤
   (setq flycheck-posframe-position 'window-bottom-left-corner)

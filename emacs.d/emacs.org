@@ -655,7 +655,6 @@ If you enable Delete Selection mode, a minor mode, then inserting text while the
 #+END_SRC
 
 ** eldoc
-
 Enable documentation for programming languages
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -677,12 +676,16 @@ Enable documentation for programming languages
 Show eldoc info in a childframe
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package eldoc
+(use-package eldoc-box
   :ensure t
+  :after eldoc
   :custom-face
-  (eldoc-box-border (t (:background "#202020"))))
-  (eldoc-box-body (t (:background "#202020"))))
+  ;;(eldoc-box-border (t (:background "#202020"))))
+  ;;(eldoc-box-body (t (:background "#202020"))))
   :config
+  ;;(setq eldoc-box-max-pixel-width)
+  ;;(setq eldoc-box-max-pixel-height)
+  ;;(setq eldoc-box-only-multi-line)   ;;  Set this to non-nil and eldoc-box only display multi-line message in childframe. One line messages are left in minibuffer.
   ;; (eldoc-box-hover-mode)
   (eldoc-box-hover-at-point-mode)
 )
@@ -2356,16 +2359,16 @@ Requires: Emacs >= 26
   :ensure t
   :after flycheck
   :custom-face
-  (flycheck-posframe-error-face (nil (:inherit 'error)))
-  (flycheck-posframe-background-face (nil (:inherit 'error)))
-  (flycheck-posframe-border-face nil (:inherit 'error)))
-  (flycheck-posframe-border-width (nil (:inherit 'error)))
+  ;;(flycheck-posframe-error-face (nil (:inherit 'error)))
+  ;;(flycheck-posframe-background-face (nil (:inherit 'error)))
+  ;;(flycheck-posframe-border-face nil (:inherit 'error)))
+  ;;(flycheck-posframe-border-width (nil (:inherit 'error)))
   :hook
   (flycheck-mode . flycheck-posframe-mode)
   :config
-  ;;(set-face-attribute 'flycheck-posframe-error-face nil :inherit 'error)
-  ;;(set-face-attribute 'flycheck-posframe-background-face nil :inherit 'error)
-  ;;(set-face-attribute 'flycheck-posframe-border-face nil :inherit 'error)
+  (set-face-attribute 'flycheck-posframe-error-face nil :inherit 'error)
+  (set-face-attribute 'flycheck-posframe-background-face nil :inherit 'error)
+  (set-face-attribute 'flycheck-posframe-border-face nil :inherit 'error)
   ;;(set-face-attribute 'flycheck-posframe-border-width nil :inherit 'error)
   (setq flycheck-posframe-warning-prefix "\u26a0 ") ;; default: ➤
   (setq flycheck-posframe-position 'window-bottom-left-corner)
@@ -2427,6 +2430,8 @@ C-c g for any git related stuff other than magit's
   :ensure t
   :custom
   (magit-auto-revert-mode nil)
+  :hook
+  (after-save . (lambda () (magit-after-save-refresh-status t)))
   :bind
   ("<tab>" . magit-section-toggle)
   ("M-g s" . magit-status)
@@ -4997,13 +5002,38 @@ Highlight matching parenthesis
 )
 #+END_SRC
 
+** color identifiers mode
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package color-identifiers-mode
+  :ensure t
+  :hook
+  (js2-mode . color-identifiers-mode)
+;;:config
+;;(add-hook 'after-init-hook 'global-color-identifiers-mode)
+;; the following code disabled highlighting for all other keywords and only highlights and color variables
+;;   (defun myfunc-color-identifiers-mode-hook ()
+;;     (let ((faces '(font-lock-comment-face font-lock-comment-delimiter-face font-lock-constant-face font-lock-type-face font-lock-function-name-face font-lock-variable-name-face font-lock-keyword-face font-lock-string-face font-lock-builtin-face font-lock-preprocessor-face font-lock-warning-face font-lock-doc-face font-lock-negation-char-face font-lock-regexp-grouping-construct font-lock-regexp-grouping-backslash)))
+;;       (dolist (face faces)
+;;         (face-remap-add-relative face '((:foreground "" :weight normal :slant normal)))))
+;;     (face-remap-add-relative 'font-lock-keyword-face '((:weight bold)))
+;;     (face-remap-add-relative 'font-lock-comment-face '((:slant italic)))
+;;     (face-remap-add-relative 'font-lock-builtin-face '((:weight bold)))
+;;     (face-remap-add-relative 'font-lock-preprocessor-face '((:weight bold)))
+;;     (face-remap-add-relative 'font-lock-function-name-face '((:slant italic)))
+;;     (face-remap-add-relative 'font-lock-string-face '((:slant italic)))
+;;     (face-remap-add-relative 'font-lock-constant-face '((:weight bold))))
+;;   (add-hook 'color-identifiers-mode-hook 'myfunc-color-identifiers-mode-hook)
+)
+#+END_SRC
+
 ** Highlighting numbers
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package highlight-numbers
-    :ensure t
-    :hook
-    (prog-mode . highlight-numbers-mode)
+  :ensure t
+  :hook
+  (prog-mode . highlight-numbers-mode)
 )
 #+END_SRC
 
@@ -6161,6 +6191,13 @@ https://github.com/felipeochoa/rjsx-mode
 )
 #+END_SRC
 
+* cheat-sh
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package cheat-sh
+  :ensure t
+)
+#+END_SRC
 
 * fun packages
 
