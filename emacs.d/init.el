@@ -37,27 +37,22 @@ tangled, and the tangled file is compiled."
 ;; First save the current value of gc-cons-threshold to restore it after the init file is loaded at the very bottom of this file
 (setq gc-threshold-original gc-cons-threshold)
 
-(setq gc-cons-threshold (* 511 1024 1024))
-(setq gc-cons-percentage 0.5) ;; GC only with 500mb of data allocated
+;; reduce the frequency of garbage collection by making it happen on
+;; each 50MB of allocated data (the default is on every 0.76MB)
+(setq gc-cons-threshold 50000000) ;; 50mb
+;;(setq gc-cons-threshold 100000000) ;; 100mb
 
-(run-with-idle-timer 5 t #'garbage-collect) ;; GC after 5s idle time
+;; GC only with 500mb of data allocated
+;; (setq gc-cons-percentage 0.5)
+
+;; GC after 5s idle time
+;; (run-with-idle-timer 5 t #'garbage-collect)
+
 (setq garbage-collection-messages t)
+(setq inhibit-compacting-font-caches t)      ;; Don’t compact font caches during GC (garbage collection).
 
 ;; Restore original gc value after init
 ;; (add-hook 'after-init-hook (lambda () (setq gc-cons-threshold gc-threshold-original)))
-
-(setq inhibit-compacting-font-caches t)      ;; Don’t compact font caches during GC (garbage collection).
-
-;; First save the current value of gc-cons-threshold to restore it after the init file is loaded at the very bottom of this file
-;;  (setq gc-threshold-original gc-cons-threshold)
-  ;; Show gc messages in the messages buffer
-;;  (setq garbage-collection-messages t)
-  ;; Set high gc-cons-threshold
-;;  (setq gc-cons-threshold 100000000)
-  ;; Restore original gc value after init
-;;  (add-hook 'after-init-hook (lambda () (setq gc-cons-threshold gc-threshold-original)))
-  ;; Defer garbage collection further back in the startup process
-  ;; (setq gc-cons-threshold (if (display-graphic-p) 400000000 100000000))
 
 (require 'package)
 ;; add melpa stable emacs package repository
@@ -137,31 +132,31 @@ tangled, and the tangled file is compiled."
 (use-package gnus
   :ensure nil
   :config
-(setq user-mail-address "joshuafwolfe@gmail.com"
-      user-full-name "Josh Wolfe")
+  (setq user-mail-address "joshuafwolfe@gmail.com"
+        user-full-name "Josh Wolfe")
 
-(setq gnus-select-method
-      '(nnimap "gmail"
-         (nnimap-address "imap.gmail.com")
-         (nnimap-server-port 993)
-         (nnimap-stream ssl)))
+  (setq gnus-select-method
+        '(nnimap "gmail"
+           (nnimap-address "imap.gmail.com")
+           (nnimap-server-port 993)
+           (nnimap-stream ssl)))
 
-(setq smtpmail-smtp-server "smtp.gmail.com"
-      smtpmail-smtp-service 587
-      gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
+  (setq smtpmail-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-service 587
+        gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
 
-(setq gnus-thread-sort-functions
-      '(gnus-thread-sort-by-most-recent-date
-        (not gnus-thread-sort-by-number)))
+  (setq gnus-thread-sort-functions
+        '(gnus-thread-sort-by-most-recent-date
+          (not gnus-thread-sort-by-number)))
 
-(defun my-gnus-group-list-subscribed-groups ()
-  "List all subscribed groups with or without un-read messages"
-  (interactive)
-  (gnus-group-list-all-groups 5))
+  (defun my-gnus-group-list-subscribed-groups ()
+    "List all subscribed groups with or without un-read messages"
+    (interactive)
+    (gnus-group-list-all-groups 5))
 
-(define-key gnus-group-mode-map
-  ;; list all the subscribed groups even they contain zero un-read messages
-      (kbd "o") 'my-gnus-group-list-subscribed-groups)
+  (define-key gnus-group-mode-map
+    ;; list all the subscribed groups even they contain zero un-read messages
+        (kbd "o") 'my-gnus-group-list-subscribed-groups)
 )
 
 ;; (use-package server
@@ -320,6 +315,9 @@ tangled, and the tangled file is compiled."
   '(lambda () (interactive) (kill-buffer (current-buffer)))
 )
 
+;; warn when opening files bigger than 100MB
+(setq large-file-warning-threshold 100000000)
+
 (setq require-final-newline t)
 
 (setq-default fill-column 80)
@@ -432,6 +430,9 @@ Example output:
 				"\\S-+\\(\\s-+\\)"
 				1 1 nil))
 
+;; align code in a pretty way
+(global-set-key (kbd "C-x \\") #'align-regexp)
+
 (use-package dumb-jump
   :ensure t
   :after helm
@@ -474,12 +475,12 @@ Example output:
   :ensure t
   :after evil
   :bind
-  ([(meta shift up)] . move-text-up)
-  ([(meta shift down)] . move-text-down)
   ([(meta k)] . move-text-up)
   ([(meta j)] . move-text-down)
   ([(meta shift k)] . move-text-line-up)
   ([(meta shift j)] . move-text-line-down)
+  ([(meta shift up)] . move-text-up)
+  ([(meta shift down)] . move-text-down)
   :init
   ;; free the bindings used by this plugin from windmove and other areas that use the same keys
   (global-unset-key (kbd "M-j"))
@@ -689,7 +690,7 @@ Example output:
   )
   (:map evil-insert-state-map
   ;; this is also defined globally above in the config
-  ("C-S-<tab>" . er/expand-region)
+  ("C-S-<backtab>" . er/expand-region)
   )
   (:map evil-visual-state-map
   ;; this is also defined globally above in the config
@@ -1145,7 +1146,7 @@ Example output:
   (:map projectile-mode-map
   ("s-p" . projectile-command-map)
   ("C-c p" . projectile-command-map)
-  ("M-o p" . counsel-projectile-switch-project)
+  ("M-S-O p" . counsel-projectile-switch-project)
   )
 :custom
 (projectile-completion-system 'helm)
@@ -1174,15 +1175,16 @@ Example output:
     )
 
 (use-package org-jira
-      :ensure t
-      :defer 3
-      :commands (org-jira-mode org-jira-get-issues org-jira-get-projects)
-      :after org
-      :custom
-      (jiralib-url "https://stairscreativestudio.atlassian.net")
-    :config
-    (setq jiralib-token
-      `("Cookie" . ,(format "ajs_group_id=null; ajs_anonymous_id=%222e15ea7d-cb97-4d24-bfe2-348c4655df02%22; atlassian.xsrf.token=86ec43db-1a9e-48fa-892a-9210c6fee684_38750fda3fb7e52a86533ed838cb5688d745af60_lin; cloud.session.token=eyJraWQiOiJzZXNzaW9uLXNlcnZpY2VcL3Nlc3Npb24tc2VydmljZSIsImFsZyI6IlJTMjU2In0.eyJhc3NvY2lhdGlvbnMiOlt7ImFhSWQiOiI1YmE3ZjkyNDNjMDEzZDdiMTA1MTRjYmIiLCJzZXNzaW9uSWQiOiJhYWUwYmVkNC02MTY1LTQ4MjUtYThkYS03ZWEwNGIxMWQ3MzgiLCJlbWFpbCI6Imd1Z3V0ekBnbWFpbC5jb20ifV0sInN1YiI6IjVkOTM1MzI1MGMyYTVkMGRkODdhZmQ2MCIsImVtYWlsRG9tYWluIjoic3RhaXJzLnN0dWRpbyIsImltcGVyc29uYXRpb24iOltdLCJyZWZyZXNoVGltZW91dCI6MTU3MjYzODk5NywidmVyaWZpZWQiOnRydWUsImlzcyI6InNlc3Npb24tc2VydmljZSIsInNlc3Npb25JZCI6ImYwNTEwYzA5LWRmNGMtNGE2MC1iYTM4LTA2OTU2YzRiODRkMSIsImF1ZCI6ImF0bGFzc2lhbiIsIm5iZiI6MTU3MjYzODM5NywiZXhwIjoxNTc1MjMwMzk3LCJpYXQiOjE1NzI2MzgzOTcsImVtYWlsIjoiZ3VzdGF2b0BzdGFpcnMuc3R1ZGlvIiwianRpIjoiZjA1MTBjMDktZGY0Yy00YTYwLWJhMzgtMDY5NTZjNGI4NGQxIn0.naz3Vi6yvn0aoFX7nAMK-K7fff4zpkeUifPSrEj6a3so9pK6uPrMDZOIGd8Mg7pJJkCy8FJ9bC6eTCGdrbqll3v8Kg6NhThAQzx8tvcW4gFObJyL12HEvt9EBpwvGKW1mWLhb-S_ZGwoTCXk1QRpNHy6zNl3etwlhX9jk3KXXT5fIaO2oJJaFCovZRvQTJdyoCRiIBRPWwyh3tqrqJiZVD08NFY1bq_aCyfkxxN-owWP7KPJxmLtH-ZPpj24ky8Dv-4oVP_frUPkLW5ULvHstdhxkwCUWCpaTPPDBqijljTj5YvXFp_ulNyWqQHnPHeV3m6BszI9WxBxZF7mUwIBZw; _csrf=AMoq40Bo50JzeFptjXhUvsBl")))
+  :ensure t
+  :disabled
+  :defer 3
+  :commands (org-jira-mode org-jira-get-issues org-jira-get-projects)
+  :after org
+  :custom
+  (jiralib-url "https://stairscreativestudio.atlassian.net")
+  :config
+  (setq jiralib-token
+  `("Cookie" . ,(format "ajs_group_id=null; ajs_anonymous_id=%222e15ea7d-cb97-4d24-bfe2-348c4655df02%22; atlassian.xsrf.token=86ec43db-1a9e-48fa-892a-9210c6fee684_38750fda3fb7e52a86533ed838cb5688d745af60_lin; cloud.session.token=eyJraWQiOiJzZXNzaW9uLXNlcnZpY2VcL3Nlc3Npb24tc2VydmljZSIsImFsZyI6IlJTMjU2In0.eyJhc3NvY2lhdGlvbnMiOlt7ImFhSWQiOiI1YmE3ZjkyNDNjMDEzZDdiMTA1MTRjYmIiLCJzZXNzaW9uSWQiOiJhYWUwYmVkNC02MTY1LTQ4MjUtYThkYS03ZWEwNGIxMWQ3MzgiLCJlbWFpbCI6Imd1Z3V0ekBnbWFpbC5jb20ifV0sInN1YiI6IjVkOTM1MzI1MGMyYTVkMGRkODdhZmQ2MCIsImVtYWlsRG9tYWluIjoic3RhaXJzLnN0dWRpbyIsImltcGVyc29uYXRpb24iOltdLCJyZWZyZXNoVGltZW91dCI6MTU3MjYzODk5NywidmVyaWZpZWQiOnRydWUsImlzcyI6InNlc3Npb24tc2VydmljZSIsInNlc3Npb25JZCI6ImYwNTEwYzA5LWRmNGMtNGE2MC1iYTM4LTA2OTU2YzRiODRkMSIsImF1ZCI6ImF0bGFzc2lhbiIsIm5iZiI6MTU3MjYzODM5NywiZXhwIjoxNTc1MjMwMzk3LCJpYXQiOjE1NzI2MzgzOTcsImVtYWlsIjoiZ3VzdGF2b0BzdGFpcnMuc3R1ZGlvIiwianRpIjoiZjA1MTBjMDktZGY0Yy00YTYwLWJhMzgtMDY5NTZjNGI4NGQxIn0.naz3Vi6yvn0aoFX7nAMK-K7fff4zpkeUifPSrEj6a3so9pK6uPrMDZOIGd8Mg7pJJkCy8FJ9bC6eTCGdrbqll3v8Kg6NhThAQzx8tvcW4gFObJyL12HEvt9EBpwvGKW1mWLhb-S_ZGwoTCXk1QRpNHy6zNl3etwlhX9jk3KXXT5fIaO2oJJaFCovZRvQTJdyoCRiIBRPWwyh3tqrqJiZVD08NFY1bq_aCyfkxxN-owWP7KPJxmLtH-ZPpj24ky8Dv-4oVP_frUPkLW5ULvHstdhxkwCUWCpaTPPDBqijljTj5YvXFp_ulNyWqQHnPHeV3m6BszI9WxBxZF7mUwIBZw; _csrf=AMoq40Bo50JzeFptjXhUvsBl")))
   (define-key org-jira-map (kbd "C-c pg") 'org-jira-get-projects)
   (define-key org-jira-map (kbd "C-c ib") 'org-jira-browse-issue)
   (define-key org-jira-map (kbd "C-c ig") 'org-jira-get-issues)
@@ -1285,8 +1287,8 @@ Example output:
   '((t . ivy--regex-plus)))
   :config
   (ivy-mode)
-;; display an arrow on the selected item in the list
-(setf (cdr (assoc t ivy-format-functions-alist)) #'ivy-format-function-arrow)
+  ;; display an arrow on the selected item in the list
+  (setf (cdr (assoc t ivy-format-functions-alist)) #'ivy-format-function-arrow)
 
   (setq ivy-display-style 'fancy
      ivy-use-virtual-buffers t
@@ -1295,11 +1297,11 @@ Example output:
   (ivy-set-actions  t
   '(("I" insert "insert")))
   (ivy-set-occur 'ivy-switch-buffer 'ivy-switch-buffer-occur)
-
 )
 
 (use-package counsel
   :ensure t
+  :after ivy
   :diminish counsel-mode
   :defines
   (projectile-completion-system magit-completing-read-function)
@@ -1327,19 +1329,34 @@ Example output:
      (lambda (str)
        (concat "  " str))
      cands
-     "\n"))
-
+     "\n")
+  )
   :bind
-  ("C-M-x" . counsel-M-x)
-  ("M-s c" . counsel-ag)
+  ([remap execute-extended-command] . counsel-M-x)
+  ([remap find-file] . counsel-find-file)
   ("C-s" . swiper)
+  ("C-c C-r" . ivy-resume)
+  ("<f6>" . ivy-resume)
+  ("M-x" . counsel-M-x)
+  ("C-x C-f" . counsel-find-file)
+  ("<f1> f" . counsel-describe-function)
+  ("<f1> v" . counsel-describe-variable)
+  ("<f1> l" . counsel-find-library)
+  ("<f2> i" . counsel-info-lookup-symbol)
+  ("<f2> u" . counsel-unicode-char)
+  ("C-c g g" . counsel-git)
+  ("C-c j" . counsel-git-grep)
+  ("C-c k" . counsel-ag)
+  ("M-s c" . counsel-ag)
+  ("C-x l" . counsel-locate)
+  ("C-S-o" . counsel-rhythmbox)
+  ;; ladicle keys
   ("M-s r" . ivy-resume)
   ("C-c v p" . ivy-push-view)
   ("C-c v o" . ivy-pop-view)
   ("C-c v ." . ivy-switch-view)
-  ("M-s c" . counsel-ag)
-  ("M-o f" . counsel-fzf)
-  ("M-o r" . counsel-recentf)
+  ("M-s f" . counsel-fzf)
+  ("M-s r" . counsel-recentf)
   ("M-y" . counsel-yank-pop)
   (:map ivy-minibuffer-map
   ("C-w" . ivy-backward-kill-word)
@@ -1347,6 +1364,8 @@ Example output:
   ("C-j" . ivy-immediate-done)
   ("RET" . ivy-alt-done)
   ("C-h" . ivy-backward-delete-char))
+  (:map minibuffer-local-map
+  ("C-r" . counsel-minibuffer-history))
   :config
   (evil-leader/set-key
     "e" 'counsel-find-file
@@ -1446,17 +1465,70 @@ Example output:
 
 (use-package helm
   :ensure t
+  :diminish helm-mode
+  :bind
+  ;; ("M-x" . helm-M-x)
+  ("C-c h" . helm-command-prefix)
+  ("C-x b" . helm-buffers-list)
+  ("C-x C-b" . helm-mini)
+  ("C-x C-f" . helm-find-files)
+  ("C-x r b" . helm-bookmarks)
+  ("M-y" . helm-show-kill-ring)
+  ("M-:" . helm-eval-expression-with-eldoc)
+  (:map helm-map
+  ("C-z" . helm-select-action)
+  ("C-h a" . helm-apropos)
+  ("C-c h" . helm-execute-persistent-action)
+  ("<tab>" . helm-execute-persistent-action)
+  )
+  :init
+  (setq helm-autoresize-mode t)
+  (setq helm-buffer-max-length 40)
+  (setq helm-bookmark-show-location t)
+  (setq helm-buffer-max-length 40)
+  (setq helm-split-window-inside-p t)
+
+  ;; turn on helm fuzzy matching
+  (setq helm-M-x-fuzzy-match t)
+  (setq helm-mode-fuzzy-match t)
+
+  (setq helm-ff-file-name-history-use-recentf t)
+  (setq helm-ff-skip-boring-files t)
+  (setq helm-follow-mode-persistent t)
+  ;; take between 10-30% of screen space
+  (setq helm-autoresize-min-height 10)
+  (setq helm-autoresize-max-height 30)
   :config
   (require 'helm-config)
   (helm-mode 1)
+  ;; Make helm replace the default Find-File and M-x
+  ;;(global-set-key [remap execute-extended-command] #'helm-M-x)
+  ;; (global-set-key [remap find-file] #'helm-find-files)
+  ;; helm bindings
+  (global-unset-key (kbd "C-x c"))
 )
 
 (use-package helm-ag
   :ensure helm-ag
   :bind ("M-p" . helm-projectile-ag)
   :commands (helm-ag helm-projectile-ag)
-  :init (setq helm-ag-insert-at-point 'symbol
-	      helm-ag-command-option "--path-to-ignore ~/.agignore"))
+  :init
+  (setq helm-ag-insert-at-point 'symbol)
+  (setq  helm-ag-command-option "--path-to-ignore ~/.agignore")
+)
+
+(use-package helm-rg
+  :ensure t
+  :defer t
+)
+
+(use-package helm-fuzzier
+  :disabled nil
+  :ensure t
+  :after helm
+  :config
+  (helm-fuzzier-mode 1)
+)
 
 (use-package hydra
   :ensure t
@@ -1795,7 +1867,7 @@ Example output:
   ("C-n" . company-select-next-or-abort)
   ("C-p" . company-select-previous-or-abort)
   ("<tab>" . company-complete-common-or-cycle)
-  ("S-<tab>" . company-select-previous)
+  ("S-<backtab>" . company-select-previous)
   ("<backtab>" . company-select-previous)
   ("C-d" . company-show-doc-buffer))
   (:map company-search-map
@@ -2069,7 +2141,7 @@ Example output:
   :hook
   (lsp-mode . lsp-ui-mode)
   :preface
-  (defun ladicle/toggle-lsp-ui-doc ()
+  (defun tau/toggle-lsp-ui-doc ()
     (interactive)
     (if lsp-ui-doc-mode
       (progn
@@ -2084,9 +2156,8 @@ Example output:
   (set-face-attribute 'lsp-ui-doc-background  nil :background "#f9f2d9")
   (add-hook 'lsp-ui-doc-frame-hook
     (lambda (frame _w)
-      (set-face-attribute 'default frame :font "Overpass Mono 11")
-    )
-  )
+      (set-face-attribute 'default frame :font "Overpass Mono 11")))
+
   (set-face-attribute 'lsp-ui-sideline-global nil
                       :inherit 'shadow
                       :background "#f9f2d9")
@@ -2122,23 +2193,22 @@ Example output:
         lsp-ui-peek-fontify 'on-demand) ;; never, on-demand, or always
   :bind
     (:map lsp-mode-map
-      ("C-c C-r" . lsp-ui-peek-find-references)
-      ("C-c C-j" . lsp-ui-peek-find-definitions)
+      ("C-c u f r" . lsp-ui-peek-find-references)
+      ("C-c u f d" . lsp-ui-peek-find-definitions)
+      ("C-c u f i" . lsp-ui-peek-find-implementation)
       ("C-c g d" . lsp-goto-type-definition)
       ("C-c f d" . lsp-find-definition)
       ("C-c g i" . lsp-goto-implementation)
       ("C-c f i" . lsp-find-implementation)
-      ("C-c i"   . lsp-ui-peek-find-implementation)
       ("C-c m"   . lsp-ui-imenu)
       ("C-c s"   . lsp-ui-sideline-mode)
-      ("C-c d"   . ladicle/toggle-lsp-ui-doc)
+      ("C-c d"   . tau/toggle-lsp-ui-doc)
     )
     ;; remap native find-definitions and references to use lsp-ui
     (:map lsp-ui-mode-map
       ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
       ([remap xref-find-references] . lsp-ui-peek-find-references)
-      ("C-c u" . lsp-ui-imenu)
-    )
+      ("C-c u" . lsp-ui-imenu))
 )
 
 ;; (define-key ac-completing-map [return] nil)
@@ -2181,6 +2251,7 @@ Example output:
 
 (use-package ivy-explorer
   :ensure t
+  :after ivy
   :config
   ;; use ivy explorer for all file dialogs
   (ivy-explorer-mode 1)
@@ -2507,8 +2578,8 @@ Example output:
 (use-package rotate
   :ensure t
   :bind
-  ("C-c C-r w" . rotate-window)
-  ("C-c C-r l" . rotate-layout)
+  ("C-c r w" . rotate-window)
+  ("C-c r l" . rotate-layout)
 )
 
 (setq echo-keystrokes 0.02)
@@ -2647,9 +2718,9 @@ Example output:
 )
 
 (use-package emojify
-:ensure t
-:config
-(add-hook 'after-init-hook #'global-emojify-mode)
+  :ensure t
+  :config
+  (add-hook 'after-init-hook #'global-emojify-mode)
 )
 
 (dolist (frame (frame-list))
@@ -2662,6 +2733,129 @@ Example output:
 
 (setq resize-mini-windows t)
 (setq max-mini-window-height 0.33)
+
+(defconst tau-savefile-dir (expand-file-name "savefile" user-emacs-directory))
+
+;; create the savefile dir if it doesn't exist
+(unless (file-exists-p tau-savefile-dir)
+  (make-directory tau-savefile-dir))
+
+(use-package desktop
+:ensure nil
+:bind
+("C-c s" . desktop-save-in-desktop-dir)
+:init
+;; use only one desktop
+(setq desktop-path '("~/.emacs.d/"))
+(setq desktop-dirname "~/.emacs.d/")
+(setq desktop-base-file-name "emacs-desktop")
+
+(setq desktop-restore-eager 5) ;; restore 5 buffers immediately. the others restore lazily
+(setq desktop-load-locked-desktop t)
+(setq desktop-files-not-to-save "^$")
+(setq desktop-save t)
+(setq desktop-buffers-not-to-save
+     (concat "\\("
+             "^nn\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
+             "\\|\\.emacs.*\\|\\.diary\\|\\.newsrc-dribble\\|\\.bbdb"
+       "\\)$"))
+:config
+(desktop-save-mode t)
+(add-to-list 'desktop-modes-not-to-save 'dired-mode)
+(add-to-list 'desktop-modes-not-to-save 'Info-mode)
+(add-to-list 'desktop-modes-not-to-save 'info-lookup-mode)
+(add-to-list 'desktop-modes-not-to-save 'fundamental-mode)
+(add-to-list 'desktop-modes-not-to-save 'completion-list-mode)
+
+;; remove desktop after it's been read
+(add-hook 'desktop-after-read-hook
+    '(lambda ()
+       ;; desktop-remove clears desktop-dirname
+       (setq desktop-dirname-tmp desktop-dirname)
+       (desktop-remove)
+       (setq desktop-dirname desktop-dirname-tmp)))
+
+(defun saved-session ()
+  (file-exists-p (concat desktop-dirname "/" desktop-base-file-name)))
+
+;; use session-restore to restore the desktop manually
+(defun session-restore ()
+  "Restore a saved emacs session."
+  (interactive)
+  (if (saved-session)
+      (desktop-read)
+    (message "No desktop found.")))
+
+;; use session-save to save the desktop manually
+(defun session-save ()
+  "Save an emacs session."
+  (interactive)
+  (if (saved-session)
+      (if (y-or-n-p "Overwrite existing desktop? ")
+    (desktop-save-in-desktop-dir)
+  (message "Session not saved."))
+  (desktop-save-in-desktop-dir)))
+
+;; ask user whether to restore desktop at start-up
+(add-hook 'after-init-hook
+    '(lambda ()
+       (if (saved-session)
+     (if (y-or-n-p "Restore desktop? ")
+         (session-restore)))))
+)
+
+(use-package auto-save-mode
+  :ensure nil
+  :config
+  (setq auto-save-default nil)  ;; dont auto save files
+)
+
+(use-package saveplace
+  :ensure nil
+  :config
+  (defconst savefile-dir (expand-file-name "savefile" user-emacs-directory))
+
+  ;; create the savefile dir if it doesn't exist
+  (unless (file-exists-p savefile-dir)
+    (make-directory savefile-dir))
+
+  (setq save-place-file (expand-file-name "saveplace" savefile-dir))
+  ;; activate it for all buffers
+  (setq-default save-place t)
+  (save-place-mode t)
+)
+
+(use-package savehist
+  :ensure nil
+  :config
+  (setq savehist-save-minibuffer-history t)
+  (setq savehist-additional-variables
+        '(kill-ring
+          search-ring
+          regexp-search-ring
+          last-kbd-macro
+          kmacro-ring
+          shell-command-history))
+  (savehist-mode)
+)
+
+(use-package recentf
+  :ensure t
+  :config
+  (setq recentf-save-file (expand-file-name "recentf" user-emacs-directory)
+        recentf-max-saved-items 500
+        recentf-max-menu-items 15
+        ;; disable recentf-cleanup on Emacs start, because it can cause
+        ;; problems with remote files
+        recentf-auto-cleanup 'never)
+  (recentf-mode +1)
+)
+
+(use-package auto-save-visited-mode
+  :ensure nil
+  :config
+  (auto-save-visited-mode)
+)
 
 (use-package swiper
   :disabled
@@ -2683,7 +2877,7 @@ Example output:
 (use-package avy
   :ensure t
   :bind
-  ("M-j" . avy-goto-char-2)
+  ("M-g j" . avy-goto-char-2)
   ("C-:" . avy-goto-char)
   ("C-'" . avy-goto-char-2)
   ;; replace native M-g g `goto-line' with `avy-goto-line'
@@ -2708,19 +2902,35 @@ Example output:
 )
 
 (use-package ace-window
+  :ensure t
   :functions hydra-frame-window/body
   :bind
+<<<<<<< HEAD
   ("C-M-o" . hydra-frame-window/body)
   ;; first disassociate M-t with 
   ("M-t" . nil)
   ("M-t m" . ladicle/toggle-window-maximize)
   :custom
   (aw-keys '(?j ?k ?l ?i ?o ?h ?y ?u ?p))
+=======
+  ("M-o" . ace-window)
+>>>>>>> 5b62e0dfa51835f6cf314fd3f1efa3db8019eea2
   :custom-face
   (aw-leading-char-face ((t (:height 4.0 :foreground "#f1fa8c"))))
+  :config
+  ;; (setq aw-keys '(?j ?k ?l ?i ?o ?h ?y ?u ?p))
+  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)) ;; set the window labels in the home row
+)
+
+(use-package rotate
+  :ensure t
+  :bind
+  ("M-S-O SPC" . rotate-layout)
+  ("M-S-O m" . tau/toggle-window-maximize)
+  ("C-M-o" . hydra-frame-window/body)
   :preface
   (defvar is-window-maximized nil)
-  (defun ladicle/toggle-window-maximize ()
+  (defun tau/toggle-window-maximize ()
       (interactive)
       (progn
         (if is-window-maximized
@@ -2732,10 +2942,6 @@ Example output:
   (defun command-name(title) (propertize title 'face `(:foreground "#f8f8f2")))
   (defun spacer() (propertize "." 'face `(:foreground "#282a36")))
   :config
-  (use-package rotate
-      :load-path "~/Developments/src/github.com/Ladicle/dotfiles/common/emacs.d/elisp/emacs-rotate"
-      :bind
-      ("M-o SPC" . rotate-layout))
   (with-eval-after-load 'hydra
       (defhydra hydra-frame-window (:color blue :hint nil)
       (format
@@ -2780,7 +2986,7 @@ Example output:
         ("i" ace-window)
         ("s" ace-swap-window :exit t)
         ("d" ace-delete-window)
-        ("m" ladicle/toggle-window-maximize :exit t)
+        ("m" tau/toggle-window-maximize :exit t)
         ("=" text-scale-decrease)
         ("+" text-scale-increase)
         ("-" split-window-vertically)
@@ -2798,7 +3004,7 @@ Example output:
         ("D" kill-buffer-and-window)
         ("<SPC>" rotate-layout)
         ("q" nil)))
-        )
+)
 
 (use-package ace-jump-mode
   :disabled
@@ -3166,7 +3372,6 @@ Example output:
                          (bookmarks . 5)
                          (projects . 5)
                          (agenda . 5)
-                         (fireplace . 1)
                          (registers . 5))
   )
 
@@ -3529,8 +3734,15 @@ Example output:
 )
 
 (use-package highlight-tail
-  :ensure t
+  :load-path "packages/highlight-tail-modified"
+  :ensure nil
   :config
+  (setq highlight-tail-colors '(("black" . 0)
+                                 ("#DDA0DD" . 25)
+                                 ("#9370DB" . 66)))
+  (setq highlight-tail-steps 12)
+  (setq highlight-tail-timer 0.1)
+  (setq highlight-tail-posterior-type 'const)
   (highlight-tail-mode)
 )
 
@@ -4091,7 +4303,8 @@ Example output:
           (message "Prettier not found in %s. Not enabling prettier-js-mode" root)
           (message "Falling back to aggressive-indent-mode")
           (aggressive-indent-mode 1)))))
-  (add-hook 'prettier-js-mode-hook #'tau/use-prettier-if-in-node-modules)
+  ;; disabled cause my current project doenst have prettier local
+  ;; (add-hook 'prettier-js-mode-hook #'tau/use-prettier-if-in-node-modules)
 
 )
 
@@ -4205,7 +4418,7 @@ Example output:
       (animate-string str (1- (line-number-at-pos)) (current-column)))))
 
 ;; to disable simply comment this hook
-(add-hook 'post-self-insert-hook 'animated-self-insert)
+;;; (add-hook 'post-self-insert-hook 'animated-self-insert)
 
 (use-package c-c-combo
   :ensure t
@@ -4290,20 +4503,32 @@ Example output:
   :ensure t
 )
 
+(defun duplicate-line()
+  "Duplicate current line."
+  (interactive)
+  (move-beginning-of-line 1)
+  (kill-line)
+  (yank)
+  (open-line 1)
+  (next-line 1)
+  (yank))
+
+(global-set-key (kbd "M-S-D") 'duplicate-line)
+
 (defun copy-to-clipboard ()
-"Make F8 and F9 Copy and Paste to/from OS Clipboard.  Super usefull."
-(interactive)
-(if (display-graphic-p)
-    (progn
-        (message "Yanked region to x-clipboard!")
-        (call-interactively 'clipboard-kill-ring-save)
-        )
-    (if (region-active-p)
-        (progn
-        (shell-command-on-region (region-beginning) (region-end) "xsel -i -b")
-        (message "Yanked region to clipboard!")
-        (deactivate-mark))
-    (message "No region active; can't yank to clipboard!")))
+  "Make F8 and F9 Copy and Paste to/from OS Clipboard.  Super usefull."
+  (interactive)
+  (if (display-graphic-p)
+      (progn
+          (message "Yanked region to x-clipboard!")
+          (call-interactively 'clipboard-kill-ring-save)
+          )
+      (if (region-active-p)
+          (progn
+          (shell-command-on-region (region-beginning) (region-end) "xsel -i -b")
+          (message "Yanked region to clipboard!")
+          (deactivate-mark))
+      (message "No region active; can't yank to clipboard!")))
 )
 
 (evil-define-command paste-from-clipboard()

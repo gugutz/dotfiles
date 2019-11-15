@@ -1,18 +1,18 @@
 
 ;; ----- amx-history -----
 (
+ eyebrowse-mode
+ check-parens
+ bug-hunter-init-file
  package-install
- snake
- animate-birthday-present
- butterfly
- ripgrep-regexp
- sublimity-mode
- smooth-scrolling-mode
+ visual-line-mode
+ rainbow-mode
+ c-c-combo-mode
 )
 
 ;; ----- amx-data -----
 (
- (bug-hunter-init-file . 2)
+ (bug-hunter-init-file . 3)
  (scss-mode . 11)
  (eslintd-fix-mode . 3)
  (helm-M-x . 1)
@@ -22,7 +22,7 @@
  (counsel-projectile-mode . 2)
  (swiper-avy . 2)
  (align-regexp . 3)
- (package-install . 9)
+ (package-install . 10)
  (package-refresh-contents . 2)
  (package-delete . 4)
  (electric-indent-mode . 1)
@@ -40,11 +40,11 @@
  (org-bullets-mode . 3)
  (avy-goto-char . 2)
  (avy-goto-char-2 . 1)
- (rainbow-mode . 1)
+ (rainbow-mode . 2)
  (profiler-start . 1)
  (profiler-report . 1)
  (evil-mode . 2)
- (visual-line-mode . 2)
+ (visual-line-mode . 3)
  (display-line-numbers-mode . 1)
  (flycheck-mode . 2)
  (smooth-scrolling-mode . 2)
@@ -54,4 +54,7 @@
  (butterfly . 1)
  (animate-birthday-present . 1)
  (snake . 2)
+ (c-c-combo-mode . 2)
+ (check-parens . 2)
+ (eyebrowse-mode . 2)
 )
