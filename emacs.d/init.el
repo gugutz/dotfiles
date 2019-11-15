@@ -325,6 +325,8 @@ tangled, and the tangled file is compiled."
 
 (prefer-coding-system 'utf-8) ;; Prefer UTF-8 encoding
 
+(delete-selection-mode 1)
+
 (setq window-combination-resize t)
 
 ;; (setq-default line-spacing 1) ;; A nice line height
@@ -395,6 +397,19 @@ tangled, and the tangled file is compiled."
   (setq eldoc-idle-delay 0.4)
 )
 
+(use-package eldoc-box
+  :ensure t
+  :custom-face
+  ;;(eldoc-box-border (t (:background "#202020"))))
+  ;;(eldoc-box-body (t (:background "#202020"))))
+  :config
+  ;;(setq eldoc-box-max-pixel-width)
+  ;;(setq eldoc-box-max-pixel-height)
+  ;;(setq eldoc-box-only-multi-line)   ;;  Set this to non-nil and eldoc-box only display multi-line message in childframe. One line messages are left in minibuffer.
+  ;; (eldoc-box-hover-mode)
+  (eldoc-box-hover-at-point-mode)
+)
+
 (use-package aggressive-indent
   :ensure t
   :custom
@@ -448,6 +463,8 @@ Example output:
   (setq dumb-jump-selector 'helm)
   ;; (setq dumb-jump-selector 'ivy)
 )
+
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 (defun upcase-backward-word (arg)
   (interactive "p")
@@ -928,6 +945,7 @@ Example output:
 :hook
 (org-mode . diff-hl-mode)
 (org-mode . rainbow-mode)
+(org-mode . visual-line-mode)
   :bind
   ("C-c l" . org-store-link)
   ("C-c a" . org-agenda)
@@ -1615,10 +1633,12 @@ Example output:
 
 (use-package quick-peek
   :ensure t
+  :disabled
 )
 
 (use-package flycheck-inline
   :ensure t
+  :disabled
   :hook
   (flycheck-mode . flycheck-inline-mode)
   :config
@@ -1637,6 +1657,28 @@ Example output:
             (quick-peek-update ov)))
         flycheck-inline-clear-function #'quick-peek-hide))
 
+(use-package flycheck-posframe
+  :ensure t
+  :after flycheck
+  :custom-face
+  ;;(flycheck-posframe-error-face (nil (:inherit 'error)))
+  ;;(flycheck-posframe-background-face (nil (:inherit 'error)))
+  ;;(flycheck-posframe-border-face nil (:inherit 'error)))
+  ;;(flycheck-posframe-border-width (nil (:inherit 'error)))
+  :hook
+  (flycheck-mode . flycheck-posframe-mode)
+  :config
+  (set-face-attribute 'flycheck-posframe-error-face nil :inherit 'error)
+  (set-face-attribute 'flycheck-posframe-background-face nil :inherit 'error)
+  (set-face-attribute 'flycheck-posframe-border-face nil :inherit 'error)
+  ;;(set-face-attribute 'flycheck-posframe-border-width nil :inherit 'error)
+  (setq flycheck-posframe-warning-prefix "\u26a0 ") ;; default: ➤
+  (setq flycheck-posframe-position 'window-bottom-left-corner)
+
+  ;; Calling (flycheck-posframe-configure-pretty-defaults) will configure flycheck-posframe to show warnings and errors with nicer faces (inheriting from warning and error respectively), and set the prefix for each to nicer unicode characters.
+  (flycheck-posframe-configure-pretty-defaults)
+)
+
 (use-package flycheck-pos-tip
   :ensure t
   :disabled
@@ -1652,6 +1694,7 @@ Example output:
 ;;; Show Flycheck errors in tooltip
 (use-package flycheck-popup-tip
   :ensure t
+  :disabled
   :after flycheck
   :hook
   (flycheck-mode . flycheck-popup-tip-mode)
@@ -2220,9 +2263,9 @@ Example output:
 (use-package yasnippet
   :ensure t
   :diminish yas-minor-mode
-  :hook
-  (prog-mode . yas-minor-mode)
-  (text-mode . yas-minor-mode)
+  ;;:hook
+  ;;(prog-mode . yas-minor-mode)
+  ;;(text-mode . yas-minor-mode)
   :bind
   ;; ("<tab>" . yas-maybe-expand)
   ("C-<tab>" . yas-maybe-expand)
@@ -2236,13 +2279,16 @@ Example output:
   )
   :config
   ;; set snippets directory
-  ;; (with-eval-after-load 'yasnippet
-  ;;  (setq yas-snippet-dirs '(yasnippet-snippets-dir)))
+  ;;  (setq yas-snippet-dirs '(yasnippet-snippets-dir))
+  ;; add angular snippets folder
+  (with-eval-after-load 'yasnippets-snippets
+  (setq yas-snippet-dirs (append yas-snippet-dirs
+                                 '("~/dotfiles/emacs.d/snippets/angular/"))))
   (setq yas-verbosity 1)                      ; No need to be so verbose
   (setq yas-wrap-around-region t)
   (yas-reload-all)
   ;; disabled global mode in favor or hooks in prog and text modes only
-  ;; (yas-global-mode 1)
+  (yas-global-mode 1)
 )
 
 (use-package yasnippet-snippets         ; Collection of snippets
@@ -3025,6 +3071,19 @@ Example output:
   (global-set-key (kbd "C-S-J") 'windmove-down)
 )
 
+(setq mode-line-format
+      (list
+       ;; value of `mode-name'
+       "%m: "
+       ;; value of current buffer name
+       "buffer %b, "
+       ;; value of current line number
+       "line %l "
+       "-- user: "
+       ;; value of user
+       (getenv "USER"))
+)
+
 (line-number-mode t)
 (column-number-mode t)
 (size-indication-mode t)
@@ -3033,8 +3092,24 @@ Example output:
   :ensure nil
   :load-path "packages/show-point-mode"
   :config
- (show-point-mode t)
+  (show-point-mode t)
 )
+
+(set-face-attribute 'mode-line nil :height tau/font-size-mode-line)
+(set-face-attribute 'mode-line nil
+                    :background "#007ad3"
+                    :foreground "#ffffff"
+                    :box '(:line-width 4 :color "#007ad3") ;; modeline border
+                    :overline nil
+                    :underline nil)
+
+;; for now the inactive modeline looks the same as the active one
+(set-face-attribute 'mode-line-inactive nil
+                    :background "#007ad3"
+                    :foreground "#ffffff"
+                    :box '(:line-width 4 :color "#007ad3") ;; modeline border
+                    :overline nil
+                    :underline nil)
 
 (use-package anzu
   :ensure t
@@ -3058,19 +3133,6 @@ Example output:
 ;;  (define-key isearch-mode-map [remap isearch-query-replace-regexp] #'anzu-isearch-query-replace-regexp)
 )
 
-(setq mode-line-format
-      (list
-       ;; value of `mode-name'
-       "%m: "
-       ;; value of current buffer name
-       "buffer %b, "
-       ;; value of current line number
-       "line %l "
-       "-- user: "
-       ;; value of user
-       (getenv "USER"))
-)
-
 (use-package hide-mode-line
   :ensure t
   :hook
@@ -3088,22 +3150,6 @@ Example output:
   (setq save-place-file (expand-file-name ".places" user-emacs-directory))
 )
 
-(set-face-attribute 'mode-line nil :height tau/font-size-mode-line)
-(set-face-attribute 'mode-line nil
-                    :background "#007ad3"
-                    :foreground "#ffffff"
-                    :box '(:line-width 4 :color "#007ad3") ;; modeline border
-                    :overline nil
-                    :underline nil)
-
-;; for now the inactive modeline looks the same as the active one
-(set-face-attribute 'mode-line-inactive nil
-                    :background "#007ad3"
-                    :foreground "#ffffff"
-                    :box '(:line-width 4 :color "#007ad3") ;; modeline border
-                    :overline nil
-                    :underline nil)
-
 (use-package mini-modeline
   :ensure t
   :config
@@ -3120,6 +3166,7 @@ Example output:
 
 (use-package feebleline
   :ensure t
+  :disabled
   :config
   (setq feebleline-msg-functions
         '((feebleline-line-number         :post "" :fmt "%5s")
@@ -4219,6 +4266,14 @@ Example output:
   (setq web-mode-markup-indent-offset 4)
   (setq web-mode-css-indent-offset 2)
   (setq web-mode-code-indent-offset 2)
+  (setq web-mode-enable-auto-pairing t)
+  (setq web-mode-enable-current-element-highlight t)
+  (setq web-mode-enable-block-face t)
+  (setq web-mode-enable-part-face t)
+
+  ;; add flycheck linter for webmode
+  (add-to-list 'web-mode-hook 'flycheck-mode)
+  (flycheck-add-mode 'javascript-eslint 'web-mode)
 
   ;; Use tidy to check HTML buffers with web-mode.
   (eval-after-load 'flycheck
@@ -4397,7 +4452,10 @@ Example output:
 
 (use-package ng2-mode
   :defer
+  :mode
+  ("\\.component.ts$\\'" "\\.component.html$\\'")
   :hook
+  (ng2-mode . rainbow-mode)
   (ng2-mode . prettier-js-mode)
 )
 

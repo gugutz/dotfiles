@@ -1,13 +1,13 @@
 
 ;; ----- amx-history -----
 (
- eyebrowse-mode
- check-parens
- bug-hunter-init-file
- package-install
- visual-line-mode
+ helm-ag
+ dumb-jump-mode
+ conf-unix-mode
+ js2-mode
  rainbow-mode
- c-c-combo-mode
+ visual-line-mode
+ eyebrowse-mode
 )
 
 ;; ----- amx-data -----
@@ -40,11 +40,11 @@
  (org-bullets-mode . 3)
  (avy-goto-char . 2)
  (avy-goto-char-2 . 1)
- (rainbow-mode . 2)
+ (rainbow-mode . 3)
  (profiler-start . 1)
  (profiler-report . 1)
  (evil-mode . 2)
- (visual-line-mode . 3)
+ (visual-line-mode . 4)
  (display-line-numbers-mode . 1)
  (flycheck-mode . 2)
  (smooth-scrolling-mode . 2)
@@ -57,4 +57,8 @@
  (c-c-combo-mode . 2)
  (check-parens . 2)
  (eyebrowse-mode . 2)
+ (js2-mode . 1)
+ (conf-unix-mode . 1)
+ (dumb-jump-mode . 1)
+ (helm-ag . 1)
 )
