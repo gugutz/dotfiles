@@ -2230,7 +2230,22 @@ Requires: Emacs >= 26
       (right-fringe . 5)))
   :custom-face
   (hydra-posframe-border-face ((t (:background "#6272a4"))))
-  :hook (after-init . hydra-posframe-enable)
+  :hook (after-init . hydra-posframe-mode) ;; changed from `hydra-postframe-enable' cause emacs itself suggested
+)
+#+END_SRC
+* occur mode
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package occur
+  :ensure t
+  :config
+  (evil-add-hjkl-bindings occur-mode-map 'emacs
+    (kbd "/")       'evil-search-forward
+    (kbd "n")       'evil-search-next
+    (kbd "N")       'evil-search-previous
+    (kbd "C-d")     'evil-scroll-down
+    (kbd "C-u")     'evil-scroll-up
+    (kbd "C-w C-w") 'other-window)
 )
 #+END_SRC
 
@@ -3848,7 +3863,7 @@ Save emacs sessions
 ** auto-save files
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package auto-save-mode
+(use-package auto-save
   :ensure nil
   :config
   (setq auto-save-default nil)  ;; dont auto save files
@@ -3919,7 +3934,7 @@ Save list of recently opened files across emacs sessions
 auto-save file-visiting buffers after five seconds of idle time
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package auto-save-visited-mode
+(use-package auto-save-visited
   :ensure nil
   :config
   (auto-save-visited-mode)
@@ -5213,14 +5228,14 @@ Highlight portions of text
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package highlight-tail
-  :load-path "packages/highlight-tail-modified"
+  :load-path "packages/highlight-tail"
   :ensure nil
   :config
-  (setq highlight-tail-colors '(("black" . 0)
-                                 ("#DDA0DD" . 25)
-                                 ("#9370DB" . 66)))
-  (setq highlight-tail-steps 12)
-  (setq highlight-tail-timer 0.1)
+  (setq highlight-tail-colors '(("#9310FF" . 0) ;; closest to cursor
+                                 ("#9370DB" . 35)  ;; midle of tail
+                                 ("#DDA0DD" . 76)))  ;; end of the tail
+  (setq highlight-tail-steps 17)
+  (setq highlight-tail-timer 0.05)
   (setq highlight-tail-posterior-type 'const)
   (highlight-tail-mode)
 )
@@ -5230,19 +5245,27 @@ Highlight portions of text
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package beacon
   :ensure t
+  ;;:hook
+  (post-self-insert . beacon-blink)
+  (blink-cursor-mode. beacon-blink)
+  (after-change-functions . beacon-blink)
+  (delete-selection-mode . beacon-blink)
+  (normal-erase-is-backspace . beacon-blink)
   :init
-  (setq beacon-blink-when-point-moves-vertically nil) ; default nil
-  (setq beacon-blink-when-point-moves-horizontally nil) ; default nil
+  (setq inhibit-modification-hooks nil)
+  (setq beacon-blink-when-point-moves-vertically 1) ; default nil
+  (setq beacon-blink-when-point-moves-horizontally 1) ; default nil
   (setq beacon-blink-when-buffer-changes t) ; default t
   (setq beacon-blink-when-window-scrolls t) ; default t
   (setq beacon-blink-when-window-changes t) ; default t
   (setq beacon-blink-when-focused nil) ; default nil
-  (setq beacon-blink-duration 0.3) ; default 0.3
+  (setq beacon-blink-duration 0.2) ; default 0.3
   (setq beacon-blink-delay 0.3) ; default 0.3
-  (setq beacon-size 20) ; default 40
-  ;; (setq beacon-color "yellow") ; default 0.5
-  (setq beacon-color 0.6) ; default 0.5
+  (setq beacon-size 23) ; default 40
+  (setq beacon-color "#9310FF") ; default 0.5
   :config
+  (setq inhibit-modification-hooks nil)
+  (add-hook 'after-change-functions #'beacon-blink)
   (beacon-mode 1)
 )
 #+END_SRC
@@ -5380,7 +5403,7 @@ Simulate Vim-Scrolof: https://wolfecub.github.io/dotfiles/#orgff34878
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 ;;(setq redisplay-dont-pause t)
-  ;; (setq scroll-preserve-screen-position 1)  ;; centered screen scrolling
+(setq scroll-preserve-screen-position 1)  ;; centered screen scrolling
   ;; (setq scroll-margin 10
   ;; (setq maximum-scroll-margin 0.5)
   ;; (setq scroll-step 1)

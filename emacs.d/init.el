@@ -399,6 +399,7 @@ tangled, and the tangled file is compiled."
 
 (use-package eldoc-box
   :ensure t
+  :after eldoc
   :custom-face
   ;;(eldoc-box-border (t (:background "#202020"))))
   ;;(eldoc-box-body (t (:background "#202020"))))
@@ -1563,7 +1564,7 @@ Example output:
       (right-fringe . 5)))
   :custom-face
   (hydra-posframe-border-face ((t (:background "#6272a4"))))
-  :hook (after-init . hydra-posframe-enable)
+  :hook (after-init . hydra-posframe-mode) ;; changed from `hydra-postframe-enable' cause emacs itself suggested
 )
 
 (use-package ag
@@ -1707,6 +1708,8 @@ Example output:
   :ensure t
   :custom
   (magit-auto-revert-mode nil)
+  :hook
+  (after-save . (lambda () (magit-after-save-refresh-status t)))
   :bind
   ("<tab>" . magit-section-toggle)
   ("M-g s" . magit-status)
@@ -2850,7 +2853,7 @@ Example output:
          (session-restore)))))
 )
 
-(use-package auto-save-mode
+(use-package auto-save
   :ensure nil
   :config
   (setq auto-save-default nil)  ;; dont auto save files
@@ -2897,7 +2900,7 @@ Example output:
   (recentf-mode +1)
 )
 
-(use-package auto-save-visited-mode
+(use-package auto-save-visited
   :ensure nil
   :config
   (auto-save-visited-mode)
@@ -3637,10 +3640,31 @@ Example output:
   (show-paren-mode +1)
 )
 
+(use-package color-identifiers-mode
+  :ensure t
+  :hook
+  (js2-mode . color-identifiers-mode)
+;;:config
+;;(add-hook 'after-init-hook 'global-color-identifiers-mode)
+;; the following code disabled highlighting for all other keywords and only highlights and color variables
+;;   (defun myfunc-color-identifiers-mode-hook ()
+;;     (let ((faces '(font-lock-comment-face font-lock-comment-delimiter-face font-lock-constant-face font-lock-type-face font-lock-function-name-face font-lock-variable-name-face font-lock-keyword-face font-lock-string-face font-lock-builtin-face font-lock-preprocessor-face font-lock-warning-face font-lock-doc-face font-lock-negation-char-face font-lock-regexp-grouping-construct font-lock-regexp-grouping-backslash)))
+;;       (dolist (face faces)
+;;         (face-remap-add-relative face '((:foreground "" :weight normal :slant normal)))))
+;;     (face-remap-add-relative 'font-lock-keyword-face '((:weight bold)))
+;;     (face-remap-add-relative 'font-lock-comment-face '((:slant italic)))
+;;     (face-remap-add-relative 'font-lock-builtin-face '((:weight bold)))
+;;     (face-remap-add-relative 'font-lock-preprocessor-face '((:weight bold)))
+;;     (face-remap-add-relative 'font-lock-function-name-face '((:slant italic)))
+;;     (face-remap-add-relative 'font-lock-string-face '((:slant italic)))
+;;     (face-remap-add-relative 'font-lock-constant-face '((:weight bold))))
+;;   (add-hook 'color-identifiers-mode-hook 'myfunc-color-identifiers-mode-hook)
+)
+
 (use-package highlight-numbers
-    :ensure t
-    :hook
-    (prog-mode . highlight-numbers-mode)
+  :ensure t
+  :hook
+  (prog-mode . highlight-numbers-mode)
 )
 
 (use-package highlight-operators
@@ -3772,33 +3796,41 @@ Example output:
 )
 
 (use-package highlight-tail
-  :load-path "packages/highlight-tail-modified"
+  :load-path "packages/highlight-tail"
   :ensure nil
   :config
-  (setq highlight-tail-colors '(("black" . 0)
-                                 ("#DDA0DD" . 25)
-                                 ("#9370DB" . 66)))
-  (setq highlight-tail-steps 12)
-  (setq highlight-tail-timer 0.1)
+  (setq highlight-tail-colors '(("#9310FF" . 0) ;; closest to cursor
+                                 ("#9370DB" . 35)  ;; midle of tail
+                                 ("#DDA0DD" . 76)))  ;; end of the tail
+  (setq highlight-tail-steps 17)
+  (setq highlight-tail-timer 0.05)
   (setq highlight-tail-posterior-type 'const)
   (highlight-tail-mode)
 )
 
 (use-package beacon
   :ensure t
+  ;;:hook
+  (post-self-insert . beacon-blink)
+  (blink-cursor-mode. beacon-blink)
+  (after-change-functions . beacon-blink)
+  (delete-selection-mode . beacon-blink)
+  (normal-erase-is-backspace . beacon-blink)
   :init
-  (setq beacon-blink-when-point-moves-vertically nil) ; default nil
-  (setq beacon-blink-when-point-moves-horizontally nil) ; default nil
+  (setq inhibit-modification-hooks nil)
+  (setq beacon-blink-when-point-moves-vertically 1) ; default nil
+  (setq beacon-blink-when-point-moves-horizontally 1) ; default nil
   (setq beacon-blink-when-buffer-changes t) ; default t
   (setq beacon-blink-when-window-scrolls t) ; default t
   (setq beacon-blink-when-window-changes t) ; default t
   (setq beacon-blink-when-focused nil) ; default nil
-  (setq beacon-blink-duration 0.3) ; default 0.3
+  (setq beacon-blink-duration 0.2) ; default 0.3
   (setq beacon-blink-delay 0.3) ; default 0.3
-  (setq beacon-size 20) ; default 40
-  ;; (setq beacon-color "yellow") ; default 0.5
-  (setq beacon-color 0.6) ; default 0.5
+  (setq beacon-size 23) ; default 40
+  (setq beacon-color "#9310FF") ; default 0.5
   :config
+  (setq inhibit-modification-hooks nil)
+  (add-hook 'after-change-functions #'beacon-blink)
   (beacon-mode 1)
 )
 
@@ -3881,7 +3913,7 @@ Example output:
 )
 
 ;;(setq redisplay-dont-pause t)
-  ;; (setq scroll-preserve-screen-position 1)  ;; centered screen scrolling
+(setq scroll-preserve-screen-position 1)  ;; centered screen scrolling
   ;; (setq scroll-margin 10
   ;; (setq maximum-scroll-margin 0.5)
   ;; (setq scroll-step 1)
@@ -4452,6 +4484,10 @@ Example output:
 
 (use-package dockerfile-mode
   :mode "\\Dockerfile\\'"
+)
+
+(use-package cheat-sh
+  :ensure t
 )
 
 (defun animated-self-insert ()
