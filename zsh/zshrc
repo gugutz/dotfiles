@@ -72,8 +72,13 @@ bindkey "${terminfo[kend]}" end-of-line
 
 #########################################
 # Tmux
-# ZSH_TMUX_AUTOSTART="true"
+ZSH_TMUX_AUTOSTART="true"
 ZSH_TMUX_AUTOSTART_ONCE="true"
+
+if [ -z "$TMUX" ]
+then
+    tmux attach -t TMUX || tmux new -s TMUX
+fi
 
 # THIS WAS GIVING ME ERRORS WITH EMACS PACKAGE `exec-path-from-shell`
 # if [[ $DISPLAY ]]; then

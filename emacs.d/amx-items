@@ -1,13 +1,13 @@
 
 ;; ----- amx-history -----
 (
+ org-table-create-or-convert-from-region
+ org-table-create
+ org-table-paste-rectangle
  ivy-switch-buffer-other-window
  ng2-mode
  typescript-mode
  package-install
- ag-project
- helm-ag
- dumb-jump-mode
 )
 
 ;; ----- amx-data -----
@@ -65,4 +65,7 @@
  (ng2-mode . 2)
  (typescript-mode . 1)
  (ivy-switch-buffer-other-window . 1)
+ (org-table-paste-rectangle . 1)
+ (org-table-create . 1)
+ (org-table-create-or-convert-from-region . 1)
 )
