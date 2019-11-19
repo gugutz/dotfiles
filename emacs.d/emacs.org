@@ -871,6 +871,70 @@ Delete trailing whitespace on save
   (capitalize-word (- arg))
 )
 #+END_SRC
+*** Change case
+
+These were taken from :
+https://github.com/chrismccord/dot_emacs/blob/master/vendor/change-case.el
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(defun camelcase-region (start end)
+  "Changes region from snake_case to camelCase"
+  (interactive "r")
+  (save-restriction (narrow-to-region start end)
+                    (goto-char (point-min))
+                    (while (re-search-forward "_\\(.\\)" nil t)
+                      (replace-match (upcase (match-string 1))))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;; ----------------------------------------------------------------------
+;; cadged largely from http://xahlee.org/emacs/elisp_idioms.html:
+;;
+(defun camelcase ()
+  "Changes word or region from snake_case to camelCase"
+  (interactive)
+  (let (pos1 pos2 bds)
+    (if (and transient-mark-mode mark-active)
+        (setq pos1 (region-beginning) pos2 (region-end))
+      (progn
+        (setq bds (bounds-of-thing-at-point 'symbol))
+        (setq pos1 (car bds) pos2 (cdr bds))))
+    (camelcase-region pos1 pos2)))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;; ----------------------------------------------------------------------
+;; snakecase-region
+;; Given a region of text in camelCase format, changes it to snake_case.
+;;
+;; BUG: This is actually just a repeat of camelcase-region!
+(defun snakecase-region (start end)
+  "Changes region from camelCase to snake_case"
+  (interactive "r")
+  (save-restriction
+    (let ((case-fold-search nil))
+      (narrow-to-region start end)
+      (goto-char (point-min))
+      (while (re-search-forward "\\([a-z]\\)\\([A-Z]\\)" nil t)
+        (message (match-string 1))
+        (replace-match (concat (match-string 1) "_" (downcase (match-string 2))))
+        (goto-char (point-min))))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;; ----------------------------------------------------------------------
+;; Given a region of text in camelCase format, changes it to snake_case.
+(defun snakecase ()
+  "Changes word or region from camelCase to snake_case"
+  (interactive)
+  (let (pos1 pos2 bds)
+    (if (and transient-mark-mode mark-active)
+        (setq pos1 (region-beginning) pos2 (region-end))
+      (progn
+        (setq bds (bounds-of-thing-at-point 'symbol))
+        (setq pos1 (car bds) pos2 (cdr bds))))
+    (snakecase-region pos1 pos2)))
+#+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (global-set-key (kbd "C-M-u")	 'upcase-backward-word)
@@ -1284,7 +1348,38 @@ Make emacs use $PATH defined in the systems shell
     "k" 'kill-buffer
     "b" 'switch-to-buffer
     "-" 'split-window-bellow
-    "|" 'split-window-right)
+    "|" 'split-window-right
+    "." 'find-tag
+    "t" 'projectile-find-file
+    "b" 'ido-switch-buffer
+    "cc" 'evilnc-comment-or-uncomment-lines
+    "ag" 'projectile-ag
+    "," 'switch-to-previous-buffer
+    ; "gg" 'git-gutter+:toggle
+    ; "gd" 'git-gutter+:popup-diff
+    ; "gp" 'git-gutter+:previous-hunk
+    ; "gn" 'git-gutter+:next-hunk
+    ; "gr" 'git-gutter+:revert-hunk
+    "gb" 'mo-git-blame-current
+    "gL" 'magit-log
+    "gs" 'magit-status
+    "q"  'kill-buffer-and-window
+    "u"  'undo-tree-visualize
+    "nn" 'neotree-toggle
+    "nm" 'next-match
+    "nf" 'neotree-find
+    "gk" 'windmove-up
+    "gj" 'windmove-down
+    "gl" 'windmove-right
+    "gh" 'windmove-left
+    "vs" 'split-window-right
+    "hs" 'split-window-below
+    "s"  'ispell-word
+    "ht" 'alchemist-help-search-at-point
+    "gt" 'alchemist-goto-definition-at-point
+    "mf" 'elixir-format
+    "ll" 'longlines-mode
+    "x" 'smex)
 )
 #+END_SRC
 
@@ -2839,6 +2934,24 @@ Org source blocks and exporter for restclient
 )
 #+END_SRC
 
+** company-coq
+
+Proof General mode for emacs
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package proof-general
+  :ensure t
+  :config
+  (add-hook 'coq-mode-hook #'company-coq-mode)
+)
+#+END_SRC
+
+Collection of extensions for proof general
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package company-coq
+  :ensure t
+)
+#+END_SRC
 ** Company emoji suport
 
 : use `:` to use emojis
@@ -6320,6 +6433,7 @@ Unfortunatelly this package has to be installed manually, as its not available o
 
   :hook
   (js2-mode . flycheck-mode)
+  (js2-mode . rainbow-mode)
   (js2-mode . company-mode)
   (js2-mode . tide-mode)
   (js2-mode . add-node-modules-path)
@@ -6342,7 +6456,186 @@ Unfortunatelly this package has to be installed manually, as its not available o
 )
 #+END_SRC
 
-* PrettierJS
+** js2-refactor
+js2-refactor uses 2 char mnemonic for refactorings.
+So C-c C-r ef would be "extract-function", and so on
+
+Refactorings available:
+| ee | expand-node-at-point: Expand bracketed list according to node type at point (array, object, function, call args).                     |
+| cc | contract-node-at-point: Contract bracketed list according to node type at point (array, object, function, call args).                 |
+| ef | extract-function: Extracts the marked expressions out into a new named function.                                                      |
+| em | extract-method: Extracts the marked expressions out into a new named method in an object literal.                                     |
+| tf | toggle-function-expression-and-declaration: Toggle between function name() {} and var name = function ();                             |
+| ta | toggle-arrow-function-and-expression: Toggle between function expression to arrow function.                                           |
+| ts | toggle-function-async: Toggle between an async and a regular function.                                                                |
+| ip | introduce-parameter: Changes the marked expression to a parameter in a local function.                                                |
+| lp | localize-parameter: Changes a parameter to a local var in a local function.                                                           |
+| wi | wrap-buffer-in-iife: Wraps the entire buffer in an immediately invoked function expression                                            |
+| ig | inject-global-in-iife: Creates a shortcut for a marked global by injecting it in the wrapping immediately invoked function expression |
+| ag | add-to-globals-annotation: Creates a /*global */ annotation if it is missing, and adds the var at point to it.                        |
+| ev | extract-var: Takes a marked expression and replaces it with a var.                                                                    |
+| el | extract-let: Similar to extract-var but uses a let-statement.                                                                         |
+| ec | extract-const: Similar to extract-var but uses a const-statement.                                                                     |
+| iv | inline-var: Replaces all instances of a variable with its initial value.                                                              |
+| rv | rename-var: Renames the variable on point and all occurrences in its lexical scope.                                                   |
+| vt | var-to-this: Changes local var a to be this.a instead.                                                                                |
+| ao | arguments-to-object: Replaces arguments to a function call with an object literal of named arguments.                                 |
+| 3i | ternary-to-if: Converts ternary operator to if-statement.                                                                             |
+| sv | split-var-declaration: Splits a var with multiple vars declared, into several var statements.                                         |
+| ss | split-string: Splits a string.                                                                                                        |
+| st | string-to-template: Converts a string into a template string.                                                                         |
+| uw | unwrap: Replaces the parent statement with the selected region.                                                                       |
+| lt | log-this: Adds a console.log() statement for what is at point (or region). With a prefix argument, use JSON pretty-printing.          |
+| dt | debug-this: Adds a debug() statement for what is at point (or region).                                                                |
+| sl | forward-slurp: Moves the next statement into current function, if-statement, for-loop or while-loop.                                  |
+| ba | forward-barf: Moves the last child out of current function, if-statement, for-loop or while-loop.                                     |
+| k  | kill: Kills to the end of the line, but does not cross semantic boundaries.                                                           |
+
+There are also some minor conveniences bundled:
+
+| C-S-down and C-S-up | moves the current line up or down. If the line is an element in an object or array literal, it makes sure that the commas are still correctly placed. |
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package js2-refactor
+  :ensure t
+  :after js2-mode
+  :hook
+  (js2-mode . js2-refactor-mode)
+  :bind
+  (:map js2-mode-map
+        ("C-k" . js2r-kill)
+        ("C-c h r" . js2-refactor-hydra/body))
+  :config
+  (js2r-add-keybindings-with-prefix "C-c C-r")
+  (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
+
+  (defhydra js2-refactor-hydra (:color blue :hint nil)
+    "
+^Functions^                    ^Variables^               ^Buffer^                      ^sexp^               ^Debugging^
+------------------------------------------------------------------------------------------------------------------------------
+[_lp_] Localize Parameter      [_ev_] Extract variable   [_wi_] Wrap buffer in IIFE    [_k_]  js2 kill      [_lt_] log this
+[_ef_] Extract function        [_iv_] Inline variable    [_ig_] Inject global in IIFE  [_ss_] split string  [_dt_] debug this
+[_ip_] Introduce parameter     [_rv_] Rename variable    [_ee_] Expand node at point   [_sl_] forward slurp
+[_em_] Extract method          [_vt_] Var to this        [_cc_] Contract node at point [_ba_] forward barf
+[_ao_] Arguments to object     [_sv_] Split var decl.    [_uw_] unwrap
+[_tf_] Toggle fun exp and decl [_ag_] Add var to globals
+[_ta_] Toggle fun expr and =>  [_ti_] Ternary to if
+[_q_]  quit"
+    ("ee" js2r-expand-node-at-point)
+    ("cc" js2r-contract-node-at-point)
+    ("ef" js2r-extract-function)
+    ("em" js2r-extract-method)
+    ("tf" js2r-toggle-function-expression-and-declaration)
+    ("ta" js2r-toggle-arrow-function-and-expression)
+    ("ip" js2r-introduce-parameter)
+    ("lp" js2r-localize-parameter)
+    ("wi" js2r-wrap-buffer-in-iife)
+    ("ig" js2r-inject-global-in-iife)
+    ("ag" js2r-add-to-globals-annotation)
+    ("ev" js2r-extract-var)
+    ("iv" js2r-inline-var)
+    ("rv" js2r-rename-var)
+    ("vt" js2r-var-to-this)
+    ("ao" js2r-arguments-to-object)
+    ("ti" js2r-ternary-to-if)
+    ("sv" js2r-split-var-declaration)
+    ("ss" js2r-split-string)
+    ("uw" js2r-unwrap)
+    ("lt" js2r-log-this)
+    ("dt" js2r-debug-this)
+    ("sl" js2r-forward-slurp)
+    ("ba" js2r-forward-barf)
+    ("k" js2r-kill)
+    ("q" nil))
+)
+#+END_SRC
+
+** xref-js2
+
+Jump to references/definitions using ag & js2-mode's AST in Emacs
+
+xref-js2 adds navigation to definitions or references to JavaScript projects in Emacs.
+xref-js2 adds an xref backend for JavaScript files.
+
+Instead of using a tag system, it relies on ag to query the codebase of a project. This might sound crazy at first, but it turns out that ag is so fast that jumping using xref-js2 is most of the time instantaneous, even on fairly large JavaScript codebases (it has been tested on 50k lines of JS code).
+
+Because line by line regexp search has its limitations, xref-js2 does a second pass on result candidates and eliminates possible false positives using js2-mode's AST, thus giving very accurate results.
+
+xref-js2 uses ag to perform searches, so you’ll need to install it as well.
+
+Keybindings
+
+| M-. | Jump  to definition                         |
+| M-? | Jump to references                          |
+| M-, | Pop back  to where  M-.  was  last  invoked |
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package xref-js2
+  :ensure t
+  :config
+  ;;(setq xref-js2-search-program 'rg)
+
+  ;; js-mode (which js2 is based on) binds "M-." which conflicts with xref, so
+  ;; unbind it.
+  (define-key js-mode-map (kbd "M-.") nil)
+
+  (add-hook 'js2-mode-hook (lambda ()
+    (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
+)
+#+END_SRC
+** Indium
+
+A JavaScript development environment for Emacs.
+
+Indium connects to a browser tab or nodejs process and provides many features for JavaScript development, including:
+
++ a REPL (with auto completion) & object inspection;
++ an inspector, with history and navigation;
++ a scratch buffer (M-x indium-scratch);
++ JavaScript evaluation in JS buffers with indium-interaction-mode;
++ a stepping Debugger, similar to edebug, or cider.
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package indium
+  :ensure t
+  :ensure-system-package
+  (indium . "npm i -g indium")
+  :after js2-mode
+  :bind (:map js2-mode-map
+              ("C-c C-l" . indium-eval-buffer))
+  :hook
+  ((js2-mode typescript-mode) . indium-interaction-mode)
+)
+#+END_SRC
+
+** add-json-modules-path
+
+Adds the node_modules/.bin directory to the buffer exec_path. E.g. support project local eslint installations.
+https://github.com/codesuki/add-node-modules-path/tree/master
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package add-node-modules-path
+  :hook ((js2-mode . add-node-modules-path)
+         (rjsx-mode . add-node-modules-path)))
+#+END_SRC
+
+** json-snatcher
+
+json-snatcher: get the path of any JSON element easily
+https://github.com/Sterlingg/json-snatcher
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package json-snatcher
+  :hook ((json-mode . js-mode-bindings))
+  :config
+  (defun js-mode-bindings ()
+    "Sets a hotkey for using the json-snatcher plugin"
+    (when (string-match  "\\.json$" (buffer-name))
+      (local-set-key (kbd "C-c C-g") 'jsons-print-path)))
+)
+#+END_SRC
+
+** PrettierJS
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 ;; prettier-emacs: minor-mode to prettify javascript files on save
@@ -6400,32 +6693,12 @@ Unfortunatelly this package has to be installed manually, as its not available o
 )
 #+END_SRC
 
-* format-all
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
-  (use-package format-all
-  :ensure t
-  :bind ("C-c C-f" . format-all-buffer)
-  )
-#+END_SRC
+** ESLint
 
-* JSON Mode
+*** eslintd-fix
 
-    #+BEGIN_SRC emacs-lisp :tangle init.el
-;; json-mode: Major mode for editing JSON files with emacs
-;; https://github.com/joshwnj/json-mode
-(use-package json-mode
-  :mode "\\.js\\(?:on\\|[hl]int\\(rc\\)?\\)\\'"
-  :config
-  (add-hook 'json-mode-hook #'prettier-js-mode)
-  (setq json-reformat:indent-width 2)
-  (setq json-reformat:pretty-string? t)
-  (setq js-indent-level 2))
-    #+END_SRC
-
-* ESLint
-
-eslintd-fix: Emacs minor-mode to automatically fix javascript with eslint_d.
+Emacs minor-mode to automatically fix javascript with eslint_d.
 https://github.com/aaronjensen/eslintd-fix/tree/master
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -6434,6 +6707,9 @@ https://github.com/aaronjensen/eslintd-fix/tree/master
   :ensure-system-package
   (eslint . "npm i -g eslint")
   :config
+  ;;(setq eslintd-fix-executable "/my/path/eslint_d")
+  ;;
+
   ;; Grab eslint executable from node_modules instead of global
   ;; Taken from https://github.com/flycheck/flycheck/issues/1087#issuecomment-246514860
   ;; Gist: https://github.com/lunaryorn/.emacs.d/blob/master/lisp/lunaryorn-flycheck.el#L62
@@ -6457,28 +6733,23 @@ https://github.com/aaronjensen/eslintd-fix/tree/master
 )
 #+END_SRC
 
-* RJSX Mode
-
-https://github.com/felipeochoa/rjsx-mode
+** npm-mode
+https://github.com/mojochao/npm-mode
+| <l>                           |  <c>   | <l>                                 |
+| Command                       | Keymap | Description                         |
+| npm-mode-npm-init             |   n    | initialize new project              |
+| npm-mode-npm-install          |   i    | Install all project dependencies    |
+| npm-mode-npm-install-save     |   s    | Add new project dependency          |
+| npm-mode-npm-install-save-dev |   d    | Add new project dev dependency      |
+| npm-mode-npm-uninstall        |   u    | Remove project dependency           |
+| npm-mode-npm-list             |   l    | List installed project dependencies |
+| npm-mode-npm-run              |   r    | Run project script                  |
+| npm-mode-visit-project-file   |   v    | Visit project package.json file     |
+|                               |   ?    | Display keymap commands             |
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package rjsx-mode
-    :after js2-mode
-    :mode
-    ("\\.jsx$" . rjsx-mode)
-    ("components/.+\\.js$" . rjsx-mode)
-
-    :config
-    ;; auto register for JS files that are inside a `components' folder
-    (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
-
-    ;; for better jsx syntax-highlighting in web-mode
-    ;; - courtesy of Patrick @halbtuerke
-    (defadvice web-mode-highlight-part (around tweak-jsx activate)
-      (if (equal web-mode-content-type "jsx")
-        (let ((web-mode-enable-part-face nil))
-          ad-do-it)
-        ad-do-it))
+(use-package npm-mode
+  :ensure t
 )
 #+END_SRC
 
@@ -6520,6 +6791,27 @@ https://github.com/felipeochoa/rjsx-mode
 
 #+END_SRC
 
+** tslint for flycheck
+This package is now part of flycheck
+This is just for its configuration
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package flycheck-typescript-tslint
+  :ensure nil
+  :ensure-system-package
+  ((tslint . "npm i -g tslint")
+   (typescript . "npm i -g typescript"))
+  :config
+  (eval-after-load 'flycheck
+  '(add-hook 'flycheck-mode-hook #'flycheck-typescript-tslint-setup))
+  ;; location of config file
+  (custom-set-variables
+     '(flycheck-typescript-tslint-config "~/tslint.json"))
+  ;; custom location of executable (if not available globally)
+   (custom-set-variables
+     '(flycheck-typescript-tslint-executable "~/my_executables/tslint"))
+)
+#+END_SRC
 * Angular
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package ng2-mode
@@ -6529,6 +6821,54 @@ https://github.com/felipeochoa/rjsx-mode
   :hook
   (ng2-mode . rainbow-mode)
   (ng2-mode . prettier-js-mode)
+)
+#+END_SRC
+
+* format-all
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (use-package format-all
+  :ensure t
+  :bind ("C-c C-f" . format-all-buffer)
+  )
+#+END_SRC
+
+* JSON Mode
+
+    #+BEGIN_SRC emacs-lisp :tangle init.el
+;; json-mode: Major mode for editing JSON files with emacs
+;; https://github.com/joshwnj/json-mode
+(use-package json-mode
+  :mode "\\.js\\(?:on\\|[hl]int\\(rc\\)?\\)\\'"
+  :config
+  (add-hook 'json-mode-hook #'prettier-js-mode)
+  (setq json-reformat:indent-width 2)
+  (setq json-reformat:pretty-string? t)
+  (setq js-indent-level 2))
+    #+END_SRC
+
+* RJSX Mode
+
+https://github.com/felipeochoa/rjsx-mode
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package rjsx-mode
+    :after js2-mode
+    :mode
+    ("\\.jsx$" . rjsx-mode)
+    ("components/.+\\.js$" . rjsx-mode)
+
+    :config
+    ;; auto register for JS files that are inside a `components' folder
+    (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
+
+    ;; for better jsx syntax-highlighting in web-mode
+    ;; - courtesy of Patrick @halbtuerke
+    (defadvice web-mode-highlight-part (around tweak-jsx activate)
+      (if (equal web-mode-content-type "jsx")
+        (let ((web-mode-enable-part-face nil))
+          ad-do-it)
+        ad-do-it))
 )
 #+END_SRC
 

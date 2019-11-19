@@ -101,18 +101,18 @@ set $reboot sudo reboot now
 set $netrefresh sudo systemctl restart NetworkManager
 set $hibernate sudo systemctl suspend
 
-# define default file managers (terminal and gui)
-set $file_manager ranger
-set $file_manager_gui pcmanfm
-
-# define default browser
-set $browser brave
-
 # define main terminal as st in tmux (suckless terminal)
 # this make tmux use a main session and doenst spawn multiple unused sessions
 set $terminal st -e tmux new-session -A -s "main-session"
 # set $terminal       st -e tmux new-session
 #set $terminal       st
+
+# define default file managers (terminal and gui)
+set $file_manager ranger
+set $file_manager_gui pcmanfm
+
+# define default browser
+set $browser firefox
 
 # define default text editor
 # set $editor st -e tmux new-session -A -s "emacs-session" emacs -t -nw
@@ -274,6 +274,7 @@ assign [class="Slack"]  → $ws8
 exec $browser
 # \$browser_window_class "Brave"
 assign [class="Brave"]  → $ws3
+assign [class="Firefox"]  → $ws3
 
 # Telegram Desktop
 exec telegram-desktop
@@ -819,6 +820,7 @@ for_window [class="Skype"] floating enable border normal
 for_window [class="Timeset-gui"] floating enable border normal
 for_window [class="(?i)virtualbox"] floating enable border normal
 for_window [class="Xfburn"] floating enable
+for_window [class="Toggl Desktop"] floating enable
 
 # set 'App' window_class as floating windows
 # this makes my java build and runs float on top of the idea, and not divide the screen with another window

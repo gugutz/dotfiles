@@ -506,6 +506,58 @@ Example output:
   (capitalize-word (- arg))
 )
 
+(defun camelcase-region (start end)
+  "Changes region from snake_case to camelCase"
+  (interactive "r")
+  (save-restriction (narrow-to-region start end)
+                    (goto-char (point-min))
+                    (while (re-search-forward "_\\(.\\)" nil t)
+                      (replace-match (upcase (match-string 1))))))
+
+;; ----------------------------------------------------------------------
+;; cadged largely from http://xahlee.org/emacs/elisp_idioms.html:
+;;
+(defun camelcase ()
+  "Changes word or region from snake_case to camelCase"
+  (interactive)
+  (let (pos1 pos2 bds)
+    (if (and transient-mark-mode mark-active)
+        (setq pos1 (region-beginning) pos2 (region-end))
+      (progn
+        (setq bds (bounds-of-thing-at-point 'symbol))
+        (setq pos1 (car bds) pos2 (cdr bds))))
+    (camelcase-region pos1 pos2)))
+
+;; ----------------------------------------------------------------------
+;; snakecase-region
+;; Given a region of text in camelCase format, changes it to snake_case.
+;;
+;; BUG: This is actually just a repeat of camelcase-region!
+(defun snakecase-region (start end)
+  "Changes region from camelCase to snake_case"
+  (interactive "r")
+  (save-restriction
+    (let ((case-fold-search nil))
+      (narrow-to-region start end)
+      (goto-char (point-min))
+      (while (re-search-forward "\\([a-z]\\)\\([A-Z]\\)" nil t)
+        (message (match-string 1))
+        (replace-match (concat (match-string 1) "_" (downcase (match-string 2))))
+        (goto-char (point-min))))))
+
+;; ----------------------------------------------------------------------
+;; Given a region of text in camelCase format, changes it to snake_case.
+(defun snakecase ()
+  "Changes word or region from camelCase to snake_case"
+  (interactive)
+  (let (pos1 pos2 bds)
+    (if (and transient-mark-mode mark-active)
+        (setq pos1 (region-beginning) pos2 (region-end))
+      (progn
+        (setq bds (bounds-of-thing-at-point 'symbol))
+        (setq pos1 (car bds) pos2 (cdr bds))))
+    (snakecase-region pos1 pos2)))
+
 (global-set-key (kbd "C-M-u")	 'upcase-backward-word)
 (global-set-key (kbd "C-M-l")	 'downcase-backward-WORD)
 ;; this replaces native capitlize word!
@@ -842,11 +894,43 @@ Example output:
     ;;"e" 'find-file  ;; removed in favor of counsel-find-file
     "q" 'evil-quit
     "w" 'save-buffer
+    "w"  'kill-this-buffer
     "d" 'delete-frame
     "k" 'kill-buffer
     "b" 'switch-to-buffer
     "-" 'split-window-bellow
-    "|" 'split-window-right)
+    "|" 'split-window-right
+    "." 'find-tag
+    "t" 'projectile-find-file
+    "b" 'ido-switch-buffer
+    "cc" 'evilnc-comment-or-uncomment-lines
+    "ag" 'projectile-ag
+    "," 'switch-to-previous-buffer
+    ; "gg" 'git-gutter+:toggle
+    ; "gd" 'git-gutter+:popup-diff
+    ; "gp" 'git-gutter+:previous-hunk
+    ; "gn" 'git-gutter+:next-hunk
+    ; "gr" 'git-gutter+:revert-hunk
+    "gb" 'mo-git-blame-current
+    "gL" 'magit-log
+    "gs" 'magit-status
+    "q"  'kill-buffer-and-window
+    "u"  'undo-tree-visualize
+    "nn" 'neotree-toggle
+    "nm" 'next-match
+    "nf" 'neotree-find
+    "gk" 'windmove-up
+    "gj" 'windmove-down
+    "gl" 'windmove-right
+    "gh" 'windmove-left
+    "vs" 'split-window-right
+    "hs" 'split-window-below
+    "s"  'ispell-word
+    "ht" 'alchemist-help-search-at-point
+    "gt" 'alchemist-goto-definition-at-point
+    "mf" 'elixir-format
+    "ll" 'longlines-mode
+    "x" 'smex)
 )
 
 (use-package evil-surround
@@ -1716,10 +1800,10 @@ Example output:
   :ensure t
   :after flycheck
   :custom-face
-  ;;(flycheck-posframe-error-face (nil (:inherit 'error)))
-  ;;(flycheck-posframe-background-face (nil (:inherit 'error)))
-  ;;(flycheck-posframe-border-face nil (:inherit 'error)))
-  ;;(flycheck-posframe-border-width (nil (:inherit 'error)))
+  ;;(flycheck-posframe-error-face ((nil (:inherit 'error))))
+  ;;(flycheck-posframe-background-face ((nil (:inherit 'error))))
+  ;;(flycheck-posframe-border-face nil ((:inherit 'error))))
+  ;;(flycheck-posframe-border-width ((nil (:inherit 'error))))
   :hook
   (flycheck-mode . flycheck-posframe-mode)
   :config
@@ -2024,6 +2108,16 @@ Example output:
   ;; (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
   ;; (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
   ;; (define-key company-active-map (kbd "<backtab>") 'company-select-previous)
+)
+
+(use-package proof-general
+  :ensure t
+  :config
+  (add-hook 'coq-mode-hook #'company-coq-mode)
+)
+
+(use-package company-coq
+  :ensure t
 )
 
 (use-package company-emoji
@@ -4574,6 +4668,7 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
 
   :hook
   (js2-mode . flycheck-mode)
+  (js2-mode . rainbow-mode)
   (js2-mode . company-mode)
   (js2-mode . tide-mode)
   (js2-mode . add-node-modules-path)
@@ -4593,6 +4688,96 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
   (setq js2-mode-show-parse-errors t)
   (setq js2-mode-show-strict-warnings nil)
   (setq js2-strict-missing-semi-warning nil)
+)
+
+(use-package js2-refactor
+  :ensure t
+  :after js2-mode
+  :hook
+  (js2-mode . js2-refactor-mode)
+  :bind
+  (:map js2-mode-map
+        ("C-k" . js2r-kill)
+        ("C-c h r" . js2-refactor-hydra/body))
+  :config
+  (js2r-add-keybindings-with-prefix "C-c C-r")
+  (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
+
+  (defhydra js2-refactor-hydra (:color blue :hint nil)
+    "
+^Functions^                    ^Variables^               ^Buffer^                      ^sexp^               ^Debugging^
+------------------------------------------------------------------------------------------------------------------------------
+[_lp_] Localize Parameter      [_ev_] Extract variable   [_wi_] Wrap buffer in IIFE    [_k_]  js2 kill      [_lt_] log this
+[_ef_] Extract function        [_iv_] Inline variable    [_ig_] Inject global in IIFE  [_ss_] split string  [_dt_] debug this
+[_ip_] Introduce parameter     [_rv_] Rename variable    [_ee_] Expand node at point   [_sl_] forward slurp
+[_em_] Extract method          [_vt_] Var to this        [_cc_] Contract node at point [_ba_] forward barf
+[_ao_] Arguments to object     [_sv_] Split var decl.    [_uw_] unwrap
+[_tf_] Toggle fun exp and decl [_ag_] Add var to globals
+[_ta_] Toggle fun expr and =>  [_ti_] Ternary to if
+[_q_]  quit"
+    ("ee" js2r-expand-node-at-point)
+    ("cc" js2r-contract-node-at-point)
+    ("ef" js2r-extract-function)
+    ("em" js2r-extract-method)
+    ("tf" js2r-toggle-function-expression-and-declaration)
+    ("ta" js2r-toggle-arrow-function-and-expression)
+    ("ip" js2r-introduce-parameter)
+    ("lp" js2r-localize-parameter)
+    ("wi" js2r-wrap-buffer-in-iife)
+    ("ig" js2r-inject-global-in-iife)
+    ("ag" js2r-add-to-globals-annotation)
+    ("ev" js2r-extract-var)
+    ("iv" js2r-inline-var)
+    ("rv" js2r-rename-var)
+    ("vt" js2r-var-to-this)
+    ("ao" js2r-arguments-to-object)
+    ("ti" js2r-ternary-to-if)
+    ("sv" js2r-split-var-declaration)
+    ("ss" js2r-split-string)
+    ("uw" js2r-unwrap)
+    ("lt" js2r-log-this)
+    ("dt" js2r-debug-this)
+    ("sl" js2r-forward-slurp)
+    ("ba" js2r-forward-barf)
+    ("k" js2r-kill)
+    ("q" nil))
+)
+
+(use-package xref-js2
+  :ensure t
+  :config
+  ;;(setq xref-js2-search-program 'rg)
+
+  ;; js-mode (which js2 is based on) binds "M-." which conflicts with xref, so
+  ;; unbind it.
+  (define-key js-mode-map (kbd "M-.") nil)
+
+  (add-hook 'js2-mode-hook (lambda ()
+    (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
+)
+
+(use-package indium
+  :ensure t
+  :ensure-system-package
+  (indium . "npm i -g indium")
+  :after js2-mode
+  :bind (:map js2-mode-map
+              ("C-c C-l" . indium-eval-buffer))
+  :hook
+  ((js2-mode typescript-mode) . indium-interaction-mode)
+)
+
+(use-package add-node-modules-path
+  :hook ((js2-mode . add-node-modules-path)
+         (rjsx-mode . add-node-modules-path)))
+
+(use-package json-snatcher
+  :hook ((json-mode . js-mode-bindings))
+  :config
+  (defun js-mode-bindings ()
+    "Sets a hotkey for using the json-snatcher plugin"
+    (when (string-match  "\\.json$" (buffer-name))
+      (local-set-key (kbd "C-c C-g") 'jsons-print-path)))
 )
 
 ;; prettier-emacs: minor-mode to prettify javascript files on save
@@ -4649,26 +4834,14 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
 
 )
 
-(use-package format-all
-:ensure t
-:bind ("C-c C-f" . format-all-buffer)
-)
-
-;; json-mode: Major mode for editing JSON files with emacs
-;; https://github.com/joshwnj/json-mode
-(use-package json-mode
-  :mode "\\.js\\(?:on\\|[hl]int\\(rc\\)?\\)\\'"
-  :config
-  (add-hook 'json-mode-hook #'prettier-js-mode)
-  (setq json-reformat:indent-width 2)
-  (setq json-reformat:pretty-string? t)
-  (setq js-indent-level 2))
-
 (use-package eslintd-fix
   :ensure t
   :ensure-system-package
   (eslint . "npm i -g eslint")
   :config
+  ;;(setq eslintd-fix-executable "/my/path/eslint_d")
+  ;;
+
   ;; Grab eslint executable from node_modules instead of global
   ;; Taken from https://github.com/flycheck/flycheck/issues/1087#issuecomment-246514860
   ;; Gist: https://github.com/lunaryorn/.emacs.d/blob/master/lisp/lunaryorn-flycheck.el#L62
@@ -4691,23 +4864,8 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
                                    package-directory)))))))
 )
 
-(use-package rjsx-mode
-    :after js2-mode
-    :mode
-    ("\\.jsx$" . rjsx-mode)
-    ("components/.+\\.js$" . rjsx-mode)
-
-    :config
-    ;; auto register for JS files that are inside a `components' folder
-    (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
-
-    ;; for better jsx syntax-highlighting in web-mode
-    ;; - courtesy of Patrick @halbtuerke
-    (defadvice web-mode-highlight-part (around tweak-jsx activate)
-      (if (equal web-mode-content-type "jsx")
-        (let ((web-mode-enable-part-face nil))
-          ad-do-it)
-        ad-do-it))
+(use-package npm-mode
+  :ensure t
 )
 
 (use-package typescript-mode
@@ -4736,6 +4894,22 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
   )
 )
 
+(use-package flycheck-typescript-tslint
+  :ensure nil
+  :ensure-system-package
+  ((tslint     . "npm i -g tslint")
+   (typescript   . "npm i -g typescript"))
+  :config
+  (eval-after-load 'flycheck
+  '(add-hook 'flycheck-mode-hook #'flycheck-typescript-tslint-setup))
+  ;; location of config file
+  (custom-set-variables
+     '(flycheck-typescript-tslint-config "~/tslint.json"))
+  ;; custom location of executable (if not available globally)
+   (custom-set-variables
+     '(flycheck-typescript-tslint-executable "~/my_executables/tslint"))
+)
+
 (use-package ng2-mode
   :defer
   :mode
@@ -4743,6 +4917,40 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
   :hook
   (ng2-mode . rainbow-mode)
   (ng2-mode . prettier-js-mode)
+)
+
+(use-package format-all
+:ensure t
+:bind ("C-c C-f" . format-all-buffer)
+)
+
+;; json-mode: Major mode for editing JSON files with emacs
+;; https://github.com/joshwnj/json-mode
+(use-package json-mode
+  :mode "\\.js\\(?:on\\|[hl]int\\(rc\\)?\\)\\'"
+  :config
+  (add-hook 'json-mode-hook #'prettier-js-mode)
+  (setq json-reformat:indent-width 2)
+  (setq json-reformat:pretty-string? t)
+  (setq js-indent-level 2))
+
+(use-package rjsx-mode
+    :after js2-mode
+    :mode
+    ("\\.jsx$" . rjsx-mode)
+    ("components/.+\\.js$" . rjsx-mode)
+
+    :config
+    ;; auto register for JS files that are inside a `components' folder
+    (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
+
+    ;; for better jsx syntax-highlighting in web-mode
+    ;; - courtesy of Patrick @halbtuerke
+    (defadvice web-mode-highlight-part (around tweak-jsx activate)
+      (if (equal web-mode-content-type "jsx")
+        (let ((web-mode-enable-part-face nil))
+          ad-do-it)
+        ad-do-it))
 )
 
 (use-package dockerfile-mode
