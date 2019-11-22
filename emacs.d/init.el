@@ -1567,6 +1567,18 @@ Example output:
   :hook (after-init . hydra-posframe-mode) ;; changed from `hydra-postframe-enable' cause emacs itself suggested
 )
 
+(use-package occur
+  :ensure nil
+  :config
+  (evil-add-hjkl-bindings occur-mode-map 'emacs
+    (kbd "/")       'evil-search-forward
+    (kbd "n")       'evil-search-next
+    (kbd "N")       'evil-search-previous
+    (kbd "C-d")     'evil-scroll-down
+    (kbd "C-u")     'evil-scroll-up
+    (kbd "C-w C-w") 'other-window)
+)
+
 (use-package ag
   :custom
   (ag-highligh-search t)
@@ -3810,7 +3822,7 @@ Example output:
 
 (use-package beacon
   :ensure t
-  ;;:hook
+  :hook
   (post-self-insert . beacon-blink)
   (blink-cursor-mode. beacon-blink)
   (after-change-functions . beacon-blink)

@@ -2237,7 +2237,7 @@ Requires: Emacs >= 26
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package occur
-  :ensure t
+  :ensure nil
   :config
   (evil-add-hjkl-bindings occur-mode-map 'emacs
     (kbd "/")       'evil-search-forward
@@ -5245,7 +5245,7 @@ Highlight portions of text
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package beacon
   :ensure t
-  ;;:hook
+  :hook
   (post-self-insert . beacon-blink)
   (blink-cursor-mode. beacon-blink)
   (after-change-functions . beacon-blink)
