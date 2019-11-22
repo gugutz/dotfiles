@@ -204,6 +204,35 @@ emacs asks 2 annoying confirmations on every startup before actually starting
 )
 #+END_SRC
 
+** paradox
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package paradox
+  :ensure t
+  :defer t
+  :config
+  (setq paradox-spinner-type 'progress-bar
+        paradox-execute-asynchronously t)
+)
+#+END_SRC
+
+** quelpa
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package quelpa
+  :ensure t
+)
+#+END_SRC
+
+*** quelpa-use-package
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package quelpa-use-package
+  :ensure t
+  :init
+  (setq quelpa-update-melpa-p nil)
+)
+#+END_SRC
 
 * GPG Encryption
 
@@ -780,6 +809,16 @@ Example output:
 (global-set-key (kbd "C-x \\") #'align-regexp)
 #+END_SRC
 
+** align to equals
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(defun align-to-equals (begin end)
+  "Align region to equal signs"
+   (interactive "r")
+   (align-regexp begin end "\\(\\s-*\\)=" 1 1 )
+)
+#+END_SRC
+
 ** dumb-jump
 Emacs jump to definition tool
 
@@ -831,6 +870,70 @@ Delete trailing whitespace on save
   (interactive "p")
   (capitalize-word (- arg))
 )
+#+END_SRC
+*** Change case
+
+These were taken from :
+https://github.com/chrismccord/dot_emacs/blob/master/vendor/change-case.el
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(defun camelcase-region (start end)
+  "Changes region from snake_case to camelCase"
+  (interactive "r")
+  (save-restriction (narrow-to-region start end)
+                    (goto-char (point-min))
+                    (while (re-search-forward "_\\(.\\)" nil t)
+                      (replace-match (upcase (match-string 1))))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;; ----------------------------------------------------------------------
+;; cadged largely from http://xahlee.org/emacs/elisp_idioms.html:
+;;
+(defun camelcase ()
+  "Changes word or region from snake_case to camelCase"
+  (interactive)
+  (let (pos1 pos2 bds)
+    (if (and transient-mark-mode mark-active)
+        (setq pos1 (region-beginning) pos2 (region-end))
+      (progn
+        (setq bds (bounds-of-thing-at-point 'symbol))
+        (setq pos1 (car bds) pos2 (cdr bds))))
+    (camelcase-region pos1 pos2)))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;; ----------------------------------------------------------------------
+;; snakecase-region
+;; Given a region of text in camelCase format, changes it to snake_case.
+;;
+;; BUG: This is actually just a repeat of camelcase-region!
+(defun snakecase-region (start end)
+  "Changes region from camelCase to snake_case"
+  (interactive "r")
+  (save-restriction
+    (let ((case-fold-search nil))
+      (narrow-to-region start end)
+      (goto-char (point-min))
+      (while (re-search-forward "\\([a-z]\\)\\([A-Z]\\)" nil t)
+        (message (match-string 1))
+        (replace-match (concat (match-string 1) "_" (downcase (match-string 2))))
+        (goto-char (point-min))))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;; ----------------------------------------------------------------------
+;; Given a region of text in camelCase format, changes it to snake_case.
+(defun snakecase ()
+  "Changes word or region from camelCase to snake_case"
+  (interactive)
+  (let (pos1 pos2 bds)
+    (if (and transient-mark-mode mark-active)
+        (setq pos1 (region-beginning) pos2 (region-end))
+      (progn
+        (setq bds (bounds-of-thing-at-point 'symbol))
+        (setq pos1 (car bds) pos2 (cdr bds))))
+    (snakecase-region pos1 pos2)))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -1245,7 +1348,38 @@ Make emacs use $PATH defined in the systems shell
     "k" 'kill-buffer
     "b" 'switch-to-buffer
     "-" 'split-window-bellow
-    "|" 'split-window-right)
+    "|" 'split-window-right
+    "." 'find-tag
+    "t" 'projectile-find-file
+    "b" 'ido-switch-buffer
+    "cc" 'evilnc-comment-or-uncomment-lines
+    "ag" 'projectile-ag
+    "," 'switch-to-previous-buffer
+    ; "gg" 'git-gutter+:toggle
+    ; "gd" 'git-gutter+:popup-diff
+    ; "gp" 'git-gutter+:previous-hunk
+    ; "gn" 'git-gutter+:next-hunk
+    ; "gr" 'git-gutter+:revert-hunk
+    "gb" 'mo-git-blame-current
+    "gL" 'magit-log
+    "gs" 'magit-status
+    "q"  'kill-buffer-and-window
+    "u"  'undo-tree-visualize
+    "nn" 'neotree-toggle
+    "nm" 'next-match
+    "nf" 'neotree-find
+    "gk" 'windmove-up
+    "gj" 'windmove-down
+    "gl" 'windmove-right
+    "gh" 'windmove-left
+    "vs" 'split-window-right
+    "hs" 'split-window-below
+    "s"  'ispell-word
+    "ht" 'alchemist-help-search-at-point
+    "gt" 'alchemist-goto-definition-at-point
+    "mf" 'elixir-format
+    "ll" 'longlines-mode
+    "x" 'smex)
 )
 #+END_SRC
 
@@ -1431,101 +1565,105 @@ fifteen = 15
 
 ** org-mode setup
 #+BEGIN_SRC emacs-lisp :tangle init.el
-  (use-package org
-    :ensure org-plus-contrib
-    :defer t
+(use-package org
+  :ensure org-plus-contrib
+  :defer t
   :hook
   (org-mode . diff-hl-mode)
   (org-mode . rainbow-mode)
   (org-mode . visual-line-mode)
-    :bind
-    ("C-c l" . org-store-link)
-    ("C-c a" . org-agenda)
-    ("C-c c" . org-capture)
-    ("C-c b" . org-switch)
+  :bind
+  ("C-c l" . org-store-link)
+  ("C-c a" . org-agenda)
+  ("C-c c" . org-capture)
+  ("C-c b" . org-switch)
 
-    ;; this map is to delete de bellow commented lambda that does the same thing
-    ;; Resolve issue with Tab not working with ORG only in Normal VI Mode in terminal
-    ;; (something with TAB on terminals being related to C-i...)
-    (:map evil-normal-state-map
-    ("<tab>" . org-cycle))
-    :init
-    ;; general org config variables
-    (setq org-log-done 'time)
-    (setq org-export-backends (quote (ascii html icalendar latex md odt)))
-    (setq org-use-speed-commands t)
+  ;; this map is to delete de bellow commented lambda that does the same thing
+  ;; Resolve issue with Tab not working with ORG only in Normal VI Mode in terminal
+  ;; (something with TAB on terminals being related to C-i...)
+  (:map evil-normal-state-map
+  ("<tab>" . org-cycle))
+  :init
+  ;; general org config variables
+  (setq org-log-done 'time)
+  (setq org-export-backends (quote (ascii html icalendar latex md odt)))
+  (setq org-use-speed-commands t)
 
-    ;; dont display atual width for images inline. set per-file with
-    ;; #+ATTR_HTML: :width 600px :height: auto
-    ;; #+ATTR_ORG: :width 600
-    ;; #+ATTR_LATEX: :width 5in
-    (setq org-image-actual-width nil)
-    (setq org-startup-with-inline-images t)
+  ;; dont display atual width for images inline. set per-file with
+  ;; #+ATTR_HTML: :width 600px :height: auto
+  ;; #+ATTR_ORG: :width 600
+  ;; #+ATTR_LATEX: :width 5in
+  (setq org-image-actual-width nil)
+  (setq org-startup-with-inline-images t)
 
-    ;; make tab behave like it usually do (ie: indent) inside org source blocks
-    (setq org-src-tab-acts-natively t)
+  ;; make tab behave like it usually do (ie: indent) inside org source blocks
+  (setq org-src-tab-acts-natively t)
 
-    (setq org-confirm-babel-evaluate 'nil)
-    (setq org-todo-keywords
-     '((sequence "TODO" "IN-PROGRESS" "REVIEW" "|" "DONE")))
-    (setq org-agenda-window-setup 'other-window)
-    (setq org-log-done 'time) ;; Show CLOSED tag line in closed TODO items
-    (setq org-log-done 'note) ;; Prompt to leave a note when closing an item
-    (setq org-hide-emphasis-markers nil)
+  (setq org-confirm-babel-evaluate 'nil)
+  (setq org-todo-keywords
+   '((sequence "TODO" "IN-PROGRESS" "REVIEW" "|" "DONE")))
+  (setq org-agenda-window-setup 'other-window)
+  (setq org-log-done 'time) ;; Show CLOSED tag line in closed TODO items
+  (setq org-log-done 'note) ;; Prompt to leave a note when closing an item
+  (setq org-hide-emphasis-markers nil)
 
-    ;;ox-twbs (exporter to twitter bootstrap html)
-    (setq org-enable-bootstrap-support t)
-    :config
-    ;; make windmove work with org mode
-    (add-hook 'org-shiftup-final-hook 'windmove-up)
-    (add-hook 'org-shiftleft-final-hook 'windmove-left)
-    (add-hook 'org-shiftdown-final-hook 'windmove-down)
-    (add-hook 'org-shiftright-final-hook 'windmove-right)
+  ;;ox-twbs (exporter to twitter bootstrap html)
+  (setq org-enable-bootstrap-support t)
 
-    ;; org-capture - needs to be in :config because it assumes a variable is already defined: `org-directory'
-    (setq org-default-notes-file (concat org-directory "/notes.org"))
+  ;; make ispell ignore source blocks
+  (add-to-list 'ispell-skip-region-alist '("^#+begin_src" . "^#+end_src"))
 
-    ;;(add-hook 'org-mode-hook
-    ;;          (lambda ()
-    ;;        (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
+  :config
+  ;; make windmove work with org mode
+  (add-hook 'org-shiftup-final-hook 'windmove-up)
+  (add-hook 'org-shiftleft-final-hook 'windmove-left)
+  (add-hook 'org-shiftdown-final-hook 'windmove-down)
+  (add-hook 'org-shiftright-final-hook 'windmove-right)
 
-    (defun org-export-turn-on-syntax-highlight()
-      "Setup variables to turn on syntax highlighting when calling `org-latex-export-to-pdf'"
-      (interactive)
-      (setq org-latex-listings 'minted
-            org-latex-packages-alist '(("" "minted"))
-            org-latex-pdf-process '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f")))
+  ;; org-capture - needs to be in :config because it assumes a variable is already defined: `org-directory'
+  (setq org-default-notes-file (concat org-directory "/notes.org"))
 
-  ;; (setq org-latex-pdf-process
-  ;;     '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
+  ;;(add-hook 'org-mode-hook
+  ;;          (lambda ()
+  ;;        (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
 
-  ;; compile with xelatex to use the Arial font
-  (setq org-latex-pdf-process
-    '("xelatex -interaction nonstopmode %f"
-       "xelatex -interaction nonstopmode %f")) ;; for multiple passes
+  (defun org-export-turn-on-syntax-highlight()
+    "Setup variables to turn on syntax highlighting when calling `org-latex-export-to-pdf'"
+    (interactive)
+    (setq org-latex-listings 'minted
+          org-latex-packages-alist '(("" "minted"))
+          org-latex-pdf-process '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f")))
 
+;; (setq org-latex-pdf-process
+;;     '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
 
-    (setq org-emphasis-alist '(("*" bold)
-                           ("/" italic)
-                           ("_" underline)
-                           ("=" org-verbatim verbatim)
-                           ("~" org-code verbatim)))
+;; compile with xelatex to use the Arial font
+(setq org-latex-pdf-process
+  '("xelatex -interaction nonstopmode %f"
+     "xelatex -interaction nonstopmode %f")) ;; for multiple passes
 
 
-    (require 'org-habit)
-    '(org-emphasis-alist
-     (quote
-      (
-       ("!" org-habit-overdue-face)
-       ("%" org-habit-alert-face)
-       ("*" bold)
-       ("/" italic)
-       ("_" underline)
-       ("=" org-verbatim verbatim)
-       ("~" org-code verbatim)
-       ("+" (:strike-through t))
-       )))
-  )
+  (setq org-emphasis-alist '(("*" bold)
+                         ("/" italic)
+                         ("_" underline)
+                         ("=" org-verbatim verbatim)
+                         ("~" org-code verbatim)))
+
+
+  (require 'org-habit)
+  '(org-emphasis-alist
+   (quote
+    (
+     ("!" org-habit-overdue-face)
+     ("%" org-habit-alert-face)
+     ("*" bold)
+     ("/" italic)
+     ("_" underline)
+     ("=" org-verbatim verbatim)
+     ("~" org-code verbatim)
+     ("+" (:strike-through t))
+     )))
+)
 #+END_SRC
 
 ** org-sidebar
@@ -1549,6 +1687,14 @@ Dragging-and-releasing with mouse buttons (as opposed to clicking and releasing 
 :after org
 :bind
 ("S-<f8>" . org-sidebar-tree-toggle)
+)
+#+END_SRC
+
+** org-dashboard
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package org-dashboard
+  :ensure t
 )
 #+END_SRC
 
@@ -2147,6 +2293,16 @@ Requires: Emacs >= 26
   (setq helm-buffer-max-length 40)
   (setq helm-split-window-inside-p t)
 
+  (setq helm-scroll-amount 4)                  ; scroll 4 lines other window using M-<next>/M-<prior>
+  (setq helm-quick-update t)                   ; do not display invisible candidates
+  (setq helm-idle-delay 0.01)                  ; be idle for this many seconds, before updating in delayed sources.
+  (setq helm-input-idle-delay 0.01)            ; be idle for this many seconds, before updating candidate buffer
+  (setq helm-show-completion-display-function #'helm-show-completion-default-display-function)
+  (setq helm-split-window-default-side 'below) ;; open helm buffer in another window
+  (setq helm-split-window-inside-p t)          ;; open helm buffer inside current window, not occupy whole other window
+  (setq helm-candidate-number-limit 200)       ; limit the number of displayed canidates
+  (setq helm-move-to-line-cycle-in-source nil) ; move to end or beginning of source when reaching top or bottom of source.
+
   ;; turn on helm fuzzy matching
   (setq helm-M-x-fuzzy-match t)
   (setq helm-mode-fuzzy-match t)
@@ -2374,10 +2530,10 @@ Requires: Emacs >= 26
   :ensure t
   :after flycheck
   :custom-face
-  ;;(flycheck-posframe-error-face (nil (:inherit 'error)))
-  ;;(flycheck-posframe-background-face (nil (:inherit 'error)))
-  ;;(flycheck-posframe-border-face nil (:inherit 'error)))
-  ;;(flycheck-posframe-border-width (nil (:inherit 'error)))
+  ;;(flycheck-posframe-error-face ((nil (:inherit 'error))))
+  ;;(flycheck-posframe-background-face ((nil (:inherit 'error))))
+  ;;(flycheck-posframe-border-face nil ((:inherit 'error))))
+  ;;(flycheck-posframe-border-width ((nil (:inherit 'error))))
   :hook
   (flycheck-mode . flycheck-posframe-mode)
   :config
@@ -2386,7 +2542,7 @@ Requires: Emacs >= 26
   (set-face-attribute 'flycheck-posframe-border-face nil :inherit 'error)
   ;;(set-face-attribute 'flycheck-posframe-border-width nil :inherit 'error)
   (setq flycheck-posframe-warning-prefix "\u26a0 ") ;; default: ➤
-  (setq flycheck-posframe-position 'window-bottom-left-corner)
+  (setq flycheck-posframe-position 'point-bottom-left-corner)
 
   ;; Calling (flycheck-posframe-configure-pretty-defaults) will configure flycheck-posframe to show warnings and errors with nicer faces (inheriting from warning and error respectively), and set the prefix for each to nicer unicode characters.
   (flycheck-posframe-configure-pretty-defaults)
@@ -2736,26 +2892,34 @@ Org source blocks and exporter for restclient
   '(company-tooltip-common ((t (:inherit font-lock-constant-face))))
   '(company-tooltip-selection ((t (:inherit company-tooltip-common :background "#2a2a2a" )))))
 
+ ;; Facing
+  (unless (face-attribute 'company-tooltip :background)
+    (set-face-attribute 'company-tooltip nil :background "black" :foreground "gray40")
+    (set-face-attribute 'company-tooltip-selection nil :inherit 'company-tooltip :background "gray15")
+    (set-face-attribute 'company-preview nil :background "black")
+    (set-face-attribute 'company-preview-common nil :inherit 'company-preview :foreground "gray40")
+    (set-face-attribute 'company-scrollbar-bg nil :inherit 'company-tooltip :background "gray20")
+    (set-face-attribute 'company-scrollbar-fg nil :background "gray40"))
+
   ;; Use Company for completion
-  (progn
-    (bind-key [remap completion-at-point] #'company-complete company-mode-map))
-  (setq company-tooltip-limit 20)                      ; bigger popup window
-  (setq company-minimum-prefix-length 1)               ; start completing after 1st char typed
-  (setq company-idle-delay 0)                         ; decrease delay before autocompletion popup shows
-  (setq company-echo-delay 0)                          ; remove annoying blinking
-  (setq company-begin-commands '(self-insert-command)) ; start autocompletion only after typing
-  ;; company-dabbrev
-  (setq company-dabbrev-downcase nil)                  ;; Do not downcase completions by default.
-  (setq company-dabbrev-ignore-case t)  ;; Even if I write something with the ‘wrong’ case, provide the ‘correct’ casing.
+  (bind-key [remap completion-at-point] #'company-complete company-mode-map)
+  (setq company-tooltip-limit 20)                           ; bigger popup window
+  (setq company-minimum-prefix-length 1)                    ; start completing after 1st char typed
+  (setq company-idle-delay 0)                               ; decrease delay before autocompletion popup shows
+  (setq company-echo-delay 0)                               ; remove annoying blinking
+  (setq company-begin-commands '(self-insert-command))      ; start autocompletion only after typing
+                                                            ;; company-dabbrev
+  (setq company-dabbrev-downcase nil)                       ;; Do not downcase completions by default.
+  (setq company-dabbrev-ignore-case t)                      ;; Even if I write something with the ‘wrong’ case, provide the ‘correct’ casing.
   (setq company-dabbrev-code-everywhere t)
   (setq company-dabbrev-other-buffers t)
   (setq company-dabbrev-code-other-buffers t)
-  (setq company-selection-wrap-around t)               ; continue from top when reaching bottom
+  (setq company-selection-wrap-around t)                    ; continue from top when reaching bottom
   (setq company-auto-complete 'company-explicit-action-p)
   (setq company-require-match nil)
   (setq company-tooltip-align-annotations t)
-  (setq company-complete-number t)                     ;; Allow (lengthy) numbers to be eligible for completion.
-  (setq company-show-numbers t)  ;; M-⟪num⟫ to select an option according to its number.
+  (setq company-complete-number t)                          ;; Allow (lengthy) numbers to be eligible for completion.
+  (setq company-show-numbers t)                             ;; M-⟪num⟫ to select an option according to its number.
   (setq company-transformers '(company-sort-by-occurrence)) ; weight by frequency
   ;; (setq company-tooltip-flip-when-above t)
   ;; DELETE THIS PART IF USE PACKAGE :MAP WORKS
@@ -2770,6 +2934,24 @@ Org source blocks and exporter for restclient
 )
 #+END_SRC
 
+** company-coq
+
+Proof General mode for emacs
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package proof-general
+  :ensure t
+  :config
+  (add-hook 'coq-mode-hook #'company-coq-mode)
+)
+#+END_SRC
+
+Collection of extensions for proof general
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package company-coq
+  :ensure t
+)
+#+END_SRC
 ** Company emoji suport
 
 : use `:` to use emojis
@@ -4636,6 +4818,43 @@ this was commented with C-c ; so it doenst get exported in favor of doom-modelin
 )
 #+END_SRC
 
+
+** origami
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package origami
+  :ensure quelpa
+  :quelpa (origami :repo "seblemaguer/origami.el" :fetcher github)
+  :custom
+  (origami-show-fold-header t)
+
+  :custom-face
+  (origami-fold-replacement-face ((t (:inherit magit-diff-context-highlight))))
+  (origami-fold-fringe-face ((t (:inherit magit-diff-context-highlight))))
+
+  :init
+  (defhydra origami-hydra (:color blue :hint none)
+    "
+      _:_: recursively toggle node       _a_: toggle all nodes    _t_: toggle node
+      _o_: show only current node        _u_: undo                _r_: redo
+      _R_: reset
+      "
+    (":" origami-recursively-toggle-node)
+    ("a" origami-toggle-all-nodes)
+    ("t" origami-toggle-node)
+    ("o" origami-show-only-node)
+    ("u" origami-undo)
+    ("r" origami-redo)
+    ("R" origami-reset))
+
+  :bind
+  (:map origami-mode-map
+  ("C->" . origami-hydra/body))
+  :config
+  (face-spec-reset-face 'origami-fold-header-face)
+)
+#+END_SRC
+
 ** auto balance windows area
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -4671,8 +4890,6 @@ Zoom in selected window and resize othersAuto balance windows and frames
   (sublimity-mode 1)
 )
  #+END_SRC
-
-
 
 *** sublimity-map (experimental)
 
@@ -5162,6 +5379,23 @@ and any sequence of X's or ?'s of length at least 3: XXX, XXXX, XXXXX, …, ???,
 )
 #+END_SRC
 
+** fic-me
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package fic-mode
+  :commands fic-mode
+  :ensure t
+  :init
+  (add-hook 'prog-mode-hook 'fic-mode)
+  :config
+
+  (defun fic-view-listing ()
+    "Use occur to list related FIXME keywords"
+    (interactive)
+    (occur "\\<\\(FIXME\\|WRITEME\\|WRITEME!\\|TODO\\|BUG\\):?"))
+)
+#+END_SRC
+
 ** hi-lock mode
 
 Highlight regexp
@@ -5600,6 +5834,109 @@ Make sure :ensure nil
 )
 #+END_SRC
 
+* PDF
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package pdf-tools
+  :ensure t
+  :after hydra
+  :config
+
+  ;; Install what need to be installed !
+  (pdf-tools-install t t t)
+  ;; open pdfs scaled to fit page
+  (setq-default pdf-view-display-size 'fit-page)
+  ;; automatically annotate highlights
+  (setq pdf-annot-activate-created-annotations t)
+  ;; use normal isearch
+  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+  ;; more fine-grained zooming
+  (setq pdf-view-resize-factor 1.1)
+
+  ;;
+  (add-hook 'pdf-view-mode-hook
+            (lambda ()
+              (pdf-misc-size-indication-minor-mode)
+              (pdf-links-minor-mode)
+              (pdf-isearch-minor-mode)
+              (cua-mode 0)
+              ))
+
+  (add-to-list 'auto-mode-alist (cons "\\.pdf$" 'pdf-view-mode))
+
+  ;; Keys
+  (bind-keys :map pdf-view-mode-map
+             ("/" . hydra-pdftools/body)
+             ("<s-spc>" .  pdf-view-scroll-down-or-next-page)
+             ("g"  . pdf-view-first-page)
+             ("G"  . pdf-view-last-page)
+             ("l"  . image-forward-hscroll)
+             ("h"  . image-backward-hscroll)
+             ("j"  . pdf-view-next-page)
+             ("k"  . pdf-view-previous-page)
+             ("e"  . pdf-view-goto-page)
+             ("u"  . pdf-view-revert-buffer)
+             ("al" . pdf-annot-list-annotations)
+             ("ad" . pdf-annot-delete)
+             ("aa" . pdf-annot-attachment-dired)
+             ("am" . pdf-annot-add-markup-annotation)
+             ("at" . pdf-annot-add-text-annotation)
+             ("y"  . pdf-view-kill-ring-save)
+             ("i"  . pdf-misc-display-metadata)
+             ("s"  . pdf-occur)
+             ("b"  . pdf-view-set-slice-from-bounding-box)
+             ("r"  . pdf-view-reset-slice))
+
+  (defhydra hydra-pdftools (:color blue :hint nil)
+    "
+      PDF tools
+
+   Move  History   Scale/Fit                  Annotations     Search/Link     Do
+------------------------------------------------------------------------------------------------
+     ^^_g_^^      _B_    ^↧^    _+_    ^ ^     _al_: list    _s_: search    _u_: revert buffer
+     ^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   _am_: markup  _o_: outline   _i_: info
+     ^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     _at_: text    _F_: link      _d_: dark mode
+     ^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   _ad_: delete  _f_: search link
+_h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
+     ^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   _y_:  yank
+     ^^_n_^^      ^ ^  _r_eset slice box
+     ^^^↓^^^
+     ^^_G_^^
+"
+          ("\\" hydra-master/body "back")
+          ("<ESC>" nil "quit")
+          ("al" pdf-annot-list-annotations)
+          ("ad" pdf-annot-delete)
+          ("aa" pdf-annot-attachment-dired)
+          ("am" pdf-annot-add-markup-annotation)
+          ("at" pdf-annot-add-text-annotation)
+          ("y"  pdf-view-kill-ring-save)
+          ("+" pdf-view-enlarge :color red)
+          ("-" pdf-view-shrink :color red)
+          ("0" pdf-view-scale-reset)
+          ("H" pdf-view-fit-height-to-window)
+          ("W" pdf-view-fit-width-to-window)
+          ("P" pdf-view-fit-page-to-window)
+          ("n" pdf-view-next-page-command :color red)
+          ("p" pdf-view-previous-page-command :color red)
+          ("d" pdf-view-dark-minor-mode)
+          ("b" pdf-view-set-slice-from-bounding-box)
+          ("r" pdf-view-reset-slice)
+          ("g" pdf-view-first-page)
+          ("G" pdf-view-last-page)
+          ("e" pdf-view-goto-page)
+          ("o" pdf-outline)
+          ("s" pdf-occur)
+          ("i" pdf-misc-display-metadata)
+          ("u" pdf-view-revert-buffer)
+          ("F" pdf-links-action-perfom)
+          ("f" pdf-links-isearch-link)
+          ("B" pdf-history-backward :color red)
+          ("N" pdf-history-forward :color red)
+          ("l" image-forward-hscroll :color red)
+          ("h" image-backward-hscroll :color red))
+)
+#+END_SRC
 
 * LaTeX
 
@@ -5655,6 +5992,42 @@ Make sure :ensure nil
         (setq TeX-source-correlate-start-server t)))
 )
 
+#+END_SRC
+** Bibtex
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package bibtex
+  :defer t
+  :config
+  (defun bibtex-generate-autokey ()
+    (let* ((bibtex-autokey-names nil)
+           (bibtex-autokey-year-length 2)
+           (bibtex-autokey-name-separator "\0")
+           (names (split-string (bibtex-autokey-get-names) "\0"))
+           (year (bibtex-autokey-get-year))
+           (name-char (cond ((= (length names) 1) 4)
+                            ((= (length names) 2) 2)
+                            (t 1)))
+           (existing-keys (bibtex-parse-keys))
+           key)
+      (setq names (mapconcat (lambda (x)
+                               (substring x 0 name-char))
+                             names
+                             ""))
+      (setq key (format "%s%s" names year))
+      (let ((ret key))
+        (loop for c from ?a to ?z
+              while (assoc ret existing-keys)
+              do (setq ret (format "%s%c" key c)))
+        ret)))
+
+  (setq bibtex-align-at-equal-sign t
+        bibtex-autokey-name-year-separator ""
+        bibtex-autokey-year-title-separator ""
+        bibtex-autokey-titleword-first-ignore '("the" "a" "if" "and" "an")
+        bibtex-autokey-titleword-length 100
+        bibtex-autokey-titlewords 1)
+)
 #+END_SRC
 
 ** Add the beamer presentation class template to org
@@ -5814,7 +6187,10 @@ Set HTML indentation to 4 spaces by default (only on html-mode)
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package emmet-mode
   :ensure t
-  :commands emmet-mode
+  :diminish (emmet-mode . "ε")
+  :commands (emmet-mode
+             emmet-next-edit-point
+             emmet-prev-edit-point)
   :init
     (setq emmet-indentation 2)
     (setq emmet-move-cursor-between-quotes t)
@@ -5980,6 +6356,69 @@ Unfortunatelly this package has to be installed manually, as its not available o
   ;; Use tidy to check HTML buffers with web-mode.
   (eval-after-load 'flycheck
      '(flycheck-add-mode 'html-tidy 'web-mode))
+
+  ;; Template
+  (setq web-mode-engines-alist
+        '(("php"    . "\\.phtml\\'")
+          ("blade"  . "\\.blade\\."))
+        )
+)
+#+END_SRC
+
+** web-beautify
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package web-beautify
+  :ensure t
+  :commands (web-beautify-css
+             web-beautify-css-buffer
+             web-beautify-html
+             web-beautify-html-buffer
+             web-beautify-js
+             web-beautify-js-buffer)
+)
+#+END_SRC
+
+
+** web-mode-edit-element
+
+**** General Keymaps
+| C-(           | web-mode-element-wrap                                 |
+| M-(           | web-mode-element-rename                               |
+| C-M-SPC       | web-mode-element-content-select                       |
+
+**** Elements Keymaps
+| C-<left>      | web-mode-element-previous                             |
+| C-<right>     | web-mode-element-next                                 |
+| M-<left>      | web-mode-edit-element-elements-contract-over-border   |
+| M-<right>     | web-mode-edit-element-elements-expand-over-border     |
+| C-M-<left>    | web-mode-edit-element-elements-transpose-backward     |
+| C-M-<right>   | web-mode-element-transpose                            |
+| C-<up>        | web-mode-element-beginning                            |
+| C-<down>      | web-mode-tag-match                                    |
+| C-S-<up>      | web-mode-element-parent                               |
+| C-S-<down>    | web-mode-element-next                                 |
+| M-<up>        | web-mode-edit-element-elements-dissolve               |
+| M-<down>      | web-mode-edit-element-elements-raise                  |
+| C-M-<up>      | web-mode-element-vanish                               |
+| C-M-<down>    | web-mode-edit-element-elements-sibling-next-or-parent |
+| C-k           | web-mode-element-kill                                 |
+| C-S-k         | web-mode-edit-element-elements-kill-siblings          |
+| M-k           | web-mode-edit-element-elements-kill-siblings-previous |
+| M-K           | web-mode-edit-element-elements-kill-siblings-next     |
+
+**** Attributes Keymaps
+| C-S-<left>    | web-mode-attribute-previous                           |
+| C-S-<right>   | web-mode-attribute-next                               |
+| C-M-S-<left>  | web-mode-edit-element-attributes-transpose-backward   |
+| C-M-S-<right> | web-mode-attribute-transpose                          |
+| C-M-S-<up>    | web-mode-attribute-beginning                          |
+| C-M-S-<down>  | web-mode-edit-element-attributes-end-inside           |
+| C-M-K         | web-mode-attribute-kill                               |
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package web-mode-edit-element
+  :ensure t
 )
 #+END_SRC
 
@@ -5994,6 +6433,7 @@ Unfortunatelly this package has to be installed manually, as its not available o
 
   :hook
   (js2-mode . flycheck-mode)
+  (js2-mode . rainbow-mode)
   (js2-mode . company-mode)
   (js2-mode . tide-mode)
   (js2-mode . add-node-modules-path)
@@ -6016,7 +6456,186 @@ Unfortunatelly this package has to be installed manually, as its not available o
 )
 #+END_SRC
 
-* PrettierJS
+** js2-refactor
+js2-refactor uses 2 char mnemonic for refactorings.
+So C-c C-r ef would be "extract-function", and so on
+
+Refactorings available:
+| ee | expand-node-at-point: Expand bracketed list according to node type at point (array, object, function, call args).                     |
+| cc | contract-node-at-point: Contract bracketed list according to node type at point (array, object, function, call args).                 |
+| ef | extract-function: Extracts the marked expressions out into a new named function.                                                      |
+| em | extract-method: Extracts the marked expressions out into a new named method in an object literal.                                     |
+| tf | toggle-function-expression-and-declaration: Toggle between function name() {} and var name = function ();                             |
+| ta | toggle-arrow-function-and-expression: Toggle between function expression to arrow function.                                           |
+| ts | toggle-function-async: Toggle between an async and a regular function.                                                                |
+| ip | introduce-parameter: Changes the marked expression to a parameter in a local function.                                                |
+| lp | localize-parameter: Changes a parameter to a local var in a local function.                                                           |
+| wi | wrap-buffer-in-iife: Wraps the entire buffer in an immediately invoked function expression                                            |
+| ig | inject-global-in-iife: Creates a shortcut for a marked global by injecting it in the wrapping immediately invoked function expression |
+| ag | add-to-globals-annotation: Creates a /*global */ annotation if it is missing, and adds the var at point to it.                        |
+| ev | extract-var: Takes a marked expression and replaces it with a var.                                                                    |
+| el | extract-let: Similar to extract-var but uses a let-statement.                                                                         |
+| ec | extract-const: Similar to extract-var but uses a const-statement.                                                                     |
+| iv | inline-var: Replaces all instances of a variable with its initial value.                                                              |
+| rv | rename-var: Renames the variable on point and all occurrences in its lexical scope.                                                   |
+| vt | var-to-this: Changes local var a to be this.a instead.                                                                                |
+| ao | arguments-to-object: Replaces arguments to a function call with an object literal of named arguments.                                 |
+| 3i | ternary-to-if: Converts ternary operator to if-statement.                                                                             |
+| sv | split-var-declaration: Splits a var with multiple vars declared, into several var statements.                                         |
+| ss | split-string: Splits a string.                                                                                                        |
+| st | string-to-template: Converts a string into a template string.                                                                         |
+| uw | unwrap: Replaces the parent statement with the selected region.                                                                       |
+| lt | log-this: Adds a console.log() statement for what is at point (or region). With a prefix argument, use JSON pretty-printing.          |
+| dt | debug-this: Adds a debug() statement for what is at point (or region).                                                                |
+| sl | forward-slurp: Moves the next statement into current function, if-statement, for-loop or while-loop.                                  |
+| ba | forward-barf: Moves the last child out of current function, if-statement, for-loop or while-loop.                                     |
+| k  | kill: Kills to the end of the line, but does not cross semantic boundaries.                                                           |
+
+There are also some minor conveniences bundled:
+
+| C-S-down and C-S-up | moves the current line up or down. If the line is an element in an object or array literal, it makes sure that the commas are still correctly placed. |
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package js2-refactor
+  :ensure t
+  :after js2-mode
+  :hook
+  (js2-mode . js2-refactor-mode)
+  :bind
+  (:map js2-mode-map
+        ("C-k" . js2r-kill)
+        ("C-c h r" . js2-refactor-hydra/body))
+  :config
+  (js2r-add-keybindings-with-prefix "C-c C-r")
+  (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
+
+  (defhydra js2-refactor-hydra (:color blue :hint nil)
+    "
+^Functions^                    ^Variables^               ^Buffer^                      ^sexp^               ^Debugging^
+------------------------------------------------------------------------------------------------------------------------------
+[_lp_] Localize Parameter      [_ev_] Extract variable   [_wi_] Wrap buffer in IIFE    [_k_]  js2 kill      [_lt_] log this
+[_ef_] Extract function        [_iv_] Inline variable    [_ig_] Inject global in IIFE  [_ss_] split string  [_dt_] debug this
+[_ip_] Introduce parameter     [_rv_] Rename variable    [_ee_] Expand node at point   [_sl_] forward slurp
+[_em_] Extract method          [_vt_] Var to this        [_cc_] Contract node at point [_ba_] forward barf
+[_ao_] Arguments to object     [_sv_] Split var decl.    [_uw_] unwrap
+[_tf_] Toggle fun exp and decl [_ag_] Add var to globals
+[_ta_] Toggle fun expr and =>  [_ti_] Ternary to if
+[_q_]  quit"
+    ("ee" js2r-expand-node-at-point)
+    ("cc" js2r-contract-node-at-point)
+    ("ef" js2r-extract-function)
+    ("em" js2r-extract-method)
+    ("tf" js2r-toggle-function-expression-and-declaration)
+    ("ta" js2r-toggle-arrow-function-and-expression)
+    ("ip" js2r-introduce-parameter)
+    ("lp" js2r-localize-parameter)
+    ("wi" js2r-wrap-buffer-in-iife)
+    ("ig" js2r-inject-global-in-iife)
+    ("ag" js2r-add-to-globals-annotation)
+    ("ev" js2r-extract-var)
+    ("iv" js2r-inline-var)
+    ("rv" js2r-rename-var)
+    ("vt" js2r-var-to-this)
+    ("ao" js2r-arguments-to-object)
+    ("ti" js2r-ternary-to-if)
+    ("sv" js2r-split-var-declaration)
+    ("ss" js2r-split-string)
+    ("uw" js2r-unwrap)
+    ("lt" js2r-log-this)
+    ("dt" js2r-debug-this)
+    ("sl" js2r-forward-slurp)
+    ("ba" js2r-forward-barf)
+    ("k" js2r-kill)
+    ("q" nil))
+)
+#+END_SRC
+
+** xref-js2
+
+Jump to references/definitions using ag & js2-mode's AST in Emacs
+
+xref-js2 adds navigation to definitions or references to JavaScript projects in Emacs.
+xref-js2 adds an xref backend for JavaScript files.
+
+Instead of using a tag system, it relies on ag to query the codebase of a project. This might sound crazy at first, but it turns out that ag is so fast that jumping using xref-js2 is most of the time instantaneous, even on fairly large JavaScript codebases (it has been tested on 50k lines of JS code).
+
+Because line by line regexp search has its limitations, xref-js2 does a second pass on result candidates and eliminates possible false positives using js2-mode's AST, thus giving very accurate results.
+
+xref-js2 uses ag to perform searches, so you’ll need to install it as well.
+
+Keybindings
+
+| M-. | Jump  to definition                         |
+| M-? | Jump to references                          |
+| M-, | Pop back  to where  M-.  was  last  invoked |
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package xref-js2
+  :ensure t
+  :config
+  ;;(setq xref-js2-search-program 'rg)
+
+  ;; js-mode (which js2 is based on) binds "M-." which conflicts with xref, so
+  ;; unbind it.
+  (define-key js-mode-map (kbd "M-.") nil)
+
+  (add-hook 'js2-mode-hook (lambda ()
+    (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
+)
+#+END_SRC
+** Indium
+
+A JavaScript development environment for Emacs.
+
+Indium connects to a browser tab or nodejs process and provides many features for JavaScript development, including:
+
++ a REPL (with auto completion) & object inspection;
++ an inspector, with history and navigation;
++ a scratch buffer (M-x indium-scratch);
++ JavaScript evaluation in JS buffers with indium-interaction-mode;
++ a stepping Debugger, similar to edebug, or cider.
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package indium
+  :ensure t
+  :ensure-system-package
+  (indium . "npm i -g indium")
+  :after js2-mode
+  :bind (:map js2-mode-map
+              ("C-c C-l" . indium-eval-buffer))
+  :hook
+  ((js2-mode typescript-mode) . indium-interaction-mode)
+)
+#+END_SRC
+
+** add-json-modules-path
+
+Adds the node_modules/.bin directory to the buffer exec_path. E.g. support project local eslint installations.
+https://github.com/codesuki/add-node-modules-path/tree/master
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package add-node-modules-path
+  :hook ((js2-mode . add-node-modules-path)
+         (rjsx-mode . add-node-modules-path)))
+#+END_SRC
+
+** json-snatcher
+
+json-snatcher: get the path of any JSON element easily
+https://github.com/Sterlingg/json-snatcher
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package json-snatcher
+  :hook ((json-mode . js-mode-bindings))
+  :config
+  (defun js-mode-bindings ()
+    "Sets a hotkey for using the json-snatcher plugin"
+    (when (string-match  "\\.json$" (buffer-name))
+      (local-set-key (kbd "C-c C-g") 'jsons-print-path)))
+)
+#+END_SRC
+
+** PrettierJS
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 ;; prettier-emacs: minor-mode to prettify javascript files on save
@@ -6074,32 +6693,12 @@ Unfortunatelly this package has to be installed manually, as its not available o
 )
 #+END_SRC
 
-* format-all
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
-  (use-package format-all
-  :ensure t
-  :bind ("C-c C-f" . format-all-buffer)
-  )
-#+END_SRC
+** ESLint
 
-* JSON Mode
+*** eslintd-fix
 
-    #+BEGIN_SRC emacs-lisp :tangle init.el
-;; json-mode: Major mode for editing JSON files with emacs
-;; https://github.com/joshwnj/json-mode
-(use-package json-mode
-  :mode "\\.js\\(?:on\\|[hl]int\\(rc\\)?\\)\\'"
-  :config
-  (add-hook 'json-mode-hook #'prettier-js-mode)
-  (setq json-reformat:indent-width 2)
-  (setq json-reformat:pretty-string? t)
-  (setq js-indent-level 2))
-    #+END_SRC
-
-* ESLint
-
-eslintd-fix: Emacs minor-mode to automatically fix javascript with eslint_d.
+Emacs minor-mode to automatically fix javascript with eslint_d.
 https://github.com/aaronjensen/eslintd-fix/tree/master
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -6108,6 +6707,9 @@ https://github.com/aaronjensen/eslintd-fix/tree/master
   :ensure-system-package
   (eslint . "npm i -g eslint")
   :config
+  ;;(setq eslintd-fix-executable "/my/path/eslint_d")
+  ;;
+
   ;; Grab eslint executable from node_modules instead of global
   ;; Taken from https://github.com/flycheck/flycheck/issues/1087#issuecomment-246514860
   ;; Gist: https://github.com/lunaryorn/.emacs.d/blob/master/lisp/lunaryorn-flycheck.el#L62
@@ -6131,28 +6733,23 @@ https://github.com/aaronjensen/eslintd-fix/tree/master
 )
 #+END_SRC
 
-* RJSX Mode
-
-https://github.com/felipeochoa/rjsx-mode
+** npm-mode
+https://github.com/mojochao/npm-mode
+| <l>                           |  <c>   | <l>                                 |
+| Command                       | Keymap | Description                         |
+| npm-mode-npm-init             |   n    | initialize new project              |
+| npm-mode-npm-install          |   i    | Install all project dependencies    |
+| npm-mode-npm-install-save     |   s    | Add new project dependency          |
+| npm-mode-npm-install-save-dev |   d    | Add new project dev dependency      |
+| npm-mode-npm-uninstall        |   u    | Remove project dependency           |
+| npm-mode-npm-list             |   l    | List installed project dependencies |
+| npm-mode-npm-run              |   r    | Run project script                  |
+| npm-mode-visit-project-file   |   v    | Visit project package.json file     |
+|                               |   ?    | Display keymap commands             |
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package rjsx-mode
-    :after js2-mode
-    :mode
-    ("\\.jsx$" . rjsx-mode)
-    ("components/.+\\.js$" . rjsx-mode)
-
-    :config
-    ;; auto register for JS files that are inside a `components' folder
-    (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
-
-    ;; for better jsx syntax-highlighting in web-mode
-    ;; - courtesy of Patrick @halbtuerke
-    (defadvice web-mode-highlight-part (around tweak-jsx activate)
-      (if (equal web-mode-content-type "jsx")
-        (let ((web-mode-enable-part-face nil))
-          ad-do-it)
-        ad-do-it))
+(use-package npm-mode
+  :ensure t
 )
 #+END_SRC
 
@@ -6194,6 +6791,27 @@ https://github.com/felipeochoa/rjsx-mode
 
 #+END_SRC
 
+** tslint for flycheck
+This package is now part of flycheck
+This is just for its configuration
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package flycheck-typescript-tslint
+  :ensure nil
+  :ensure-system-package
+  ((tslint . "npm i -g tslint")
+   (typescript . "npm i -g typescript"))
+  :config
+  (eval-after-load 'flycheck
+  '(add-hook 'flycheck-mode-hook #'flycheck-typescript-tslint-setup))
+  ;; location of config file
+  (custom-set-variables
+     '(flycheck-typescript-tslint-config "~/tslint.json"))
+  ;; custom location of executable (if not available globally)
+   (custom-set-variables
+     '(flycheck-typescript-tslint-executable "~/my_executables/tslint"))
+)
+#+END_SRC
 * Angular
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package ng2-mode
@@ -6203,6 +6821,54 @@ https://github.com/felipeochoa/rjsx-mode
   :hook
   (ng2-mode . rainbow-mode)
   (ng2-mode . prettier-js-mode)
+)
+#+END_SRC
+
+* format-all
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (use-package format-all
+  :ensure t
+  :bind ("C-c C-f" . format-all-buffer)
+  )
+#+END_SRC
+
+* JSON Mode
+
+    #+BEGIN_SRC emacs-lisp :tangle init.el
+;; json-mode: Major mode for editing JSON files with emacs
+;; https://github.com/joshwnj/json-mode
+(use-package json-mode
+  :mode "\\.js\\(?:on\\|[hl]int\\(rc\\)?\\)\\'"
+  :config
+  (add-hook 'json-mode-hook #'prettier-js-mode)
+  (setq json-reformat:indent-width 2)
+  (setq json-reformat:pretty-string? t)
+  (setq js-indent-level 2))
+    #+END_SRC
+
+* RJSX Mode
+
+https://github.com/felipeochoa/rjsx-mode
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package rjsx-mode
+    :after js2-mode
+    :mode
+    ("\\.jsx$" . rjsx-mode)
+    ("components/.+\\.js$" . rjsx-mode)
+
+    :config
+    ;; auto register for JS files that are inside a `components' folder
+    (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
+
+    ;; for better jsx syntax-highlighting in web-mode
+    ;; - courtesy of Patrick @halbtuerke
+    (defadvice web-mode-highlight-part (around tweak-jsx activate)
+      (if (equal web-mode-content-type "jsx")
+        (let ((web-mode-enable-part-face nil))
+          ad-do-it)
+        ad-do-it))
 )
 #+END_SRC
 

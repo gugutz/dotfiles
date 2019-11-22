@@ -1,0 +1,15 @@
+# ~/.eslintrc
+parser: babel-eslint
+extends:
+  - 'eslint:recommended'
+  - 'angular'
+env:
+  browser: true
+  es6: true
+  node: true
+globals:
+  angular: true
+  browser: true
+  element: true
+settings:
+  angular: 1

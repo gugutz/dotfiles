@@ -118,6 +118,24 @@ tangled, and the tangled file is compiled."
   :ensure t
 )
 
+(use-package paradox
+  :ensure t
+  :defer t
+  :config
+  (setq paradox-spinner-type 'progress-bar
+        paradox-execute-asynchronously t)
+)
+
+(use-package quelpa
+  :ensure t
+)
+
+(use-package quelpa-use-package
+  :ensure t
+  :init
+  (setq quelpa-update-melpa-p nil)
+)
+
 (use-package epa-file
   :config
   (epa-file-enable)
@@ -449,6 +467,12 @@ Example output:
 ;; align code in a pretty way
 (global-set-key (kbd "C-x \\") #'align-regexp)
 
+(defun align-to-equals (begin end)
+  "Align region to equal signs"
+   (interactive "r")
+   (align-regexp begin end "\\(\\s-*\\)=" 1 1 )
+)
+
 (use-package dumb-jump
   :ensure t
   :after helm
@@ -481,6 +505,58 @@ Example output:
   (interactive "p")
   (capitalize-word (- arg))
 )
+
+(defun camelcase-region (start end)
+  "Changes region from snake_case to camelCase"
+  (interactive "r")
+  (save-restriction (narrow-to-region start end)
+                    (goto-char (point-min))
+                    (while (re-search-forward "_\\(.\\)" nil t)
+                      (replace-match (upcase (match-string 1))))))
+
+;; ----------------------------------------------------------------------
+;; cadged largely from http://xahlee.org/emacs/elisp_idioms.html:
+;;
+(defun camelcase ()
+  "Changes word or region from snake_case to camelCase"
+  (interactive)
+  (let (pos1 pos2 bds)
+    (if (and transient-mark-mode mark-active)
+        (setq pos1 (region-beginning) pos2 (region-end))
+      (progn
+        (setq bds (bounds-of-thing-at-point 'symbol))
+        (setq pos1 (car bds) pos2 (cdr bds))))
+    (camelcase-region pos1 pos2)))
+
+;; ----------------------------------------------------------------------
+;; snakecase-region
+;; Given a region of text in camelCase format, changes it to snake_case.
+;;
+;; BUG: This is actually just a repeat of camelcase-region!
+(defun snakecase-region (start end)
+  "Changes region from camelCase to snake_case"
+  (interactive "r")
+  (save-restriction
+    (let ((case-fold-search nil))
+      (narrow-to-region start end)
+      (goto-char (point-min))
+      (while (re-search-forward "\\([a-z]\\)\\([A-Z]\\)" nil t)
+        (message (match-string 1))
+        (replace-match (concat (match-string 1) "_" (downcase (match-string 2))))
+        (goto-char (point-min))))))
+
+;; ----------------------------------------------------------------------
+;; Given a region of text in camelCase format, changes it to snake_case.
+(defun snakecase ()
+  "Changes word or region from camelCase to snake_case"
+  (interactive)
+  (let (pos1 pos2 bds)
+    (if (and transient-mark-mode mark-active)
+        (setq pos1 (region-beginning) pos2 (region-end))
+      (progn
+        (setq bds (bounds-of-thing-at-point 'symbol))
+        (setq pos1 (car bds) pos2 (cdr bds))))
+    (snakecase-region pos1 pos2)))
 
 (global-set-key (kbd "C-M-u")	 'upcase-backward-word)
 (global-set-key (kbd "C-M-l")	 'downcase-backward-WORD)
@@ -818,11 +894,43 @@ Example output:
     ;;"e" 'find-file  ;; removed in favor of counsel-find-file
     "q" 'evil-quit
     "w" 'save-buffer
+    "w"  'kill-this-buffer
     "d" 'delete-frame
     "k" 'kill-buffer
     "b" 'switch-to-buffer
     "-" 'split-window-bellow
-    "|" 'split-window-right)
+    "|" 'split-window-right
+    "." 'find-tag
+    "t" 'projectile-find-file
+    "b" 'ido-switch-buffer
+    "cc" 'evilnc-comment-or-uncomment-lines
+    "ag" 'projectile-ag
+    "," 'switch-to-previous-buffer
+    ; "gg" 'git-gutter+:toggle
+    ; "gd" 'git-gutter+:popup-diff
+    ; "gp" 'git-gutter+:previous-hunk
+    ; "gn" 'git-gutter+:next-hunk
+    ; "gr" 'git-gutter+:revert-hunk
+    "gb" 'mo-git-blame-current
+    "gL" 'magit-log
+    "gs" 'magit-status
+    "q"  'kill-buffer-and-window
+    "u"  'undo-tree-visualize
+    "nn" 'neotree-toggle
+    "nm" 'next-match
+    "nf" 'neotree-find
+    "gk" 'windmove-up
+    "gj" 'windmove-down
+    "gl" 'windmove-right
+    "gh" 'windmove-left
+    "vs" 'split-window-right
+    "hs" 'split-window-below
+    "s"  'ispell-word
+    "ht" 'alchemist-help-search-at-point
+    "gt" 'alchemist-goto-definition-at-point
+    "mf" 'elixir-format
+    "ll" 'longlines-mode
+    "x" 'smex)
 )
 
 (use-package evil-surround
@@ -943,10 +1051,10 @@ Example output:
 (use-package org
   :ensure org-plus-contrib
   :defer t
-:hook
-(org-mode . diff-hl-mode)
-(org-mode . rainbow-mode)
-(org-mode . visual-line-mode)
+  :hook
+  (org-mode . diff-hl-mode)
+  (org-mode . rainbow-mode)
+  (org-mode . visual-line-mode)
   :bind
   ("C-c l" . org-store-link)
   ("C-c a" . org-agenda)
@@ -984,6 +1092,10 @@ Example output:
 
   ;;ox-twbs (exporter to twitter bootstrap html)
   (setq org-enable-bootstrap-support t)
+
+  ;; make ispell ignore source blocks
+  (add-to-list 'ispell-skip-region-alist '("^#+begin_src" . "^#+end_src"))
+
   :config
   ;; make windmove work with org mode
   (add-hook 'org-shiftup-final-hook 'windmove-up)
@@ -1041,6 +1153,10 @@ Example output:
 :after org
 :bind
 ("S-<f8>" . org-sidebar-tree-toggle)
+)
+
+(use-package org-dashboard
+  :ensure t
 )
 
 (use-package ox-extra
@@ -1507,6 +1623,16 @@ Example output:
   (setq helm-buffer-max-length 40)
   (setq helm-split-window-inside-p t)
 
+  (setq helm-scroll-amount 4)                  ; scroll 4 lines other window using M-<next>/M-<prior>
+  (setq helm-quick-update t)                   ; do not display invisible candidates
+  (setq helm-idle-delay 0.01)                  ; be idle for this many seconds, before updating in delayed sources.
+  (setq helm-input-idle-delay 0.01)            ; be idle for this many seconds, before updating candidate buffer
+  (setq helm-show-completion-display-function #'helm-show-completion-default-display-function)
+  (setq helm-split-window-default-side 'below) ;; open helm buffer in another window
+  (setq helm-split-window-inside-p t)          ;; open helm buffer inside current window, not occupy whole other window
+  (setq helm-candidate-number-limit 200)       ; limit the number of displayed canidates
+  (setq helm-move-to-line-cycle-in-source nil) ; move to end or beginning of source when reaching top or bottom of source.
+
   ;; turn on helm fuzzy matching
   (setq helm-M-x-fuzzy-match t)
   (setq helm-mode-fuzzy-match t)
@@ -1674,10 +1800,10 @@ Example output:
   :ensure t
   :after flycheck
   :custom-face
-  ;;(flycheck-posframe-error-face (nil (:inherit 'error)))
-  ;;(flycheck-posframe-background-face (nil (:inherit 'error)))
-  ;;(flycheck-posframe-border-face nil (:inherit 'error)))
-  ;;(flycheck-posframe-border-width (nil (:inherit 'error)))
+  ;;(flycheck-posframe-error-face ((nil (:inherit 'error))))
+  ;;(flycheck-posframe-background-face ((nil (:inherit 'error))))
+  ;;(flycheck-posframe-border-face nil ((:inherit 'error))))
+  ;;(flycheck-posframe-border-width ((nil (:inherit 'error))))
   :hook
   (flycheck-mode . flycheck-posframe-mode)
   :config
@@ -1686,7 +1812,7 @@ Example output:
   (set-face-attribute 'flycheck-posframe-border-face nil :inherit 'error)
   ;;(set-face-attribute 'flycheck-posframe-border-width nil :inherit 'error)
   (setq flycheck-posframe-warning-prefix "\u26a0 ") ;; default: ➤
-  (setq flycheck-posframe-position 'window-bottom-left-corner)
+  (setq flycheck-posframe-position 'point-bottom-left-corner)
 
   ;; Calling (flycheck-posframe-configure-pretty-defaults) will configure flycheck-posframe to show warnings and errors with nicer faces (inheriting from warning and error respectively), and set the prefix for each to nicer unicode characters.
   (flycheck-posframe-configure-pretty-defaults)
@@ -1943,26 +2069,34 @@ Example output:
   '(company-tooltip-common ((t (:inherit font-lock-constant-face))))
   '(company-tooltip-selection ((t (:inherit company-tooltip-common :background "#2a2a2a" )))))
 
+ ;; Facing
+  (unless (face-attribute 'company-tooltip :background)
+    (set-face-attribute 'company-tooltip nil :background "black" :foreground "gray40")
+    (set-face-attribute 'company-tooltip-selection nil :inherit 'company-tooltip :background "gray15")
+    (set-face-attribute 'company-preview nil :background "black")
+    (set-face-attribute 'company-preview-common nil :inherit 'company-preview :foreground "gray40")
+    (set-face-attribute 'company-scrollbar-bg nil :inherit 'company-tooltip :background "gray20")
+    (set-face-attribute 'company-scrollbar-fg nil :background "gray40"))
+
   ;; Use Company for completion
-  (progn
-    (bind-key [remap completion-at-point] #'company-complete company-mode-map))
-  (setq company-tooltip-limit 20)                      ; bigger popup window
-  (setq company-minimum-prefix-length 1)               ; start completing after 1st char typed
-  (setq company-idle-delay 0)                         ; decrease delay before autocompletion popup shows
-  (setq company-echo-delay 0)                          ; remove annoying blinking
-  (setq company-begin-commands '(self-insert-command)) ; start autocompletion only after typing
-  ;; company-dabbrev
-  (setq company-dabbrev-downcase nil)                  ;; Do not downcase completions by default.
-  (setq company-dabbrev-ignore-case t)  ;; Even if I write something with the ‘wrong’ case, provide the ‘correct’ casing.
+  (bind-key [remap completion-at-point] #'company-complete company-mode-map)
+  (setq company-tooltip-limit 20)                           ; bigger popup window
+  (setq company-minimum-prefix-length 1)                    ; start completing after 1st char typed
+  (setq company-idle-delay 0)                               ; decrease delay before autocompletion popup shows
+  (setq company-echo-delay 0)                               ; remove annoying blinking
+  (setq company-begin-commands '(self-insert-command))      ; start autocompletion only after typing
+                                                            ;; company-dabbrev
+  (setq company-dabbrev-downcase nil)                       ;; Do not downcase completions by default.
+  (setq company-dabbrev-ignore-case t)                      ;; Even if I write something with the ‘wrong’ case, provide the ‘correct’ casing.
   (setq company-dabbrev-code-everywhere t)
   (setq company-dabbrev-other-buffers t)
   (setq company-dabbrev-code-other-buffers t)
-  (setq company-selection-wrap-around t)               ; continue from top when reaching bottom
+  (setq company-selection-wrap-around t)                    ; continue from top when reaching bottom
   (setq company-auto-complete 'company-explicit-action-p)
   (setq company-require-match nil)
   (setq company-tooltip-align-annotations t)
-  (setq company-complete-number t)                     ;; Allow (lengthy) numbers to be eligible for completion.
-  (setq company-show-numbers t)  ;; M-⟪num⟫ to select an option according to its number.
+  (setq company-complete-number t)                          ;; Allow (lengthy) numbers to be eligible for completion.
+  (setq company-show-numbers t)                             ;; M-⟪num⟫ to select an option according to its number.
   (setq company-transformers '(company-sort-by-occurrence)) ; weight by frequency
   ;; (setq company-tooltip-flip-when-above t)
   ;; DELETE THIS PART IF USE PACKAGE :MAP WORKS
@@ -1974,6 +2108,16 @@ Example output:
   ;; (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
   ;; (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
   ;; (define-key company-active-map (kbd "<backtab>") 'company-select-previous)
+)
+
+(use-package proof-general
+  :ensure t
+  :config
+  (add-hook 'coq-mode-hook #'company-coq-mode)
+)
+
+(use-package company-coq
+  :ensure t
 )
 
 (use-package company-emoji
@@ -3347,6 +3491,38 @@ Example output:
   )
 )
 
+(use-package origami
+  :ensure quelpa
+  :quelpa (origami :repo "seblemaguer/origami.el" :fetcher github)
+  :custom
+  (origami-show-fold-header t)
+
+  :custom-face
+  (origami-fold-replacement-face ((t (:inherit magit-diff-context-highlight))))
+  (origami-fold-fringe-face ((t (:inherit magit-diff-context-highlight))))
+
+  :init
+  (defhydra origami-hydra (:color blue :hint none)
+    "
+      _:_: recursively toggle node       _a_: toggle all nodes    _t_: toggle node
+      _o_: show only current node        _u_: undo                _r_: redo
+      _R_: reset
+      "
+    (":" origami-recursively-toggle-node)
+    ("a" origami-toggle-all-nodes)
+    ("t" origami-toggle-node)
+    ("o" origami-show-only-node)
+    ("u" origami-undo)
+    ("r" origami-redo)
+    ("R" origami-reset))
+
+  :bind
+  (:map origami-mode-map
+  ("C->" . origami-hydra/body))
+  :config
+  (face-spec-reset-face 'origami-fold-header-face)
+)
+
 (global-set-key (kbd "C-M-+") 'balance-windows-area)
 
 (use-package zoom
@@ -3764,6 +3940,19 @@ Example output:
   (add-to-list 'hl-todo-keyword-faces '("DONE" . "#00ff00"))
 )
 
+(use-package fic-mode
+  :commands fic-mode
+  :ensure t
+  :init
+  (add-hook 'prog-mode-hook 'fic-mode)
+  :config
+
+  (defun fic-view-listing ()
+    "Use occur to list related FIXME keywords"
+    (interactive)
+    (occur "\\<\\(FIXME\\|WRITEME\\|WRITEME!\\|TODO\\|BUG\\):?"))
+)
+
 (use-package hi-lock
   :init
   (global-hi-lock-mode 1)
@@ -4054,6 +4243,106 @@ Example output:
   ("M-<f5>" . quickrun-shell)
 )
 
+(use-package pdf-tools
+  :ensure t
+  :after hydra
+  :config
+
+  ;; Install what need to be installed !
+  (pdf-tools-install t t t)
+  ;; open pdfs scaled to fit page
+  (setq-default pdf-view-display-size 'fit-page)
+  ;; automatically annotate highlights
+  (setq pdf-annot-activate-created-annotations t)
+  ;; use normal isearch
+  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+  ;; more fine-grained zooming
+  (setq pdf-view-resize-factor 1.1)
+
+  ;;
+  (add-hook 'pdf-view-mode-hook
+            (lambda ()
+              (pdf-misc-size-indication-minor-mode)
+              (pdf-links-minor-mode)
+              (pdf-isearch-minor-mode)
+              (cua-mode 0)
+              ))
+
+  (add-to-list 'auto-mode-alist (cons "\\.pdf$" 'pdf-view-mode))
+
+  ;; Keys
+  (bind-keys :map pdf-view-mode-map
+             ("/" . hydra-pdftools/body)
+             ("<s-spc>" .  pdf-view-scroll-down-or-next-page)
+             ("g"  . pdf-view-first-page)
+             ("G"  . pdf-view-last-page)
+             ("l"  . image-forward-hscroll)
+             ("h"  . image-backward-hscroll)
+             ("j"  . pdf-view-next-page)
+             ("k"  . pdf-view-previous-page)
+             ("e"  . pdf-view-goto-page)
+             ("u"  . pdf-view-revert-buffer)
+             ("al" . pdf-annot-list-annotations)
+             ("ad" . pdf-annot-delete)
+             ("aa" . pdf-annot-attachment-dired)
+             ("am" . pdf-annot-add-markup-annotation)
+             ("at" . pdf-annot-add-text-annotation)
+             ("y"  . pdf-view-kill-ring-save)
+             ("i"  . pdf-misc-display-metadata)
+             ("s"  . pdf-occur)
+             ("b"  . pdf-view-set-slice-from-bounding-box)
+             ("r"  . pdf-view-reset-slice))
+
+  (defhydra hydra-pdftools (:color blue :hint nil)
+    "
+      PDF tools
+
+   Move  History   Scale/Fit                  Annotations     Search/Link     Do
+------------------------------------------------------------------------------------------------
+     ^^_g_^^      _B_    ^↧^    _+_    ^ ^     _al_: list    _s_: search    _u_: revert buffer
+     ^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   _am_: markup  _o_: outline   _i_: info
+     ^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     _at_: text    _F_: link      _d_: dark mode
+     ^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   _ad_: delete  _f_: search link
+_h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
+     ^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   _y_:  yank
+     ^^_n_^^      ^ ^  _r_eset slice box
+     ^^^↓^^^
+     ^^_G_^^
+"
+          ("\\" hydra-master/body "back")
+          ("<ESC>" nil "quit")
+          ("al" pdf-annot-list-annotations)
+          ("ad" pdf-annot-delete)
+          ("aa" pdf-annot-attachment-dired)
+          ("am" pdf-annot-add-markup-annotation)
+          ("at" pdf-annot-add-text-annotation)
+          ("y"  pdf-view-kill-ring-save)
+          ("+" pdf-view-enlarge :color red)
+          ("-" pdf-view-shrink :color red)
+          ("0" pdf-view-scale-reset)
+          ("H" pdf-view-fit-height-to-window)
+          ("W" pdf-view-fit-width-to-window)
+          ("P" pdf-view-fit-page-to-window)
+          ("n" pdf-view-next-page-command :color red)
+          ("p" pdf-view-previous-page-command :color red)
+          ("d" pdf-view-dark-minor-mode)
+          ("b" pdf-view-set-slice-from-bounding-box)
+          ("r" pdf-view-reset-slice)
+          ("g" pdf-view-first-page)
+          ("G" pdf-view-last-page)
+          ("e" pdf-view-goto-page)
+          ("o" pdf-outline)
+          ("s" pdf-occur)
+          ("i" pdf-misc-display-metadata)
+          ("u" pdf-view-revert-buffer)
+          ("F" pdf-links-action-perfom)
+          ("f" pdf-links-isearch-link)
+          ("B" pdf-history-backward :color red)
+          ("N" pdf-history-forward :color red)
+          ("l" image-forward-hscroll :color red)
+          ("h" image-backward-hscroll :color red))
+)
+
 (use-package auctex-latexmk
     :defer t
     :init
@@ -4098,6 +4387,39 @@ Example output:
         (setq TeX-PDF-mode t)
         (setq TeX-source-correlate-method 'synctex)
         (setq TeX-source-correlate-start-server t)))
+)
+
+(use-package bibtex
+  :defer t
+  :config
+  (defun bibtex-generate-autokey ()
+    (let* ((bibtex-autokey-names nil)
+           (bibtex-autokey-year-length 2)
+           (bibtex-autokey-name-separator "\0")
+           (names (split-string (bibtex-autokey-get-names) "\0"))
+           (year (bibtex-autokey-get-year))
+           (name-char (cond ((= (length names) 1) 4)
+                            ((= (length names) 2) 2)
+                            (t 1)))
+           (existing-keys (bibtex-parse-keys))
+           key)
+      (setq names (mapconcat (lambda (x)
+                               (substring x 0 name-char))
+                             names
+                             ""))
+      (setq key (format "%s%s" names year))
+      (let ((ret key))
+        (loop for c from ?a to ?z
+              while (assoc ret existing-keys)
+              do (setq ret (format "%s%c" key c)))
+        ret)))
+
+  (setq bibtex-align-at-equal-sign t
+        bibtex-autokey-name-year-separator ""
+        bibtex-autokey-year-title-separator ""
+        bibtex-autokey-titleword-first-ignore '("the" "a" "if" "and" "an")
+        bibtex-autokey-titleword-length 100
+        bibtex-autokey-titlewords 1)
 )
 
 (add-to-list 'org-latex-classes
@@ -4197,7 +4519,10 @@ Example output:
 
 (use-package emmet-mode
   :ensure t
-  :commands emmet-mode
+  :diminish (emmet-mode . "ε")
+  :commands (emmet-mode
+             emmet-next-edit-point
+             emmet-prev-edit-point)
   :init
     (setq emmet-indentation 2)
     (setq emmet-move-cursor-between-quotes t)
@@ -4313,6 +4638,26 @@ Example output:
   ;; Use tidy to check HTML buffers with web-mode.
   (eval-after-load 'flycheck
      '(flycheck-add-mode 'html-tidy 'web-mode))
+
+  ;; Template
+  (setq web-mode-engines-alist
+        '(("php"    . "\\.phtml\\'")
+          ("blade"  . "\\.blade\\."))
+        )
+)
+
+(use-package web-beautify
+  :ensure t
+  :commands (web-beautify-css
+             web-beautify-css-buffer
+             web-beautify-html
+             web-beautify-html-buffer
+             web-beautify-js
+             web-beautify-js-buffer)
+)
+
+(use-package web-mode-edit-element
+  :ensure t
 )
 
 ;; js2-mode: enhanced JavaScript editing mode
@@ -4323,6 +4668,7 @@ Example output:
 
   :hook
   (js2-mode . flycheck-mode)
+  (js2-mode . rainbow-mode)
   (js2-mode . company-mode)
   (js2-mode . tide-mode)
   (js2-mode . add-node-modules-path)
@@ -4342,6 +4688,96 @@ Example output:
   (setq js2-mode-show-parse-errors t)
   (setq js2-mode-show-strict-warnings nil)
   (setq js2-strict-missing-semi-warning nil)
+)
+
+(use-package js2-refactor
+  :ensure t
+  :after js2-mode
+  :hook
+  (js2-mode . js2-refactor-mode)
+  :bind
+  (:map js2-mode-map
+        ("C-k" . js2r-kill)
+        ("C-c h r" . js2-refactor-hydra/body))
+  :config
+  (js2r-add-keybindings-with-prefix "C-c C-r")
+  (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
+
+  (defhydra js2-refactor-hydra (:color blue :hint nil)
+    "
+^Functions^                    ^Variables^               ^Buffer^                      ^sexp^               ^Debugging^
+------------------------------------------------------------------------------------------------------------------------------
+[_lp_] Localize Parameter      [_ev_] Extract variable   [_wi_] Wrap buffer in IIFE    [_k_]  js2 kill      [_lt_] log this
+[_ef_] Extract function        [_iv_] Inline variable    [_ig_] Inject global in IIFE  [_ss_] split string  [_dt_] debug this
+[_ip_] Introduce parameter     [_rv_] Rename variable    [_ee_] Expand node at point   [_sl_] forward slurp
+[_em_] Extract method          [_vt_] Var to this        [_cc_] Contract node at point [_ba_] forward barf
+[_ao_] Arguments to object     [_sv_] Split var decl.    [_uw_] unwrap
+[_tf_] Toggle fun exp and decl [_ag_] Add var to globals
+[_ta_] Toggle fun expr and =>  [_ti_] Ternary to if
+[_q_]  quit"
+    ("ee" js2r-expand-node-at-point)
+    ("cc" js2r-contract-node-at-point)
+    ("ef" js2r-extract-function)
+    ("em" js2r-extract-method)
+    ("tf" js2r-toggle-function-expression-and-declaration)
+    ("ta" js2r-toggle-arrow-function-and-expression)
+    ("ip" js2r-introduce-parameter)
+    ("lp" js2r-localize-parameter)
+    ("wi" js2r-wrap-buffer-in-iife)
+    ("ig" js2r-inject-global-in-iife)
+    ("ag" js2r-add-to-globals-annotation)
+    ("ev" js2r-extract-var)
+    ("iv" js2r-inline-var)
+    ("rv" js2r-rename-var)
+    ("vt" js2r-var-to-this)
+    ("ao" js2r-arguments-to-object)
+    ("ti" js2r-ternary-to-if)
+    ("sv" js2r-split-var-declaration)
+    ("ss" js2r-split-string)
+    ("uw" js2r-unwrap)
+    ("lt" js2r-log-this)
+    ("dt" js2r-debug-this)
+    ("sl" js2r-forward-slurp)
+    ("ba" js2r-forward-barf)
+    ("k" js2r-kill)
+    ("q" nil))
+)
+
+(use-package xref-js2
+  :ensure t
+  :config
+  ;;(setq xref-js2-search-program 'rg)
+
+  ;; js-mode (which js2 is based on) binds "M-." which conflicts with xref, so
+  ;; unbind it.
+  (define-key js-mode-map (kbd "M-.") nil)
+
+  (add-hook 'js2-mode-hook (lambda ()
+    (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
+)
+
+(use-package indium
+  :ensure t
+  :ensure-system-package
+  (indium . "npm i -g indium")
+  :after js2-mode
+  :bind (:map js2-mode-map
+              ("C-c C-l" . indium-eval-buffer))
+  :hook
+  ((js2-mode typescript-mode) . indium-interaction-mode)
+)
+
+(use-package add-node-modules-path
+  :hook ((js2-mode . add-node-modules-path)
+         (rjsx-mode . add-node-modules-path)))
+
+(use-package json-snatcher
+  :hook ((json-mode . js-mode-bindings))
+  :config
+  (defun js-mode-bindings ()
+    "Sets a hotkey for using the json-snatcher plugin"
+    (when (string-match  "\\.json$" (buffer-name))
+      (local-set-key (kbd "C-c C-g") 'jsons-print-path)))
 )
 
 ;; prettier-emacs: minor-mode to prettify javascript files on save
@@ -4398,26 +4834,14 @@ Example output:
 
 )
 
-(use-package format-all
-:ensure t
-:bind ("C-c C-f" . format-all-buffer)
-)
-
-;; json-mode: Major mode for editing JSON files with emacs
-;; https://github.com/joshwnj/json-mode
-(use-package json-mode
-  :mode "\\.js\\(?:on\\|[hl]int\\(rc\\)?\\)\\'"
-  :config
-  (add-hook 'json-mode-hook #'prettier-js-mode)
-  (setq json-reformat:indent-width 2)
-  (setq json-reformat:pretty-string? t)
-  (setq js-indent-level 2))
-
 (use-package eslintd-fix
   :ensure t
   :ensure-system-package
   (eslint . "npm i -g eslint")
   :config
+  ;;(setq eslintd-fix-executable "/my/path/eslint_d")
+  ;;
+
   ;; Grab eslint executable from node_modules instead of global
   ;; Taken from https://github.com/flycheck/flycheck/issues/1087#issuecomment-246514860
   ;; Gist: https://github.com/lunaryorn/.emacs.d/blob/master/lisp/lunaryorn-flycheck.el#L62
@@ -4440,23 +4864,8 @@ Example output:
                                    package-directory)))))))
 )
 
-(use-package rjsx-mode
-    :after js2-mode
-    :mode
-    ("\\.jsx$" . rjsx-mode)
-    ("components/.+\\.js$" . rjsx-mode)
-
-    :config
-    ;; auto register for JS files that are inside a `components' folder
-    (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
-
-    ;; for better jsx syntax-highlighting in web-mode
-    ;; - courtesy of Patrick @halbtuerke
-    (defadvice web-mode-highlight-part (around tweak-jsx activate)
-      (if (equal web-mode-content-type "jsx")
-        (let ((web-mode-enable-part-face nil))
-          ad-do-it)
-        ad-do-it))
+(use-package npm-mode
+  :ensure t
 )
 
 (use-package typescript-mode
@@ -4485,6 +4894,22 @@ Example output:
   )
 )
 
+(use-package flycheck-typescript-tslint
+  :ensure nil
+  :ensure-system-package
+  ((tslint     . "npm i -g tslint")
+   (typescript   . "npm i -g typescript"))
+  :config
+  (eval-after-load 'flycheck
+  '(add-hook 'flycheck-mode-hook #'flycheck-typescript-tslint-setup))
+  ;; location of config file
+  (custom-set-variables
+     '(flycheck-typescript-tslint-config "~/tslint.json"))
+  ;; custom location of executable (if not available globally)
+   (custom-set-variables
+     '(flycheck-typescript-tslint-executable "~/my_executables/tslint"))
+)
+
 (use-package ng2-mode
   :defer
   :mode
@@ -4492,6 +4917,40 @@ Example output:
   :hook
   (ng2-mode . rainbow-mode)
   (ng2-mode . prettier-js-mode)
+)
+
+(use-package format-all
+:ensure t
+:bind ("C-c C-f" . format-all-buffer)
+)
+
+;; json-mode: Major mode for editing JSON files with emacs
+;; https://github.com/joshwnj/json-mode
+(use-package json-mode
+  :mode "\\.js\\(?:on\\|[hl]int\\(rc\\)?\\)\\'"
+  :config
+  (add-hook 'json-mode-hook #'prettier-js-mode)
+  (setq json-reformat:indent-width 2)
+  (setq json-reformat:pretty-string? t)
+  (setq js-indent-level 2))
+
+(use-package rjsx-mode
+    :after js2-mode
+    :mode
+    ("\\.jsx$" . rjsx-mode)
+    ("components/.+\\.js$" . rjsx-mode)
+
+    :config
+    ;; auto register for JS files that are inside a `components' folder
+    (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
+
+    ;; for better jsx syntax-highlighting in web-mode
+    ;; - courtesy of Patrick @halbtuerke
+    (defadvice web-mode-highlight-part (around tweak-jsx activate)
+      (if (equal web-mode-content-type "jsx")
+        (let ((web-mode-enable-part-face nil))
+          ad-do-it)
+        ad-do-it))
 )
 
 (use-package dockerfile-mode

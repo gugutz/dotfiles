@@ -1,13 +1,13 @@
 
 ;; ----- amx-history -----
 (
- helm-ag
- dumb-jump-mode
- conf-unix-mode
- js2-mode
- rainbow-mode
+ package-install
+ org-table-create-or-convert-from-region
  visual-line-mode
- eyebrowse-mode
+ org-table-create
+ org-table-paste-rectangle
+ ivy-switch-buffer-other-window
+ ng2-mode
 )
 
 ;; ----- amx-data -----
@@ -22,7 +22,7 @@
  (counsel-projectile-mode . 2)
  (swiper-avy . 2)
  (align-regexp . 3)
- (package-install . 10)
+ (package-install . 12)
  (package-refresh-contents . 2)
  (package-delete . 4)
  (electric-indent-mode . 1)
@@ -44,7 +44,7 @@
  (profiler-start . 1)
  (profiler-report . 1)
  (evil-mode . 2)
- (visual-line-mode . 4)
+ (visual-line-mode . 5)
  (display-line-numbers-mode . 1)
  (flycheck-mode . 2)
  (smooth-scrolling-mode . 2)
@@ -61,4 +61,11 @@
  (conf-unix-mode . 1)
  (dumb-jump-mode . 1)
  (helm-ag . 1)
+ (ag-project . 1)
+ (ng2-mode . 2)
+ (typescript-mode . 1)
+ (ivy-switch-buffer-other-window . 1)
+ (org-table-paste-rectangle . 1)
+ (org-table-create . 1)
+ (org-table-create-or-convert-from-region . 4)
 )
