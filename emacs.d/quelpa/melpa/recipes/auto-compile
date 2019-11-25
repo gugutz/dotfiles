@@ -1,0 +1,1 @@
+(auto-compile :repo "emacscollective/auto-compile" :fetcher github)

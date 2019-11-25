@@ -1,0 +1,1 @@
+(ruby-test-mode :fetcher github :repo "ruby-test-mode/ruby-test-mode")

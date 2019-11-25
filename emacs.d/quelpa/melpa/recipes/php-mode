@@ -1,0 +1,2 @@
+(php-mode :repo "emacs-php/php-mode" :fetcher github
+          :files (:defaults "skeleton/*.el"))

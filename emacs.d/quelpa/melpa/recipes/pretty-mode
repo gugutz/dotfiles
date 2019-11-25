@@ -1,0 +1,1 @@
+(pretty-mode :fetcher github :repo "pretty-mode/pretty-mode")

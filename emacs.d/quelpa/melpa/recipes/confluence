@@ -1,0 +1,4 @@
+(confluence
+ :fetcher github
+ :repo "emacsorphanage/confluence"
+ :files ("confluence*.el" "*.dtd" "*.xsl"))

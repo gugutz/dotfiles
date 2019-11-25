@@ -1,0 +1,1 @@
+(markdown-mode :fetcher github :repo "jrblevin/markdown-mode")

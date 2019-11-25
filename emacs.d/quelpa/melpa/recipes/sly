@@ -1,0 +1,7 @@
+(sly :repo "joaotavora/sly"
+     :fetcher github
+     :files (:defaults
+             "lib"
+             "slynk"
+             "contrib"
+             (:exclude "sly-autoloads.el")))

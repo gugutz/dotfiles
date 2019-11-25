@@ -1,0 +1,2 @@
+(helm-cmd-t :repo "emacs-helm/helm-cmd-t"
+            :fetcher github)

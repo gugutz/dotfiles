@@ -1,0 +1,3 @@
+(maude-mode
+ :fetcher github
+ :repo "rudi/maude-mode")

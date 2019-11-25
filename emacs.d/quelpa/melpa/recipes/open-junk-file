@@ -1,0 +1,1 @@
+(open-junk-file :repo "rubikitch/open-junk-file" :fetcher github)

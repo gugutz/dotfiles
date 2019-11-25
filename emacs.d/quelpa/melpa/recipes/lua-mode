@@ -1,0 +1,4 @@
+(lua-mode
+ :repo "immerrr/lua-mode"
+ :fetcher github
+ :files (:defaults "scripts"))

@@ -1,0 +1,2 @@
+(findr :fetcher github :repo "emacsorphanage/findr")
+

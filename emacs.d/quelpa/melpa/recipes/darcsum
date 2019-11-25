@@ -1,0 +1,2 @@
+(darcsum :fetcher github :repo "emacsmirror/darcsum")
+

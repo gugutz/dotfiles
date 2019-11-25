@@ -11,7 +11,7 @@ set $alt Mod1
 # set default desktop layout (default is tiling)
 # workspace_layout tabbed <stacking|tabbed>
 
-# Configure border style <normal|1pixel|pixel xx|none|pixel>
+# Configure brder style <normal|1pixel|pixel xx|none|pixel>
 default_border pixel 1
 default_floating_border normal
 
@@ -103,8 +103,8 @@ set $hibernate sudo systemctl suspend
 
 # define main terminal as st in tmux (suckless terminal)
 # this make tmux use a main session and doenst spawn multiple unused sessions
-set $terminal st -e tmux new-session -A -s "main-session"
-# set $terminal       st -e tmux new-session
+# set $terminal st -e tmux new-session -A -s "main-session"
+set $terminal       st -e tmux new-session
 #set $terminal       st
 
 # define default file managers (terminal and gui)
@@ -274,15 +274,19 @@ assign [class="Slack"]  → $ws8
 exec $browser
 # \$browser_window_class "Brave"
 assign [class="Brave"]  → $ws3
-assign [class="Firefox"]  → $ws3
+assign [class="firefox"]  → $ws3
 
 # Telegram Desktop
 exec telegram-desktop
 assign [class="TelegramDesktop"] → $ws9
 
+# Whatsapp Desktop
+exec whatsapp-nativefier
+assign [class="whats-app-nativefier-d52542"] → $ws9
+
 # Toggl Desktop
-exec TogglDesktop
-assign [class="TogglDesktop"] → $ws5
+exec flatpak run com.toggl.TogglDesktop
+assign [class="Toggl Desktop"] → $ws5
 
 
 ################################################
@@ -687,6 +691,10 @@ set $ws7 "7: browser"
 set $ws8 "8: slack"
 set $ws9 "9: telegram/whatsapp"
 set $ws10 "10: terminal"
+
+# workspaces layouts
+for_window [workspace=$ws3] layout tabbed
+for_window [workspace=$ws9] layout tabbed
 
 # workspaces settings
 workspace $ws1 gaps outer 1

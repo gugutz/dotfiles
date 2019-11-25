@@ -47,6 +47,29 @@ https://www.masteringemacs.org/article/mastering-key-bindings-emacs
 
 : For native packages that come with emacs, `:ensure nil` must be set or use-package will try to download those packages from melpa and break
 
+Set Face attribute
+the argument after the FACE is the FRAME
+If its nil, it applied that face customization to existing and all new frames
+If its t, it only applies to newly created frames
+set-face-attribute face frame &rest arguments
+
+** Posframe position options
+
+| frame-center               | "Center of the frame"                      |
+| frame-top-center           | "Centered at the top of the frame"         |
+| frame-top-left-corner      | "Left corner at the top of the frame"      |
+| frame-top-right-corner     | "Right corner at the top of the frame"     |
+| frame-bottom-left-corner   | "Left corner at the bottom of the frame"   |
+| frame-bottom-right-corner  | "Right corner at the bottom of the frame"  |
+| window-center              | "Center of the window"                     |
+| window-top-left-corner     | "Left corner at the top of the window"     |
+| window-top-right-corner    | "Right corner at the top of the window"    |
+| window-bottom-left-corner  | "Left corner at the bottom of the window"  |
+| window-bottom-right-corner | "Right corner at the bottom of the window" |
+| point-top-left-corner      | "Top left corner of point"                 |
+| point-bottom-left-corner   | "Bottom left corner of point"              |
+
+
 * Recompile init.el everytime emacs.org is changed and saved
 
   : Moved this to beggining of the file to avoid it not being parsed when theres an error in the middle of the file
@@ -318,7 +341,8 @@ Find the first font in the list and use it
 
 ;; define list of fonts to be used in the above function
 ;; the first one found will be used
-(set-face-attribute 'default nil :font (font-candidate '"Hack-10:weight=normal"
+(set-face-attribute 'default nil :font (font-candidate '"DejaVu Sans Mono-10:weight=normal"
+                                                        "Hack-10:weight=normal"
                                                         "Consolas-10:weight=normal"
                                                         "Droid Sans Mono-10:weight=normal"
                                                         "DejaVu Sans Mono-10:weight=normal"
@@ -330,8 +354,8 @@ Find the first font in the list and use it
 (use-package visual-line-mode
   :ensure nil
   :hook
-  (prog-mode . visual-line-mode)
-  (text-mode . visual-line-mode)
+  (prog-mode . turn-on-visual-line-mode)
+  (text-mode . turn-on-visual-line-mode)
 )
 #+END_SRC
 
@@ -565,7 +589,10 @@ Sets a 80 character line width
 
 ** preffer UTF-8 coding system
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(prefer-coding-system 'utf-8) ;; Prefer UTF-8 encoding
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
 #+END_SRC
 
 ** delete selection mode
@@ -729,10 +756,6 @@ Show eldoc info in a childframe
   (aggressive-indent-comments-too t)
   :hook
   (emacs-lisp-mode . aggressive-indent-mode)
-  (js2-mode . aggressive-indent-mode)
-  (typescript-mode . aggressive-indent-mode)
-  (css-mode . aggressive-indent-mode)
-  (sgml-mode . aggressive-indent-mode)
   :config
 )
 #+END_SRC
@@ -846,6 +869,39 @@ Delete trailing whitespace on save
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+END_SRC
+
+* Native Command Remappings
+
+These remap commands instead of keybindings
+This allows to use different functions but preserve the original keybindings
+See C-h i g (elisp) Remapping Commands RET
+
+Example: (global-set-key [remap backward-up-list] 'my-backward-up-list)
+
+Keybindings and remaps
+
+Vector is array in other languages. Vector was used for mapping function keys, such as [left], [right], [up], [down], [f1]...[f12]. But now, you can also map function keys in (kbd ...) function using angle brackets:
+
+(global-set-key (kbd "<f3>") 'kmacro-start-macro-or-insert-counter)
+
+Here are common function keys (remember to wrap them in a pair of angle bracket):
+| Key                                            | Description                                        |
+| left, up, right, down                          | Cursor arrow keys                                  |
+| begin, end, home, next, prior                  | Other cursor re-positioning keys                   |
+|                                                | prior means PageUp                                 |
+|                                                | next means PageDOwn                                |
+| select, print, execute, backtab                | Miscellaneous keys                                 |
+| insert, undo, redo, clearline                  | backtab means S-TAB or C-iso-tab                   |
+| insertline, deleteline, insertchar, deletechar |                                                    |
+| f1, f2, ... F35                                | Numbered function keys on top of your keyboard     |
+| kp-add, kp-subtract, kp-multiply, kp-divide    | Keypad keys (to the right of the regular keyboard) |
+| kp-backtab, kp-space, kp-tab, kp-enter         | , with names or punctuation.                       |
+| kp-separator, kp-decimal, kp-equal             |                                                    |
+|                                                |                                                    |
+|                                                |                                                    |
+| kp-0, kp-1, ... kp-9                           | Keypad keys with digits.                           |
+|                                                |                                                    |
+| kp-f1, kp-f2, kp-f3, kp-f4                     | Keypad PF keys.                                    |
 
 * Text editing settings
 
@@ -1179,63 +1235,60 @@ Make emacs use $PATH defined in the systems shell
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package evil
-    :ensure t
-    :init
-    (setq evil-ex-complete-emacs-commands nil)
-    (setq evil-vsplit-window-right t)
-    (setq evil-split-window-below t)
-    (setq evil-shift-round nil)
-    (setq evil-esc-delay 0)  ;; Don't wait for any other keys after escape is pressed.
-    ;; Make Evil look a bit more like (n) vim  (??)
-    (setq evil-search-module 'isearch-regexp)
-    ;; (setq evil-search-module 'evil-search)
-    (setq evil-magic 'very-magic)
-    (setq evil-shift-width (symbol-value 'tab-width))
-    (setq evil-regexp-search t)
-    (setq evil-search-wrap t)
-    ;; (setq evil-want-C-i-jump t)
-    (setq evil-want-C-u-scroll t)
-    (setq evil-want-fine-undo nil)
-    (setq evil-want-integration nil)
-    ;; (setq evil-want-abbrev-on-insert-exit nil)
-    (setq evil-want-abbrev-expand-on-insert-exit nil)
-    (setq evil-mode-line-format '(before . mode-line-front-space)) ;; move evil tag to beginning of modeline
-    ;; Cursor is alway black because of evil.
-    ;; Here is the workaround
-    ;; (@see https://bitbucket.org/lyro/evil/issue/342/evil-default-cursor-setting-should-default)
-    (setq evil-default-cursor t)
-    ;; change cursor color according to mode
-    (setq evil-emacs-state-cursor '("#ff0000" box))
-    (setq evil-motion-state-cursor '("#FFFFFF" box))
-    (setq evil-normal-state-cursor '("#00ff00" box))
-    (setq evil-visual-state-cursor '("#abcdef" box))
-    (setq evil-insert-state-cursor '("#e2f00f" bar))
-    (setq evil-replace-state-cursor '("red" hbar))
-    (setq evil-operator-state-cursor '("red" hollow))
+  :ensure t
+  :init
+  (setq evil-ex-complete-emacs-commands nil)
+  (setq evil-vsplit-window-right t)
+  (setq evil-split-window-below t)
+  (setq evil-shift-round nil)
+  (setq evil-esc-delay 0)  ;; Don't wait for any other keys after escape is pressed.
+  ;; Make Evil look a bit more like (n) vim  (??)
+  (setq evil-search-module 'isearch-regexp)
+  ;; (setq evil-search-module 'evil-search)
+  (setq evil-magic 'very-magic)
+  (setq evil-shift-width (symbol-value 'tab-width))
+  (setq evil-regexp-search t)
+  (setq evil-search-wrap t)
+  ;; (setq evil-want-C-i-jump t)
+  (setq evil-want-C-u-scroll t)
+  (setq evil-want-fine-undo nil)
+  (setq evil-want-integration nil)
+  ;; (setq evil-want-abbrev-on-insert-exit nil)
+  (setq evil-want-abbrev-expand-on-insert-exit nil)
+  (setq evil-mode-line-format '(before . mode-line-front-space)) ;; move evil tag to beginning of modeline
+  ;; Cursor is alway black because of evil.
+  ;; Here is the workaround
+  ;; (@see https://bitbucket.org/lyro/evil/issue/342/evil-default-cursor-setting-should-default)
+  (setq evil-default-cursor t)
+  ;; change cursor color according to mode
+  (setq evil-emacs-state-cursor '("#ff0000" box))
+  (setq evil-motion-state-cursor '("#FFFFFF" box))
+  (setq evil-normal-state-cursor '("#00ff00" box))
+  (setq evil-visual-state-cursor '("#abcdef" box))
+  (setq evil-insert-state-cursor '("#e2f00f" bar))
+  (setq evil-replace-state-cursor '("red" hbar))
+  (setq evil-operator-state-cursor '("red" hollow))
 
   :bind
   (:map evil-normal-state-map
   (", w" . evil-window-vsplit)
-  ("C-r" . undo-tree-redo)
-  )
+  ("C-r" . undo-tree-redo))
   (:map evil-insert-state-map
   ;; this is also defined globally above in the config
-  ("C-S-<backtab>" . er/expand-region)
-  )
+  ("C-S-<backtab>" . er/expand-region))
   (:map evil-visual-state-map
   ;; this is also defined globally above in the config
   ("<tab>" . indent-region)
   ("C-/" . comment-line)
   ("C-S-/" . comment-region)
   ("C-S-M-/" . comment-box)
-  ("M-=" . #'align-values)
-  )
+  ("M-=" . #'align-values))
 
-;; check if global-set-key also maps to evil insert mode; if yes delete bellow snippets
+  ;; check if global-set-key also maps to evil insert mode; if yes delete bellow snippets
   :config
   (evil-mode)
 
-;; unset evil bindings that conflits with other stuff
+  ;; unset evil bindings that conflits with other stuff
   (define-key evil-insert-state-map (kbd "<tab>") nil)
   (define-key evil-normal-state-map (kbd "<tab>") nil)
   (define-key evil-visual-state-map (kbd "<tab>") nil)
@@ -1251,6 +1304,15 @@ Make emacs use $PATH defined in the systems shell
   (define-key evil-motion-state-map (kbd "M-w") 'evil-window-map)
 
   ;; make esc quit or cancel everything in Emacs
+  (defun minibuffer-keyboard-quit ()
+    "Abort recursive edit.
+  In Delete Selection mode, if the mark is active, just deactivate it;
+  then it takes a second \\[keyboard-quit] to abort the minibuffer."
+    (interactive)
+    (if (and delete-selection-mode transient-mark-mode mark-active)
+        (setq deactivate-mark  t)
+      (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
+      (abort-recursive-edit)))
   (define-key evil-normal-state-map [escape] 'keyboard-quit)
   (define-key evil-visual-state-map [escape] 'keyboard-quit)
   (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
@@ -1258,44 +1320,46 @@ Make emacs use $PATH defined in the systems shell
   (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
   (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
   (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
+  (global-set-key [escape] 'keyboard-quit)
+  ;;-----------------------------------------
 
-  ;; recover native emacs commands that are overriden by evil
-  ;; this gives priority to native emacs behaviour rathen than Vim's
-  (define-key evil-normal-state-map (kbd "C-e") 'evil-end-of-line)
-  (define-key evil-insert-state-map (kbd "C-e") 'move-end-of-line)
-  (define-key evil-visual-state-map (kbd "C-e") 'evil-end-of-line)
-  (define-key evil-motion-state-map (kbd "C-e") 'evil-end-of-line)
-  (define-key evil-insert-state-map (kbd "C-d") 'evil-delete-char)
-  (define-key evil-normal-state-map (kbd "C-d") 'evil-delete-char)
-  (define-key evil-visual-state-map (kbd "C-d") 'evil-delete-char)
-  (define-key evil-normal-state-map (kbd "C-k") 'kill-line)
-  (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
-  (define-key evil-visual-state-map (kbd "C-k") 'kill-line)
-  (define-key evil-insert-state-map (kbd "C-w") 'kill-region)
-  (define-key evil-normal-state-map (kbd "C-w") 'kill-region)
-  (define-key evil-visual-state-map (kbd "C-w") 'kill-region)
-  (define-key evil-normal-state-map (kbd "C-w") 'evil-delete)
-  (define-key evil-insert-state-map (kbd "C-w") 'evil-delete)
-  (define-key evil-visual-state-map (kbd "C-w") 'evil-delete)
-  (define-key evil-normal-state-map (kbd "C-y") 'yank)
-  (define-key evil-insert-state-map (kbd "C-y") 'yank)
-  (define-key evil-visual-state-map (kbd "C-y") 'yank)
-  (define-key evil-normal-state-map (kbd "C-f") 'evil-forward-char)
-  (define-key evil-insert-state-map (kbd "C-f") 'evil-forward-char)
-  (define-key evil-insert-state-map (kbd "C-f") 'evil-forward-char)
-  (define-key evil-normal-state-map (kbd "C-b") 'evil-backward-char)
-  (define-key evil-insert-state-map (kbd "C-b") 'evil-backward-char)
-  (define-key evil-visual-state-map (kbd "C-b") 'evil-backward-char)
-  (define-key evil-normal-state-map (kbd "C-n") 'evil-next-line)
-  (define-key evil-insert-state-map (kbd "C-n") 'evil-next-line)
-  (define-key evil-visual-state-map (kbd "C-n") 'evil-next-line)
-  (define-key evil-normal-state-map (kbd "C-p") 'evil-previous-line)
-  (define-key evil-insert-state-map (kbd "C-p") 'evil-previous-line)
-  (define-key evil-visual-state-map (kbd "C-p") 'evil-previous-line)
-  (define-key evil-normal-state-map (kbd "Q") 'call-last-kbd-macro)
-  (define-key evil-visual-state-map (kbd "Q") 'call-last-kbd-macro)
-  (define-key evil-insert-state-map (kbd "C-r") 'search-backward)
-)
+      ;; recover native emacs commands that are overriden by evil
+      ;; this gives priority to native emacs behaviour rathen than Vim's
+      (define-key evil-normal-state-map (kbd "C-e") 'evil-end-of-line)
+      (define-key evil-insert-state-map (kbd "C-e") 'move-end-of-line)
+      (define-key evil-visual-state-map (kbd "C-e") 'evil-end-of-line)
+      (define-key evil-motion-state-map (kbd "C-e") 'evil-end-of-line)
+      (define-key evil-insert-state-map (kbd "C-d") 'evil-delete-char)
+      (define-key evil-normal-state-map (kbd "C-d") 'evil-delete-char)
+      (define-key evil-visual-state-map (kbd "C-d") 'evil-delete-char)
+      (define-key evil-normal-state-map (kbd "C-k") 'kill-line)
+      (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
+      (define-key evil-visual-state-map (kbd "C-k") 'kill-line)
+      (define-key evil-insert-state-map (kbd "C-w") 'kill-region)
+      (define-key evil-normal-state-map (kbd "C-w") 'kill-region)
+      (define-key evil-visual-state-map (kbd "C-w") 'kill-region)
+      (define-key evil-normal-state-map (kbd "C-w") 'evil-delete)
+      (define-key evil-insert-state-map (kbd "C-w") 'evil-delete)
+      (define-key evil-visual-state-map (kbd "C-w") 'evil-delete)
+      (define-key evil-normal-state-map (kbd "C-y") 'yank)
+      (define-key evil-insert-state-map (kbd "C-y") 'yank)
+      (define-key evil-visual-state-map (kbd "C-y") 'yank)
+      (define-key evil-normal-state-map (kbd "C-f") 'evil-forward-char)
+      (define-key evil-insert-state-map (kbd "C-f") 'evil-forward-char)
+      (define-key evil-insert-state-map (kbd "C-f") 'evil-forward-char)
+      (define-key evil-normal-state-map (kbd "C-b") 'evil-backward-char)
+      (define-key evil-insert-state-map (kbd "C-b") 'evil-backward-char)
+      (define-key evil-visual-state-map (kbd "C-b") 'evil-backward-char)
+      (define-key evil-normal-state-map (kbd "C-n") 'evil-next-line)
+      (define-key evil-insert-state-map (kbd "C-n") 'evil-next-line)
+      (define-key evil-visual-state-map (kbd "C-n") 'evil-next-line)
+      (define-key evil-normal-state-map (kbd "C-p") 'evil-previous-line)
+      (define-key evil-insert-state-map (kbd "C-p") 'evil-previous-line)
+      (define-key evil-visual-state-map (kbd "C-p") 'evil-previous-line)
+      (define-key evil-normal-state-map (kbd "Q") 'call-last-kbd-macro)
+      (define-key evil-visual-state-map (kbd "Q") 'call-last-kbd-macro)
+      (define-key evil-insert-state-map (kbd "C-r") 'search-backward)
+    )
 #+END_SRC
 
 
@@ -1352,9 +1416,14 @@ Make emacs use $PATH defined in the systems shell
     "." 'find-tag
     "t" 'projectile-find-file
     "b" 'ido-switch-buffer
-    "cc" 'evilnc-comment-or-uncomment-lines
+    "vc" 'evilnc-comment-or-uncomment-lines
     "ag" 'projectile-ag
     "," 'switch-to-previous-buffer
+    ;;counsel bindings
+    "e" 'counsel-find-file
+    "f" 'counsel-projectile-find-file
+    "cg" 'counsel-ag
+    "r" 'counsel-rg
     ; "gg" 'git-gutter+:toggle
     ; "gd" 'git-gutter+:popup-diff
     ; "gp" 'git-gutter+:previous-hunk
@@ -1368,6 +1437,7 @@ Make emacs use $PATH defined in the systems shell
     "nn" 'neotree-toggle
     "nm" 'next-match
     "nf" 'neotree-find
+    ;; windmove bindings
     "gk" 'windmove-up
     "gj" 'windmove-down
     "gl" 'windmove-right
@@ -1565,105 +1635,112 @@ fifteen = 15
 
 ** org-mode setup
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package org
-  :ensure org-plus-contrib
-  :defer t
-  :hook
-  (org-mode . diff-hl-mode)
-  (org-mode . rainbow-mode)
-  (org-mode . visual-line-mode)
-  :bind
-  ("C-c l" . org-store-link)
-  ("C-c a" . org-agenda)
-  ("C-c c" . org-capture)
-  ("C-c b" . org-switch)
+  (use-package org
+    :ensure org-plus-contrib
+    :defer t
+    :hook
+    (org-mode . diff-hl-mode)
+    (org-mode . rainbow-mode)
+    (org-mode . visual-line-mode)
+    :bind
+    ("C-c l" . org-store-link)
+    ("C-c a" . org-agenda)
+    ("C-c c" . org-capture)
+    ("C-c b" . org-switch)
 
-  ;; this map is to delete de bellow commented lambda that does the same thing
-  ;; Resolve issue with Tab not working with ORG only in Normal VI Mode in terminal
-  ;; (something with TAB on terminals being related to C-i...)
-  (:map evil-normal-state-map
-  ("<tab>" . org-cycle))
-  :init
-  ;; general org config variables
-  (setq org-log-done 'time)
-  (setq org-export-backends (quote (ascii html icalendar latex md odt)))
-  (setq org-use-speed-commands t)
+    ;; this map is to delete de bellow commented lambda that does the same thing
+    ;; Resolve issue with Tab not working with ORG only in Normal VI Mode in terminal
+    ;; (something with TAB on terminals being related to C-i...)
+    (:map evil-normal-state-map
+    ("<tab>" . org-cycle))
+    :init
+    ;; general org config variables
+    (setq org-log-done 'time)
+    (setq org-export-backends (quote (ascii html icalendar latex md odt)))
+    (setq org-use-speed-commands t)
 
-  ;; dont display atual width for images inline. set per-file with
-  ;; #+ATTR_HTML: :width 600px :height: auto
-  ;; #+ATTR_ORG: :width 600
-  ;; #+ATTR_LATEX: :width 5in
-  (setq org-image-actual-width nil)
-  (setq org-startup-with-inline-images t)
+    ;; dont display atual width for images inline. set per-file with
+    ;; #+ATTR_HTML: :width 600px :height: auto
+    ;; #+ATTR_ORG: :width 600
+    ;; #+ATTR_LATEX: :width 5in
+    (setq org-image-actual-width nil)
+    (setq org-startup-with-inline-images t)
 
-  ;; make tab behave like it usually do (ie: indent) inside org source blocks
-  (setq org-src-tab-acts-natively t)
+    ;; make tab behave like it usually do (ie: indent) inside org source blocks
+    (setq org-src-tab-acts-natively t)
 
-  (setq org-confirm-babel-evaluate 'nil)
-  (setq org-todo-keywords
-   '((sequence "TODO" "IN-PROGRESS" "REVIEW" "|" "DONE")))
-  (setq org-agenda-window-setup 'other-window)
-  (setq org-log-done 'time) ;; Show CLOSED tag line in closed TODO items
-  (setq org-log-done 'note) ;; Prompt to leave a note when closing an item
-  (setq org-hide-emphasis-markers nil)
+    (setq org-confirm-babel-evaluate 'nil)
+    (setq org-todo-keywords
+     '((sequence "TODO" "IN-PROGRESS" "REVIEW" "|" "DONE")))
+    (setq org-agenda-window-setup 'other-window)
+    (setq org-log-done 'time) ;; Show CLOSED tag line in closed TODO items
+    (setq org-log-done 'note) ;; Prompt to leave a note when closing an item
+    (setq org-hide-emphasis-markers nil)
 
-  ;;ox-twbs (exporter to twitter bootstrap html)
-  (setq org-enable-bootstrap-support t)
+    ;;ox-twbs (exporter to twitter bootstrap html)
+    (setq org-enable-bootstrap-support t)
 
-  ;; make ispell ignore source blocks
-  (add-to-list 'ispell-skip-region-alist '("^#+begin_src" . "^#+end_src"))
+    ;; make ispell ignore source blocks
+    (add-to-list 'ispell-skip-region-alist '("^#+begin_src" . "^#+end_src"))
 
-  :config
-  ;; make windmove work with org mode
-  (add-hook 'org-shiftup-final-hook 'windmove-up)
-  (add-hook 'org-shiftleft-final-hook 'windmove-left)
-  (add-hook 'org-shiftdown-final-hook 'windmove-down)
-  (add-hook 'org-shiftright-final-hook 'windmove-right)
+    :config
+    ;; make windmove work with org mode
+    (add-hook 'org-shiftup-final-hook 'windmove-up)
+    (add-hook 'org-shiftleft-final-hook 'windmove-left)
+    (add-hook 'org-shiftdown-final-hook 'windmove-down)
+    (add-hook 'org-shiftright-final-hook 'windmove-right)
+    ;;Set org-support-shift-select customization variable to "Everywhere except timestamps" , otherwise shift+arrows will still have org-mode keybidnings on headings.
+    (setq org-support-shift-select 'always)
+    ;; as a last attempt, disable C-S-arrows on org mode so windmove uses it
+    ;; (define-key org-mode-map (kbd "<M-S-left>") nil)
+    ;; (define-key org-mode-map (kbd "<M-S-right>") nil)
+    ;; (define-key org-mode-map (kbd "<M-left>") nil)
+    ;; (define-key org-mode-map (kbd "<M-right>") nil)
 
-  ;; org-capture - needs to be in :config because it assumes a variable is already defined: `org-directory'
-  (setq org-default-notes-file (concat org-directory "/notes.org"))
+    ;; org-capture - needs to be in :config because it assumes a variable is already defined: `org-directory'
+    (setq org-default-notes-file (concat org-directory "/notes.org"))
 
-  ;;(add-hook 'org-mode-hook
-  ;;          (lambda ()
-  ;;        (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
+    ;;(add-hook 'org-mode-hook
+    ;;          (lambda ()
+    ;;        (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
 
-  (defun org-export-turn-on-syntax-highlight()
-    "Setup variables to turn on syntax highlighting when calling `org-latex-export-to-pdf'"
-    (interactive)
-    (setq org-latex-listings 'minted
-          org-latex-packages-alist '(("" "minted"))
-          org-latex-pdf-process '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f")))
+    (defun org-export-turn-on-syntax-highlight()
+      "Setup variables to turn on syntax highlighting when calling `org-latex-export-to-pdf'"
+      (interactive)
+      (setq org-latex-listings 'minted
+            org-latex-packages-alist '(("" "minted"))
+            org-latex-pdf-process '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f")))
 
-;; (setq org-latex-pdf-process
-;;     '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
+  ;; (setq org-latex-pdf-process
+  ;;     '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
 
-;; compile with xelatex to use the Arial font
-(setq org-latex-pdf-process
-  '("xelatex -interaction nonstopmode %f"
-     "xelatex -interaction nonstopmode %f")) ;; for multiple passes
-
-
-  (setq org-emphasis-alist '(("*" bold)
-                         ("/" italic)
-                         ("_" underline)
-                         ("=" org-verbatim verbatim)
-                         ("~" org-code verbatim)))
+  ;; compile with xelatex to use the Arial font
+  (setq org-latex-pdf-process
+    '("xelatex -interaction nonstopmode %f"
+       "xelatex -interaction nonstopmode %f")) ;; for multiple passes
 
 
-  (require 'org-habit)
-  '(org-emphasis-alist
-   (quote
-    (
-     ("!" org-habit-overdue-face)
-     ("%" org-habit-alert-face)
-     ("*" bold)
-     ("/" italic)
-     ("_" underline)
-     ("=" org-verbatim verbatim)
-     ("~" org-code verbatim)
-     ("+" (:strike-through t))
-     )))
-)
+    (setq org-emphasis-alist '(("*" bold)
+                           ("/" italic)
+                           ("_" underline)
+                           ("=" org-verbatim verbatim)
+                           ("~" org-code verbatim)))
+
+
+    (require 'org-habit)
+    '(org-emphasis-alist
+     (quote
+      (
+       ("!" org-habit-overdue-face)
+       ("%" org-habit-alert-face)
+       ("*" bold)
+       ("/" italic)
+       ("_" underline)
+       ("=" org-verbatim verbatim)
+       ("~" org-code verbatim)
+       ("+" (:strike-through t))
+       )))
+  )
 #+END_SRC
 
 ** org-sidebar
@@ -2146,11 +2223,6 @@ Org Mode Integration with Jira Projects
   (:map minibuffer-local-map
   ("C-r" . counsel-minibuffer-history))
   :config
-  (evil-leader/set-key
-    "e" 'counsel-find-file
-    "f" 'counsel-projectile-find-file
-    "g" 'counsel-ag
-    "r" 'counsel-rg)
   ;; NOTE: this variable do not work if defined in :custom
   (setq ivy-format-function 'ivy-format-function-pretty)
   (setq counsel-yank-pop-separator
@@ -2361,7 +2433,19 @@ Requires: Emacs >= 26
 )
 #+END_SRC
 
+* abbrev
 
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package abbrev
+  :ensure nil
+  :config
+  (define-abbrev-table 'global-abbrev-table '(
+      ("alpha" "α")
+      ("infinity" "∞")
+      ("arrow" "→")
+      ))
+)
+#+END_SRC
 * Hydra
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -2454,36 +2538,30 @@ Requires: Emacs >= 26
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package flycheck
-    :ensure t
-    :diminish flycheck-mode
-    :defer t
-    :hook
-    (prog-mode . flycheck-mode)
-    :custom
-    (flycheck-display-errors-delay 1)
-    :config
-    (global-flycheck-mode)
+  :ensure t
+  :diminish flycheck-mode
+  :defer t
+  :ensure-system-package
+  ((tslint . "npm i -g tslint")
+   (typescript . "npm i -g typescript"))
+  :hook
+  (prog-mode . flycheck-mode)
+  :custom
+  (flycheck-display-errors-delay 1)
+  :config
+  (global-flycheck-mode)
+  ;; Only check while saving and opening files
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
 
-    ;; add eslint to list of flycheck checkers
-    (setq flycheck-checkers '(javascript-eslint))
-    ;; disable jshint since we prefer eslint checking
-    (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))
-    ;; force flycheck to use its own xml parser instead of libxml32 (was giving me errors)
-    (setq flycheck-xml-parser 'flycheck-parse-xml-region)
-    ;; set modes that will use ESLint
-    (flycheck-add-mode 'javascript-eslint 'web-mode)
-    (flycheck-add-mode 'javascript-eslint 'js2-mode)
-    (flycheck-add-mode 'javascript-eslint 'js-mode)
+  ;; Set fringe style
+  (setq flycheck-indication-mode 'right-fringe)
 
-    ;; customize flycheck temp file prefix
-    (setq-default flycheck-temp-prefix ".flycheck")
+  ;; force flycheck to use its own xml parser instead of libxml32 (was giving me errors)
+  (setq flycheck-xml-parser 'flycheck-parse-xml-region)
 
-    ;; disable json-jsonlist checking for json files
-    (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(json-jsonlist)))
+  ;; customize flycheck temp file prefix
+  (setq-default flycheck-temp-prefix ".flycheck")
 
-    ;; Workaround for eslint loading slow
-    ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
-    (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t))
 )
 
 #+END_SRC
@@ -2530,22 +2608,24 @@ Requires: Emacs >= 26
   :ensure t
   :after flycheck
   :custom-face
-  ;;(flycheck-posframe-error-face ((nil (:inherit 'error))))
-  ;;(flycheck-posframe-background-face ((nil (:inherit 'error))))
-  ;;(flycheck-posframe-border-face nil ((:inherit 'error))))
-  ;;(flycheck-posframe-border-width ((nil (:inherit 'error))))
+  (flycheck-posframe-face ((nil (:background "#20fabe" :foreground "#FFCC0E"))))
+  (flycheck-posframe-info-face ((nil (:inherit 'info))))
+  (flycheck-posframe-warning-face ((nil (:inherit 'warning))))
+  (flycheck-posframe-error-face ((nil (:inherit 'error))))
+  (flycheck-posframe-background-face ((nil (:background "#fcfa23" :foreground "#ff0000"))))
+  (flycheck-posframe-border-face ((nil (:background "#af3ec8"))))
   :hook
   (flycheck-mode . flycheck-posframe-mode)
   :config
-  (set-face-attribute 'flycheck-posframe-error-face nil :inherit 'error)
-  (set-face-attribute 'flycheck-posframe-background-face nil :inherit 'error)
-  (set-face-attribute 'flycheck-posframe-border-face nil :inherit 'error)
-  ;;(set-face-attribute 'flycheck-posframe-border-width nil :inherit 'error)
-  (setq flycheck-posframe-warning-prefix "\u26a0 ") ;; default: ➤
   (setq flycheck-posframe-position 'point-bottom-left-corner)
+  (setq flycheck-posframe-prefix "\u27a4 ") ;; default: ➤
+  (setq flycheck-posframe-warning-prefix "\u26a0 ")
+  (setq flycheck-posframe-info-prefix "\uf6c8 ")
+  (setq  flycheck-posframe-error-prefix "\u274c ")
+  (setq flycheck-posframe-border-width 2)
 
   ;; Calling (flycheck-posframe-configure-pretty-defaults) will configure flycheck-posframe to show warnings and errors with nicer faces (inheriting from warning and error respectively), and set the prefix for each to nicer unicode characters.
-  (flycheck-posframe-configure-pretty-defaults)
+  ;;(flycheck-posframe-configure-pretty-defaults)
 )
 #+END_SRC
 
@@ -2631,6 +2711,16 @@ C-c g for any git related stuff other than magit's
   (evil-define-key evil-magit-state magit-remote-section-map "K" 'magit-remote-remove)
   (evil-define-key evil-magit-state magit-stash-section-map "K" 'magit-stash-drop)
   (evil-define-key evil-magit-state magit-stashes-section-map "K" 'magit-stash-clear)
+)
+#+END_SRC
+
+** diffview
+View diffs side by side
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package diffview
+  :ensure t
+  :defer t
 )
 #+END_SRC
 
@@ -3169,14 +3259,6 @@ Collection of extensions for proof general
   (setq lsp-trace nil)
   (setq lsp-print-performance nil)
   (setq lsp-prefer-flymake t) ;; t(flymake), nil(lsp-ui), or :none
-
-  :hook
-  ;; disabled lsp for javascript and typescript to use Tide-mode only
-  ;; disabled lsp for typescript to use Tide-mode only
-  ;;(typescript-mode . lsp)
-  ;;(js2-mode . lsp)
-  (js2-jsx-mode . lsp)
-  (enh-ruby-mode . lsp)
 )
 
 #+END_SRC
@@ -3760,7 +3842,7 @@ Now with the scrollbar out of the way, add some information about buffer boundar
 ;; Makes *scratch* empty.
 (setq initial-scratch-message nil)
 ;; Don't show *Buffer list* when opening multiple files at the same time.
-(setq initial-major-mode 'org-mode)  ;;start in org-mode
+;;(setq initial-major-mode 'org-mode)  ;;start in org-mode
 (setq inhibit-startup-buffer-menu t)
 ;; Make the buffer that opens on startup your init file ("~/.emacs" or
 ;; "~/.emacs.d/init.el").
@@ -5239,8 +5321,6 @@ Highlight matching parenthesis
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package color-identifiers-mode
   :ensure t
-  :hook
-  (js2-mode . color-identifiers-mode)
 ;;:config
 ;;(add-hook 'after-init-hook 'global-color-identifiers-mode)
 ;; the following code disabled highlighting for all other keywords and only highlights and color variables
@@ -5528,11 +5608,8 @@ Helps editing lisp code
   :ensure t
   :hook
   (css-mode . rainbow-mode)
-  (scss-mode . rainbow-mode)
   (php-mode . rainbow-mode)
   (html-mode . rainbow-mode)
-  (web-mode . rainbow-mode)
-  (js2-mode . rainbow-mode))
 #+END_SRC
 
 ** Highlight lines
@@ -5670,14 +5747,13 @@ Therefore, sublimity needs to be required for this to work
 Make sure :ensure nil
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-  (use-package sublimity-scroll
-  :disabled
-    :ensure nil
-    :config
-    (setq sublimity-scroll-weight 10)  ;; default 10
-    (setq sublimity-scroll-drift-length 5)  ;; default 5
-    (setq sublimity-scroll-hide-cursor t) ;; default t
-  )
+(use-package sublimity-scroll
+  :ensure nil
+  :config
+  (setq sublimity-scroll-weight 10)  ;; default 10
+  (setq sublimity-scroll-drift-length 5)  ;; default 5
+  (setq sublimity-scroll-hide-cursor t) ;; default t
+)
 #+END_SRC
 ** scrollkeeper
 
@@ -6111,9 +6187,21 @@ The Sections and Heading Levels gets configured as follows:
 
 Set HTML indentation to 4 spaces by default (only on html-mode)
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(add-hook 'html-mode-hook
-  (lambda ()
-    (set (make-local-variable 'sgml-basic-offset) 4)))
+(use-package sgml-mode
+  :ensure nil
+  :hook
+  ;;(html-mode . (lambda () (set (make-local-variable 'sgml-basic-offset) 4)))
+  (sgml-mode . aggressive-indent-mode)
+  (sgml-mode . rainbow-mode)
+  (sgml-mode . emmet-mode)
+  :init
+  (setq sgml-basic-offset 4)
+  :config
+  (add-hook 'html-mode-hook
+    (lambda ()
+      (set (make-local-variable 'sgml-basic-offset) 4)))
+)
+
 #+END_SRC
 
 * CSS and SCSS
@@ -6124,6 +6212,9 @@ Set HTML indentation to 4 spaces by default (only on html-mode)
 (use-package css-mode
   :ensure t
   :mode "\\.css\\'"
+  :hook
+  (css-mode . aggressive-indent-mode)
+  (css-mode . emmet-mode)
   :init
   (setq css-indent-offset 2)
 )
@@ -6138,6 +6229,10 @@ Set HTML indentation to 4 spaces by default (only on html-mode)
          ("\\.component.scss\\'" . scss-mode))
   :init
   (setq scss-compile-at-save 'nil)
+  :hook
+  (scss-mode . prettier-js-mode)
+  (scss-mode . rainbow-mode)
+
   :config
   (autoload 'scss-mode "scss-mode")
   (setq scss-compile-at-save 'nil)
@@ -6146,21 +6241,22 @@ Set HTML indentation to 4 spaces by default (only on html-mode)
 )
 #+END_SRC
 
+** Helm CSS SCSS
+
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package helm-css-scss
   :ensure t
-  :bind (
+  :bind
   (:map isearch-mode-map
-  ("s-i" . helm-css-scss-from-isearch)
-  :map helm-css-scss-map
-  ("s-i" . helm-css-scss-multi-from-helm-css-scss)
-  :map css-mode-map
-  ("s-i" . helm-css-scss)
-  ("s-S-I" . helm-css-scss-back-to-last-point)
-  :map scss-mode-map
+  ("s-i" . helm-css-scss-from-isearch))
+  (:map helm-css-scss-map
+  ("s-i" . helm-css-scss-multi-from-helm-css-scss))
+  (:map css-mode-map
   ("s-i" . helm-css-scss)
   ("s-S-I" . helm-css-scss-back-to-last-point))
-  )
+  (:map scss-mode-map
+  ("s-i" . helm-css-scss)
+  ("s-S-I" . helm-css-scss-back-to-last-point))
   :config
   (setq helm-css-scss-insert-close-comment-depth 2
         helm-css-scss-split-with-multiple-windows t
@@ -6192,21 +6288,15 @@ Set HTML indentation to 4 spaces by default (only on html-mode)
              emmet-next-edit-point
              emmet-prev-edit-point)
   :init
-    (setq emmet-indentation 2)
-    (setq emmet-move-cursor-between-quotes t)
-  :hook
-    (sgml-mode . emmet-mode) ;; Auto-start on any markup modes
-    (css-mode . emmet-mode) ;; enable Emmet's css abbreviation.
-    (scss-mode . emmet-mode) ;; enable Emmet's css abbreviation.
-    (html-mode . emmet-mode) ;; Auto-start on HTML files
-    (web-mode . emmet-mode) ;; Auto-start on web-mode
+  (setq emmet-indentation 2)
+  (setq emmet-move-cursor-between-quotes t)
   :config
   (unbind-key "<C-return>" emmet-mode-keymap)
   (unbind-key "C-M-<left>" emmet-mode-keymap)
   (unbind-key "C-M-<right>" emmet-mode-keymap)
-  (setq emmet-expand-jsx-className? nil)) ;; use emmet with JSX markup
+  (setq emmet-expand-jsx-className? nil) ;; use emmet with JSX markup
+)
 #+END_SRC
-
 
 * Ruby
 
@@ -6223,6 +6313,7 @@ Set HTML indentation to 4 spaces by default (only on html-mode)
   :hook
   (ruby-mode . subword-mode)
   (ruby-mode . eldoc-mode)
+  (enh-ruby-mode . lsp)
   :config
   (defun my-ruby-mode-hook ()
     (require 'inf-ruby)
@@ -6339,6 +6430,10 @@ Unfortunatelly this package has to be installed manually, as its not available o
   :mode
   ("\\.phtml\\'" "\\.tpl\\.php\\'" "\\.[agj]sp\\'" "\\.as[cp]x\\'"
   "\\.erb\\'" "\\.mustache\\'" "\\.djhtml\\'" "\\.[t]?html?\\'")
+  :hook
+  (web-mode . rainbow-mode)
+  (web-mode . aggressive-indent-mode)
+
   :config
   ;; web-mode indentation
   (setq web-mode-markup-indent-offset 4)
@@ -6360,8 +6455,7 @@ Unfortunatelly this package has to be installed manually, as its not available o
   ;; Template
   (setq web-mode-engines-alist
         '(("php"    . "\\.phtml\\'")
-          ("blade"  . "\\.blade\\."))
-        )
+          ("blade"  . "\\.blade\\.")))
 )
 #+END_SRC
 
@@ -6430,29 +6524,49 @@ Unfortunatelly this package has to be installed manually, as its not available o
 (use-package js2-mode
   :mode
   ("\\.js$" . js2-mode)
-
   :hook
   (js2-mode . flycheck-mode)
   (js2-mode . rainbow-mode)
   (js2-mode . company-mode)
-  (js2-mode . tide-mode)
+  ;;(js2-mode . tide-mode)
   (js2-mode . add-node-modules-path)
-  :config
+  (js2-mode . lsp)
+  (js2-jsx-mode . lsp)
+  (js2-mode . rainbow-mode)
+  (js2-mode . color-identifiers-mode)
+  (js2-mode . prettier-js-mode)
+  (js2-mode . aggressive-indent-mode)
+
+  :init
   ;; have 2 space indentation by default
   (setq js-indent-level 2)
   (setq js2-basic-offset 2)
   (setq js-chain-indent t)
-
-  ;; use eslint_d insetad of eslint for faster linting
-  ;; (setq flycheck-javascript-eslint-executable "eslint_d")
-
   ;; Try to highlight most ECMA built-ins
   (setq js2-highlight-level 3)
-
   ;; turn off all warnings in js2-mode
   (setq js2-mode-show-parse-errors t)
   (setq js2-mode-show-strict-warnings nil)
   (setq js2-strict-missing-semi-warning nil)
+  :config
+  ;;=======================================
+  ;; Flycheck Setup for JavaScript
+  ;; add eslint to list of flycheck checkers
+  ;;---------------------------------------
+  (setq flycheck-checkers '(javascript-eslint))
+  ;; disable jshint since we prefer eslint checking
+  (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))
+  ;; use eslint_d insetad of eslint for faster linting
+  (setq flycheck-javascript-eslint-executable "eslint_d")
+  ;; set modes that will use ESLint
+  (flycheck-add-mode 'javascript-eslint 'web-mode)
+  (flycheck-add-mode 'javascript-eslint 'js2-mode)
+  (flycheck-add-mode 'javascript-eslint 'js-mode)
+  ;; Workaround for eslint loading slow
+  ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
+  (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t))
+  ;;=======================================
+
 )
 #+END_SRC
 
@@ -6626,7 +6740,8 @@ https://github.com/Sterlingg/json-snatcher
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package json-snatcher
-  :hook ((json-mode . js-mode-bindings))
+  :hook
+  (json-mode . js-mode-bindings)
   :config
   (defun js-mode-bindings ()
     "Sets a hotkey for using the json-snatcher plugin"
@@ -6647,11 +6762,9 @@ https://github.com/Sterlingg/json-snatcher
   :ensure-system-package
   (prettier . "npm install -g prettier")
   :hook
-  (js2-mode . prettier-js-mode)
   (web-mode . prettier-js-mode)
   (rjsx-mode . prettier-js-mode)
   (css-mode . prettier-js-mode)
-  (scss-mode . prettier-js-mode)
   (json-mode . prettier-js-mode)
   :init
   (setq prettier-js-show-errors 'buffer) ;; options: 'buffer, 'echo or nil
@@ -6762,6 +6875,9 @@ https://github.com/mojochao/npm-mode
   :ensure t
   :mode (("\\.ts\\'" . typescript-mode)
          ("\\.tsx\\'" . typescript-mode))
+  :hook
+  (typescript-mode . aggressive-indent-mode)
+
 )
 #+END_SRC
 
@@ -6791,27 +6907,6 @@ https://github.com/mojochao/npm-mode
 
 #+END_SRC
 
-** tslint for flycheck
-This package is now part of flycheck
-This is just for its configuration
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package flycheck-typescript-tslint
-  :ensure nil
-  :ensure-system-package
-  ((tslint . "npm i -g tslint")
-   (typescript . "npm i -g typescript"))
-  :config
-  (eval-after-load 'flycheck
-  '(add-hook 'flycheck-mode-hook #'flycheck-typescript-tslint-setup))
-  ;; location of config file
-  (custom-set-variables
-     '(flycheck-typescript-tslint-config "~/tslint.json"))
-  ;; custom location of executable (if not available globally)
-   (custom-set-variables
-     '(flycheck-typescript-tslint-executable "~/my_executables/tslint"))
-)
-#+END_SRC
 * Angular
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package ng2-mode
@@ -6835,16 +6930,23 @@ This is just for its configuration
 
 * JSON Mode
 
-    #+BEGIN_SRC emacs-lisp :tangle init.el
-;; json-mode: Major mode for editing JSON files with emacs
-;; https://github.com/joshwnj/json-mode
+json-mode: Major mode for editing JSON files with emacs
+https://github.com/joshwnj/json-mode
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package json-mode
   :mode "\\.js\\(?:on\\|[hl]int\\(rc\\)?\\)\\'"
   :config
   (add-hook 'json-mode-hook #'prettier-js-mode)
   (setq json-reformat:indent-width 2)
   (setq json-reformat:pretty-string? t)
-  (setq js-indent-level 2))
+  (setq js-indent-level 2)
+
+  ;;Flycheck setup for JSON Mode
+  ;; disable json-jsonlist checking for json files
+  (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(json-jsonlist)))
+)
+
     #+END_SRC
 
 * RJSX Mode

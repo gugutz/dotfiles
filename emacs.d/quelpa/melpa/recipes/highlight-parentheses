@@ -1,0 +1,3 @@
+(highlight-parentheses
+ :repo "tsdh/highlight-parentheses.el"
+ :fetcher github)

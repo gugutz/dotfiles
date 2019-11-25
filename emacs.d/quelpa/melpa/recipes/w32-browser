@@ -1,0 +1,1 @@
+(w32-browser :fetcher github :repo "emacsorphanage/w32-browser")

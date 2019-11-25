@@ -1,0 +1,2 @@
+(multi-term :fetcher github :repo "manateelazycat/multi-term")
+

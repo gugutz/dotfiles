@@ -1,0 +1,2 @@
+(js3-mode :repo "tamzinblake/js3-mode" :fetcher github)
+

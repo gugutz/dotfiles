@@ -1,0 +1,3 @@
+(vc-darcs
+ :fetcher github
+ :repo "velkyel/vc-darcs")

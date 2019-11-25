@@ -1,0 +1,2 @@
+(tc :repo "kanchoku/tc" :fetcher github :files
+               ("*.el" "tcode")) 

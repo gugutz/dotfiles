@@ -1,19 +1,19 @@
 
 ;; ----- amx-history -----
 (
- package-install
+ rainbow-mode
+ revert-buffer
  org-table-create-or-convert-from-region
- visual-line-mode
- org-table-create
- org-table-paste-rectangle
- ivy-switch-buffer-other-window
- ng2-mode
+ scss-mode
+ eyebrowse-mode
+ display-line-numbers-mode
+ package-install
 )
 
 ;; ----- amx-data -----
 (
  (bug-hunter-init-file . 3)
- (scss-mode . 11)
+ (scss-mode . 12)
  (eslintd-fix-mode . 3)
  (helm-M-x . 1)
  (tide-fix . 6)
@@ -40,12 +40,12 @@
  (org-bullets-mode . 3)
  (avy-goto-char . 2)
  (avy-goto-char-2 . 1)
- (rainbow-mode . 3)
+ (rainbow-mode . 6)
  (profiler-start . 1)
  (profiler-report . 1)
  (evil-mode . 2)
  (visual-line-mode . 5)
- (display-line-numbers-mode . 1)
+ (display-line-numbers-mode . 2)
  (flycheck-mode . 2)
  (smooth-scrolling-mode . 2)
  (sublimity-mode . 1)
@@ -56,7 +56,7 @@
  (snake . 2)
  (c-c-combo-mode . 2)
  (check-parens . 2)
- (eyebrowse-mode . 2)
+ (eyebrowse-mode . 4)
  (js2-mode . 1)
  (conf-unix-mode . 1)
  (dumb-jump-mode . 1)
@@ -67,5 +67,6 @@
  (ivy-switch-buffer-other-window . 1)
  (org-table-paste-rectangle . 1)
  (org-table-create . 1)
- (org-table-create-or-convert-from-region . 4)
+ (org-table-create-or-convert-from-region . 5)
+ (revert-buffer . 1)
 )

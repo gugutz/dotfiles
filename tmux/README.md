@@ -26,6 +26,10 @@ Prefix: `Ctrl - a`
 - `Prefix Q` - Kill window
 - `Prefix X` - Kill session
 
+## Tmux Sidebar
+- `Prefix Tab` - toggle sidebar with a directory tree
+- `Prefix Tab` - toggle sidebar and move cursor to it (focus it)
+
 ## Common shortcuts
 
 - `Prefix c` - New window

@@ -1,0 +1,1 @@
+(shell-command :fetcher github :repo "emacsorphanage/shell-command")
