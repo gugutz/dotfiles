@@ -363,11 +363,12 @@ set_from_resource $term_color15    color15
 ################################################
 
 # set $wallpapers_path ~/Pictures/Wallpapers
-# set $wallpaper1 ~/img/wallpapers/how-winter-should-look.jpg
-# set $wallpaper2 ~/img/wallpapers/stars1.jpg
+# set $wallpaper1 ~/dotfiles/i3/wallpapers/how-winter-should-look.jpg
+set $wallpaper2 ~/dotfiles/i3/wallpapers/emilia-sorrindo.jpg
 
 # 2 different wallapers for 2 monitors
 # exec_always --no-startup-id feh --bg-fill  $wallpaper1 $wallpaper2
+exec_always --no-startup-id feh --bg-fill  $wallpaper2/r
 
 # to stretch a single image across monitors, using half image for each monitor
 # exec_always --no-startup-id feh --bg-scale --no-xinerama $wallpaper1

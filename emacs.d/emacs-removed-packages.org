@@ -110,3 +110,88 @@ Used in adition with the Edit in Emacs plugin for Chrome
   (atomic-chrome-start-server)
 )
 #+END_SRC
+
+* ace jump mode
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package ace-jump-mode
+  :disabled
+  :ensure t
+  :bind
+  ("C-." . ace-jump-mode)
+)
+#+END_SRC
+
+
+* flycheck inline
+
+: Quick peek is an extension that embelishes flycheck inline messages
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package quick-peek
+  :ensure t
+  :disabled
+)
+#+END_SRC
+
+   #+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package flycheck-inline
+  :ensure t
+  :disabled
+  :hook
+  (flycheck-mode . flycheck-inline-mode)
+  :config
+  ;; Set fringe style
+  (setq flycheck-indication-mode 'right-fringe)
+
+  (setq flycheck-mode-line-prefix "Syntax")
+
+  ;; (global-flycheck-inline-mode)
+  (setq flycheck-inline-display-function
+        (lambda (msg pos)
+          (let* ((ov (quick-peek-overlay-ensure-at pos))
+                 (contents (quick-peek-overlay-contents ov)))
+            (setf (quick-peek-overlay-contents ov)
+                  (concat contents (when contents "\n") msg))
+            (quick-peek-update ov)))
+        flycheck-inline-clear-function #'quick-peek-hide))
+#+END_SRC
+
+* flycheck-pos-tip (show flycheck messages in tooltip)
+
+;;; Show Flycheck errors in tooltip
+
+: appearently depends on cask
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package flycheck-pos-tip
+  :ensure t
+  :disabled
+  :defines flycheck-pos-tip-timeout
+  :after flycheck
+  :hook
+  (global-flycheck-mode . flycheck-pos-tip-mode)
+  :config
+  (setq flycheck-pos-tip-timeout 30)
+  (flycheck-pos-tip-mode)
+)
+#+END_SRC
+
+* flycheck-popup-tip (show flycheck messages in tooltip)
+
+There is another official flycheck-pos-tip extension for displaying errors under point. However, it does not display popup if you run Emacs under TTY. It displays message on echo area and that is often used for ELDoc. Also, popups made by pos-tip library does not always look good, especially on macOS and Windows.
+: appearently depends on cask
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;;; Show Flycheck errors in tooltip
+(use-package flycheck-popup-tip
+  :ensure t
+  :disabled
+  :after flycheck
+  :hook
+  (flycheck-mode . flycheck-popup-tip-mode)
+  :config
+  (setq flycheck-popup-tip-error-prefix "\u27a4") ;;  display arrow like this: `➤'
+  ;; (setq flycheck-popup-tip-error-prefix "* ")
+)
+#+END_SRC

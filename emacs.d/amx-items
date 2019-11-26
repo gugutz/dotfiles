@@ -1,12 +1,12 @@
 
 ;; ----- amx-history -----
 (
- rainbow-mode
- revert-buffer
- org-table-create-or-convert-from-region
- scss-mode
- eyebrowse-mode
- display-line-numbers-mode
+ eval-region
+ which-key-mode
+ org-mode
+ package-delete
+ prettier-js-mode
+ ivy-mode
  package-install
 )
 
@@ -22,14 +22,14 @@
  (counsel-projectile-mode . 2)
  (swiper-avy . 2)
  (align-regexp . 3)
- (package-install . 12)
+ (package-install . 14)
  (package-refresh-contents . 2)
- (package-delete . 4)
+ (package-delete . 7)
  (electric-indent-mode . 1)
  (aggressive-indent-mode . 1)
  (customize-variable . 1)
  (exit-recursive-edit . 2)
- (ivy-mode . 3)
+ (ivy-mode . 5)
  (centaur-tabs-group-by-projectile-project . 1)
  (package-install-file . 2)
  (fundamental-mode . 1)
@@ -69,4 +69,8 @@
  (org-table-create . 1)
  (org-table-create-or-convert-from-region . 5)
  (revert-buffer . 1)
+ (prettier-js-mode . 2)
+ (org-mode . 1)
+ (which-key-mode . 1)
+ (eval-region . 1)
 )

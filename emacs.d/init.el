@@ -118,24 +118,6 @@ tangled, and the tangled file is compiled."
   :ensure t
 )
 
-(use-package paradox
-  :ensure t
-  :defer t
-  :config
-  (setq paradox-spinner-type 'progress-bar
-        paradox-execute-asynchronously t)
-)
-
-(use-package quelpa
-  :ensure t
-)
-
-(use-package quelpa-use-package
-  :ensure t
-  :init
-  (setq quelpa-update-melpa-p nil)
-)
-
 (use-package epa-file
   :config
   (epa-file-enable)
@@ -467,12 +449,6 @@ Example output:
 ;; align code in a pretty way
 (global-set-key (kbd "C-x \\") #'align-regexp)
 
-(defun align-to-equals (begin end)
-  "Align region to equal signs"
-   (interactive "r")
-   (align-regexp begin end "\\(\\s-*\\)=" 1 1 )
-)
-
 (use-package dumb-jump
   :ensure t
   :after helm
@@ -505,58 +481,6 @@ Example output:
   (interactive "p")
   (capitalize-word (- arg))
 )
-
-(defun camelcase-region (start end)
-  "Changes region from snake_case to camelCase"
-  (interactive "r")
-  (save-restriction (narrow-to-region start end)
-                    (goto-char (point-min))
-                    (while (re-search-forward "_\\(.\\)" nil t)
-                      (replace-match (upcase (match-string 1))))))
-
-;; ----------------------------------------------------------------------
-;; cadged largely from http://xahlee.org/emacs/elisp_idioms.html:
-;;
-(defun camelcase ()
-  "Changes word or region from snake_case to camelCase"
-  (interactive)
-  (let (pos1 pos2 bds)
-    (if (and transient-mark-mode mark-active)
-        (setq pos1 (region-beginning) pos2 (region-end))
-      (progn
-        (setq bds (bounds-of-thing-at-point 'symbol))
-        (setq pos1 (car bds) pos2 (cdr bds))))
-    (camelcase-region pos1 pos2)))
-
-;; ----------------------------------------------------------------------
-;; snakecase-region
-;; Given a region of text in camelCase format, changes it to snake_case.
-;;
-;; BUG: This is actually just a repeat of camelcase-region!
-(defun snakecase-region (start end)
-  "Changes region from camelCase to snake_case"
-  (interactive "r")
-  (save-restriction
-    (let ((case-fold-search nil))
-      (narrow-to-region start end)
-      (goto-char (point-min))
-      (while (re-search-forward "\\([a-z]\\)\\([A-Z]\\)" nil t)
-        (message (match-string 1))
-        (replace-match (concat (match-string 1) "_" (downcase (match-string 2))))
-        (goto-char (point-min))))))
-
-;; ----------------------------------------------------------------------
-;; Given a region of text in camelCase format, changes it to snake_case.
-(defun snakecase ()
-  "Changes word or region from camelCase to snake_case"
-  (interactive)
-  (let (pos1 pos2 bds)
-    (if (and transient-mark-mode mark-active)
-        (setq pos1 (region-beginning) pos2 (region-end))
-      (progn
-        (setq bds (bounds-of-thing-at-point 'symbol))
-        (setq pos1 (car bds) pos2 (cdr bds))))
-    (snakecase-region pos1 pos2)))
 
 (global-set-key (kbd "C-M-u")	 'upcase-backward-word)
 (global-set-key (kbd "C-M-l")	 'downcase-backward-WORD)
@@ -669,10 +593,9 @@ Example output:
   ;; :init (add-hook 'text-mode-hook #'guess-language-mode)
   :config
   (setq guess-language-langcodes '((en . ("en_US" "English"))
-                                   (br . ("pt_BR" "Portuguese Brazilian"))
-                                  )
-  guess-language-languages '(en br)
-  guess-language-min-paragraph-length 45)
+                                   (br . ("pt_BR" "Portuguese Brazilian"))))
+  (setq guess-language-languages '(en br))
+  (setq guess-language-min-paragraph-length 45)
 )
 
 (use-package exec-path-from-shell
@@ -944,6 +867,7 @@ Example output:
     "mf" 'elixir-format
     "ll" 'longlines-mode
     "x" 'smex)
+    "|" 'split-window-right
 )
 
 (use-package evil-surround
@@ -1062,12 +986,18 @@ Example output:
 )
 
 (use-package org
+  :ensure t
+  :mode "\\.org$"
   :ensure org-plus-contrib
   :defer t
   :hook
   (org-mode . diff-hl-mode)
   (org-mode . rainbow-mode)
-  (org-mode . visual-line-mode)
+  (org-mode . turn-on-visual-line-mode)
+  (org-mode . color-identifier-mode)
+  (org-mode . org-bullets-mode)
+  (org-mode . flycheck-mode)
+  (org-mode . company-mode)
   :bind
   ("C-c l" . org-store-link)
   ("C-c a" . org-agenda)
@@ -1105,23 +1035,12 @@ Example output:
 
   ;;ox-twbs (exporter to twitter bootstrap html)
   (setq org-enable-bootstrap-support t)
-
-  ;; make ispell ignore source blocks
-  (add-to-list 'ispell-skip-region-alist '("^#+begin_src" . "^#+end_src"))
-
   :config
   ;; make windmove work with org mode
   (add-hook 'org-shiftup-final-hook 'windmove-up)
   (add-hook 'org-shiftleft-final-hook 'windmove-left)
   (add-hook 'org-shiftdown-final-hook 'windmove-down)
   (add-hook 'org-shiftright-final-hook 'windmove-right)
-  ;;Set org-support-shift-select customization variable to "Everywhere except timestamps" , otherwise shift+arrows will still have org-mode keybidnings on headings.
-  (setq org-support-shift-select 'always)
-  ;; as a last attempt, disable C-S-arrows on org mode so windmove uses it
-  ;; (define-key org-mode-map (kbd "<M-S-left>") nil)
-  ;; (define-key org-mode-map (kbd "<M-S-right>") nil)
-  ;; (define-key org-mode-map (kbd "<M-left>") nil)
-  ;; (define-key org-mode-map (kbd "<M-right>") nil)
 
   ;; org-capture - needs to be in :config because it assumes a variable is already defined: `org-directory'
   (setq org-default-notes-file (concat org-directory "/notes.org"))
@@ -1137,35 +1056,35 @@ Example output:
           org-latex-packages-alist '(("" "minted"))
           org-latex-pdf-process '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f")))
 
-;; (setq org-latex-pdf-process
-;;     '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
+  ;; compile with pdf-latex
+  ;; (setq org-latex-pdf-process
+  ;;     '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
 
-;; compile with xelatex to use the Arial font
-(setq org-latex-pdf-process
-  '("xelatex -interaction nonstopmode %f"
-     "xelatex -interaction nonstopmode %f")) ;; for multiple passes
+  ;; compile with xelatex to use the Arial font
+  (setq org-latex-pdf-process
+    '("xelatex -interaction nonstopmode %f"
+       "xelatex -interaction nonstopmode %f")) ;; for multiple passes
+
+    (setq org-emphasis-alist '(("*" bold)
+                           ("/" italic)
+                           ("_" underline)
+                           ("=" org-verbatim verbatim)
+                           ("~" org-code verbatim)))
 
 
-  (setq org-emphasis-alist '(("*" bold)
-                         ("/" italic)
-                         ("_" underline)
-                         ("=" org-verbatim verbatim)
-                         ("~" org-code verbatim)))
-
-
-  (require 'org-habit)
-  '(org-emphasis-alist
-   (quote
-    (
-     ("!" org-habit-overdue-face)
-     ("%" org-habit-alert-face)
-     ("*" bold)
-     ("/" italic)
-     ("_" underline)
-     ("=" org-verbatim verbatim)
-     ("~" org-code verbatim)
-     ("+" (:strike-through t))
-     )))
+    (require 'org-habit)
+    '(org-emphasis-alist
+     (quote
+      (
+       ("!" org-habit-overdue-face)
+       ("%" org-habit-alert-face)
+       ("*" bold)
+       ("/" italic)
+       ("_" underline)
+       ("=" org-verbatim verbatim)
+       ("~" org-code verbatim)
+       ("+" (:strike-through t))
+       )))
 )
 
 (use-package org-sidebar
@@ -1173,10 +1092,6 @@ Example output:
 :after org
 :bind
 ("S-<f8>" . org-sidebar-tree-toggle)
-)
-
-(use-package org-dashboard
-  :ensure t
 )
 
 (use-package ox-extra
@@ -1195,6 +1110,30 @@ Example output:
 
 (add-hook 'org-font-lock-set-keywords-hook #'org-add-my-extra-fonts)
 
+(use-package ox-latex
+  :after org
+  :ensure nil
+  :config
+  ;; Source https://orgmode.org/worg/org-faq.html#using-xelatex-for-pdf-export
+  ;; Originally taken from Bruno Tavernier: http://thread.gmane.org/gmane.emacs.orgmode/31150/focus=31432
+  ;; but adapted to use latexmk 4.20 or higher.
+  ;; (defun my-auto-tex-cmd ()
+  ;;   "When exporting from .org with latex, automatically run latex,
+  ;;      pdflatex, or xelatex as appropriate, using latexmk."
+  ;;   (let ((texcmd)))
+  ;;   ;; default command: oldstyle latex via dvi
+  ;;   (setq texcmd "latexmk -dvi -pdfps -quiet %f")
+  ;;   ;; pdflatex -> .pdf
+  ;;   (if (string-match "LATEX_CMD: pdflatex" (buffer-string))
+  ;;       (setq texcmd "latexmk -pdf -quiet %f"))
+  ;;   ;; xelatex -> .pdf
+  ;;   (if (string-match "LATEX_CMD: xelatex" (buffer-string))
+  ;;       (setq texcmd "latexmk -pdflatex=xelatex -pdf -quiet %f"))
+  ;;   ;; LaTeX compilation command
+  ;;   (setq org-latex-to-pdf-process (list texcmd)))
+  ;; (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-cmd)
+)
+
 (use-package ox-pandoc
   :after (org ox)
   :config
@@ -1210,8 +1149,10 @@ Example output:
 )
 
 (use-package org-bullets
+  :ensure t
+  :hook
   :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  ;;(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   (setq org-bullets-bullet-list '("◉" "○" "●" "►" "•"))
 )
 
@@ -1222,6 +1163,7 @@ Example output:
 )
 
 (use-package ox-reveal
+  :ensure t
   :after ox
   :config
   (setq org-reveal-root "https://cdn.jsdelivr.net/reveal.js/3.0.0/")
@@ -1460,6 +1402,8 @@ Example output:
   :diminish counsel-mode
   :defines
   (projectile-completion-system magit-completing-read-function)
+  :hook
+  (ivy-mode . counsel-mode)
   :custom
   (counsel-yank-pop-height 15)
   (enable-recursive-minibuffers t)
@@ -1468,8 +1412,6 @@ Example output:
   (ivy-on-del-error-function nil)
   (swiper-action-recenter t)
   (counsel-grep-base-command "ag -S --noheading --nocolor --nofilename --numbers '%s' %s")
-  :hook
-  (ivy-mode . counsel-mode)
   ;; check out this better-jumper mode to see what it does
   ;; (counsel-grep-post-action . better-jumper-set-jump)
   :preface
@@ -1564,15 +1506,15 @@ Example output:
   :ensure t
   :diminish ivy-posframe-mode
   :custom-face
-  (ivy-posframe ((t (:background "#202020"))))
-  (ivy-posframe-border ((t (:background "#282a36"))))
-  (ivy-posframe-cursor ((t (:background "#61bfff"))))
+  (ivy-posframe ((t (:background "#333244"))))
+  (ivy-posframe-border ((t (:background "#abff00"))))
+  (ivy-posframe-cursor ((t (:background "#00ff00"))))
   :hook
   (ivy-mode . ivy-posframe-mode)
   :config
   ;; custom define height of post frame per function
   (setq ivy-posframe-height-alist '((swiper . 20)
-                                    (t      . 20)))
+                                    (t      . 25)))
 
   ;; display at `ivy-posframe-style'
   (setq ivy-posframe-display-functions-alist
@@ -1637,16 +1579,6 @@ Example output:
   (setq helm-bookmark-show-location t)
   (setq helm-buffer-max-length 40)
   (setq helm-split-window-inside-p t)
-
-  (setq helm-scroll-amount 4)                  ; scroll 4 lines other window using M-<next>/M-<prior>
-  (setq helm-quick-update t)                   ; do not display invisible candidates
-  (setq helm-idle-delay 0.01)                  ; be idle for this many seconds, before updating in delayed sources.
-  (setq helm-input-idle-delay 0.01)            ; be idle for this many seconds, before updating candidate buffer
-  (setq helm-show-completion-display-function #'helm-show-completion-default-display-function)
-  (setq helm-split-window-default-side 'below) ;; open helm buffer in another window
-  (setq helm-split-window-inside-p t)          ;; open helm buffer inside current window, not occupy whole other window
-  (setq helm-candidate-number-limit 200)       ; limit the number of displayed canidates
-  (setq helm-move-to-line-cycle-in-source nil) ; move to end or beginning of source when reaching top or bottom of source.
 
   ;; turn on helm fuzzy matching
   (setq helm-M-x-fuzzy-match t)
@@ -1731,6 +1663,8 @@ Example output:
 )
 
 (use-package ag
+  :ensure-system-package
+  (ag . the_silver_searcher)
   :custom
   (ag-highligh-search t)
   (ag-reuse-buffers t)
@@ -1770,11 +1704,13 @@ Example output:
   ((tslint . "npm i -g tslint")
    (typescript . "npm i -g typescript"))
   :hook
-  (prog-mode . flycheck-mode)
+  ;;(prog-mode . flycheck-mode)
+  (flycheck-mode . flycheck-posframe-mode)
   :custom
   (flycheck-display-errors-delay 1)
   :config
-  (global-flycheck-mode)
+  ;;(global-flycheck-mode)
+
   ;; Only check while saving and opening files
   (setq flycheck-check-syntax-automatically '(save mode-enabled))
 
@@ -1789,32 +1725,6 @@ Example output:
 
 )
 
-(use-package quick-peek
-  :ensure t
-  :disabled
-)
-
-(use-package flycheck-inline
-  :ensure t
-  :disabled
-  :hook
-  (flycheck-mode . flycheck-inline-mode)
-  :config
-  ;; Set fringe style
-  (setq flycheck-indication-mode 'right-fringe)
-
-  (setq flycheck-mode-line-prefix "Syntax")
-
-  ;; (global-flycheck-inline-mode)
-  (setq flycheck-inline-display-function
-        (lambda (msg pos)
-          (let* ((ov (quick-peek-overlay-ensure-at pos))
-                 (contents (quick-peek-overlay-contents ov)))
-            (setf (quick-peek-overlay-contents ov)
-                  (concat contents (when contents "\n") msg))
-            (quick-peek-update ov)))
-        flycheck-inline-clear-function #'quick-peek-hide))
-
 (use-package flycheck-posframe
   :ensure t
   :after flycheck
@@ -1825,8 +1735,6 @@ Example output:
   (flycheck-posframe-error-face ((nil (:inherit 'error))))
   (flycheck-posframe-background-face ((nil (:background "#fcfa23" :foreground "#ff0000"))))
   (flycheck-posframe-border-face ((nil (:background "#af3ec8"))))
-  :hook
-  (flycheck-mode . flycheck-posframe-mode)
   :config
   (setq flycheck-posframe-position 'point-bottom-left-corner)
   (setq flycheck-posframe-prefix "\u27a4 ") ;; default: ➤
@@ -1834,45 +1742,24 @@ Example output:
   (setq flycheck-posframe-info-prefix "\uf6c8 ")
   (setq  flycheck-posframe-error-prefix "\u274c ")
   (setq flycheck-posframe-border-width 2)
-
   ;; Calling (flycheck-posframe-configure-pretty-defaults) will configure flycheck-posframe to show warnings and errors with nicer faces (inheriting from warning and error respectively), and set the prefix for each to nicer unicode characters.
   ;;(flycheck-posframe-configure-pretty-defaults)
-)
-
-(use-package flycheck-pos-tip
-  :ensure t
-  :disabled
-  :defines flycheck-pos-tip-timeout
-  :after flycheck
-  :hook
-  (global-flycheck-mode . flycheck-pos-tip-mode)
-  :config
-  (setq flycheck-pos-tip-timeout 30)
-  (flycheck-pos-tip-mode)
-)
-
-;;; Show Flycheck errors in tooltip
-(use-package flycheck-popup-tip
-  :ensure t
-  :disabled
-  :after flycheck
-  :hook
-  (flycheck-mode . flycheck-popup-tip-mode)
-  :config
-  (setq flycheck-popup-tip-error-prefix "\u27a4") ;;  display arrow like this: `➤'
-  ;; (setq flycheck-popup-tip-error-prefix "* ")
 )
 
 (use-package magit
   :ensure t
   :custom
-  (magit-auto-revert-mode nil)
-  :hook
-  (after-save . (lambda () (magit-after-save-refresh-status t)))
+  (magit-auto-revert-mode t)
+  ;;:hook
+  ;; this line was giving the `Wrong number of arguments error'
+  ;; (after-save . (lambda () (magit-after-save-refresh-status t)))
   :bind
   ("<tab>" . magit-section-toggle)
   ("M-g s" . magit-status)
   ("C-x g" . magit-status)
+  :config
+  (add-hook 'after-save-hook 'magit-after-save-refresh-status t)
+
 )
 
 (use-package evil-magit
@@ -2095,34 +1982,26 @@ Example output:
   '(company-tooltip-common ((t (:inherit font-lock-constant-face))))
   '(company-tooltip-selection ((t (:inherit company-tooltip-common :background "#2a2a2a" )))))
 
- ;; Facing
-  (unless (face-attribute 'company-tooltip :background)
-    (set-face-attribute 'company-tooltip nil :background "black" :foreground "gray40")
-    (set-face-attribute 'company-tooltip-selection nil :inherit 'company-tooltip :background "gray15")
-    (set-face-attribute 'company-preview nil :background "black")
-    (set-face-attribute 'company-preview-common nil :inherit 'company-preview :foreground "gray40")
-    (set-face-attribute 'company-scrollbar-bg nil :inherit 'company-tooltip :background "gray20")
-    (set-face-attribute 'company-scrollbar-fg nil :background "gray40"))
-
   ;; Use Company for completion
-  (bind-key [remap completion-at-point] #'company-complete company-mode-map)
-  (setq company-tooltip-limit 20)                           ; bigger popup window
-  (setq company-minimum-prefix-length 1)                    ; start completing after 1st char typed
-  (setq company-idle-delay 0)                               ; decrease delay before autocompletion popup shows
-  (setq company-echo-delay 0)                               ; remove annoying blinking
-  (setq company-begin-commands '(self-insert-command))      ; start autocompletion only after typing
-                                                            ;; company-dabbrev
-  (setq company-dabbrev-downcase nil)                       ;; Do not downcase completions by default.
-  (setq company-dabbrev-ignore-case t)                      ;; Even if I write something with the ‘wrong’ case, provide the ‘correct’ casing.
+  (progn
+    (bind-key [remap completion-at-point] #'company-complete company-mode-map))
+  (setq company-tooltip-limit 20)                      ; bigger popup window
+  (setq company-minimum-prefix-length 1)               ; start completing after 1st char typed
+  (setq company-idle-delay 0)                         ; decrease delay before autocompletion popup shows
+  (setq company-echo-delay 0)                          ; remove annoying blinking
+  (setq company-begin-commands '(self-insert-command)) ; start autocompletion only after typing
+  ;; company-dabbrev
+  (setq company-dabbrev-downcase nil)                  ;; Do not downcase completions by default.
+  (setq company-dabbrev-ignore-case t)  ;; Even if I write something with the ‘wrong’ case, provide the ‘correct’ casing.
   (setq company-dabbrev-code-everywhere t)
   (setq company-dabbrev-other-buffers t)
   (setq company-dabbrev-code-other-buffers t)
-  (setq company-selection-wrap-around t)                    ; continue from top when reaching bottom
+  (setq company-selection-wrap-around t)               ; continue from top when reaching bottom
   (setq company-auto-complete 'company-explicit-action-p)
   (setq company-require-match nil)
   (setq company-tooltip-align-annotations t)
-  (setq company-complete-number t)                          ;; Allow (lengthy) numbers to be eligible for completion.
-  (setq company-show-numbers t)                             ;; M-⟪num⟫ to select an option according to its number.
+  (setq company-complete-number t)                     ;; Allow (lengthy) numbers to be eligible for completion.
+  (setq company-show-numbers t)  ;; M-⟪num⟫ to select an option according to its number.
   (setq company-transformers '(company-sort-by-occurrence)) ; weight by frequency
   ;; (setq company-tooltip-flip-when-above t)
   ;; DELETE THIS PART IF USE PACKAGE :MAP WORKS
@@ -2134,16 +2013,6 @@ Example output:
   ;; (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
   ;; (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
   ;; (define-key company-active-map (kbd "<backtab>") 'company-select-previous)
-)
-
-(use-package proof-general
-  :ensure t
-  :config
-  (add-hook 'coq-mode-hook #'company-coq-mode)
-)
-
-(use-package company-coq
-  :ensure t
 )
 
 (use-package company-emoji
@@ -2779,6 +2648,8 @@ Example output:
 )
 
 (use-package eyebrowse
+  :hook
+  (after-init . eyebrowse-mode)
   :bind
   (:map eyebrowse-mode-map
   ("M-1" . eyebrowse-switch-to-window-config-1)
@@ -3220,13 +3091,6 @@ Example output:
         ("q" nil)))
 )
 
-(use-package ace-jump-mode
-  :disabled
-  :ensure t
-  :bind
-  ("C-." . ace-jump-mode)
-)
-
 (use-package windmove
   :ensure t
   :config
@@ -3354,6 +3218,7 @@ Example output:
 
 (use-package celestial-mode-line
   :ensure t
+  :disabled
   :config
   (setq calendar-longitude 25.5)
   (setq calendar-latitude 17.5)
@@ -3509,38 +3374,6 @@ Example output:
   )
 )
 
-(use-package origami
-  :ensure quelpa
-  :quelpa (origami :repo "seblemaguer/origami.el" :fetcher github)
-  :custom
-  (origami-show-fold-header t)
-
-  :custom-face
-  (origami-fold-replacement-face ((t (:inherit magit-diff-context-highlight))))
-  (origami-fold-fringe-face ((t (:inherit magit-diff-context-highlight))))
-
-  :init
-  (defhydra origami-hydra (:color blue :hint none)
-    "
-      _:_: recursively toggle node       _a_: toggle all nodes    _t_: toggle node
-      _o_: show only current node        _u_: undo                _r_: redo
-      _R_: reset
-      "
-    (":" origami-recursively-toggle-node)
-    ("a" origami-toggle-all-nodes)
-    ("t" origami-toggle-node)
-    ("o" origami-show-only-node)
-    ("u" origami-undo)
-    ("r" origami-redo)
-    ("R" origami-reset))
-
-  :bind
-  (:map origami-mode-map
-  ("C->" . origami-hydra/body))
-  :config
-  (face-spec-reset-face 'origami-fold-header-face)
-)
-
 (global-set-key (kbd "C-M-+") 'balance-windows-area)
 
 (use-package zoom
@@ -3602,6 +3435,8 @@ Example output:
 (use-package dashboard
   :ensure t
   :bind ("C-S-D" . open-dashboard)
+  :hook
+  (after-init . dashboard-setup-startup-hook)
   :preface
   (defun tau/dashboard-banner ()
     "Sets a dashboard banner including information on package initialization
@@ -3622,8 +3457,8 @@ Example output:
                          (registers . 5))
   )
 
-  ;; sets dashboard as emacs initial buffer on startup
-  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+
+  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))) ;; sets dashboard as emacs initial buffer on startup
 
   ;; Set the title
   (setq dashboard-banner-logo-title "Hi 😊 ")
@@ -3631,24 +3466,17 @@ Example output:
           (message " ★ Emacs initialized in %.2fs ★ "
                    (float-time (time-subtract (current-time) my-init-el-start-time))))
 
-  ;; Set the banner
-  (setq dashboard-startup-banner 'logo) ;; values: ('oficial, 'logo, 1, 2, 3, or "path/to/image.png")
 
-  ;; Content is not centered by default. To center, set
-  (setq dashboard-center-content t)
-
-  ;; To disable shortcut "jump" indicators for each section, set
-  (setq dashboard-show-shortcuts t)
+  (setq dashboard-startup-banner 'logo) ;; Set the banner ;; values: ('oficial, 'logo, 1, 2, 3, or "path/to/image.png")
+  (setq dashboard-center-content t) ;; Content is not centered by default. To center, set
+  (setq dashboard-show-shortcuts t) ;; To disable shortcut "jump" indicators for each section, set
 
   ;; To add icons to the widget headings and their items:
   (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
 
-  ;; To show navigator below the banner:
-  (setq dashboard-set-navigator t)
-
-  ;;To show info about the packages loaded and the init time:
-  (setq dashboard-set-init-info t)
+  (setq dashboard-set-navigator t) ;; To show navigator below the banner
+  (setq dashboard-set-init-info t) ;;To show info about the packages loaded and the init time:
 
   ;; A randomly selected footnote will be displayed. To disable it:
   ;;(setq dashboard-set-footer nil)
@@ -3669,7 +3497,7 @@ Example output:
 ;;  (add-to-list 'dashboard-item-generators  '(fireplace . dashboard-insert-custom))
 ;;  (add-to-list 'dashboard-items '(fireplace) t)
 
-  (dashboard-setup-startup-hook)
+
 )
 
 
@@ -3956,19 +3784,6 @@ Example output:
   (add-to-list 'hl-todo-keyword-faces '("DONE" . "#00ff00"))
 )
 
-(use-package fic-mode
-  :commands fic-mode
-  :ensure t
-  :init
-  (add-hook 'prog-mode-hook 'fic-mode)
-  :config
-
-  (defun fic-view-listing ()
-    "Use occur to list related FIXME keywords"
-    (interactive)
-    (occur "\\<\\(FIXME\\|WRITEME\\|WRITEME!\\|TODO\\|BUG\\):?"))
-)
-
 (use-package hi-lock
   :init
   (global-hi-lock-mode 1)
@@ -4061,10 +3876,7 @@ Example output:
 
 (use-package rainbow-mode
   :ensure t
-  :hook
-  (css-mode . rainbow-mode)
-  (php-mode . rainbow-mode)
-  (html-mode . rainbow-mode)
+)
 
 (use-package hl-line
   :ensure nil
@@ -4184,30 +3996,34 @@ Example output:
 )
 
 (use-package which-key
-  :hook (after-init . which-key-mode))
+  :ensure t
+  :hook (after-init . which-key-mode)
   :config
   (setq which-key-idle-delay 0.2)
   (setq which-key-min-display-lines 3)
   (setq which-key-max-description-length 20)
   (setq which-key-max-display-columns 6)
+)
 
 (use-package keyfreq
   :ensure t
+  :hook (after-init . keyfreq-mode)
   :init
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1)
 )
 
 (use-package smartparens
-  :ensure t
-  :hook
-  (after-init . smartparens-global-mode)
-  :config
-  (require 'smartparens-config)
-  (sp-pair "=" "=" :actions '(wrap))
-  (sp-pair "+" "+" :actions '(wrap))
-  (sp-pair "<" ">" :actions '(wrap))
-  (sp-pair "$" "$" :actions '(wrap)))
+   :ensure t
+   ;;:hook
+   ;;(after-init . smartparens-global-mode)
+   :config
+   (require 'smartparens-config)
+   (sp-pair "=" "=" :actions '(wrap))
+   (sp-pair "+" "+" :actions '(wrap))
+   (sp-pair "<" ">" :actions '(wrap))
+   (sp-pair "$" "$" :actions '(wrap))
+)
 
 (use-package evil-smartparens
   :ensure t
@@ -4255,106 +4071,6 @@ Example output:
   ("M-<f5>" . quickrun-shell)
 )
 
-(use-package pdf-tools
-  :ensure t
-  :after hydra
-  :config
-
-  ;; Install what need to be installed !
-  (pdf-tools-install t t t)
-  ;; open pdfs scaled to fit page
-  (setq-default pdf-view-display-size 'fit-page)
-  ;; automatically annotate highlights
-  (setq pdf-annot-activate-created-annotations t)
-  ;; use normal isearch
-  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
-  ;; more fine-grained zooming
-  (setq pdf-view-resize-factor 1.1)
-
-  ;;
-  (add-hook 'pdf-view-mode-hook
-            (lambda ()
-              (pdf-misc-size-indication-minor-mode)
-              (pdf-links-minor-mode)
-              (pdf-isearch-minor-mode)
-              (cua-mode 0)
-              ))
-
-  (add-to-list 'auto-mode-alist (cons "\\.pdf$" 'pdf-view-mode))
-
-  ;; Keys
-  (bind-keys :map pdf-view-mode-map
-             ("/" . hydra-pdftools/body)
-             ("<s-spc>" .  pdf-view-scroll-down-or-next-page)
-             ("g"  . pdf-view-first-page)
-             ("G"  . pdf-view-last-page)
-             ("l"  . image-forward-hscroll)
-             ("h"  . image-backward-hscroll)
-             ("j"  . pdf-view-next-page)
-             ("k"  . pdf-view-previous-page)
-             ("e"  . pdf-view-goto-page)
-             ("u"  . pdf-view-revert-buffer)
-             ("al" . pdf-annot-list-annotations)
-             ("ad" . pdf-annot-delete)
-             ("aa" . pdf-annot-attachment-dired)
-             ("am" . pdf-annot-add-markup-annotation)
-             ("at" . pdf-annot-add-text-annotation)
-             ("y"  . pdf-view-kill-ring-save)
-             ("i"  . pdf-misc-display-metadata)
-             ("s"  . pdf-occur)
-             ("b"  . pdf-view-set-slice-from-bounding-box)
-             ("r"  . pdf-view-reset-slice))
-
-  (defhydra hydra-pdftools (:color blue :hint nil)
-    "
-      PDF tools
-
-   Move  History   Scale/Fit                  Annotations     Search/Link     Do
-------------------------------------------------------------------------------------------------
-     ^^_g_^^      _B_    ^↧^    _+_    ^ ^     _al_: list    _s_: search    _u_: revert buffer
-     ^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   _am_: markup  _o_: outline   _i_: info
-     ^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     _at_: text    _F_: link      _d_: dark mode
-     ^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   _ad_: delete  _f_: search link
-_h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
-     ^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   _y_:  yank
-     ^^_n_^^      ^ ^  _r_eset slice box
-     ^^^↓^^^
-     ^^_G_^^
-"
-          ("\\" hydra-master/body "back")
-          ("<ESC>" nil "quit")
-          ("al" pdf-annot-list-annotations)
-          ("ad" pdf-annot-delete)
-          ("aa" pdf-annot-attachment-dired)
-          ("am" pdf-annot-add-markup-annotation)
-          ("at" pdf-annot-add-text-annotation)
-          ("y"  pdf-view-kill-ring-save)
-          ("+" pdf-view-enlarge :color red)
-          ("-" pdf-view-shrink :color red)
-          ("0" pdf-view-scale-reset)
-          ("H" pdf-view-fit-height-to-window)
-          ("W" pdf-view-fit-width-to-window)
-          ("P" pdf-view-fit-page-to-window)
-          ("n" pdf-view-next-page-command :color red)
-          ("p" pdf-view-previous-page-command :color red)
-          ("d" pdf-view-dark-minor-mode)
-          ("b" pdf-view-set-slice-from-bounding-box)
-          ("r" pdf-view-reset-slice)
-          ("g" pdf-view-first-page)
-          ("G" pdf-view-last-page)
-          ("e" pdf-view-goto-page)
-          ("o" pdf-outline)
-          ("s" pdf-occur)
-          ("i" pdf-misc-display-metadata)
-          ("u" pdf-view-revert-buffer)
-          ("F" pdf-links-action-perfom)
-          ("f" pdf-links-isearch-link)
-          ("B" pdf-history-backward :color red)
-          ("N" pdf-history-forward :color red)
-          ("l" image-forward-hscroll :color red)
-          ("h" image-backward-hscroll :color red))
-)
-
 (use-package auctex-latexmk
     :defer t
     :init
@@ -4399,39 +4115,6 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
         (setq TeX-PDF-mode t)
         (setq TeX-source-correlate-method 'synctex)
         (setq TeX-source-correlate-start-server t)))
-)
-
-(use-package bibtex
-  :defer t
-  :config
-  (defun bibtex-generate-autokey ()
-    (let* ((bibtex-autokey-names nil)
-           (bibtex-autokey-year-length 2)
-           (bibtex-autokey-name-separator "\0")
-           (names (split-string (bibtex-autokey-get-names) "\0"))
-           (year (bibtex-autokey-get-year))
-           (name-char (cond ((= (length names) 1) 4)
-                            ((= (length names) 2) 2)
-                            (t 1)))
-           (existing-keys (bibtex-parse-keys))
-           key)
-      (setq names (mapconcat (lambda (x)
-                               (substring x 0 name-char))
-                             names
-                             ""))
-      (setq key (format "%s%s" names year))
-      (let ((ret key))
-        (loop for c from ?a to ?z
-              while (assoc ret existing-keys)
-              do (setq ret (format "%s%c" key c)))
-        ret)))
-
-  (setq bibtex-align-at-equal-sign t
-        bibtex-autokey-name-year-separator ""
-        bibtex-autokey-year-title-separator ""
-        bibtex-autokey-titleword-first-ignore '("the" "a" "if" "and" "an")
-        bibtex-autokey-titleword-length 100
-        bibtex-autokey-titlewords 1)
 )
 
 (add-to-list 'org-latex-classes
@@ -4496,6 +4179,7 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
   :mode "\\.css\\'"
   :hook
   (css-mode . aggressive-indent-mode)
+  (css-mode . prettier-js-mode)
   (css-mode . emmet-mode)
   :init
   (setq css-indent-offset 2)
@@ -4504,14 +4188,15 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
 (use-package scss-mode
   :ensure t
   ;; this mode doenst load using :mode from use-package, dunno why
-  :mode (("\\.scss\\'" . scss-mode)
-         ("\\.component.scss\\'" . scss-mode))
+  :mode (("\\.scss$\\'" . scss-mode)
+         ("\\.component.scss$\\'" . scss-mode))
   :init
   (setq scss-compile-at-save 'nil)
   :hook
   (scss-mode . prettier-js-mode)
   (scss-mode . rainbow-mode)
-
+  (scss-mode . aggressive-indent-mode)
+  (scss-mode . emmet-mode)
   :config
   (autoload 'scss-mode "scss-mode")
   (setq scss-compile-at-save 'nil)
@@ -4521,6 +4206,7 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
 
 (use-package helm-css-scss
   :ensure t
+  :after helm
   :bind
   (:map isearch-mode-map
   ("s-i" . helm-css-scss-from-isearch))
@@ -4536,6 +4222,13 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
   (setq helm-css-scss-insert-close-comment-depth 2
         helm-css-scss-split-with-multiple-windows t
         helm-css-scss-split-direction 'split-window-vertically)
+
+  ;; Set local keybind map for css-mode / scss-mode / less-css-mode
+  (dolist ($hook '(css-mode-hook scss-mode-hook less-css-mode-hook))
+    (add-hook
+     $hook (lambda ()
+             (local-set-key (kbd "s-i") 'helm-css-scss)
+             (local-set-key (kbd "s-I") 'helm-css-scss-back-to-last-point))))
 )
 
 (use-package yaml-mode
@@ -4548,10 +4241,7 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
 
 (use-package emmet-mode
   :ensure t
-  :diminish (emmet-mode . "ε")
-  :commands (emmet-mode
-             emmet-next-edit-point
-             emmet-prev-edit-point)
+  :commands emmet-mode
   :init
   (setq emmet-indentation 2)
   (setq emmet-move-cursor-between-quotes t)
@@ -4648,6 +4338,11 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
   "\\.erb\\'" "\\.mustache\\'" "\\.djhtml\\'" "\\.[t]?html?\\'")
   :hook
   (web-mode . rainbow-mode)
+  (web-mode . flycheck-mode)
+  (web-mode . company-mode)
+  (web-mode . emmet-mode)
+  (web-mode . editorconfig-mode)
+  (web-mode . color-identifiers-mode)
   (web-mode . aggressive-indent-mode)
 
   :config
@@ -4676,6 +4371,8 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
 
 (use-package web-beautify
   :ensure t
+  :ensure-system-package
+  (js-beautify . "npm i -g js-beautify")
   :commands (web-beautify-css
              web-beautify-css-buffer
              web-beautify-html
@@ -4695,7 +4392,6 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
   ("\\.js$" . js2-mode)
   :hook
   (js2-mode . flycheck-mode)
-  (js2-mode . rainbow-mode)
   (js2-mode . company-mode)
   ;;(js2-mode . tide-mode)
   (js2-mode . add-node-modules-path)
@@ -4705,6 +4401,9 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
   (js2-mode . color-identifiers-mode)
   (js2-mode . prettier-js-mode)
   (js2-mode . aggressive-indent-mode)
+(js2-mode typescript-mode . indium-interaction-mode)
+(js2-mode typescript-mode . add-node-modules-path)
+
 
   :init
   ;; have 2 space indentation by default
@@ -4809,15 +4508,14 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
   :ensure-system-package
   (indium . "npm i -g indium")
   :after js2-mode
-  :bind (:map js2-mode-map
-              ("C-c C-l" . indium-eval-buffer))
-  :hook
-  ((js2-mode typescript-mode) . indium-interaction-mode)
+  :bind
+  (:map js2-mode-map
+  ("C-c C-l" . indium-eval-buffer))
 )
 
 (use-package add-node-modules-path
-  :hook ((js2-mode . add-node-modules-path)
-         (rjsx-mode . add-node-modules-path)))
+  :ensure t
+)
 
 (use-package json-snatcher
   :hook
@@ -4837,11 +4535,6 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
   ("\\.scss$" . prettier-js-mode)
   :ensure-system-package
   (prettier . "npm install -g prettier")
-  :hook
-  (web-mode . prettier-js-mode)
-  (rjsx-mode . prettier-js-mode)
-  (css-mode . prettier-js-mode)
-  (json-mode . prettier-js-mode)
   :init
   (setq prettier-js-show-errors 'buffer) ;; options: 'buffer, 'echo or nil
   :config
@@ -4881,14 +4574,25 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
 
 )
 
+(use-package format-all
+:ensure t
+:bind ("C-c C-f" . format-all-buffer)
+)
+
+(use-package json-mode
+  :ensure t
+  :mode "\\.js\\(?:on\\|[hl]int\\(rc\\)?\\)\\'"
+  :config
+  (add-hook 'json-mode-hook #'prettier-js-mode)
+  (setq json-reformat:indent-width 2)
+  (setq json-reformat:pretty-string? t)
+  (setq js-indent-level 2))
+
 (use-package eslintd-fix
   :ensure t
   :ensure-system-package
   (eslint . "npm i -g eslint")
   :config
-  ;;(setq eslintd-fix-executable "/my/path/eslint_d")
-  ;;
-
   ;; Grab eslint executable from node_modules instead of global
   ;; Taken from https://github.com/flycheck/flycheck/issues/1087#issuecomment-246514860
   ;; Gist: https://github.com/lunaryorn/.emacs.d/blob/master/lisp/lunaryorn-flycheck.el#L62
@@ -4911,8 +4615,25 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
                                    package-directory)))))))
 )
 
-(use-package npm-mode
-  :ensure t
+(use-package rjsx-mode
+  :after js2-mode
+  :mode
+  ("\\.jsx$" . rjsx-mode)
+  ("components/.+\\.js$" . rjsx-mode)
+  :hook
+  (rjsx-mode . add-node-modules-path)
+  (rjsx-mode . prettier-js-mode)
+  :config
+  ;; auto register for JS files that are inside a `components' folder
+  (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
+
+  ;; for better jsx syntax-highlighting in web-mode
+  ;; - courtesy of Patrick @halbtuerke
+  (defadvice web-mode-highlight-part (around tweak-jsx activate)
+    (if (equal web-mode-content-type "jsx")
+      (let ((web-mode-enable-part-face nil))
+        ad-do-it)
+      ad-do-it))
 )
 
 (use-package typescript-mode
@@ -4920,28 +4641,37 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
   :mode (("\\.ts\\'" . typescript-mode)
          ("\\.tsx\\'" . typescript-mode))
   :hook
+  (typescript-mode . eldoc-mode)
   (typescript-mode . aggressive-indent-mode)
-
-)
-
-(defun setup-tide-mode ()
-  (interactive)
-  (tide-setup)
-  (flycheck-mode +1)
-  (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  (eldoc-mode +1)
-  (tide-hl-identifier-mode +1)
-  (company-mode +1)
+  (typescript-mode . aggressive-indent-mode)
+  (typescript-mode . prettier-js-mode)
+  (typescript-mode . turn-on-visual-line-mode)
+  (typescript-mode . tide-mode)
+  (typescript-mode . editorconfig-mode)
+  (typescript-mode . indium-interaction-mode)
+  (typescript-mode . smartparens-mode)
 )
 
 (use-package tide
   :ensure t
-  :config
-  (progn
-    (add-hook 'before-save-hook 'tide-format-before-save)
-    (add-hook 'typescript-mode-hook #'setup-tide-mode)
-    (add-hook 'js2-mode-hook #'setup-tide-mode)
+  :preface
+  (defun setup-tide-mode ()
+    (interactive)
+    (tide-setup)
+    (flycheck-mode +1)
+    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+    (eldoc-mode +1)
+    (tide-hl-identifier-mode +1)
+    (company-mode +1)
   )
+  :hook
+  (tide-mode . setup-tide-mode)
+  :init
+  (setq tide-always-show-documentation t)
+  :config
+  ;;(add-hook 'before-save-hook 'tide-format-before-save)
+  ;;(add-hook 'typescript-mode-hook #'setup-tide-mode)
+  ;;(add-hook 'js2-mode-hook #'setup-tide-mode)
 )
 
 (use-package ng2-mode
@@ -4950,7 +4680,14 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
   ("\\.component.ts$\\'" "\\.component.html$\\'")
   :hook
   (ng2-mode . rainbow-mode)
+  (ng2-mode . flycheck-mode)
+  (ng2-mode . company-mode)
+  (ng2-mode . smartparens-mode)
+  (ng2-mode . editorconfig-mode)
+  (ng2-mode . color-identifiers-mode)
+  (ng2-mode . lsp-mode)
   (ng2-mode . prettier-js-mode)
+  (ng2-mode . eldoc-mode)
 )
 
 (use-package format-all
@@ -5106,7 +4843,8 @@ _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     _aa_: dired
   (next-line 1)
   (yank))
 
-(global-set-key (kbd "M-S-D") 'duplicate-line)
+;;(global-set-key (kbd "M-S-D") 'duplicate-line)
+(global-set-key [(meta shift d)] 'duplicate-line)
 
 (defun copy-to-clipboard ()
   "Make F8 and F9 Copy and Paste to/from OS Clipboard.  Super usefull."
