@@ -487,32 +487,7 @@ Example output:
 ;; this replaces native capitlize word!
 (global-set-key (kbd "C-M-c")	 'capitalize-backward-word)
 
-(defconst *spell-check-support-enabled* t) ;; Enable with t if you prefer
-
-(use-package move-text
-  :ensure t
-  :after evil
-  :bind
-  ([(meta k)] . move-text-up)
-  ([(meta j)] . move-text-down)
-  ([(meta shift k)] . move-text-line-up)
-  ([(meta shift j)] . move-text-line-down)
-  ([(meta shift up)] . move-text-up)
-  ([(meta shift down)] . move-text-down)
-  :init
-  ;; free the bindings used by this plugin from windmove and other areas that use the same keys
-  (global-unset-key (kbd "M-j"))
-  (global-unset-key (kbd "M-k"))
-  (global-unset-key (kbd "C-S-j"))
-  (global-unset-key (kbd "C-S-k"))
-  :config
-  (move-text-default-bindings)
-  ;; tried setting these in :bind but use package executes :bind along with init, and i needed to free the keys before
-  (define-key evil-normal-state-map (kbd "M-j") 'move-text-down)
-  (define-key evil-normal-state-map (kbd "M-k") 'move-text-up)
-  (define-key evil-visual-state-map (kbd "M-j") 'move-text-region-up)
-  (define-key evil-visual-state-map (kbd "M-k") 'move-text-region-down)
-)
+(defconst *spell-check-support-enabled* nil) ;; Enable with t if you prefer
 
 ;(defun fd-switch-dictionary()
 ;(interactive)
@@ -541,6 +516,7 @@ Example output:
 
 (use-package flyspell
   :defer 1
+  :disabled
   :hook
   (text-mode . flyspell-mode)
   :config
@@ -587,15 +563,41 @@ Example output:
 
 (use-package guess-language         ; Automatically detect language for Flyspell
   :ensure t
+  :disabled
   :defer t
   :hook
   (text-mode . guess-language-mode)
   ;; :init (add-hook 'text-mode-hook #'guess-language-mode)
   :config
   (setq guess-language-langcodes '((en . ("en_US" "English"))
-                                   (br . ("pt_BR" "Portuguese Brazilian"))))
-  (setq guess-language-languages '(en br))
+                                   (pt . ("pt_BR" "Portuguese Brazilian"))))
+  (setq guess-language-languages '(en pt))
   (setq guess-language-min-paragraph-length 45)
+)
+
+(use-package move-text
+  :ensure t
+  :after evil
+  :bind
+  ([(meta k)] . move-text-up)
+  ([(meta j)] . move-text-down)
+  ([(meta shift k)] . move-text-line-up)
+  ([(meta shift j)] . move-text-line-down)
+  ([(meta shift up)] . move-text-up)
+  ([(meta shift down)] . move-text-down)
+  :init
+  ;; free the bindings used by this plugin from windmove and other areas that use the same keys
+  (global-unset-key (kbd "M-j"))
+  (global-unset-key (kbd "M-k"))
+  (global-unset-key (kbd "C-S-j"))
+  (global-unset-key (kbd "C-S-k"))
+  :config
+  (move-text-default-bindings)
+  ;; tried setting these in :bind but use package executes :bind along with init, and i needed to free the keys before
+  (define-key evil-normal-state-map (kbd "M-j") 'move-text-down)
+  (define-key evil-normal-state-map (kbd "M-k") 'move-text-up)
+  (define-key evil-visual-state-map (kbd "M-j") 'move-text-region-up)
+  (define-key evil-visual-state-map (kbd "M-k") 'move-text-region-down)
 )
 
 (use-package exec-path-from-shell
@@ -986,9 +988,8 @@ Example output:
 )
 
 (use-package org
-  :ensure t
-  :mode "\\.org$"
   :ensure org-plus-contrib
+  :mode ("\\.org$" . org-mode)
   :defer t
   :hook
   (org-mode . diff-hl-mode)
@@ -1150,7 +1151,6 @@ Example output:
 
 (use-package org-bullets
   :ensure t
-  :hook
   :config
   ;;(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   (setq org-bullets-bullet-list '("◉" "○" "●" "►" "•"))
@@ -1790,8 +1790,7 @@ Example output:
 
 (use-package magit-todos
   :ensure t
-  :after magit
-  :after hl-todo
+  :after magit hl-todo
   :bind
   ("M-g t" . magit-todos-list)
   :config
@@ -2564,12 +2563,14 @@ Example output:
 )
 
 (use-package treemacs-evil
-  :after treemacs evil
-  :ensure t)
+   :after treemacs evil
+   :ensure t
+)
 
 (use-package treemacs-projectile
-  :after treemacs projectile
-  :ensure t)
+   :after treemacs projectile
+   :ensure t
+)
 
 (use-package treemacs-icons-dired
   :after treemacs dired
@@ -2578,8 +2579,9 @@ Example output:
 )
 
 (use-package treemacs-magit
-  :after treemacs magit
-  :ensure t)
+   :after treemacs magit
+   :ensure t
+)
 
 (use-package neotree
   :bind
@@ -4071,27 +4073,13 @@ Example output:
   ("M-<f5>" . quickrun-shell)
 )
 
-(use-package auctex-latexmk
-    :defer t
-    :init
-    (add-hook 'LaTeX-mode-hook 'auctex-latexmk-setup)
-  :hook
-;; example of lambda usage in :hooks
-  (LaTeX-mode . (lambda () (TeX-fold-mode t)))
-  )
-
-(use-package company-auctex
-  :ensure t
-  :defer t
-  :init
-  (add-hook 'LaTeX-mode-hook 'company-auctex-init)
-)
-
 (use-package tex
   :ensure auctex
+  :mode ("\\.tex" . latex-mode)
   :defer t
   :hook
-  (LaTeX-mode . visual-line-mode)
+  (LaTeX-mode . turn-on-visual-line-mode)
+  (LaTeX-mode . rainbow-mode)
   (LaTeX-mode . flyspell-mode)
   (LaTeX-mode . LaTeX-math-mode)
   :custom
@@ -4115,6 +4103,22 @@ Example output:
         (setq TeX-PDF-mode t)
         (setq TeX-source-correlate-method 'synctex)
         (setq TeX-source-correlate-start-server t)))
+)
+
+(use-package auctex-latexmk
+    :defer t
+    :init
+    (add-hook 'LaTeX-mode-hook 'auctex-latexmk-setup)
+  :hook
+;; example of lambda usage in :hooks
+  (LaTeX-mode . (lambda () (TeX-fold-mode t)))
+  )
+
+(use-package company-auctex
+  :ensure t
+  :defer t
+  :init
+  (add-hook 'LaTeX-mode-hook 'company-auctex-init)
 )
 
 (add-to-list 'org-latex-classes
@@ -4187,9 +4191,9 @@ Example output:
 
 (use-package scss-mode
   :ensure t
+  :defer t
   ;; this mode doenst load using :mode from use-package, dunno why
-  :mode (("\\.scss$\\'" . scss-mode)
-         ("\\.component.scss$\\'" . scss-mode))
+  :mode ("\\.scss\\'")
   :init
   (setq scss-compile-at-save 'nil)
   :hook
@@ -4330,12 +4334,21 @@ Example output:
 )
 
 (use-package web-mode
+  :after flycheck company
   :custom-face
   (css-selector ((t (:inherit default :foreground "#66CCFF"))))
   (font-lock-comment-face ((t (:foreground "#828282"))))
   :mode
-  ("\\.phtml\\'" "\\.tpl\\.php\\'" "\\.[agj]sp\\'" "\\.as[cp]x\\'"
-  "\\.erb\\'" "\\.mustache\\'" "\\.djhtml\\'" "\\.[t]?html?\\'")
+  ("\\.phtml\\'" . web-mode)
+  ("\\.tsx\\'" . web-mode)
+  ("\\.jsx\\'" . web-mode)
+  ("\\.tpl\\.php\\'" . web-mode)
+  ("\\.[agj]sp\\'" . web-mode)
+  ("\\.as[cp]x\\'" . web-mode)
+  ("\\.erb\\'" . web-mode)
+  ("\\.mustache\\'" . web-mode)
+  ("\\.djhtml\\'" . web-mode)
+  ("\\.[t]?html?\\'" . web-mode)
   :hook
   (web-mode . rainbow-mode)
   (web-mode . flycheck-mode)
@@ -4344,8 +4357,12 @@ Example output:
   (web-mode . editorconfig-mode)
   (web-mode . color-identifiers-mode)
   (web-mode . aggressive-indent-mode)
-
   :config
+  ;; Template
+  (setq web-mode-engines-alist
+        '(("php"    . "\\.phtml\\'")
+          ("blade"  . "\\.blade\\.")))
+
   ;; web-mode indentation
   (setq web-mode-markup-indent-offset 4)
   (setq web-mode-css-indent-offset 2)
@@ -4355,18 +4372,32 @@ Example output:
   (setq web-mode-enable-block-face t)
   (setq web-mode-enable-part-face t)
 
+  ;;=======================================
+  ;; Flycheck Setup for JavaScript
+  ;;---------------------------------------
+  ;; disable jshint since we prefer eslint checking
+  (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))
+  ;; enable eslint as default js flycheck linter
+  (setq flycheck-checkers '(javascript-eslint))
+  ;; use eslint_d insetad of eslint for faster linting
+  (setq flycheck-javascript-eslint-executable "eslint_d")
   ;; add flycheck linter for webmode
-  (add-to-list 'web-mode-hook 'flycheck-mode)
   (flycheck-add-mode 'javascript-eslint 'web-mode)
-
   ;; Use tidy to check HTML buffers with web-mode.
-  (eval-after-load 'flycheck
-     '(flycheck-add-mode 'html-tidy 'web-mode))
+  (flycheck-add-mode 'html-tidy 'web-mode)
+  ;;(eval-after-load 'flycheck
+  ;;   '(flycheck-add-mode 'html-tidy 'web-mode))
 
-  ;; Template
-  (setq web-mode-engines-alist
-        '(("php"    . "\\.phtml\\'")
-          ("blade"  . "\\.blade\\.")))
+  ;;=======================================
+  ;; Flycheck Setup for TSX
+  ;;---------------------------------------
+  (add-hook 'web-mode-hook
+            (lambda ()
+              (when (string-equal "tsx" (file-name-extension buffer-file-name))
+                (setup-tide-mode))))
+  ;; enable typescript-tslint checker
+  (flycheck-add-mode 'typescript-tslint 'web-mode)
+
 )
 
 (use-package web-beautify
@@ -4385,9 +4416,8 @@ Example output:
   :ensure t
 )
 
-;; js2-mode: enhanced JavaScript editing mode
-;; https://github.com/mooz/js2-mode
 (use-package js2-mode
+  :after flycheck company
   :mode
   ("\\.js$" . js2-mode)
   :hook
@@ -4401,10 +4431,7 @@ Example output:
   (js2-mode . color-identifiers-mode)
   (js2-mode . prettier-js-mode)
   (js2-mode . aggressive-indent-mode)
-(js2-mode typescript-mode . indium-interaction-mode)
-(js2-mode typescript-mode . add-node-modules-path)
-
-
+  (js2-mode . indium-interaction-mode)
   :init
   ;; have 2 space indentation by default
   (setq js-indent-level 2)
@@ -4430,12 +4457,13 @@ Example output:
   (flycheck-add-mode 'javascript-eslint 'web-mode)
   (flycheck-add-mode 'javascript-eslint 'js2-mode)
   (flycheck-add-mode 'javascript-eslint 'js-mode)
+
   ;; Workaround for eslint loading slow
   ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
   (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t))
   ;;=======================================
 
-)
+  )
 
 (use-package js2-refactor
   :ensure t
@@ -4507,9 +4535,11 @@ Example output:
   :ensure t
   :ensure-system-package
   (indium . "npm i -g indium")
-  :after js2-mode
+  :after js2-mode typescript-mode
   :bind
   (:map js2-mode-map
+  ("C-c C-l" . indium-eval-buffer))
+  (:map typescript-mode-map
   ("C-c C-l" . indium-eval-buffer))
 )
 
@@ -4530,9 +4560,6 @@ Example output:
 ;; prettier-emacs: minor-mode to prettify javascript files on save
 ;; https://github.com/prettier/prettier-emacs
 (use-package prettier-js
-  :mode
-  ("\\.js$" . prettier-js-mode)
-  ("\\.scss$" . prettier-js-mode)
   :ensure-system-package
   (prettier . "npm install -g prettier")
   :init
@@ -4638,22 +4665,27 @@ Example output:
 
 (use-package typescript-mode
   :ensure t
-  :mode (("\\.ts\\'" . typescript-mode)
-         ("\\.tsx\\'" . typescript-mode))
-  :hook
+  :after indium
+  :mode
+  (("\\.ts\\'" . typescript-mode)
+   ("\\.tsx\\'" . typescript-mode))
+  :hook (
+  (typescript-mode . tide-mode)
+  (typescript-mode . tide-setup)
+  (typescript-mode . tide-hl-identifier-mode)
   (typescript-mode . eldoc-mode)
-  (typescript-mode . aggressive-indent-mode)
   (typescript-mode . aggressive-indent-mode)
   (typescript-mode . prettier-js-mode)
   (typescript-mode . turn-on-visual-line-mode)
-  (typescript-mode . tide-mode)
   (typescript-mode . editorconfig-mode)
   (typescript-mode . indium-interaction-mode)
   (typescript-mode . smartparens-mode)
+  )
 )
 
 (use-package tide
   :ensure t
+  :after (typescript-mode company flycheck)
   :preface
   (defun setup-tide-mode ()
     (interactive)
@@ -4666,6 +4698,7 @@ Example output:
   )
   :hook
   (tide-mode . setup-tide-mode)
+  (before-save . tide-format-before-save)
   :init
   (setq tide-always-show-documentation t)
   :config
@@ -4676,6 +4709,7 @@ Example output:
 
 (use-package ng2-mode
   :defer
+  :disabled
   :mode
   ("\\.component.ts$\\'" "\\.component.html$\\'")
   :hook

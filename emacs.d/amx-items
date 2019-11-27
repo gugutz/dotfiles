@@ -1,13 +1,13 @@
 
 ;; ----- amx-history -----
 (
+ rainbow-mode
+ org-mode
+ org
+ package-install
+ package-delete
  eval-region
  which-key-mode
- org-mode
- package-delete
- prettier-js-mode
- ivy-mode
- package-install
 )
 
 ;; ----- amx-data -----
@@ -22,9 +22,9 @@
  (counsel-projectile-mode . 2)
  (swiper-avy . 2)
  (align-regexp . 3)
- (package-install . 14)
+ (package-install . 16)
  (package-refresh-contents . 2)
- (package-delete . 7)
+ (package-delete . 8)
  (electric-indent-mode . 1)
  (aggressive-indent-mode . 1)
  (customize-variable . 1)
@@ -40,7 +40,7 @@
  (org-bullets-mode . 3)
  (avy-goto-char . 2)
  (avy-goto-char-2 . 1)
- (rainbow-mode . 6)
+ (rainbow-mode . 7)
  (profiler-start . 1)
  (profiler-report . 1)
  (evil-mode . 2)
@@ -70,7 +70,8 @@
  (org-table-create-or-convert-from-region . 5)
  (revert-buffer . 1)
  (prettier-js-mode . 2)
- (org-mode . 1)
+ (org-mode . 6)
  (which-key-mode . 1)
  (eval-region . 1)
+ (org . 1)
 )
