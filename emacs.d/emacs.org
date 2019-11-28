@@ -515,9 +515,13 @@ Released with Emacs 26 (released in 2018-05)
 #+END_SRC
 
 ** expand-region
+
 #+BEGIN_SRC emacs-lisp :tangle init.el
-;; (require 'expand-region)
-(global-set-key (kbd "C-S-<tab>") 'er/expand-region)
+(use-package 'expand-region
+  :ensure nil
+  :bind
+  ("C-S-iso-lefttab" . 'er/expand-region)
+)
 #+END_SRC
 
 ** refresh buffer with F5

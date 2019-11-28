@@ -305,8 +305,11 @@ tangled, and the tangled file is compiled."
 (global-set-key (kbd "C-S-_") #'text-scale-decrease)
 (global-set-key (kbd "C-S-)") #'text-scale-adjust)
 
-;; (require 'expand-region)
-(global-set-key (kbd "C-S-<tab>") 'er/expand-region)
+(use-package 'expand-region
+  :ensure nil
+  :bind
+  ("C-S-iso-lefttab" . 'er/expand-region)
+)
 
 (global-set-key [f5] '(lambda () (interactive) (revert-buffer nil t nil)))
 
@@ -4541,6 +4544,8 @@ Example output:
   ("C-c C-l" . indium-eval-buffer))
   (:map typescript-mode-map
   ("C-c C-l" . indium-eval-buffer))
+  :config
+  (setq indium-update-script-on-save t)
 )
 
 (use-package add-node-modules-path
@@ -4555,6 +4560,10 @@ Example output:
     "Sets a hotkey for using the json-snatcher plugin"
     (when (string-match  "\\.json$" (buffer-name))
       (local-set-key (kbd "C-c C-g") 'jsons-print-path)))
+)
+
+(use-package js-import
+  :ensure t
 )
 
 ;; prettier-emacs: minor-mode to prettify javascript files on save

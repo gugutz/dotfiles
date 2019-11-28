@@ -1,13 +1,13 @@
 
 ;; ----- amx-history -----
 (
+ web-mode
+ er/expand-region
+ editorconfig-apply
+ web-beautify-html
+ delete-trailing-whitespace
  rainbow-mode
- org-mode
- org
- package-install
- package-delete
- eval-region
- which-key-mode
+ dashboard-refresh-buffer
 )
 
 ;; ----- amx-data -----
@@ -40,7 +40,7 @@
  (org-bullets-mode . 3)
  (avy-goto-char . 2)
  (avy-goto-char-2 . 1)
- (rainbow-mode . 7)
+ (rainbow-mode . 9)
  (profiler-start . 1)
  (profiler-report . 1)
  (evil-mode . 2)
@@ -74,4 +74,10 @@
  (which-key-mode . 1)
  (eval-region . 1)
  (org . 1)
+ (dashboard-refresh-buffer . 1)
+ (delete-trailing-whitespace . 1)
+ (web-mode . 4)
+ (web-beautify-html . 2)
+ (editorconfig-apply . 1)
+ (er/expand-region . 2)
 )
