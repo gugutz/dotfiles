@@ -305,10 +305,10 @@ tangled, and the tangled file is compiled."
 (global-set-key (kbd "C-S-_") #'text-scale-decrease)
 (global-set-key (kbd "C-S-)") #'text-scale-adjust)
 
-(use-package 'expand-region
+(use-package expand-region
   :ensure nil
   :bind
-  ("C-S-iso-lefttab" . 'er/expand-region)
+  ([(control shift iso-lefttab)] . 'er/expand-region)
 )
 
 (global-set-key [f5] '(lambda () (interactive) (revert-buffer nil t nil)))

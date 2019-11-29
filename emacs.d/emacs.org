@@ -517,10 +517,10 @@ Released with Emacs 26 (released in 2018-05)
 ** expand-region
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package 'expand-region
+(use-package expand-region
   :ensure nil
   :bind
-  ("C-S-iso-lefttab" . 'er/expand-region)
+  ([(control shift iso-lefttab)] . 'er/expand-region)
 )
 #+END_SRC
 
