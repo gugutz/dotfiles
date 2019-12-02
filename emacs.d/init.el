@@ -1169,7 +1169,7 @@ Example output:
   :ensure t
   :after ox
   :config
-  (setq org-reveal-root "https://cdn.jsdelivr.net/reveal.js/3.0.0/")
+  ;;(setq org-reveal-root "https://cdn.jsdelivr.net/reveal.js/3.0.0/")
 )
 
 (use-package ox-md
