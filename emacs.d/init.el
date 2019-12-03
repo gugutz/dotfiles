@@ -455,17 +455,29 @@ Example output:
 (use-package dumb-jump
   :ensure t
   :after helm
-  :bind (("M-g o" . dumb-jump-go-other-window)
-         ("M-g j" . dumb-jump-go)
-         ("M-g b" . dumb-jump-back)
-         ("M-g i" . dumb-jump-go-prompt)
-         ("M-g x" . dumb-jump-go-prefer-external)
-         ("M-g z" . dumb-jump-go-prefer-external-other-window))
+  :bind
+  ("M-g o" . dumb-jump-go-other-window)
+  ("M-g j" . dumb-jump-go)
+  ("M-g b" . dumb-jump-back)
+  ("M-g i" . dumb-jump-go-prompt)
+  ("M-g x" . dumb-jump-go-prefer-external)
+  ("M-g z" . dumb-jump-go-prefer-external-other-window)
+  ("M-S-h d" . dumb-jump-hydra/body)
   :config
   (eval-when-compile
     (require 'helm-source nil t))
-  (setq dumb-jump-selector 'helm)
-  ;; (setq dumb-jump-selector 'ivy)
+  (setq dumb-jump-selector 'ivy)
+  ;;(setq dumb-jump-selector 'helm)
+
+  (defhydra dumb-jump-hydra (:color blue :columns 3)
+      "Dumb Jump"
+      ("j" dumb-jump-go "Go")
+      ("o" dumb-jump-go-other-window "Other window")
+      ("e" dumb-jump-go-prefer-external "Go external")
+      ("x" dumb-jump-go-prefer-external-other-window "Go external other window")
+      ("i" dumb-jump-go-prompt "Prompt")
+      ("l" dumb-jump-quick-look "Quick look")
+      ("b" dumb-jump-back "Back"))
 )
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
@@ -925,12 +937,14 @@ Example output:
 
 (use-package evil-paredit
   :ensure t
+  :defer t
   :hook
   (emacs-lisp-mode . evil-paredit-mode)
 )
 
 (use-package evil-mc
   :ensure t
+  :defer t
   :after evil
   :bind
   (:map evil-visual-state-map
@@ -944,6 +958,7 @@ Example output:
 
 (use-package evil-goggles
   :ensure t
+  :defer t
   :config
   (evil-goggles-mode)
   (setq evil-goggles-pulse t) ;; default is to pulse when running in a graphic display
@@ -1715,7 +1730,8 @@ Example output:
   ;;(global-flycheck-mode)
 
   ;; Only check while saving and opening files
-  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (setq flycheck-check-syntax-automatically '(save mode-enabled idle-change))
+  (setq flycheck-idle-change-delay 2)
 
   ;; Set fringe style
   (setq flycheck-indication-mode 'right-fringe)
@@ -3665,8 +3681,8 @@ Example output:
 
 (use-package paren
   :ensure nil
-  :hook
-  (after-init . show-paren-mode)
+  ;;:hook
+  ;;(after-init . show-paren-mode)
   :custom-face
   (show-paren-match ((nil (:background "#44475a" :foreground "#f1fa8c")))) ;; :box t
   :config
@@ -3706,20 +3722,23 @@ Example output:
 
 (use-package highlight-operators
   :ensure t
-  :hook
-  (prog-mode . highlight-operators-mode)
+  :defer t
+  ;;:hook
+  ;;(prog-mode . highlight-operators-mode)
 )
 
 (use-package highlight-escape-sequences
   :ensure t
-  :hook
-  (prog-mode . hes-mode)
+  :defer t
+  ;;:hook
+  ;;(prog-mode . hes-mode)
 )
 
 (use-package highlight-parentheses
   :ensure t
-  :hook
-  (prog-mode . highlight-parentheses-mode)
+  :defer t
+  ;:hook
+  ;;(prog-mode . highlight-parentheses-mode)
 )
 
 (use-package diff-hl
@@ -3792,6 +3811,7 @@ Example output:
 (use-package hi-lock
   :init
   (global-hi-lock-mode 1)
+  :defer t
   :config
   (add-hook 'hi-lock-mode-hook
           (lambda nil
@@ -3805,6 +3825,7 @@ Example output:
 
 (use-package hl-anything
   :ensure t
+  :defer t
   :after evil
 ;;  :hook
 ;;  (kill-emacs . hl-save-highlights)
@@ -3872,8 +3893,8 @@ Example output:
 )
 
 (use-package rainbow-delimiters
-  :load-path "packages/highlight-tail"
-  :ensure nil
+  :ensure t
+  :defer t
   ;;:hook
   ;;(emacs-lisp-mode . rainbow-delimiters-mode)
   ;;(prog-mode . rainbow-delimiters-mode)
@@ -3881,35 +3902,38 @@ Example output:
 
 (use-package rainbow-mode
   :ensure t
+  :defer t
 )
 
 (use-package hl-line
   :ensure nil
-  :defer nil
+  :defer t
   :config
   (global-hl-line-mode)
 )
 
 (use-package col-highlight
-  :disabled
-  :defer nil
+  :load-path "packages/col-highlight"
+  :ensure nil
+  :defer t
   :config
   (col-highlight-toggle-when-idle)
   (col-highlight-set-interval 2)
 )
 
 (use-package crosshairs
-  :disabled
-  :defer nil
+  :load-path "packages/crosshairs"
+  :ensure nil
+  :defer t
   :config
   (crosshairs-mode)
 )
 
 (use-package volatile-highlights
   :ensure t
-  :disabled
-  :hook
-  (after-init . volatile-highlights-mode)
+  :defer t
+  ;;:hook
+  ;;(after-init . volatile-highlights-mode)
   :custom-face
   (vhl/default-face ((nil (:foreground "#FF3333" :background "#FFCDCD"))))
   :config
@@ -3928,8 +3952,9 @@ Example output:
 
 (use-package highlight-indent-guides
   :ensure t
-  :hook
-  ((prog-mode yaml-mode) . highlight-indent-guides-mode)
+  :defer t
+  ;;:hook
+  ;;((prog-mode yaml-mode) . highlight-indent-guides-mode)
   :custom
   (highlight-indent-guides-auto-enabled t)
   (highlight-indent-guides-responsive t)
@@ -3938,7 +3963,7 @@ Example output:
 
 (use-package highlight-context-line
   :ensure t
-  :disabled
+  :defer t
   :config
   (highlight-context-line-mode 1)
 )
@@ -4002,6 +4027,7 @@ Example output:
 
 (use-package which-key
   :ensure t
+  :defer t
   :hook (after-init . which-key-mode)
   :config
   (setq which-key-idle-delay 0.2)
@@ -4012,6 +4038,7 @@ Example output:
 
 (use-package keyfreq
   :ensure t
+  :defer t
   :hook (after-init . keyfreq-mode)
   :init
   (keyfreq-mode 1)
@@ -4051,6 +4078,7 @@ Example output:
 
 (use-package multiple-cursors
   :after evil
+  :defer t
   ;; step 1, select thing in visual-mode (OPTIONAL)
   ;; step 2, `mc/mark-all-like-dwim' or `mc/mark-all-like-this-in-defun'
   ;; step 3, `ace-mc-add-multiple-cursors' to remove cursor, press RET to confirm
@@ -4071,6 +4099,8 @@ Example output:
 )
 
 (use-package quickrun
+  :ensure t
+  :defer t
   :bind
   ("C-<f5>" . quickrun)
   ("M-<f5>" . quickrun-shell)
@@ -4168,6 +4198,7 @@ Example output:
 
 (use-package sgml-mode
   :ensure nil
+  :defer t
   :hook
   ;;(html-mode . (lambda () (set (make-local-variable 'sgml-basic-offset) 4)))
   (sgml-mode . aggressive-indent-mode)
@@ -4183,6 +4214,7 @@ Example output:
 
 (use-package css-mode
   :ensure t
+  :defer t
   :mode "\\.css\\'"
   :hook
   (css-mode . aggressive-indent-mode)
@@ -4240,14 +4272,17 @@ Example output:
 
 (use-package yaml-mode
   :ensure t
+  :defer t
 )
 
 (use-package toml-mode
   :ensure t
+  :defer t
 )
 
 (use-package emmet-mode
   :ensure t
+  :defer t
   :commands emmet-mode
   :init
   (setq emmet-indentation 2)
@@ -4260,6 +4295,7 @@ Example output:
 )
 
 (use-package ruby-mode
+  :defer t
   :mode "\\.rb\\'"
   :interpreter "ruby"
   :ensure-system-package
@@ -4338,6 +4374,7 @@ Example output:
 
 (use-package web-mode
   :after flycheck company
+  :defer t
   :custom-face
   (css-selector ((t (:inherit default :foreground "#66CCFF"))))
   (font-lock-comment-face ((t (:foreground "#828282"))))
@@ -4353,10 +4390,10 @@ Example output:
   ("\\.djhtml\\'" . web-mode)
   ("\\.[t]?html?\\'" . web-mode)
   :hook
-  (web-mode . rainbow-mode)
   (web-mode . flycheck-mode)
   (web-mode . company-mode)
   (web-mode . emmet-mode)
+  (web-mode . rainbow-mode)
   (web-mode . editorconfig-mode)
   (web-mode . color-identifiers-mode)
   (web-mode . aggressive-indent-mode)
@@ -4405,6 +4442,7 @@ Example output:
 
 (use-package web-beautify
   :ensure t
+  :defer t
   :ensure-system-package
   (js-beautify . "npm i -g js-beautify")
   :commands (web-beautify-css
@@ -4421,6 +4459,7 @@ Example output:
 
 (use-package js2-mode
   :after flycheck company
+  :defer t
   :mode
   ("\\.js$" . js2-mode)
   :hook
@@ -4470,6 +4509,7 @@ Example output:
 
 (use-package js2-refactor
   :ensure t
+  :defer t
   :after js2-mode
   :hook
   (js2-mode . js2-refactor-mode)
@@ -4523,6 +4563,7 @@ Example output:
 
 (use-package xref-js2
   :ensure t
+  :defer t
   :config
   ;;(setq xref-js2-search-program 'rg)
 
@@ -4536,6 +4577,7 @@ Example output:
 
 (use-package indium
   :ensure t
+  :defer t
   :ensure-system-package
   (indium . "npm i -g indium")
   :after js2-mode typescript-mode
@@ -4550,9 +4592,12 @@ Example output:
 
 (use-package add-node-modules-path
   :ensure t
+  :defer t
 )
 
 (use-package json-snatcher
+  :ensure t
+  :defer t
   :hook
   (json-mode . js-mode-bindings)
   :config
@@ -4564,11 +4609,14 @@ Example output:
 
 (use-package js-import
   :ensure t
+  :defer t
 )
 
 ;; prettier-emacs: minor-mode to prettify javascript files on save
 ;; https://github.com/prettier/prettier-emacs
 (use-package prettier-js
+  :ensure t
+  :defer t
   :ensure-system-package
   (prettier . "npm install -g prettier")
   :init
@@ -4674,26 +4722,55 @@ Example output:
 
 (use-package typescript-mode
   :ensure t
-  :after indium
+  :defer t
+  :after indium tide company flycheck
   :mode
   (("\\.ts\\'" . typescript-mode)
    ("\\.tsx\\'" . typescript-mode))
-  :hook (
-  (typescript-mode . tide-mode)
-  (typescript-mode . tide-setup)
-  (typescript-mode . tide-hl-identifier-mode)
-  (typescript-mode . eldoc-mode)
-  (typescript-mode . aggressive-indent-mode)
-  (typescript-mode . prettier-js-mode)
-  (typescript-mode . turn-on-visual-line-mode)
-  (typescript-mode . editorconfig-mode)
-  (typescript-mode . indium-interaction-mode)
-  (typescript-mode . smartparens-mode)
+  ;;:hook
+  ;;(typescript-mode . tide-setup)
+  ;;(typescript-mode . eldoc-mode)
+  ;; programming utilities
+  ;;(typescript-mode . flycheck-mode)
+  ;;(typescript-mode . company-mode)
+  ;;(typescript-mode . aggressive-indent-mode)
+  ;;(typescript-mode . prettier-js-mode)
+  ;;(typescript-mode . turn-on-visual-line-mode)
+  ;;(typescript-mode . editorconfig-mode)
+  ;;(typescript-mode . indium-interaction-mode)
+  ;;(typescript-mode . smartparens-mode)
+  ;; highlights
+  ;;(typescript-mode . tide-hl-identifier-mode)
+  ;;(typescript-mode . show-paren-mode)
+  ;;(typescript-mode . col-highlight)
+  ;;(typescript-mode . highlight-indent-guides-mode)
+  ;;(typescript-mode . show-paren-mode)
+  :preface
+  :init
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  :config
+  (defun setup-typescript-mode ()
+    (interactive)
+    (tide-setup)
+    (tide-hl-identifier-mode +1)
+    (eldoc-mode +1)
+    (company-mode +1)
+    (flycheck-mode +1)
+    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+    (smartparens-mode +1)
+    (prettier-js-mode +1)
+    (highlight-indent-guides-mode +1)
+    (aggressive-indent-mode +1)
+    (show-paren-mode +1)
+    (editorconfig-mode +1)
+    (turn-on-visual-line-mode)
   )
+  (add-hook 'typescript-mode-hook . #'setup-typescript-mode)
 )
 
 (use-package tide
   :ensure t
+  :defer t
   :after (typescript-mode company flycheck)
   :preface
   (defun setup-tide-mode ()
@@ -4705,9 +4782,9 @@ Example output:
     (tide-hl-identifier-mode +1)
     (company-mode +1)
   )
-  :hook
-  (tide-mode . setup-tide-mode)
-  (before-save . tide-format-before-save)
+  ;;:hook
+  ;;(tide-mode . setup-tide-mode)
+  ;;(before-save . tide-format-before-save)
   :init
   (setq tide-always-show-documentation t)
   :config

@@ -1,13 +1,13 @@
 
 ;; ----- amx-history -----
 (
- web-mode
- er/expand-region
- editorconfig-apply
- web-beautify-html
- delete-trailing-whitespace
- rainbow-mode
- dashboard-refresh-buffer
+ dumb-jump-go
+ dumb-jump-quick-look
+ dumb-jump-mode
+ tide-fix
+ company-mode
+ setup-typescript-mode
+ flycheck-mode
 )
 
 ;; ----- amx-data -----
@@ -16,7 +16,7 @@
  (scss-mode . 12)
  (eslintd-fix-mode . 3)
  (helm-M-x . 1)
- (tide-fix . 6)
+ (tide-fix . 9)
  (fast-scroll-mode . 1)
  (hideshowvis-enable . 1)
  (counsel-projectile-mode . 2)
@@ -24,12 +24,12 @@
  (align-regexp . 3)
  (package-install . 16)
  (package-refresh-contents . 2)
- (package-delete . 8)
+ (package-delete . 9)
  (electric-indent-mode . 1)
  (aggressive-indent-mode . 1)
  (customize-variable . 1)
  (exit-recursive-edit . 2)
- (ivy-mode . 5)
+ (ivy-mode . 9)
  (centaur-tabs-group-by-projectile-project . 1)
  (package-install-file . 2)
  (fundamental-mode . 1)
@@ -46,7 +46,7 @@
  (evil-mode . 2)
  (visual-line-mode . 5)
  (display-line-numbers-mode . 2)
- (flycheck-mode . 2)
+ (flycheck-mode . 4)
  (smooth-scrolling-mode . 2)
  (sublimity-mode . 1)
  (snails-current-project . 1)
@@ -59,17 +59,17 @@
  (eyebrowse-mode . 4)
  (js2-mode . 1)
  (conf-unix-mode . 1)
- (dumb-jump-mode . 1)
+ (dumb-jump-mode . 4)
  (helm-ag . 1)
  (ag-project . 1)
  (ng2-mode . 2)
- (typescript-mode . 1)
+ (typescript-mode . 2)
  (ivy-switch-buffer-other-window . 1)
  (org-table-paste-rectangle . 1)
  (org-table-create . 1)
  (org-table-create-or-convert-from-region . 5)
  (revert-buffer . 1)
- (prettier-js-mode . 2)
+ (prettier-js-mode . 5)
  (org-mode . 6)
  (which-key-mode . 1)
  (eval-region . 1)
@@ -80,4 +80,9 @@
  (web-beautify-html . 2)
  (editorconfig-apply . 1)
  (er/expand-region . 2)
+ (prettier-js . 3)
+ (setup-typescript-mode . 1)
+ (company-mode . 2)
+ (dumb-jump-go . 3)
+ (dumb-jump-quick-look . 1)
 )
