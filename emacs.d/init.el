@@ -1009,6 +1009,18 @@ Example output:
   :ensure org-plus-contrib
   :mode ("\\.org$" . org-mode)
   :defer t
+  (defun setup-org-mode ()
+    (interactive)
+    (message "Trying to setup org-mode for buffer")
+    (company-mode 1)
+    (flycheck-mode 1)
+    (smartparens-mode 1)
+    (aggressive-indent-mode 1)
+    (show-paren-mode 1)
+    (turn-on-visual-line-mode)
+    (rainbow-mode 1)
+    (org-bullets-mode 1)
+  )
   :hook
   (org-mode . diff-hl-mode)
   (org-mode . rainbow-mode)
@@ -1108,6 +1120,7 @@ Example output:
 
 (use-package org-sidebar
 :ensure t
+:defer t
 :after org
 :bind
 ("S-<f8>" . org-sidebar-tree-toggle)
@@ -1115,6 +1128,7 @@ Example output:
 
 (use-package ox-extra
   :ensure nil
+  :defer t
   :config
   (ox-extras-activate '(ignore-headlines))
   (ox-extras-activate '(latex-header-blocks ignore-headlines))
@@ -1130,8 +1144,9 @@ Example output:
 (add-hook 'org-font-lock-set-keywords-hook #'org-add-my-extra-fonts)
 
 (use-package ox-latex
-  :after org
   :ensure nil
+  :defer t
+  :after org
   :config
   ;; Source https://orgmode.org/worg/org-faq.html#using-xelatex-for-pdf-export
   ;; Originally taken from Bruno Tavernier: http://thread.gmane.org/gmane.emacs.orgmode/31150/focus=31432
@@ -1155,6 +1170,7 @@ Example output:
 
 (use-package ox-pandoc
   :after (org ox)
+  :defer t
   :config
   ;; default options for all output formats
   (setq org-pandoc-options '((standalone . t)))
@@ -1169,25 +1185,23 @@ Example output:
 
 (use-package org-bullets
   :ensure t
+  :after org
+  :defer t
   :config
   ;;(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   (setq org-bullets-bullet-list '("◉" "○" "●" "►" "•"))
 )
 
-(use-package ox-confluence
-  :defer 3
-  :ensure nil
-  :after org
-)
-
 (use-package ox-reveal
   :ensure t
+  :defer t
   :after ox
   :config
   ;;(setq org-reveal-root "https://cdn.jsdelivr.net/reveal.js/3.0.0/")
 )
 
 (use-package ox-md
+  :ensure t
   :defer t
   :after org
 )
@@ -1199,6 +1213,8 @@ Example output:
 )
 
 (use-package shell-pop
+  :ensure t
+  :defer t
   :init
   (setq shell-pop-full-span t)
   (setq shell-pop-default-directory "~/code")
@@ -1263,8 +1279,11 @@ Example output:
   ("C-c p" . projectile-command-map)
   ("M-S-O p" . counsel-projectile-switch-project)
   )
-:custom
-(projectile-completion-system 'helm)
+  :custom
+  (projectile-completion-system 'ivy)
+  :init
+  (setq projectile-mode-line-prefix "Project -> ")
+  (setq projectile-mode-line-function '(lambda () (format " Proj[%s]" (projectile-project-name))))
   :config
   (projectile-mode +1)
   (setq projectile-globally-ignored-files
@@ -1283,113 +1302,11 @@ Example output:
 )
 
 (use-package org-kanban
-    :ensure t
-  :after org
-:commands  (org-kanban/initialize)
-    :config
-    )
-
-(use-package org-jira
   :ensure t
-  :disabled
-  :defer 3
-  :commands (org-jira-mode org-jira-get-issues org-jira-get-projects)
+  :defer t
   :after org
-  :custom
-  (jiralib-url "https://stairscreativestudio.atlassian.net")
+  :commands  (org-kanban/initialize)
   :config
-  (setq jiralib-token
-  `("Cookie" . ,(format "ajs_group_id=null; ajs_anonymous_id=%222e15ea7d-cb97-4d24-bfe2-348c4655df02%22; atlassian.xsrf.token=86ec43db-1a9e-48fa-892a-9210c6fee684_38750fda3fb7e52a86533ed838cb5688d745af60_lin; cloud.session.token=eyJraWQiOiJzZXNzaW9uLXNlcnZpY2VcL3Nlc3Npb24tc2VydmljZSIsImFsZyI6IlJTMjU2In0.eyJhc3NvY2lhdGlvbnMiOlt7ImFhSWQiOiI1YmE3ZjkyNDNjMDEzZDdiMTA1MTRjYmIiLCJzZXNzaW9uSWQiOiJhYWUwYmVkNC02MTY1LTQ4MjUtYThkYS03ZWEwNGIxMWQ3MzgiLCJlbWFpbCI6Imd1Z3V0ekBnbWFpbC5jb20ifV0sInN1YiI6IjVkOTM1MzI1MGMyYTVkMGRkODdhZmQ2MCIsImVtYWlsRG9tYWluIjoic3RhaXJzLnN0dWRpbyIsImltcGVyc29uYXRpb24iOltdLCJyZWZyZXNoVGltZW91dCI6MTU3MjYzODk5NywidmVyaWZpZWQiOnRydWUsImlzcyI6InNlc3Npb24tc2VydmljZSIsInNlc3Npb25JZCI6ImYwNTEwYzA5LWRmNGMtNGE2MC1iYTM4LTA2OTU2YzRiODRkMSIsImF1ZCI6ImF0bGFzc2lhbiIsIm5iZiI6MTU3MjYzODM5NywiZXhwIjoxNTc1MjMwMzk3LCJpYXQiOjE1NzI2MzgzOTcsImVtYWlsIjoiZ3VzdGF2b0BzdGFpcnMuc3R1ZGlvIiwianRpIjoiZjA1MTBjMDktZGY0Yy00YTYwLWJhMzgtMDY5NTZjNGI4NGQxIn0.naz3Vi6yvn0aoFX7nAMK-K7fff4zpkeUifPSrEj6a3so9pK6uPrMDZOIGd8Mg7pJJkCy8FJ9bC6eTCGdrbqll3v8Kg6NhThAQzx8tvcW4gFObJyL12HEvt9EBpwvGKW1mWLhb-S_ZGwoTCXk1QRpNHy6zNl3etwlhX9jk3KXXT5fIaO2oJJaFCovZRvQTJdyoCRiIBRPWwyh3tqrqJiZVD08NFY1bq_aCyfkxxN-owWP7KPJxmLtH-ZPpj24ky8Dv-4oVP_frUPkLW5ULvHstdhxkwCUWCpaTPPDBqijljTj5YvXFp_ulNyWqQHnPHeV3m6BszI9WxBxZF7mUwIBZw; _csrf=AMoq40Bo50JzeFptjXhUvsBl")))
-  (define-key org-jira-map (kbd "C-c pg") 'org-jira-get-projects)
-  (define-key org-jira-map (kbd "C-c ib") 'org-jira-browse-issue)
-  (define-key org-jira-map (kbd "C-c ig") 'org-jira-get-issues)
-  (define-key org-jira-map (kbd "C-c ij") 'org-jira-get-issues-from-custom-jql)
-  (define-key org-jira-map (kbd "C-c ih") 'org-jira-get-issues-headonly)
-  (define-key org-jira-map (kbd "C-c iu") 'org-jira-update-issue)
-  (define-key org-jira-map (kbd "C-c iw") 'org-jira-progress-issue)
-  (define-key org-jira-map (kbd "C-c in") 'org-jira-progress-issue-next)
-  (define-key org-jira-map (kbd "C-c ia") 'org-jira-assign-issue)
-  (define-key org-jira-map (kbd "C-c ir") 'org-jira-refresh-issue)
-  (define-key org-jira-map (kbd "C-c iR") 'org-jira-refresh-issues-in-buffer)
-  (define-key org-jira-map (kbd "C-c ic") 'org-jira-create-issue)
-  (define-key org-jira-map (kbd "C-c ik") 'org-jira-copy-current-issue-key)
-  (define-key org-jira-map (kbd "C-c sc") 'org-jira-create-subtask)
-  (define-key org-jira-map (kbd "C-c sg") 'org-jira-get-subtasks)
-  (define-key org-jira-map (kbd "C-c cc") 'org-jira-add-comment)
-  (define-key org-jira-map (kbd "C-c cu") 'org-jira-update-comment)
-  (define-key org-jira-map (kbd "C-c wu") 'org-jira-update-worklogs-from-org-clocks)
-  (define-key org-jira-map (kbd "C-c tj") 'org-jira-todo-to-jira)
-  (define-key org-jira-map (kbd "C-c if") 'org-jira-get-issues-by-fixversion)
-)
-
-(defun tau/hydra-jira ()
-  (interactive)
-  (funcall
-      (pretty-hydra-define hydra-jira (:exit t :hint nil)
-        ("Get" (("p" org-jira-get-projects                "Get Projects")
-                ("g" org-jira-get-issues                  "Get Issues")
-                ("G" org-jira-get-subtasks                "Get Subtasks")
-                ("r" org-jira-refresh-issue               "Refresh Issue")
-                ("R" org-jira-refresh-issues-in-buffer    "Refresh Issues in Buffer"))
-
-       "Manage" (("b" org-jira-browse-issue             "Browse Issue")
-                 ("c" org-jira-create-issue             "Create Issue")
-                 ("s" org-jira-create-subtask           "Create Subtask")
-                 ("P" org-jira-progress-issue           "Update Issue Progress")
-                 ("a" org-jira-assign-issue             "Assign Issue"))
-
-         "Push" (("u" org-jira-update-issue                "Update Issue")
-                 ("y" org-jira-copy-current-issue-key      "Copy Current Issue Key")
-                 ("U" org-jira-update-comment              "Update Comment")
-                 ("t" org-jira-todo-to-jira                "Todo to Jira")))))
-)
-
-(use-package ox-jira
-  :defer 3
-  :after org
-)
-
-(use-package ejira
-  :ensure t
-  :disabled
-  :init
-  (setq jiralib2-url              "https://stairscreativestudio.atlassian.net"
-        jiralib2-auth             'basic
-        jiralib2-user-login-name  "gustavo@stairs.studio"
-        jiralib2-token            nil
-
-        ejira-org-directory       "~/jira"
-        ejira-projects            '("PEP" "QuexCash")
-
-        ejira-priorities-alist    '(("Highest" . ?A)
-                                    ("High"    . ?B)
-                                    ("Medium"  . ?C)
-                                    ("Low"     . ?D)
-                                    ("Lowest"  . ?E))
-        ejira-todo-states-alist   '(("To Do"       . 1)
-                                    ("In Progress" . 2)
-                                    ("Done"        . 3)))
-  :config
-  ;; Tries to auto-set custom fields by looking into /editmeta
-  ;; of an issue and an epic.
-  (add-hook 'jiralib2-post-login-hook #'ejira-guess-epic-sprint-fields)
-
-  ;; They can also be set manually if autoconfigure is not used.
-  ;; (setq ejira-sprint-field       'customfield_10001
-  ;;       ejira-epic-field         'customfield_10002
-  ;;       ejira-epic-summary-field 'customfield_10004)
-
-  (require 'ejira-agenda)
-
-  ;; Make the issues visisble in your agenda by adding `ejira-org-directory'
-  ;; into your `org-agenda-files'.
-  (add-to-list 'org-agenda-files ejira-org-directory)
-
-  ;; Add an agenda view to browse the issues that
-  (org-add-agenda-custom-command
-   '("j" "My JIRA issues"
-     ((ejira-jql "resolution = unresolved and assignee = currentUser()"
-                 ((org-agenda-overriding-header "Assigned to me"))))))
 )
 
 (use-package ivy
@@ -1517,6 +1434,7 @@ Example output:
 
 (use-package counsel-projectile
   :ensure t
+  :after ivy projectile
   :config (counsel-projectile-mode 1)
 )
 
@@ -1575,6 +1493,7 @@ Example output:
 
 (use-package helm
   :ensure t
+  :defer t
   :diminish helm-mode
   :bind
   ;; ("M-x" . helm-M-x)
@@ -1652,20 +1571,22 @@ Example output:
 
 (use-package hydra
   :ensure t
+  :defer t
 )
 
 (use-package major-mode-hydra
   :ensure t)
 
 (use-package hydra-posframe
-  :load-path "packages"
+  :load-path "packages/hydra-posframe"
   :custom
   (hydra-posframe-parameters
     '((left-fringe . 5)
       (right-fringe . 5)))
   :custom-face
   (hydra-posframe-border-face ((t (:background "#6272a4"))))
-  :hook (after-init . hydra-posframe-mode) ;; changed from `hydra-postframe-enable' cause emacs itself suggested
+  :hook
+  (after-init . hydra-posframe-mode)
 )
 
 (use-package occur
@@ -1681,6 +1602,8 @@ Example output:
 )
 
 (use-package ag
+  :ensure t
+  :defer t
   :ensure-system-package
   (ag . the_silver_searcher)
   :custom
@@ -1694,6 +1617,7 @@ Example output:
 )
 
 (use-package wgrep
+  :ensure t
   :defer t
   :custom
   (wgrep-enable-key "e")
@@ -1716,8 +1640,8 @@ Example output:
 
 (use-package flycheck
   :ensure t
-  :diminish flycheck-mode
   :defer t
+  :diminish flycheck-mode
   :ensure-system-package
   ((tslint . "npm i -g tslint")
    (typescript . "npm i -g typescript"))
@@ -1880,21 +1804,6 @@ Example output:
 ;;  (undo-tree-mode)
 )
 
-(use-package corral
-  :ensure t
-  :bind
-  ("M-9" . corral-parentheses-backward)
-  :config
-  (setq corral-preserve-point t)
-  ;;(global-set-key (kbd "M-9") 'corral-parentheses-backward)
-  (global-set-key (kbd "M-0") 'corral-parentheses-forward)
-  (global-set-key (kbd "M-[") 'corral-brackets-backward)
-  (global-set-key (kbd "M-]") 'corral-brackets-forward)
-  (global-set-key (kbd "M-{") 'corral-braces-backward)
-  (global-set-key (kbd "M-}") 'corral-braces-forward)
-  (global-set-key (kbd "M-\"") 'corral-double-quotes-backward)
-)
-
 (use-package helpful
   :ensure t
   :config
@@ -1920,48 +1829,9 @@ Example output:
   (global-set-key (kbd "C-h C") #'helpful-command)
 )
 
-(use-package paredit
-  :ensure t
-  :config
-  (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
-  (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
-  (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
-  (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
-  (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
-  (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
-  (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
-)
-
-
-
-(use-package parinfer
-  :ensure t
-  :bind
-  ("C-," . parinfer-toggle-mode)
-  :init
-  (progn
-    (setq parinfer-extensions
-          '(defaults       ; should be included.
-            pretty-parens  ; different paren styles for different modes.
-            evil           ; If you use Evil.
-            ;lispy          ; If you use Lispy. With this extension, you should install Lispy and do not enable lispy-mode directly.
-            paredit        ; Introduce some paredit commands.
-            smart-tab      ; C-b & C-f jump positions and smart shift with tab & S-tab.
-            smart-yank))   ; Yank behavior depend on mode.
-    (add-hook 'clojure-mode-hook #'parinfer-mode)
-    (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)
-    (add-hook 'common-lisp-mode-hook #'parinfer-mode)
-    (add-hook 'scheme-mode-hook #'parinfer-mode)
-    (add-hook 'lisp-mode-hook #'parinfer-mode))
-    :config
-    ;; auto switch to Indent Mode whenever parens are balance in Paren Mode
-    (setq parinfer-auto-switch-indent-mode nil)  ;; default is nil
-    (setq parinfer-lighters '(" Parinfer:Indent" . "Parinfer:Paren"))
-
-)
-
 (use-package elisp-format
   :ensure t
+  :defer t
 )
 
 (use-package company
@@ -2668,40 +2538,8 @@ Example output:
   (setq ranger-show-hidden t) ;; show hidden files
 )
 
-(use-package eyebrowse
-  :hook
-  (after-init . eyebrowse-mode)
-  :bind
-  (:map eyebrowse-mode-map
-  ("M-1" . eyebrowse-switch-to-window-config-1)
-  ("M-2" . eyebrowse-switch-to-window-config-2)
-  ("M-3" . eyebrowse-switch-to-window-config-3)
-  ("M-4" . eyebrowse-switch-to-window-config-4)
-  ("H-<right>" . eyebrowse-next-window-config)
-  ("H-<left>" . eyebrowse-prev-window-config))
-  :config
-  ;;(define-key eyebrowse-mode-map (kbd "M-1") 'eyebrowse-switch-to-window-config-1)
-  ;;(define-key eyebrowse-mode-map (kbd "M-2") 'eyebrowse-switch-to-window-config-2)
-  ;;(define-key eyebrowse-mode-map (kbd "M-3") 'eyebrowse-switch-to-window-config-3)
-  ;;(define-key eyebrowse-mode-map (kbd "M-4") 'eyebrowse-switch-to-window-config-4)
-  ;;(define-key eyebrowse-mode-map (kbd "H-<right>") 'eyebrowse-next-window-config)
-  ;;(define-key eyebrowse-mode-map (kbd "H-<left>") 'eyebrowse-prev-window-config)
-  (eyebrowse-mode t)
-  (setq eyebrowse-new-workspace t)
-)
-
-(use-package rotate
-  :ensure t
-  :bind
-  ("C-c r w" . rotate-window)
-  ("C-c r l" . rotate-layout)
-)
-
 (setq echo-keystrokes 0.02)
 
-;; Hilight trailing whitespace
-;; like this -->
-;;
 (setq-default show-trailing-whitespace t)
 (set-face-background 'trailing-whitespace "orange1")
 
@@ -2846,6 +2684,202 @@ Example output:
            (push (cons 'bottom-divider-width 1) default-frame-alist)
            (push (cons 'right-divider-width 1) default-frame-alist)
 
+(global-set-key (kbd "C-M-+") 'balance-windows-area)
+
+(use-package eyebrowse
+  :hook
+  (after-init . eyebrowse-mode)
+  :bind
+  (:map eyebrowse-mode-map
+  ("M-1" . eyebrowse-switch-to-window-config-1)
+  ("M-2" . eyebrowse-switch-to-window-config-2)
+  ("M-3" . eyebrowse-switch-to-window-config-3)
+  ("M-4" . eyebrowse-switch-to-window-config-4)
+  ("H-<right>" . eyebrowse-next-window-config)
+  ("H-<left>" . eyebrowse-prev-window-config))
+  :config
+  ;;(define-key eyebrowse-mode-map (kbd "M-1") 'eyebrowse-switch-to-window-config-1)
+  ;;(define-key eyebrowse-mode-map (kbd "M-2") 'eyebrowse-switch-to-window-config-2)
+  ;;(define-key eyebrowse-mode-map (kbd "M-3") 'eyebrowse-switch-to-window-config-3)
+  ;;(define-key eyebrowse-mode-map (kbd "M-4") 'eyebrowse-switch-to-window-config-4)
+  ;;(define-key eyebrowse-mode-map (kbd "H-<right>") 'eyebrowse-next-window-config)
+  ;;(define-key eyebrowse-mode-map (kbd "H-<left>") 'eyebrowse-prev-window-config)
+  (eyebrowse-mode t)
+  (setq eyebrowse-new-workspace t)
+)
+
+(use-package ace-window
+  :ensure t
+  :functions hydra-frame-window/body
+  :bind
+  ("M-o" . ace-window)
+  :custom-face
+  (aw-leading-char-face ((t (:height 4.0 :foreground "#f1fa8c"))))
+  :config
+  ;; (setq aw-keys '(?j ?k ?l ?i ?o ?h ?y ?u ?p))
+  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)) ;; set the window labels in the home row
+)
+
+:ensure t
+  :bind
+  ("C-c r w" . rotate-window)
+  ("C-c r l" . rotate-layout)
+  ("M-S-O SPC" . rotate-layout)
+  ("M-S-O m" . tau/toggle-window-maximize)
+  ("C-M-o" . hydra-frame-window/body)
+  :preface
+  (defvar is-window-maximized nil)
+  (defun tau/toggle-window-maximize ()
+      (interactive)
+      (progn
+        (if is-window-maximized
+            (balance-windows)
+          (maximize-window))
+        (setq is-window-maximized
+              (not is-window-maximized))))
+  (defun hydra-title(title) (propertize title 'face `(:inherit font-lock-warning-face :weight bold)))
+  (defun command-name(title) (propertize title 'face `(:foreground "#f8f8f2")))
+  (defun spacer() (propertize "." 'face `(:foreground "#282a36")))
+  :config
+  (with-eval-after-load 'hydra
+      (defhydra hydra-frame-window (:color blue :hint nil)
+      (format
+       (format "%s" (propertize "                                                                       ╔════════╗
+  ((%s))^^^^^^^^   ((%s))^^^^  ((%s))^^  ((%s))^^  ((%s))^^^^^^  ((%s))^   ║ Window ║
+^^^^^^ ──────────────────────────────────────────────────────────────────────╨────────╜
+      ^_k_^        %s_+_         _-_       %s     _,_ ← %s → _._^  %s
+      ^^↑^^          ^↑^         ^↑^       %s
+  _h_ ←   → _l_   ^^%s%s^^^^^    ^%s    ^^^%s^^^^     %s
+      ^^↓^^          ^↓^         ^↓^       %s^^       %s
+      ^_j_^        %s_=_         _/_       %s
+^^^^^^ ┌──────────────────────────────────────────────────────────────────────────────┘
+                         [_q_]: %s, [_<SPC>_]: %s" 'face `(:inherit font-lock-doc-face)))
+                         (hydra-title "Size")
+                         (hydra-title "Zoom")
+                         (hydra-title "Split")
+                         (hydra-title "Window")
+                         (hydra-title "Buffer")
+                         (hydra-title "Misc")
+                         (all-the-icons-material "zoom_in" :height .85 :face 'font-lock-doc-face)
+                         (command-name "_o_ther")
+                         (command-name "page")
+                         (command-name "_r_centf")
+                         (command-name "_s_wap")
+                         (all-the-icons-faicon "slideshare" :height .85 :face 'font-lock-doc-face)
+                         (command-name "_p_mode")
+                         (command-name "w_i_ndow")
+                         (command-name "_m_aximize")
+                         (command-name "_s_witch")
+                         (command-name "_d_elete")
+                         (command-name "_D_elete")
+                         (all-the-icons-material "zoom_out" :height .85 :face 'font-lock-doc-face)
+                         (command-name "del_O_thers")
+                         (command-name "quit")
+                         (command-name "rotate")
+                         )
+
+        ("K" kill-current-buffer :exit t)
+        ("D" kill-buffer-and-window :exit t)
+        ("O" delete-other-windows  :exit t)
+        ("F" toggle-frame-fullscreen)
+        ("i" ace-window)
+        ("s" ace-swap-window :exit t)
+        ("d" ace-delete-window)
+        ("m" tau/toggle-window-maximize :exit t)
+        ("=" text-scale-decrease)
+        ("+" text-scale-increase)
+        ("-" split-window-vertically)
+        ("/" split-window-horizontally)
+        ("h" shrink-window-horizontally)
+        ("k" shrink-window)
+        ("j" enlarge-window)
+        ("l" enlarge-window-horizontally)
+        ("," previous-buffer)
+        ("." next-buffer)
+        ("o" other-window)
+        ("p" presentation-mode)
+        ("r" counsel-recentf :exit t)
+        ("s" switch-to-buffer :exit t)
+        ("D" kill-buffer-and-window)
+        ("<SPC>" rotate-layout)
+        ("q" nil)))
+)
+
+(use-package windmove
+  :ensure t
+  :config
+  ;; use shift + arrow keys to switch between visible buffers
+  ;; (windmove-default-keybindings)
+  (windmove-default-keybindings 'control)
+  (global-set-key (kbd "C-S-H") 'windmove-left)
+  (global-set-key (kbd "C-S-L") 'windmove-right)
+  (global-set-key (kbd "C-S-K") 'windmove-up)
+  (global-set-key (kbd "C-S-J") 'windmove-down)
+)
+
+(use-package zoom
+  :ensure t
+  :bind
+  ("C-M-z" . zoom)
+  :init
+  (setq zoom-size '(0.618 . 0.618))
+  (setq zoom-ignored-major-modes '(treemacs dired-mode neotree dired-sidebar))
+  (setq zoom-ignored-buffer-names '("zoom.el" "init.el"))
+  (setq zoom-ignored-buffer-name-regexps '("^*calc"))
+  :config
+  (zoom-mode t)
+)
+
+(use-package swiper
+  :disabled
+  :ensure t
+  :bind
+  (("C-s" . swiper-isearch)
+   :map swiper-map
+   ("M-q" . swiper-query-replace)
+   ("C-l". swiper-recenter-top-bottom)
+   ("C-'" . swiper-avy))
+  :custom
+  (counsel-grep-swiper-limit 20000)
+  (counsel-rg-base-command
+   "rg -i -M 120 --no-heading --line-number --color never %s .")
+  (counsel-grep-base-command
+   "rg -i -M 120 --no-heading --line-number --color never '%s' %s")
+)
+
+(use-package avy
+  :ensure t
+  :bind
+  ("M-g j" . avy-goto-char-2)
+  ("C-:" . avy-goto-char)
+  ("C-'" . avy-goto-char-2)
+  ;; replace native M-g g `goto-line' with `avy-goto-line'
+  ("M-g f" .  avy-goto-line)
+  ("M-g g" .  avy-goto-line)
+  ("M-g w" . avy-goto-word-1)
+  ("M-g e" . avy-goto-word-0)
+  (:map isearch-mode-map
+  ("C-'" . avy-search))
+  (:map evil-normal-state-map
+  ("SPC" . avy-goto-char))
+  (:map evil-visual-state-map
+  ("SPC" . avy-goto-char))
+  :config
+  (setq avy-background t) ;; default nil ;; gray background will be added during the selection.
+  (setq avy-highlight-first t) ;; When non-nil highlight the first decision char with avy-lead-face-0. Do this even when the char is terminating.
+
+  ;; nil: use only the selected window
+  ;; t: use all windows on the selected frame
+  ;; all-frames: use all windows on all frames
+  (setq avy-all-windows nil) ;;
+)
+
+(use-package goto-line-preview
+  :ensure t
+  :config
+  (global-set-key [remap goto-line] 'goto-line-preview)
+)
+
 (setq resize-mini-windows t)
 (setq max-mini-window-height 0.33)
 
@@ -2970,158 +3004,6 @@ Example output:
   :ensure nil
   :config
   (auto-save-visited-mode)
-)
-
-(use-package swiper
-  :disabled
-  :ensure t
-  :bind
-  (("C-s" . swiper-isearch)
-   :map swiper-map
-   ("M-q" . swiper-query-replace)
-   ("C-l". swiper-recenter-top-bottom)
-   ("C-'" . swiper-avy))
-  :custom
-  (counsel-grep-swiper-limit 20000)
-  (counsel-rg-base-command
-   "rg -i -M 120 --no-heading --line-number --color never %s .")
-  (counsel-grep-base-command
-   "rg -i -M 120 --no-heading --line-number --color never '%s' %s")
-)
-
-(use-package avy
-  :ensure t
-  :bind
-  ("M-g j" . avy-goto-char-2)
-  ("C-:" . avy-goto-char)
-  ("C-'" . avy-goto-char-2)
-  ;; replace native M-g g `goto-line' with `avy-goto-line'
-  ("M-g f" .  avy-goto-line)
-  ("M-g g" .  avy-goto-line)
-  ("M-g w" . avy-goto-word-1)
-  ("M-g e" . avy-goto-word-0)
-  (:map isearch-mode-map
-  ("C-'" . avy-search))
-  (:map evil-normal-state-map
-  ("SPC" . avy-goto-char))
-  (:map evil-visual-state-map
-  ("SPC" . avy-goto-char))
-  :config
-  (setq avy-background t) ;; default nil ;; gray background will be added during the selection.
-  (setq avy-highlight-first t) ;; When non-nil highlight the first decision char with avy-lead-face-0. Do this even when the char is terminating.
-
-  ;; nil: use only the selected window
-  ;; t: use all windows on the selected frame
-  ;; all-frames: use all windows on all frames
-  (setq avy-all-windows nil) ;;
-)
-
-(use-package ace-window
-  :ensure t
-  :functions hydra-frame-window/body
-  :bind
-  ("M-o" . ace-window)
-  :custom-face
-  (aw-leading-char-face ((t (:height 4.0 :foreground "#f1fa8c"))))
-  :config
-  ;; (setq aw-keys '(?j ?k ?l ?i ?o ?h ?y ?u ?p))
-  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)) ;; set the window labels in the home row
-)
-
-(use-package rotate
-  :ensure t
-  :bind
-  ("M-S-O SPC" . rotate-layout)
-  ("M-S-O m" . tau/toggle-window-maximize)
-  ("C-M-o" . hydra-frame-window/body)
-  :preface
-  (defvar is-window-maximized nil)
-  (defun tau/toggle-window-maximize ()
-      (interactive)
-      (progn
-        (if is-window-maximized
-            (balance-windows)
-          (maximize-window))
-        (setq is-window-maximized
-              (not is-window-maximized))))
-  (defun hydra-title(title) (propertize title 'face `(:inherit font-lock-warning-face :weight bold)))
-  (defun command-name(title) (propertize title 'face `(:foreground "#f8f8f2")))
-  (defun spacer() (propertize "." 'face `(:foreground "#282a36")))
-  :config
-  (with-eval-after-load 'hydra
-      (defhydra hydra-frame-window (:color blue :hint nil)
-      (format
-       (format "%s" (propertize "                                                                       ╔════════╗
-  ((%s))^^^^^^^^   ((%s))^^^^  ((%s))^^  ((%s))^^  ((%s))^^^^^^  ((%s))^   ║ Window ║
-^^^^^^ ──────────────────────────────────────────────────────────────────────╨────────╜
-      ^_k_^        %s_+_         _-_       %s     _,_ ← %s → _._^  %s
-      ^^↑^^          ^↑^         ^↑^       %s
-  _h_ ←   → _l_   ^^%s%s^^^^^    ^%s    ^^^%s^^^^     %s
-      ^^↓^^          ^↓^         ^↓^       %s^^       %s
-      ^_j_^        %s_=_         _/_       %s
-^^^^^^ ┌──────────────────────────────────────────────────────────────────────────────┘
-                         [_q_]: %s, [_<SPC>_]: %s" 'face `(:inherit font-lock-doc-face)))
-                         (hydra-title "Size")
-                         (hydra-title "Zoom")
-                         (hydra-title "Split")
-                         (hydra-title "Window")
-                         (hydra-title "Buffer")
-                         (hydra-title "Misc")
-                         (all-the-icons-material "zoom_in" :height .85 :face 'font-lock-doc-face)
-                         (command-name "_o_ther")
-                         (command-name "page")
-                         (command-name "_r_centf")
-                         (command-name "_s_wap")
-                         (all-the-icons-faicon "slideshare" :height .85 :face 'font-lock-doc-face)
-                         (command-name "_p_mode")
-                         (command-name "w_i_ndow")
-                         (command-name "_m_aximize")
-                         (command-name "_s_witch")
-                         (command-name "_d_elete")
-                         (command-name "_D_elete")
-                         (all-the-icons-material "zoom_out" :height .85 :face 'font-lock-doc-face)
-                         (command-name "del_O_thers")
-                         (command-name "quit")
-                         (command-name "rotate")
-                         )
-
-        ("K" kill-current-buffer :exit t)
-        ("D" kill-buffer-and-window :exit t)
-        ("O" delete-other-windows  :exit t)
-        ("F" toggle-frame-fullscreen)
-        ("i" ace-window)
-        ("s" ace-swap-window :exit t)
-        ("d" ace-delete-window)
-        ("m" tau/toggle-window-maximize :exit t)
-        ("=" text-scale-decrease)
-        ("+" text-scale-increase)
-        ("-" split-window-vertically)
-        ("/" split-window-horizontally)
-        ("h" shrink-window-horizontally)
-        ("k" shrink-window)
-        ("j" enlarge-window)
-        ("l" enlarge-window-horizontally)
-        ("," previous-buffer)
-        ("." next-buffer)
-        ("o" other-window)
-        ("p" presentation-mode)
-        ("r" counsel-recentf :exit t)
-        ("s" switch-to-buffer :exit t)
-        ("D" kill-buffer-and-window)
-        ("<SPC>" rotate-layout)
-        ("q" nil)))
-)
-
-(use-package windmove
-  :ensure t
-  :config
-  ;; use shift + arrow keys to switch between visible buffers
-  ;; (windmove-default-keybindings)
-  (windmove-default-keybindings 'control)
-  (global-set-key (kbd "C-S-H") 'windmove-left)
-  (global-set-key (kbd "C-S-L") 'windmove-right)
-  (global-set-key (kbd "C-S-K") 'windmove-up)
-  (global-set-key (kbd "C-S-J") 'windmove-down)
 )
 
 (setq mode-line-format
@@ -3276,6 +3158,7 @@ Example output:
 
 (use-package doom-modeline
   :ensure t
+  :disabled
   :init
   :config
   (doom-modeline-mode 1)
@@ -3395,21 +3278,6 @@ Example output:
   )
 )
 
-(global-set-key (kbd "C-M-+") 'balance-windows-area)
-
-(use-package zoom
-  :ensure t
-  :bind
-  ("C-M-z" . zoom)
-  :init
-  (setq zoom-size '(0.618 . 0.618))
-  (setq zoom-ignored-major-modes '(treemacs dired-mode neotree dired-sidebar))
-  (setq zoom-ignored-buffer-names '("zoom.el" "init.el"))
-  (setq zoom-ignored-buffer-name-regexps '("^*calc"))
-  :config
-  (zoom-mode t)
-)
-
 (use-package sublimity
   :ensure t
   :disabled
@@ -3445,12 +3313,6 @@ Example output:
   ;; (sublimity-attractive-hide-vertical-border)
   ;; (sublimity-attractive-hide-fringes)
   ;; (sublimity-attractive-hide-modelines)
-)
-
-(use-package goto-line-preview
-  :ensure t
-  :config
-  (global-set-key [remap goto-line] 'goto-line-preview)
 )
 
 (use-package dashboard
@@ -3672,7 +3534,7 @@ Example output:
 
 (use-package hideshowvis
   :ensure nil
-  :load-path "packages"
+  :load-path "packages/hideshowvis"
   :hook
   (display-line-numbers-mode . hideshowvis-enable)
   :config
@@ -4216,10 +4078,24 @@ Example output:
   :ensure t
   :defer t
   :mode "\\.css\\'"
+  :preface
+  (defun setup-css-mode ()
+    (interactive)
+    (message "Trying to setup css-mode for buffer")
+    (company-mode 1)
+    (flycheck-mode 1)
+    (smartparens-mode 1)
+    (prettier-js-mode 1)
+    (aggressive-indent-mode 1)
+    (show-paren-mode 1)
+    (editorconfig-mode 1)
+    (turn-on-visual-line-mode)
+  )
   :hook
-  (css-mode . aggressive-indent-mode)
-  (css-mode . prettier-js-mode)
-  (css-mode . emmet-mode)
+  (css-mode . setup-css-mode)
+  ;;(css-mode . aggressive-indent-mode)
+  ;;(css-mode . prettier-js-mode)
+  ;;(css-mode . emmet-mode)
   :init
   (setq css-indent-offset 2)
 )
@@ -4240,11 +4116,11 @@ Example output:
   (autoload 'scss-mode "scss-mode")
   (setq scss-compile-at-save 'nil)
    (add-to-list 'auto-mode-alist '("\\.scss$\\'" . scss-mode))
-   (add-to-list 'auto-mode-alist '("\\.component.scss$\\'" . scss-mode))
 )
 
 (use-package helm-css-scss
   :ensure t
+  :defer t
   :after helm
   :bind
   (:map isearch-mode-map
@@ -4333,23 +4209,28 @@ Example output:
 
 (use-package ruby-hash-syntax
   :ensure t
+  :defer t
 )
 
 (use-package ruby-additional
   :ensure t
+  :defer t
 )
 
 (use-package ruby-tools
   :ensure t
+  :defer t
 )
 
 (use-package rspec-mode
   :ensure t
+  :defer t
 )
 
 (use-package ruby-block
   :disabled
   :ensure t
+  :defer t
   :init
   ;; do overlay
   (setq ruby-block-highlight-toggle 'overlay)
@@ -4363,11 +4244,14 @@ Example output:
 
 (use-package ruby-extra-highlight
   :ensure t
+  :defer t
   :hook
   (ruby-mode . ruby-extra-highlight-mode)
 )
 
 (use-package go-mode
+  :ensure t
+  :defer t
   :mode "\\.go\\'"
   :hook (before-save . gofmt-before-save)
 )
@@ -4389,21 +4273,26 @@ Example output:
   ("\\.mustache\\'" . web-mode)
   ("\\.djhtml\\'" . web-mode)
   ("\\.[t]?html?\\'" . web-mode)
+  :preface
+  (defun setup-web-mode ()
+    (interactive)
+    (message "Trying to setup web-mode for buffer %s (file: %s)" buffer-name buffer-file-name)
+    (eldoc-mode 1)
+    (company-mode 1)
+    (flycheck-mode 1)
+    (smartparens-mode 1)
+    (aggressive-indent-mode 1)
+    (prettier-js-mode 1)
+    (highlight-indent-guides-mode 1)
+    (show-paren-mode 1)
+    (editorconfig-mode 1)
+    (turn-on-visual-line-mode)
+  )
   :hook
-  (web-mode . flycheck-mode)
-  (web-mode . company-mode)
-  (web-mode . emmet-mode)
-  (web-mode . rainbow-mode)
-  (web-mode . editorconfig-mode)
-  (web-mode . color-identifiers-mode)
-  (web-mode . aggressive-indent-mode)
-  :config
-  ;; Template
-  (setq web-mode-engines-alist
-        '(("php"    . "\\.phtml\\'")
-          ("blade"  . "\\.blade\\.")))
-
-  ;; web-mode indentation
+  (web-mode . setup-web-mode)
+  :init
+  ;;=======================================
+  ;; Web Mode setup variables
   (setq web-mode-markup-indent-offset 4)
   (setq web-mode-css-indent-offset 2)
   (setq web-mode-code-indent-offset 2)
@@ -4411,33 +4300,39 @@ Example output:
   (setq web-mode-enable-current-element-highlight t)
   (setq web-mode-enable-block-face t)
   (setq web-mode-enable-part-face t)
-
   ;;=======================================
-  ;; Flycheck Setup for JavaScript
+  ;; Flycheck Setup for web-mode
   ;;---------------------------------------
+  ;; Javascript
+  ;;
   ;; disable jshint since we prefer eslint checking
   (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))
   ;; enable eslint as default js flycheck linter
   (setq flycheck-checkers '(javascript-eslint))
-  ;; use eslint_d insetad of eslint for faster linting
+  ;; use eslint_d instead of eslint for faster linting
   (setq flycheck-javascript-eslint-executable "eslint_d")
   ;; add flycheck linter for webmode
-  (flycheck-add-mode 'javascript-eslint 'web-mode)
+  (eval-after-load 'flycheck
+     '(flycheck-add-mode 'javascript-eslint 'web-mode))
   ;; Use tidy to check HTML buffers with web-mode.
-  (flycheck-add-mode 'html-tidy 'web-mode)
-  ;;(eval-after-load 'flycheck
-  ;;   '(flycheck-add-mode 'html-tidy 'web-mode))
-
-  ;;=======================================
-  ;; Flycheck Setup for TSX
+  (eval-after-load 'flycheck
+     '(flycheck-add-mode 'html-tidy 'web-mode))
   ;;---------------------------------------
+  ;; TSX
+  ;;
   (add-hook 'web-mode-hook
             (lambda ()
               (when (string-equal "tsx" (file-name-extension buffer-file-name))
                 (setup-tide-mode))))
   ;; enable typescript-tslint checker
   (flycheck-add-mode 'typescript-tslint 'web-mode)
-
+    (setq flycheck-check-syntax-automatically '(save mode-enabled idle-change))
+    (setq flycheck-idle-change-delay 2)
+  ;; Template
+  (setq web-mode-engines-alist
+        '(("php"    . "\\.phtml\\'")
+          ("blade"  . "\\.blade\\.")))
+  ;;---------------------------------------
 )
 
 (use-package web-beautify
@@ -4659,8 +4554,9 @@ Example output:
 )
 
 (use-package format-all
-:ensure t
-:bind ("C-c C-f" . format-all-buffer)
+  :ensure t
+  :defer t
+  :bind ("C-c C-f" . format-all-buffer)
 )
 
 (use-package json-mode
@@ -4674,6 +4570,7 @@ Example output:
 
 (use-package eslintd-fix
   :ensure t
+  :defer t
   :ensure-system-package
   (eslint . "npm i -g eslint")
   :config
@@ -4700,6 +4597,8 @@ Example output:
 )
 
 (use-package rjsx-mode
+  :ensure t
+  :defer t
   :after js2-mode
   :mode
   ("\\.jsx$" . rjsx-mode)
@@ -4723,49 +4622,30 @@ Example output:
 (use-package typescript-mode
   :ensure t
   :defer t
-  :after indium tide company flycheck
+  ;;:after indium tide company flycheck
   :mode
   (("\\.ts\\'" . typescript-mode)
    ("\\.tsx\\'" . typescript-mode))
-  ;;:hook
-  ;;(typescript-mode . tide-setup)
-  ;;(typescript-mode . eldoc-mode)
-  ;; programming utilities
-  ;;(typescript-mode . flycheck-mode)
-  ;;(typescript-mode . company-mode)
-  ;;(typescript-mode . aggressive-indent-mode)
-  ;;(typescript-mode . prettier-js-mode)
-  ;;(typescript-mode . turn-on-visual-line-mode)
-  ;;(typescript-mode . editorconfig-mode)
-  ;;(typescript-mode . indium-interaction-mode)
-  ;;(typescript-mode . smartparens-mode)
-  ;; highlights
-  ;;(typescript-mode . tide-hl-identifier-mode)
-  ;;(typescript-mode . show-paren-mode)
-  ;;(typescript-mode . col-highlight)
-  ;;(typescript-mode . highlight-indent-guides-mode)
-  ;;(typescript-mode . show-paren-mode)
   :preface
-  :init
-  (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  :config
   (defun setup-typescript-mode ()
     (interactive)
+    (message "Trying to setup typescript-mode for buffer")
     (tide-setup)
-    (tide-hl-identifier-mode +1)
-    (eldoc-mode +1)
-    (company-mode +1)
-    (flycheck-mode +1)
+    (tide-hl-identifier-mode 1)
+    (eldoc-mode 1)
+    (company-mode 1)
+    (flycheck-mode 1)
     (setq flycheck-check-syntax-automatically '(save mode-enabled))
-    (smartparens-mode +1)
-    (prettier-js-mode +1)
-    (highlight-indent-guides-mode +1)
-    (aggressive-indent-mode +1)
-    (show-paren-mode +1)
-    (editorconfig-mode +1)
+    (smartparens-mode 1)
+    (prettier-js-mode 1)
+    (highlight-indent-guides-mode 1)
+    (aggressive-indent-mode 1)
+    (show-paren-mode 1)
+    (editorconfig-mode 1)
     (turn-on-visual-line-mode)
   )
-  (add-hook 'typescript-mode-hook . #'setup-typescript-mode)
+  :hook
+  (typescript-mode . setup-typescript-mode)
 )
 
 (use-package tide
@@ -4794,7 +4674,7 @@ Example output:
 )
 
 (use-package ng2-mode
-  :defer
+  :defer t
   :disabled
   :mode
   ("\\.component.ts$\\'" "\\.component.html$\\'")
@@ -4848,11 +4728,9 @@ Example output:
 )
 
 (use-package dockerfile-mode
-  :mode "\\Dockerfile\\'"
-)
-
-(use-package cheat-sh
   :ensure t
+  :defer t
+  :mode "\\Dockerfile\\'"
 )
 
 (defun animated-self-insert ()
@@ -4872,14 +4750,17 @@ Example output:
 
 (use-package c-c-combo
   :ensure t
+  :defer t
 )
 
 (use-package xkcd
-:ensure t
+  :ensure t
+  :defer t
 )
 
 (use-package fireplace
   :ensure t
+  :defer t
   :init (defvar fireplace-mode-map)
   :bind (:map fireplace-mode-map
               ("d" . fireplace-down)
@@ -4892,6 +4773,7 @@ Example output:
 
 (use-package selectric-mode
   :ensure t
+  :defer t
 )
 
 (defvar tetris-mode-map
@@ -4906,9 +4788,11 @@ Example output:
 
 (use-package pacmacs
   :ensure t
+  :defer t
 )
 
 (use-package epaint
+  :defer t
   :if window-system
   :commands (epaint)
   :init
@@ -4920,37 +4804,42 @@ Example output:
 )
 
 (use-package speed-type
-  :defer t)
+  :defer t
+)
 
 (use-package 2048-game
-:defer t)
+  :defer t
+)
 
 (use-package zone
- :ensure nil
- :defer 5
- :config
- ;; (zone-when-idle 600) ; in seconds
- (defun zone-choose (pgm)
-   "Choose a PGM to run for `zone'."
-   (interactive
-    (list
-     (completing-read
-      "Program: "
-      (mapcar 'symbol-name zone-programs))))
-   (let ((zone-programs (list (intern pgm))))
-     (zone))))
+  :ensure nil
+  :defer 5
+  :config
+  ;; (zone-when-idle 600) ; in seconds
+  (defun zone-choose (pgm)
+    "Choose a PGM to run for `zone'."
+    (interactive
+     (list
+      (completing-read
+       "Program: "
+       (mapcar 'symbol-name zone-programs))))
+    (let ((zone-programs (list (intern pgm))))
+      (zone))))
 
 (use-package meme
   :ensure nil
+  :defer t
   :commands (meme meme-file)
 )
 
 (use-package zone-nyan
   :ensure t
+  :defer t
 )
 
 (use-package zone-nyan
   :ensure t
+  :defer t
 )
 
 (defun duplicate-line()
@@ -4961,7 +4850,8 @@ Example output:
   (yank)
   (open-line 1)
   (next-line 1)
-  (yank))
+  (yank)
+)
 
 ;;(global-set-key (kbd "M-S-D") 'duplicate-line)
 (global-set-key [(meta shift d)] 'duplicate-line)
