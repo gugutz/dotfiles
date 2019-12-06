@@ -47,8 +47,6 @@
 
 (define-abbrev-table 'evil-list-view-mode-abbrev-table '())
 
-(define-abbrev-table 'flymake-diagnostics-buffer-mode-abbrev-table '())
-
 (define-abbrev-table 'forge-issue-list-mode-abbrev-table '())
 
 (define-abbrev-table 'forge-notifications-mode-abbrev-table '())
@@ -108,10 +106,6 @@
 
 (define-abbrev-table 'log-edit-mode-abbrev-table '())
 
-(define-abbrev-table 'lsp-browser-mode-abbrev-table '())
-
-(define-abbrev-table 'lsp-log-io-mode-abbrev-table '())
-
 (define-abbrev-table 'magit-cherry-mode-abbrev-table '())
 
 (define-abbrev-table 'magit-diff-mode-abbrev-table '())
@@ -154,8 +148,6 @@
 
 (define-abbrev-table 'occur-mode-abbrev-table '())
 
-(define-abbrev-table 'org-export-stack-mode-abbrev-table '())
-
 (define-abbrev-table 'org-mode-abbrev-table '())
 
 (define-abbrev-table 'outline-mode-abbrev-table '())
@@ -171,10 +163,6 @@
 (define-abbrev-table 'python-mode-skeleton-abbrev-table
   '(
    ))
-
-(define-abbrev-table 'rspec-compilation-mode-abbrev-table '())
-
-(define-abbrev-table 'ruby-mode-abbrev-table '())
 
 (define-abbrev-table 'select-tags-table-mode-abbrev-table '())
 
@@ -193,8 +181,6 @@
 (define-abbrev-table 'url-cookie-mode-abbrev-table '())
 
 (define-abbrev-table 'use-package-statistics-mode-abbrev-table '())
-
-(define-abbrev-table 'web-mode-abbrev-table '())
 
 (define-abbrev-table 'xref--xref-buffer-mode-abbrev-table '())
 

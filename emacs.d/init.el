@@ -1009,26 +1009,24 @@ Example output:
   :ensure org-plus-contrib
   :mode ("\\.org$" . org-mode)
   :defer t
+  :preface
   (defun setup-org-mode ()
     (interactive)
     (message "Trying to setup org-mode for buffer")
     (company-mode 1)
+    (color-identifiers-mode 1)
     (flycheck-mode 1)
     (smartparens-mode 1)
     (aggressive-indent-mode 1)
     (show-paren-mode 1)
     (turn-on-visual-line-mode)
-    (rainbow-mode 1)
+    (rainbow-mode)
+    (diff-hl-mode)
+    (add-pretty-lambda)
     (org-bullets-mode 1)
   )
   :hook
-  (org-mode . diff-hl-mode)
-  (org-mode . rainbow-mode)
-  (org-mode . turn-on-visual-line-mode)
-  (org-mode . color-identifier-mode)
-  (org-mode . org-bullets-mode)
-  (org-mode . flycheck-mode)
-  (org-mode . company-mode)
+  (org-mode . setup-org-mode)
   :bind
   ("C-c l" . org-store-link)
   ("C-c a" . org-agenda)
@@ -1201,7 +1199,7 @@ Example output:
 )
 
 (use-package ox-md
-  :ensure t
+  :ensure nil
   :defer t
   :after org
 )
@@ -2094,6 +2092,7 @@ Example output:
 
 (use-package company-lsp
   :ensure t
+  :after company lsp-mode
   :custom
   ;; debug
   (lsp-print-io nil)
@@ -2115,6 +2114,7 @@ Example output:
 
 (use-package lsp-ui
   :ensure t
+  :after lsp-mode
   :hook
   (lsp-mode . lsp-ui-mode)
   :preface
@@ -2188,11 +2188,36 @@ Example output:
       ("C-c u" . lsp-ui-imenu))
 )
 
+(use-package lsp-treemacs
+  :ensure t
+  :defer t
+  :init
+  (setq lsp-treemacs-sync-mode 1)
+)
+
+(use-package lsp-ivy
+  :ensure t
+  :defer t
+)
+
+(use-package dap-mode
+  :ensure t
+  :defer t
+  :config
+  (dap-mode 1)
+  (dap-ui-mode 1)
+  ;; enables mouse hover support
+  (dap-tooltip-mode 1)
+  ;; use tooltips for mouse hover
+  ;; if it is not enabled `dap-mode' will use the minibuffer.
+  (tooltip-mode 1)
+  ;; dap-mode also provides a hydra with dap-hydra. You can automatically trigger the hydra when the program hits a breakpoint by using the following code.
+  (add-hook 'dap-stopped-hook
+          (lambda (arg) (call-interactively #'dap-hydra)))
+)
+
 ;; (define-key ac-completing-map [return] nil)
 ;; (define-key ac-completing-map "\r" nil)
-
-;(require 'auto-complete)
-;(global-auto-complete-mode t)
 
 (use-package yasnippet
   :ensure t
@@ -2472,44 +2497,6 @@ Example output:
    :ensure t
 )
 
-(use-package neotree
-  :bind
-  ("<f7>" . neotree-toggle)
-  :config
-  (progn
-    (setq neo-smart-open t)
-    (setq neo-window-fixed-size nil)
-    (evil-leader/set-key
-      "tt" 'neotree-toggle
-      "tp" 'neotree-projectile-action))
-
-  ;; neotree 'icons' theme, which supports filetype icons
-  (setq neo-theme (if (display-graphic-p) 'icons))
-  (setq neo-theme 'icons)
-  (setq neo-window-width 32)
-
-  ;; Neotree bindings
-  (add-hook 'neotree-mode-hook
-            (lambda ()
-              ; default Neotree bindings
-              (define-key evil-normal-state-local-map (kbd "<tab>") 'neotree-enter)
-              (define-key evil-normal-state-local-map (kbd "SPC") 'neotree-quick-look)
-              (define-key evil-normal-state-local-map (kbd "q") 'neotree-hide)
-              (define-key evil-normal-state-local-map (kbd "RET") 'neotree-enter)
-              (define-key evil-normal-state-local-map (kbd "g") 'neotree-refresh)
-              (define-key evil-normal-state-local-map (kbd "n") 'neotree-next-line)
-              (define-key evil-normal-state-local-map (kbd "p") 'neotree-previous-line)
-              (define-key evil-normal-state-local-map (kbd "A") 'neotree-stretch-toggle)
-              (define-key evil-normal-state-local-map (kbd "H") 'neotree-hidden-file-toggle)
-              (define-key evil-normal-state-local-map (kbd "|") 'neotree-enter-vertical-split)
-              (define-key evil-normal-state-local-map (kbd "-") 'neotree-enter-horizontal-split)
-              ; simulating NERDTree bindings in Neotree
-              (define-key evil-normal-state-local-map (kbd "R") 'neotree-refresh)
-              (define-key evil-normal-state-local-map (kbd "r") 'neotree-refresh)
-              (define-key evil-normal-state-local-map (kbd "u") 'neotree-refresh)
-              (define-key evil-normal-state-local-map (kbd "C") 'neotree-change-root)
-              (define-key evil-normal-state-local-map (kbd "c") 'neotree-create-node))))
-
 (use-package dired-sidebar
   :ensure t
   :commands (dired-sidebar-toggle-sidebar)
@@ -2532,6 +2519,7 @@ Example output:
 
 (use-package ranger
   :ensure t
+  :defer t
   :bind
   ("C-x C-j" . ranger)
   :config
@@ -2720,7 +2708,9 @@ Example output:
   (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)) ;; set the window labels in the home row
 )
 
-:ensure t
+(use-package rotate
+  :ensure t
+  :defer t
   :bind
   ("C-c r w" . rotate-window)
   ("C-c r l" . rotate-layout)
@@ -2882,129 +2872,6 @@ Example output:
 
 (setq resize-mini-windows t)
 (setq max-mini-window-height 0.33)
-
-(defconst tau-savefile-dir (expand-file-name "savefile" user-emacs-directory))
-
-;; create the savefile dir if it doesn't exist
-(unless (file-exists-p tau-savefile-dir)
-  (make-directory tau-savefile-dir))
-
-(use-package desktop
-:ensure nil
-:bind
-("C-c s" . desktop-save-in-desktop-dir)
-:init
-;; use only one desktop
-(setq desktop-path '("~/.emacs.d/"))
-(setq desktop-dirname "~/.emacs.d/")
-(setq desktop-base-file-name "emacs-desktop")
-
-(setq desktop-restore-eager 5) ;; restore 5 buffers immediately. the others restore lazily
-(setq desktop-load-locked-desktop t)
-(setq desktop-files-not-to-save "^$")
-(setq desktop-save t)
-(setq desktop-buffers-not-to-save
-     (concat "\\("
-             "^nn\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
-             "\\|\\.emacs.*\\|\\.diary\\|\\.newsrc-dribble\\|\\.bbdb"
-       "\\)$"))
-:config
-(desktop-save-mode t)
-(add-to-list 'desktop-modes-not-to-save 'dired-mode)
-(add-to-list 'desktop-modes-not-to-save 'Info-mode)
-(add-to-list 'desktop-modes-not-to-save 'info-lookup-mode)
-(add-to-list 'desktop-modes-not-to-save 'fundamental-mode)
-(add-to-list 'desktop-modes-not-to-save 'completion-list-mode)
-
-;; remove desktop after it's been read
-(add-hook 'desktop-after-read-hook
-    '(lambda ()
-       ;; desktop-remove clears desktop-dirname
-       (setq desktop-dirname-tmp desktop-dirname)
-       (desktop-remove)
-       (setq desktop-dirname desktop-dirname-tmp)))
-
-(defun saved-session ()
-  (file-exists-p (concat desktop-dirname "/" desktop-base-file-name)))
-
-;; use session-restore to restore the desktop manually
-(defun session-restore ()
-  "Restore a saved emacs session."
-  (interactive)
-  (if (saved-session)
-      (desktop-read)
-    (message "No desktop found.")))
-
-;; use session-save to save the desktop manually
-(defun session-save ()
-  "Save an emacs session."
-  (interactive)
-  (if (saved-session)
-      (if (y-or-n-p "Overwrite existing desktop? ")
-    (desktop-save-in-desktop-dir)
-  (message "Session not saved."))
-  (desktop-save-in-desktop-dir)))
-
-;; ask user whether to restore desktop at start-up
-(add-hook 'after-init-hook
-    '(lambda ()
-       (if (saved-session)
-     (if (y-or-n-p "Restore desktop? ")
-         (session-restore)))))
-)
-
-(use-package auto-save
-  :ensure nil
-  :config
-  (setq auto-save-default nil)  ;; dont auto save files
-)
-
-(use-package saveplace
-  :ensure nil
-  :config
-  (defconst savefile-dir (expand-file-name "savefile" user-emacs-directory))
-
-  ;; create the savefile dir if it doesn't exist
-  (unless (file-exists-p savefile-dir)
-    (make-directory savefile-dir))
-
-  (setq save-place-file (expand-file-name "saveplace" savefile-dir))
-  ;; activate it for all buffers
-  (setq-default save-place t)
-  (save-place-mode t)
-)
-
-(use-package savehist
-  :ensure nil
-  :config
-  (setq savehist-save-minibuffer-history t)
-  (setq savehist-additional-variables
-        '(kill-ring
-          search-ring
-          regexp-search-ring
-          last-kbd-macro
-          kmacro-ring
-          shell-command-history))
-  (savehist-mode)
-)
-
-(use-package recentf
-  :ensure t
-  :config
-  (setq recentf-save-file (expand-file-name "recentf" user-emacs-directory)
-        recentf-max-saved-items 500
-        recentf-max-menu-items 15
-        ;; disable recentf-cleanup on Emacs start, because it can cause
-        ;; problems with remote files
-        recentf-auto-cleanup 'never)
-  (recentf-mode +1)
-)
-
-(use-package auto-save-visited
-  :ensure nil
-  :config
-  (auto-save-visited-mode)
-)
 
 (setq mode-line-format
       (list
@@ -3247,6 +3114,129 @@ Example output:
    (setq nyan-animate-nyancat t)
    (setq nyan-wavy-trail t)
    (nyan-start-animation))
+
+(defconst tau-savefile-dir (expand-file-name "savefile" user-emacs-directory))
+
+;; create the savefile dir if it doesn't exist
+(unless (file-exists-p tau-savefile-dir)
+  (make-directory tau-savefile-dir))
+
+(use-package desktop
+:ensure nil
+:bind
+("C-c s" . desktop-save-in-desktop-dir)
+:init
+;; use only one desktop
+(setq desktop-path '("~/.emacs.d/"))
+(setq desktop-dirname "~/.emacs.d/")
+(setq desktop-base-file-name "emacs-desktop")
+
+(setq desktop-restore-eager 5) ;; restore 5 buffers immediately. the others restore lazily
+(setq desktop-load-locked-desktop t)
+(setq desktop-files-not-to-save "^$")
+(setq desktop-save t)
+(setq desktop-buffers-not-to-save
+     (concat "\\("
+             "^nn\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
+             "\\|\\.emacs.*\\|\\.diary\\|\\.newsrc-dribble\\|\\.bbdb"
+       "\\)$"))
+:config
+(desktop-save-mode t)
+(add-to-list 'desktop-modes-not-to-save 'dired-mode)
+(add-to-list 'desktop-modes-not-to-save 'Info-mode)
+(add-to-list 'desktop-modes-not-to-save 'info-lookup-mode)
+(add-to-list 'desktop-modes-not-to-save 'fundamental-mode)
+(add-to-list 'desktop-modes-not-to-save 'completion-list-mode)
+
+;; remove desktop after it's been read
+(add-hook 'desktop-after-read-hook
+    '(lambda ()
+       ;; desktop-remove clears desktop-dirname
+       (setq desktop-dirname-tmp desktop-dirname)
+       (desktop-remove)
+       (setq desktop-dirname desktop-dirname-tmp)))
+
+(defun saved-session ()
+  (file-exists-p (concat desktop-dirname "/" desktop-base-file-name)))
+
+;; use session-restore to restore the desktop manually
+(defun session-restore ()
+  "Restore a saved emacs session."
+  (interactive)
+  (if (saved-session)
+      (desktop-read)
+    (message "No desktop found.")))
+
+;; use session-save to save the desktop manually
+(defun session-save ()
+  "Save an emacs session."
+  (interactive)
+  (if (saved-session)
+      (if (y-or-n-p "Overwrite existing desktop? ")
+    (desktop-save-in-desktop-dir)
+  (message "Session not saved."))
+  (desktop-save-in-desktop-dir)))
+
+;; ask user whether to restore desktop at start-up
+(add-hook 'after-init-hook
+    '(lambda ()
+       (if (saved-session)
+     (if (y-or-n-p "Restore desktop? ")
+         (session-restore)))))
+)
+
+(use-package auto-save
+  :ensure nil
+  :config
+  (setq auto-save-default nil)  ;; dont auto save files
+)
+
+(use-package saveplace
+  :ensure nil
+  :config
+  (defconst savefile-dir (expand-file-name "savefile" user-emacs-directory))
+
+  ;; create the savefile dir if it doesn't exist
+  (unless (file-exists-p savefile-dir)
+    (make-directory savefile-dir))
+
+  (setq save-place-file (expand-file-name "saveplace" savefile-dir))
+  ;; activate it for all buffers
+  (setq-default save-place t)
+  (save-place-mode t)
+)
+
+(use-package savehist
+  :ensure nil
+  :config
+  (setq savehist-save-minibuffer-history t)
+  (setq savehist-additional-variables
+        '(kill-ring
+          search-ring
+          regexp-search-ring
+          last-kbd-macro
+          kmacro-ring
+          shell-command-history))
+  (savehist-mode)
+)
+
+(use-package recentf
+  :ensure t
+  :config
+  (setq recentf-save-file (expand-file-name "recentf" user-emacs-directory)
+        recentf-max-saved-items 500
+        recentf-max-menu-items 15
+        ;; disable recentf-cleanup on Emacs start, because it can cause
+        ;; problems with remote files
+        recentf-auto-cleanup 'never)
+  (recentf-mode +1)
+)
+
+(use-package auto-save-visited
+  :ensure nil
+  :config
+  (auto-save-visited-mode)
+)
 
 (require 'discover)
 (when (featurep 'discover)
@@ -4001,13 +3991,13 @@ Example output:
 )
 
 (use-package auctex-latexmk
-    :defer t
-    :init
-    (add-hook 'LaTeX-mode-hook 'auctex-latexmk-setup)
+  :defer t
+  :init
+  (add-hook 'LaTeX-mode-hook 'auctex-latexmk-setup)
   :hook
-;; example of lambda usage in :hooks
+  ;; example of lambda usage in :hooks
   (LaTeX-mode . (lambda () (TeX-fold-mode t)))
-  )
+)
 
 (use-package company-auctex
   :ensure t
@@ -4016,13 +4006,13 @@ Example output:
   (add-hook 'LaTeX-mode-hook 'company-auctex-init)
 )
 
-(add-to-list 'org-latex-classes
+(with-eval-after-load 'org
+   '(add-to-list 'org-latex-classes
 	      '("beamer"
 	        "\\documentclass\[presentation\]\{beamer\}"
 	        ("\\section\{%s\}" . "\\section*\{%s\}")
 	        ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
-	        ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}"))
-)
+	        ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}"))))
 
 ;(add-to-list 'org-latex-classes
 ;        '("memoir"
@@ -4036,27 +4026,27 @@ Example output:
 ;)
 
 ;(add-to-list 'org-latex-classes
-;             '("abntex2"
-;               "\\documentclass{abntex2}"
-;               ("\\part{%s}" . "\\part*{%s}")
-;               ("\\chapter{%s}" . "\\chapter*{%s}")
-;               ("\\section{%s}" . "\\section*{%s}")
-;               ("\\subsection{%s}" . "\\subsection*{%s}")
-;               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-;               ("\\subsubsubsection{%s}" . "\\subsubsubsection*{%s}")
-;               ("\\paragraph{%s}" . "\\paragraph*{%s}"))
-;)
+  ;             '("abntex2"
+  ;               "\\documentclass{abntex2}"
+  ;               ("\\part{%s}" . "\\part*{%s}")
+  ;               ("\\chapter{%s}" . "\\chapter*{%s}")
+  ;               ("\\section{%s}" . "\\section*{%s}")
+  ;               ("\\subsection{%s}" . "\\subsection*{%s}")
+  ;               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+  ;               ("\\subsubsubsection{%s}" . "\\subsubsubsection*{%s}")
+  ;               ("\\paragraph{%s}" . "\\paragraph*{%s}"))
+  ;)
 
-(add-to-list 'org-latex-classes
-             '("abntex2"
-               "\\documentclass{abntex2}"
-               ;; ("\\chapter{%s}" . "\\chapter*{%s}")
-               ("\\section{%s}" . "\\section*{%s}")
-               ("\\subsection{%s}" . "\\subsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-               ("\\subsubsubsection{%s}" . "\\subsubsubsection*{%s}")
-               ("\\paragraph{%s}" . "\\paragraph*{%s}"))
-)
+(with-eval-after-load 'org
+  '(add-to-list 'org-latex-classes
+               '("abntex2"
+                 "\\documentclass{abntex2}"
+                 ;; ("\\chapter{%s}" . "\\chapter*{%s}")
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsubsection{%s}" . "\\subsubsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}"))))
 
 (use-package sgml-mode
   :ensure nil
@@ -4263,6 +4253,7 @@ Example output:
   (css-selector ((t (:inherit default :foreground "#66CCFF"))))
   (font-lock-comment-face ((t (:foreground "#828282"))))
   :mode
+  ("\\.component.html\\'" . web-mode)
   ("\\.phtml\\'" . web-mode)
   ("\\.tsx\\'" . web-mode)
   ("\\.jsx\\'" . web-mode)
@@ -4276,7 +4267,8 @@ Example output:
   :preface
   (defun setup-web-mode ()
     (interactive)
-    (message "Trying to setup web-mode for buffer %s (file: %s)" buffer-name buffer-file-name)
+    ;;(message "Trying to setup web-mode for buffer %s (file: %s)" buffer-name buffer-file-name)
+    (message "Trying to setup web-mode for buffer")
     (eldoc-mode 1)
     (company-mode 1)
     (flycheck-mode 1)
