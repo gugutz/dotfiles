@@ -1,0 +1,18 @@
+configuration {
+/* ROFI configuration file */
+/* According to ROFI github page, this is the recommended way to keep a config (inside XDG_USER_CONFIG_DIR) */
+/* Using new config format release with version 1.4.0 */
+/* To see all available options, run */
+/* rofi -dump-config > ~/.config/rofi/config.example */
+ width: 100;
+ lines: 15;
+ columns: 1;
+ modi: "window,drun,ssh,combi";
+/* theme: extra; */
+ font: "hack 10";
+ combi-modi: "window,drun,ssh";
+ show-icons: true;
+ sidebar-mode: true;
+ line-margin: 2;
+ line-padding: 1;
+}

@@ -118,8 +118,9 @@ bindsym XF86MonBrightnessDown exec "xbacklight -dec 10; notify-send 'brightness 
 ################################################
 
 # bindsym $mod+t exec --no-startup-id pkill compton
-bindsym $mod+Ctrl+t exec --no-startup-id compton -b
-bindsym $mod+Shift+d --release exec "killall dunst; exec notify-send 'restart dunst'"
+bindsym $mod+Ctrl+t exec --no-startup-id compton -b; exec notify-send 'running compton'
+# add ctrl to the bellow binding to i can use the original binding for dmenu
+bindsym $mod+Ctrl+Shift+d --release exec "killall dunst; exec notify-send 'restart dunst'"
 bindsym $mod+Ctrl+x --release exec --no-startup-id xkill
 
 # Call for i3 help pdf
@@ -367,7 +368,9 @@ set_from_resource $term_color15    color15
 set $wallpaper2 ~/dotfiles/i3/wallpapers/emilia-sorrindo.jpg
 
 # 2 different wallapers for 2 monitors
-# exec_always --no-startup-id feh --bg-fill  $wallpaper1 $wallpaper2
+#exec_always --no-startup-id feh --bg-fill  $wallpaper1 $wallpaper2
+
+# wallpaper only on monitor on the right
 exec_always --no-startup-id feh --bg-fill  $wallpaper2/r
 
 # to stretch a single image across monitors, using half image for each monitor
@@ -492,22 +495,6 @@ bindsym $mod+Shift+minus move scratchpad
 # If there are multiple scratchpad windows, this command cycles through them.
 bindsym $mod+minus scratchpad show; [instance="dropdown"] move position center
 
-################################################
-# ROFI TASK SWITCHER SETTINGS
-################################################
-
-# rofi task switcher - dmenu replacement
-bindsym $mod+Tab \
-  exec rofi \
-  -show window -terminal urxvtc -hide-scrollbar true  \
-  -line-margin 0 -lines 20 -eh 1 -width 35 -bw 3 \
-  -kb-mode-next      Alt+Tab \
-  -kb-mode-previous  Alt+Control+Tab \
-  -bg        "#222222"  -fg        "#2ECC71" \
-  -hlbg      "#2ECC71"  -hlfg      "#222222" \
-  -bg-active "#222222"  -fg-active "#2288DD" \
-  -font      "Roboto Slab 11"   -opactiy 80
-
 
 ################################################
 # BINDINGS FOR EDITING SEVERAL CONFIG AND
@@ -560,14 +547,38 @@ bindsym $mod+$alt+Control+b    exec --no-startup-id $editorterm ~/sync/scripts/s
 # APPLICATION KEY BINDINGS
 ################################################
 
-# start dmenu program launcher
-# bindsym $mod+d                    exec dmenu_run
-bindsym $mod+d exec --no-startup-id dmenu_recency
+#------------------------------------------------
+# ROFI TASK SWITCHER SETTINGS
 
-# Start Settings Menu
+# rofi window switcher
+bindsym $mod+Tab \
+  exec rofi \
+  -show window -terminal st -hide-scrollbar true  \
+  -line-margin 0 -lines 20 -eh 1 -width 35 -bw 3 \
+  -kb-mode-next      Alt+Tab \
+  -kb-mode-previous  Alt+Control+Tab \
+  -bg        "#222222"  -fg        "#2ECC71" \
+  -hlbg      "#2ECC71"  -hlfg      "#222222" \
+  -bg-active "#222222"  -fg-active "#2288DD" \
+  -font      "Roboto Slab 11"   -opactiy 80
+
+# rofi app runner
+# bindsym $mod+d exec rofi -show run -theme extra
+bindsym $mod+d exec rofi -show run -config ~/dotfiles/rofi/config.rasi -theme ~/dotfiles/rofi/extra
+#------------------------------------------------
+# DMENU
+
+# bindsym $mod+d                    exec dmenu_run
+bindsym $mod+Shift+d exec --no-startup-id dmenu_recency
+
+#------------------------------------------------
+# BMENU - Settings Menu
+
 bindsym $mod+Ctrl+b exec terminal -e 'bmenu'
 
-# launch categorized menu
+#------------------------------------------------
+# morc menu - categorized menu
+
 bindsym $mod+Shift+z exec --no-startup-id morc_menu
 
 # # firefox
