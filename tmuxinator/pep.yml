@@ -43,11 +43,10 @@ windows:
       layout: 283a,239x64,0,0{119x64,0,0,0,119x64,120,0[119x32,120,0,2,119x31,120,33,3]}
       panes:
         - ng s --host
-        - htop
+        - #empty
         - #empty
   - server:
-      layout: 283a,239x64,0,0{119x64,0,0,0,119x64,120,0[119x32,120,0,2,119x31,120,33,3]}
+      layout: even-horizontal
       panes:
         - htop
-        - cmatrix
-        - neofetch
+        - cd ~/dotfiles && git status

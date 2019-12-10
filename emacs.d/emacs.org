@@ -2369,29 +2369,21 @@ Requires: Emacs >= 26
   :defer t
   :diminish flycheck-mode
   :ensure-system-package
-  ((tslint . "npm i -g tslint")
-   (typescript . "npm i -g typescript"))
+  ((tslint . "npm i -g tslint"))
   :hook
-  ;;(prog-mode . flycheck-mode)
   (flycheck-mode . flycheck-posframe-mode)
   :custom
   (flycheck-display-errors-delay 1)
-  :config
-  ;;(global-flycheck-mode)
-
+  :init
   ;; Only check while saving and opening files
   (setq flycheck-check-syntax-automatically '(save mode-enabled idle-change))
-  (setq flycheck-idle-change-delay 2)
-
+  (setq flycheck-idle-change-delay 1)
   ;; Set fringe style
-  (setq flycheck-indication-mode 'right-fringe)
-
+  (setq flycheck-indication-mode 'left-fringe)
   ;; force flycheck to use its own xml parser instead of libxml32 (was giving me errors)
   (setq flycheck-xml-parser 'flycheck-parse-xml-region)
-
   ;; customize flycheck temp file prefix
   (setq-default flycheck-temp-prefix ".flycheck")
-
 )
 
 #+END_SRC
@@ -6473,34 +6465,37 @@ https://github.com/felipeochoa/rjsx-mode
 * Typescript
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package typescript-mode
-  :ensure t
-  :defer t
-  ;;:after indium tide company flycheck
-  :mode
-  (("\\.ts\\'" . typescript-mode)
-   ("\\.tsx\\'" . typescript-mode))
-  :preface
-  (defun setup-typescript-mode ()
-    (interactive)
-    (message "Trying to setup typescript-mode for buffer")
-    (tide-setup)
-    (tide-hl-identifier-mode 1)
-    (eldoc-mode 1)
-    (company-mode 1)
-    (flycheck-mode 1)
-    (setq flycheck-check-syntax-automatically '(save mode-enabled))
-    (smartparens-mode 1)
-    (prettier-js-mode 1)
-    (highlight-indent-guides-mode 1)
-    (aggressive-indent-mode 1)
-    (show-paren-mode 1)
-    (editorconfig-mode 1)
-    (turn-on-visual-line-mode)
+  (use-package typescript-mode
+    :ensure t
+    :ensure-system-package
+    ((typescript . "npm i -g typescript"))
+    :defer t
+    ;;:after indium tide company flycheck
+    :mode
+    (("\\.ts\\'" . typescript-mode)
+     ("\\.tsx\\'" . typescript-mode))
+    :preface
+    (defun setup-typescript-mode ()
+      (interactive)
+      (message "Trying to setup typescript-mode for buffer")
+      (tide-setup)
+      (tide-hl-identifier-mode 1)
+      (eldoc-mode 1)
+      (company-mode 1)
+      (flycheck-mode 1)
+      (setq flycheck-check-syntax-automatically '(save mode-enabled idle-change))
+      (setq flycheck-idle-change-delay 1)
+      (smartparens-mode 1)
+      (prettier-js-mode 1)
+      (highlight-indent-guides-mode 1)
+      (aggressive-indent-mode 1)
+      (show-paren-mode 1)
+      (editorconfig-mode 1)
+      (turn-on-visual-line-mode)
+    )
+    :hook
+    (typescript-mode . setup-typescript-mode)
   )
-  :hook
-  (typescript-mode . setup-typescript-mode)
-)
 #+END_SRC
 
 ** Tide

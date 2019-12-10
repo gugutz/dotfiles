@@ -5,11 +5,7 @@
 
 (define-abbrev-table 'Info-edit-mode-abbrev-table '())
 
-(define-abbrev-table 'apropos-mode-abbrev-table '())
-
 (define-abbrev-table 'calendar-mode-abbrev-table '())
-
-(define-abbrev-table 'change-log-mode-abbrev-table '())
 
 (define-abbrev-table 'comint-mode-abbrev-table '())
 
@@ -17,25 +13,11 @@
 
 (define-abbrev-table 'debugger-mode-abbrev-table '())
 
-(define-abbrev-table 'diff-mode-abbrev-table '())
-
-(define-abbrev-table 'display-time-world-mode-abbrev-table '())
-
-(define-abbrev-table 'edebug-eval-mode-abbrev-table '())
-
 (define-abbrev-table 'edit-abbrevs-mode-abbrev-table '())
 
 (define-abbrev-table 'elisp-byte-code-mode-abbrev-table '())
 
-(define-abbrev-table 'elisp-refs-mode-abbrev-table '())
-
 (define-abbrev-table 'emacs-lisp-mode-abbrev-table '())
-
-(define-abbrev-table 'emojify-apropos-mode-abbrev-table '())
-
-(define-abbrev-table 'emojify-description-mode-abbrev-table '())
-
-(define-abbrev-table 'emojify-list-mode-abbrev-table '())
 
 (define-abbrev-table 'epa-info-mode-abbrev-table '())
 
@@ -47,27 +29,7 @@
 
 (define-abbrev-table 'evil-list-view-mode-abbrev-table '())
 
-(define-abbrev-table 'forge-issue-list-mode-abbrev-table '())
-
-(define-abbrev-table 'forge-notifications-mode-abbrev-table '())
-
-(define-abbrev-table 'forge-post-mode-abbrev-table '())
-
-(define-abbrev-table 'forge-pullreq-list-mode-abbrev-table '())
-
-(define-abbrev-table 'forge-repository-list-mode-abbrev-table '())
-
-(define-abbrev-table 'forge-topic-list-mode-abbrev-table '())
-
-(define-abbrev-table 'forge-topic-mode-abbrev-table '())
-
 (define-abbrev-table 'fundamental-mode-abbrev-table '())
-
-(define-abbrev-table 'gfm-mode-abbrev-table '())
-
-(define-abbrev-table 'gfm-view-mode-abbrev-table '())
-
-(define-abbrev-table 'git-commit-elisp-text-mode-abbrev-table '())
 
 (define-abbrev-table 'global-abbrev-table
   '(
@@ -75,12 +37,6 @@
     ("arrow" "→" nil 0)
     ("infinity" "∞" nil 0)
    ))
-
-(define-abbrev-table 'go-dot-mod-mode-abbrev-table '())
-
-(define-abbrev-table 'go-mode-abbrev-table '())
-
-(define-abbrev-table 'godoc-mode-abbrev-table '())
 
 (define-abbrev-table 'grep-mode-abbrev-table '())
 
@@ -92,55 +48,13 @@
 
 (define-abbrev-table 'help-mode-abbrev-table '())
 
-(define-abbrev-table 'helpful-mode-abbrev-table '())
-
 (define-abbrev-table 'ibuffer-mode-abbrev-table '())
-
-(define-abbrev-table 'inferior-python-mode-abbrev-table '())
 
 (define-abbrev-table 'ivy-occur-grep-mode-abbrev-table '())
 
 (define-abbrev-table 'ivy-occur-mode-abbrev-table '())
 
 (define-abbrev-table 'lisp-mode-abbrev-table '())
-
-(define-abbrev-table 'log-edit-mode-abbrev-table '())
-
-(define-abbrev-table 'magit-cherry-mode-abbrev-table '())
-
-(define-abbrev-table 'magit-diff-mode-abbrev-table '())
-
-(define-abbrev-table 'magit-log-mode-abbrev-table '())
-
-(define-abbrev-table 'magit-log-select-mode-abbrev-table '())
-
-(define-abbrev-table 'magit-merge-preview-mode-abbrev-table '())
-
-(define-abbrev-table 'magit-mode-abbrev-table '())
-
-(define-abbrev-table 'magit-process-mode-abbrev-table '())
-
-(define-abbrev-table 'magit-reflog-mode-abbrev-table '())
-
-(define-abbrev-table 'magit-refs-mode-abbrev-table '())
-
-(define-abbrev-table 'magit-repolist-mode-abbrev-table '())
-
-(define-abbrev-table 'magit-revision-mode-abbrev-table '())
-
-(define-abbrev-table 'magit-stash-mode-abbrev-table '())
-
-(define-abbrev-table 'magit-stashes-mode-abbrev-table '())
-
-(define-abbrev-table 'magit-status-mode-abbrev-table '())
-
-(define-abbrev-table 'magit-submodule-list-mode-abbrev-table '())
-
-(define-abbrev-table 'markdown-mode-abbrev-table '())
-
-(define-abbrev-table 'markdown-view-mode-abbrev-table '())
-
-(define-abbrev-table 'message-mode-abbrev-table '())
 
 (define-abbrev-table 'messages-buffer-mode-abbrev-table '())
 
@@ -158,27 +72,13 @@
 
 (define-abbrev-table 'prog-mode-abbrev-table '())
 
-(define-abbrev-table 'python-mode-abbrev-table '())
-
-(define-abbrev-table 'python-mode-skeleton-abbrev-table
-  '(
-   ))
-
-(define-abbrev-table 'select-tags-table-mode-abbrev-table '())
-
 (define-abbrev-table 'shell-mode-abbrev-table '())
-
-(define-abbrev-table 'snippet-mode-abbrev-table '())
 
 (define-abbrev-table 'special-mode-abbrev-table '())
 
 (define-abbrev-table 'tabulated-list-mode-abbrev-table '())
 
-(define-abbrev-table 'tar-mode-abbrev-table '())
-
 (define-abbrev-table 'text-mode-abbrev-table '())
-
-(define-abbrev-table 'url-cookie-mode-abbrev-table '())
 
 (define-abbrev-table 'use-package-statistics-mode-abbrev-table '())
 

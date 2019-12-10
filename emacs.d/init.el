@@ -1641,29 +1641,21 @@ Example output:
   :defer t
   :diminish flycheck-mode
   :ensure-system-package
-  ((tslint . "npm i -g tslint")
-   (typescript . "npm i -g typescript"))
+  ((tslint . "npm i -g tslint"))
   :hook
-  ;;(prog-mode . flycheck-mode)
   (flycheck-mode . flycheck-posframe-mode)
   :custom
   (flycheck-display-errors-delay 1)
-  :config
-  ;;(global-flycheck-mode)
-
+  :init
   ;; Only check while saving and opening files
   (setq flycheck-check-syntax-automatically '(save mode-enabled idle-change))
-  (setq flycheck-idle-change-delay 2)
-
+  (setq flycheck-idle-change-delay 1)
   ;; Set fringe style
-  (setq flycheck-indication-mode 'right-fringe)
-
+  (setq flycheck-indication-mode 'left-fringe)
   ;; force flycheck to use its own xml parser instead of libxml32 (was giving me errors)
   (setq flycheck-xml-parser 'flycheck-parse-xml-region)
-
   ;; customize flycheck temp file prefix
   (setq-default flycheck-temp-prefix ".flycheck")
-
 )
 
 (use-package flycheck-posframe
@@ -4613,6 +4605,8 @@ Example output:
 
 (use-package typescript-mode
   :ensure t
+  :ensure-system-package
+  ((typescript . "npm i -g typescript"))
   :defer t
   ;;:after indium tide company flycheck
   :mode
@@ -4627,7 +4621,8 @@ Example output:
     (eldoc-mode 1)
     (company-mode 1)
     (flycheck-mode 1)
-    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+    (setq flycheck-check-syntax-automatically '(save mode-enabled idle-change))
+    (setq flycheck-idle-change-delay 1)
     (smartparens-mode 1)
     (prettier-js-mode 1)
     (highlight-indent-guides-mode 1)
