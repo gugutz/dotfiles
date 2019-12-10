@@ -1,0 +1,8 @@
+Host github.com
+    Hostname github.com
+    IdentityFile ~/.ssh/id_rsa_github
+    IdentitiesOnly yes
+Host bitbucket.org
+    Hostname bitbucket.org
+    IdentityFile ~/.ssh/id_rsa_stairs_bitbucket
+    IdentitiesOnly yes
