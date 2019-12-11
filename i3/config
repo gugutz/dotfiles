@@ -284,8 +284,6 @@ exec --no-startup-id clipit
 # start blueman bluetooth manager tray applet
 # exec --no-startup-id blueman-applet
 
-# auto start blurlock after 10 minutes
-exec --no-startup-id xautolock -time 8 -locker blurlock
 
 # exec_always --no-startup-id sbxkb
 exec_always --no-startup-id ff-theme-util
@@ -363,15 +361,18 @@ set_from_resource $term_color15    color15
 # WALLPAPER SETUP
 ################################################
 
+# use nitrogen to restore latest set wallpapers (for both monitors)
+exec_always --no-startup-id nitrogen --restore &
+
 # set $wallpapers_path ~/Pictures/Wallpapers
-# set $wallpaper1 ~/dotfiles/i3/wallpapers/how-winter-should-look.jpg
-set $wallpaper2 ~/dotfiles/i3/wallpapers/emilia-sorrindo.jpg
+# set $how-winter-should-look ~/dotfiles/i3/wallpapers/how-winter-should-look.jpg
+# set $emilia-sorrindo ~/dotfiles/wallpapers/emilia-sorrindo.jpg
 
 # 2 different wallapers for 2 monitors
 #exec_always --no-startup-id feh --bg-fill  $wallpaper1 $wallpaper2
 
 # wallpaper only on monitor on the right
-exec_always --no-startup-id feh --bg-fill  $wallpaper2/r
+# exec_always --no-startup-id feh --bg-center  $emilia_sorrindo
 
 # to stretch a single image across monitors, using half image for each monitor
 # exec_always --no-startup-id feh --bg-scale --no-xinerama $wallpaper1
@@ -381,9 +382,22 @@ exec_always --no-startup-id feh --bg-fill  $wallpaper2/r
 
 # set background to solid color
 # xsetroot doesnt work with compton enabled, so using hsetroot (from aur) instead
-exec_always --no-startup-id hsetroot -solid "#000"  #darkgrey
+# exec_always --no-startup-id hsetroot -solid "#000"  #darkgrey
 
+# animated GIFs as wallpapers using foo-Wallpaper-Feh-Gif
+# source: https://github.com/thomas10-10/foo-Wallpaper-Feh-Gif
+# exec_always --no-startup-id killall back4.sh
+# exec_always --no-startup-id ~/dotfiles/i3/scripts/back4.sh 0.03 wallpapers/beautycity.gif
+################################################
+# LOCK SCREEN AND SCREENSAVER
+################################################
 
+# auto start blurlock after 10 minutes
+# exec --no-startup-id xautolock -time 8 -locker blurlock
+
+# animated screensaver on lock screen
+# exec --no-startup-id xscreensaver -no-splash &
+# exec --no-startup-id xautolock -time 8 -locker i3lock -c 000000
 
 ################################################
 # SCREENSHOTS SETUP

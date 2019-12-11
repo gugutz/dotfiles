@@ -1,7 +1,7 @@
 
 ;; ----- amx-history -----
 (
- tide-fix
+ display-line-numbers-mode
  package-install
  hydra-ivy/body
  dumb-jump-go
@@ -45,7 +45,7 @@
  (profiler-report . 1)
  (evil-mode . 2)
  (visual-line-mode . 5)
- (display-line-numbers-mode . 2)
+ (display-line-numbers-mode . 5)
  (flycheck-mode . 2)
  (smooth-scrolling-mode . 2)
  (sublimity-mode . 1)
