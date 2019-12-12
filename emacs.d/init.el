@@ -676,9 +676,10 @@ Example output:
   :config
   (setq-default hippie-expand-try-functions-list
         '(yas-hippie-try-expand
-          indent-according-to-mode
-          emmet-expand-line
           company-indent-or-complete-common
+          emmet-expand-yas
+          emmet-expand-line
+          indent-according-to-mode
           ))
 )
 
@@ -844,7 +845,7 @@ Example output:
     "w" 'save-buffer
     "d" 'delete-frame
     "k" 'kill-buffer
-    "b" 'switch-to-buffer
+    "b" 'ivy-switch-buffer
     "-" 'split-window-bellow
     "|" 'split-window-right
     "." 'find-tag
@@ -1743,6 +1744,19 @@ Example output:
     (define-key git-messenger-map (kbd "RET") 'git-messenger:popup-close))
 )
 
+(use-package vc-msg
+  :ensure t
+  :defer t
+  :bind
+  ("C-c g p" . git-messenger:popup-message)
+  :init
+  (setq git-messenger:show-detail t)
+  (setq git-messenger:use-magit-popup t)
+  :config
+  (progn
+    (define-key git-messenger-map (kbd "RET") 'git-messenger:popup-close))
+)
+
 ;; Mode for .gitignore files.
 (use-package gitignore-mode :ensure t :defer t)
 (use-package gitconfig-mode :ensure t :defer t)
@@ -1838,19 +1852,20 @@ Example output:
   (:map company-active-map
   ("M-n" . nil)
   ("M-p" . nil)
-  ;; ("C-n" . company-select-next)
-  ;; ("C-p" . company-select-previous)
-  ("C-n" . company-select-next-or-abort)
-  ("C-p" . company-select-previous-or-abort)
-  ("<tab>" . company-complete-common-or-cycle)
+  ("C-n" . company-select-next)
+  ("C-p" . company-select-previous)
+  ;;("C-n" . company-select-next-or-abort)
+  ;;("C-p" . company-select-previous-or-abort)
+  ;;("<tab>" . company-complete-common-or-cycle)
+  ("<tab>" . company-complete)
   ("S-<backtab>" . company-select-previous)
   ("<backtab>" . company-select-previous)
   ("C-d" . company-show-doc-buffer))
   (:map company-search-map
-  ;; ("C-p" . company-select-previous)
-  ;; ("C-n" . company-select-next)
-  ("C-p" . company-select-previous-or-abort)
-  ("C-n" . company-select-next-or-abort))
+  ("C-p" . company-select-previous)
+  ("C-n" . company-select-next))
+  ;;("C-p" . company-select-previous-or-abort)
+  ;;("C-n" . company-select-next-or-abort))
   :config
   ;; define company appearance
   (custom-set-faces
@@ -2111,7 +2126,7 @@ Example output:
   (setq lsp-print-io nil)
   (setq lsp-trace nil)
   (setq lsp-print-performance nil)
-  (setq lsp-prefer-flymake t) ;; t(flymake), nil(lsp-ui), or :none
+  (setq lsp-prefer-flymake nil) ;; t(flymake), nil(lsp-ui), or :none
 )
 
 (use-package lsp-ui
@@ -2125,51 +2140,8 @@ Example output:
     (if lsp-ui-doc-mode
       (progn
         (lsp-ui-doc-mode -1)
-        (lsp-ui-doc--hide-frame)
-      )
-    (lsp-ui-doc-mode 1)
-    )
-  )
-  :config
-  ;; lsp-ui appearance
-  (set-face-attribute 'lsp-ui-doc-background  nil :background "#f9f2d9")
-  (add-hook 'lsp-ui-doc-frame-hook
-    (lambda (frame _w)
-      (set-face-attribute 'default frame :font "Overpass Mono 11")))
-
-  (set-face-attribute 'lsp-ui-sideline-global nil
-                      :inherit 'shadow
-                      :background "#f9f2d9")
-  (setq ;; lsp-ui-doc
-        lsp-ui-doc-enable t
-        lsp-ui-doc-header t
-        lsp-ui-doc-include-signature nil
-        lsp-ui-doc-position 'at-point ;; top, bottom, or at-point
-        lsp-ui-doc-max-width 100
-        lsp-ui-doc-max-height 30
-        lsp-ui-doc-use-childframe t
-        lsp-ui-doc-use-webkit t
-        ;; lsp-ui-flycheck
-        lsp-ui-flycheck-enable t
-        lsp-ui-flycheck-list-position 'right
-        lsp-ui-flycheck-live-reporting t
-        ;; lsp-ui-sideline
-        lsp-ui-sideline-enable t
-        lsp-ui-sideline-ignore-duplicate t
-        lsp-ui-sideline-show-symbol t
-        lsp-ui-sideline-show-hover t
-        lsp-ui-sideline-show-diagnostics nil
-        lsp-ui-sideline-show-code-actions t
-        lsp-ui-sideline-code-actions-prefix ""
-        lsp-ui-sideline-update-mode 'point
-        ;; lsp-ui-imenu
-        lsp-ui-imenu-enable t
-        lsp-ui-imenu-kind-position 'top
-        ;; lsp-ui-peek
-        lsp-ui-peek-enable t
-        lsp-ui-peek-peek-height 20
-        lsp-ui-peek-list-width 40
-        lsp-ui-peek-fontify 'on-demand) ;; never, on-demand, or always
+        (lsp-ui-doc--hide-frame))
+    (lsp-ui-doc-mode 1)))
   :bind
     (:map lsp-mode-map
       ("C-c u f r" . lsp-ui-peek-find-references)
@@ -2188,6 +2160,46 @@ Example output:
       ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
       ([remap xref-find-references] . lsp-ui-peek-find-references)
       ("C-c u" . lsp-ui-imenu))
+  :config
+  ;; lsp-ui appearance
+  (set-face-attribute 'lsp-ui-doc-background  nil :background "#f9f2d9")
+  (add-hook 'lsp-ui-doc-frame-hook
+    (lambda (frame _w)
+      (set-face-attribute 'default frame :font "Overpass Mono 11")))
+
+  (set-face-attribute 'lsp-ui-sideline-global nil
+                      :inherit 'shadow
+                      :background "#f9f2d9")
+   ;; lsp-ui-doc
+   (setq lsp-ui-doc-enable t)
+   (setq lsp-ui-doc-header t)
+   (setq lsp-ui-doc-include-signature nil)
+   (setq lsp-ui-doc-position 'at-point) ;; top, bottom, or at-point
+   (setq lsp-ui-doc-max-width 100)
+   (setq lsp-ui-doc-max-height 30)
+   (setq lsp-ui-doc-use-childframe t)
+   (setq lsp-ui-doc-use-webkit t)
+   (setq ;; lsp-ui-flycheck
+   (setq lsp-ui-flycheck-enable t)
+   (setq lsp-ui-flycheck-list-position 'right)
+   (setq lsp-ui-flycheck-live-reporting t)
+   (setq ;; lsp-ui-sideline
+   (setq lsp-ui-sideline-enable nil)
+   (setq lsp-ui-sideline-ignore-duplicate t)
+   (setq lsp-ui-sideline-show-symbol t)
+   (setq lsp-ui-sideline-show-hover t)
+   (setq lsp-ui-sideline-show-diagnostics nil) ;; show flycheck diagnostics
+   (setq lsp-ui-sideline-show-code-actions t)
+   (setq lsp-ui-sideline-code-actions-prefix "")
+   (setq lsp-ui-sideline-update-mode 'point)
+   (setq ;; lsp-ui-imenu
+   (setq lsp-ui-imenu-enable t)
+   (setq lsp-ui-imenu-kind-position 'top)
+   (setq ;; lsp-ui-peek
+   (setq lsp-ui-peek-enable t)
+   (setq lsp-ui-peek-peek-height 20)
+   (setq lsp-ui-peek-list-width 40)
+   (setq lsp-ui-peek-fontify 'on-demand) ;; never, on-demand, or always
 )
 
 (use-package lsp-treemacs
@@ -2249,9 +2261,9 @@ Example output:
                                  '("~/dotfiles/emacs.d/snippets/angular/"))))
   (setq yas-verbosity 1)                      ; No need to be so verbose
   (setq yas-wrap-around-region t)
-  (yas-reload-all)
+  (yas-reload-all) ;; tell yasnippet about updates to yas-snippet-dirs
   ;; disabled global mode in favor or hooks in prog and text modes only
-  (yas-global-mode 1)
+  ;; (yas-global-mode 1)
 )
 
 (use-package yasnippet-snippets         ; Collection of snippets
@@ -3421,6 +3433,7 @@ Example output:
 ;; Pulse current line
 (use-package pulse
   :ensure nil
+  :defer t
   :preface
   (defun my-pulse-momentary-line (&rest _)
     "Pulse the current line."
@@ -3528,6 +3541,7 @@ Example output:
 
 (use-package hideshowvis
   :ensure nil
+  :defer t
   :load-path "packages/hideshowvis"
   :hook
   (display-line-numbers-mode . hideshowvis-enable)
@@ -3537,6 +3551,7 @@ Example output:
 
 (use-package paren
   :ensure nil
+  :defer t
   ;;:hook
   ;;(after-init . show-paren-mode)
   :custom-face
@@ -3553,6 +3568,7 @@ Example output:
 
 (use-package color-identifiers-mode
   :ensure t
+  :defer t
 ;;:config
 ;;(add-hook 'after-init-hook 'global-color-identifiers-mode)
 ;; the following code disabled highlighting for all other keywords and only highlights and color variables
@@ -3572,8 +3588,7 @@ Example output:
 
 (use-package highlight-numbers
   :ensure t
-  :hook
-  (prog-mode . highlight-numbers-mode)
+  :defer t
 )
 
 (use-package highlight-operators
@@ -3599,7 +3614,8 @@ Example output:
 
 (use-package diff-hl
   :ensure t
-    :custom-face (diff-hl-change ((t (:foreground ,(face-background 'highlight)))))
+  :defer t
+  :custom-face (diff-hl-change ((t (:foreground ,(face-background 'highlight)))))
   :hook
   (prog-mode . diff-hl-mode)
   (dired-mode . diff-hl-mode)
@@ -3651,9 +3667,6 @@ Example output:
 ;; NOTE that the highlighting works even in comments.
 (use-package hl-todo
   :ensure t
-  :hook
-  (prog-mode . hl-todo-mode)
-  (text-mode . hl-todo-mode)
   :init
   ;; (add-hook 'text-mode-hook (lambda () (hl-todo-mode t)))
   :config
@@ -4276,6 +4289,7 @@ Example output:
     (company-mode 1)
     (flycheck-mode 1)
     (smartparens-mode 1)
+    (emmet-mode 1)
     (aggressive-indent-mode 1)
     (prettier-js-mode 1)
     (highlight-indent-guides-mode 1)
@@ -4632,10 +4646,11 @@ Example output:
     (tide-hl-identifier-mode 1)
     (eldoc-mode 1)
     (company-mode 1)
+    (yas-minor-mode 1)
     (flycheck-mode 1)
     (setq flycheck-check-syntax-automatically '(save mode-enabled idle-change))
     (setq flycheck-idle-change-delay 0.5)
-    (lsp-mode 1)
+    (lsp)
     (smartparens-mode 1)
     (prettier-js-mode 1)
     (highlight-indent-guides-mode 1)
@@ -4643,6 +4658,7 @@ Example output:
     (show-paren-mode 1)
     (editorconfig-mode 1)
     (dumb-jump-mode 1)
+    (hl-todo-mode 1)
     (smartscan-mode 1)
     (turn-on-visual-line-mode)
   )

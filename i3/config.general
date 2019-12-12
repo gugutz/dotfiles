@@ -544,7 +544,7 @@ bindsym $mod+Tab \
 
 # rofi app runner
 # bindsym $mod+d exec rofi -show run -theme extra
-bindsym $mod+d exec rofi -show run -config ~/dotfiles/rofi/config.rasi -theme ~/dotfiles/rofi/extra
+bindsym $mod+d exec rofi -show run -theme config
 #------------------------------------------------
 # DMENU
 
