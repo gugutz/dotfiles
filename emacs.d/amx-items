@@ -2,12 +2,12 @@
 ;; ----- amx-history -----
 (
  tide-fix
- hideshowvis-enable
  bug-hunter-init-file
- emmet-mode
- emmet-expand-yas
- lsp-ui-mode
- dumb-jump-mode
+ rainbow-mode
+ package-install
+ toggle-debug-on-error
+ counsel-yank-pop
+ switch-to-buffer
 )
 
 ;; ----- amx-data -----
@@ -16,13 +16,13 @@
  (scss-mode . 12)
  (eslintd-fix-mode . 3)
  (helm-M-x . 1)
- (tide-fix . 9)
+ (tide-fix . 10)
  (fast-scroll-mode . 1)
- (hideshowvis-enable . 2)
+ (hideshowvis-enable . 1)
  (counsel-projectile-mode . 2)
  (swiper-avy . 2)
  (align-regexp . 3)
- (package-install . 20)
+ (package-install . 22)
  (package-refresh-contents . 2)
  (package-delete . 11)
  (electric-indent-mode . 1)
@@ -40,7 +40,7 @@
  (org-bullets-mode . 4)
  (avy-goto-char . 2)
  (avy-goto-char-2 . 1)
- (rainbow-mode . 10)
+ (rainbow-mode . 12)
  (profiler-start . 1)
  (profiler-report . 1)
  (evil-mode . 2)
@@ -59,7 +59,7 @@
  (eyebrowse-mode . 4)
  (js2-mode . 1)
  (conf-unix-mode . 1)
- (dumb-jump-mode . 3)
+ (dumb-jump-mode . 2)
  (helm-ag . 1)
  (ag-project . 1)
  (ng2-mode . 2)
@@ -88,18 +88,13 @@
  (hl-line-mode . 4)
  (volatile-highlights-mode . 1)
  (hydra-frame-window/body . 3)
- (toggle-debug-on-error . 1)
+ (toggle-debug-on-error . 2)
  (shell-pop . 1)
- (dumb-jump-go . 3)
+ (dumb-jump-go . 2)
  (lsp . 1)
- (dumb-jump-quick-look . 2)
+ (dumb-jump-quick-look . 1)
  (hydra-ivy/body . 1)
  (switch-to-buffer . 2)
  (ivy-switch-buffer . 1)
  (counsel-yank-pop . 1)
- (xref-find-definitions . 1)
- (xref-find-definitions-other-window . 1)
- (lsp-ui-mode . 1)
- (emmet-expand-yas . 1)
- (emmet-mode . 1)
 )

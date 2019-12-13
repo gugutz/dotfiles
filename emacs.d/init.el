@@ -2153,8 +2153,7 @@ Example output:
       ("C-c f i" . lsp-find-implementation)
       ("C-c m"   . lsp-ui-imenu)
       ("C-c s"   . lsp-ui-sideline-mode)
-      ("C-c d"   . tau/toggle-lsp-ui-doc)
-    )
+      ("C-c d"   . tau/toggle-lsp-ui-doc))
     ;; remap native find-definitions and references to use lsp-ui
     (:map lsp-ui-mode-map
       ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
@@ -2179,11 +2178,11 @@ Example output:
    (setq lsp-ui-doc-max-height 30)
    (setq lsp-ui-doc-use-childframe t)
    (setq lsp-ui-doc-use-webkit t)
-   (setq ;; lsp-ui-flycheck
+   ;; lsp-ui-flycheck
    (setq lsp-ui-flycheck-enable t)
    (setq lsp-ui-flycheck-list-position 'right)
    (setq lsp-ui-flycheck-live-reporting t)
-   (setq ;; lsp-ui-sideline
+   ;; lsp-ui-sideline
    (setq lsp-ui-sideline-enable nil)
    (setq lsp-ui-sideline-ignore-duplicate t)
    (setq lsp-ui-sideline-show-symbol t)
@@ -2192,10 +2191,10 @@ Example output:
    (setq lsp-ui-sideline-show-code-actions t)
    (setq lsp-ui-sideline-code-actions-prefix "")
    (setq lsp-ui-sideline-update-mode 'point)
-   (setq ;; lsp-ui-imenu
+   ;; lsp-ui-imenu
    (setq lsp-ui-imenu-enable t)
    (setq lsp-ui-imenu-kind-position 'top)
-   (setq ;; lsp-ui-peek
+   ;; lsp-ui-peek
    (setq lsp-ui-peek-enable t)
    (setq lsp-ui-peek-peek-height 20)
    (setq lsp-ui-peek-list-width 40)
@@ -4649,7 +4648,7 @@ Example output:
     (yas-minor-mode 1)
     (flycheck-mode 1)
     (setq flycheck-check-syntax-automatically '(save mode-enabled idle-change))
-    (setq flycheck-idle-change-delay 0.5)
+    (setq flycheck-idle-change-delay 1)
     (lsp)
     (smartparens-mode 1)
     (prettier-js-mode 1)
