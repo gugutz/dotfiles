@@ -2,8 +2,8 @@
 ;; ----- amx-history -----
 (
  tide-fix
- bug-hunter-init-file
  rainbow-mode
+ bug-hunter-init-file
  package-install
  toggle-debug-on-error
  counsel-yank-pop
@@ -16,7 +16,7 @@
  (scss-mode . 12)
  (eslintd-fix-mode . 3)
  (helm-M-x . 1)
- (tide-fix . 10)
+ (tide-fix . 28)
  (fast-scroll-mode . 1)
  (hideshowvis-enable . 1)
  (counsel-projectile-mode . 2)
@@ -40,7 +40,7 @@
  (org-bullets-mode . 4)
  (avy-goto-char . 2)
  (avy-goto-char-2 . 1)
- (rainbow-mode . 12)
+ (rainbow-mode . 13)
  (profiler-start . 1)
  (profiler-report . 1)
  (evil-mode . 2)

@@ -4648,7 +4648,7 @@ Example output:
     (yas-minor-mode 1)
     (flycheck-mode 1)
     (setq flycheck-check-syntax-automatically '(save mode-enabled idle-change))
-    (setq flycheck-idle-change-delay 1)
+    (setq flycheck-idle-change-delay 1.3)
     (lsp)
     (smartparens-mode 1)
     (prettier-js-mode 1)
