@@ -676,9 +676,10 @@ Example output:
   :config
   (setq-default hippie-expand-try-functions-list
         '(yas-hippie-try-expand
-          indent-according-to-mode
-          emmet-expand-line
           company-indent-or-complete-common
+          emmet-expand-yas
+          emmet-expand-line
+          indent-according-to-mode
           ))
 )
 
@@ -844,7 +845,7 @@ Example output:
     "w" 'save-buffer
     "d" 'delete-frame
     "k" 'kill-buffer
-    "b" 'switch-to-buffer
+    "b" 'ivy-switch-buffer
     "-" 'split-window-bellow
     "|" 'split-window-right
     "." 'find-tag
@@ -1364,6 +1365,7 @@ Example output:
   :bind
   ([remap execute-extended-command] . counsel-M-x)
   ([remap find-file] . counsel-find-file)
+  ([remap switch-to-buffer] . ivy-switch-buffer)
   ("C-s" . swiper)
   ("C-c C-r" . ivy-resume)
   ("<f6>" . ivy-resume)
@@ -1447,7 +1449,7 @@ Example output:
   (ivy-mode . ivy-posframe-mode)
   :config
   ;; custom define height of post frame per function
-  (setq ivy-posframe-height-alist '((swiper . 20)
+  (setq ivy-posframe-height-alist '((swiper . 15)
                                     (t      . 25)))
 
   ;; display at `ivy-posframe-style'
@@ -1461,32 +1463,32 @@ Example output:
 )
 
 (use-package ivy-rich
-:ensure t
-:config
-(ivy-rich-mode 1)
-(setq ivy-format-function #'ivy-format-function-line)
+  :ensure t
+  :config
+  (ivy-rich-mode 1)
+  (setq ivy-format-function #'ivy-format-function-line)
 
-;; use all-the-icons for `ivy-switch-buffer'
-(defun ivy-rich-switch-buffer-icon (candidate)
-   (with-current-buffer
-    (get-buffer candidate)
-    (let ((icon (all-the-icons-icon-for-mode major-mode)))
-      (if (symbolp icon)
-      (all-the-icons-icon-for-mode 'fundamental-mode)
-        icon))))
-;; add the above function to `ivy-rich--display-transformers-list'
-(setq ivy-rich--display-transformers-list
-    '(ivy-switch-buffer
-      (:columns
-       ((ivy-rich-switch-buffer-icon :width 2)
-        (ivy-rich-candidate (:width 30))
-        (ivy-rich-switch-buffer-size (:width 7))
-        (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
-        (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))
-        (ivy-rich-switch-buffer-project (:width 15 :face success))
-        (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
-       :predicate
-       (lambda (cand) (get-buffer cand)))))
+  ;; use all-the-icons for `ivy-switch-buffer'
+  (defun ivy-rich-switch-buffer-icon (candidate)
+     (with-current-buffer
+      (get-buffer candidate)
+      (let ((icon (all-the-icons-icon-for-mode major-mode)))
+        (if (symbolp icon)
+        (all-the-icons-icon-for-mode 'fundamental-mode)
+          icon))))
+  ;; add the above function to `ivy-rich--display-transformers-list'
+  (setq ivy-rich--display-transformers-list
+      '(ivy-switch-buffer
+        (:columns
+         ((ivy-rich-switch-buffer-icon :width 2)
+          (ivy-rich-candidate (:width 30))
+          (ivy-rich-switch-buffer-size (:width 7))
+          (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
+          (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))
+          (ivy-rich-switch-buffer-project (:width 15 :face success))
+          (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
+         :predicate
+         (lambda (cand) (get-buffer cand)))))
 )
 
 (use-package helm
@@ -1742,6 +1744,19 @@ Example output:
     (define-key git-messenger-map (kbd "RET") 'git-messenger:popup-close))
 )
 
+(use-package vc-msg
+  :ensure t
+  :defer t
+  :bind
+  ("C-c g p" . git-messenger:popup-message)
+  :init
+  (setq git-messenger:show-detail t)
+  (setq git-messenger:use-magit-popup t)
+  :config
+  (progn
+    (define-key git-messenger-map (kbd "RET") 'git-messenger:popup-close))
+)
+
 ;; Mode for .gitignore files.
 (use-package gitignore-mode :ensure t :defer t)
 (use-package gitconfig-mode :ensure t :defer t)
@@ -1828,8 +1843,8 @@ Example output:
   :ensure t
   :diminish company-mode
   :defer t
-  :init
-  (global-company-mode)
+  ;;:init
+  ;;(global-company-mode)
   :bind
   (:map evil-insert-state-map
   ;; ("<tab>" . company-indent-or-complete-common)
@@ -1837,19 +1852,20 @@ Example output:
   (:map company-active-map
   ("M-n" . nil)
   ("M-p" . nil)
-  ;; ("C-n" . company-select-next)
-  ;; ("C-p" . company-select-previous)
-  ("C-n" . company-select-next-or-abort)
-  ("C-p" . company-select-previous-or-abort)
-  ("<tab>" . company-complete-common-or-cycle)
+  ("C-n" . company-select-next)
+  ("C-p" . company-select-previous)
+  ;;("C-n" . company-select-next-or-abort)
+  ;;("C-p" . company-select-previous-or-abort)
+  ;;("<tab>" . company-complete-common-or-cycle)
+  ("<tab>" . company-complete)
   ("S-<backtab>" . company-select-previous)
   ("<backtab>" . company-select-previous)
   ("C-d" . company-show-doc-buffer))
   (:map company-search-map
-  ;; ("C-p" . company-select-previous)
-  ;; ("C-n" . company-select-next)
-  ("C-p" . company-select-previous-or-abort)
-  ("C-n" . company-select-next-or-abort))
+  ("C-p" . company-select-previous)
+  ("C-n" . company-select-next))
+  ;;("C-p" . company-select-previous-or-abort)
+  ;;("C-n" . company-select-next-or-abort))
   :config
   ;; define company appearance
   (custom-set-faces
@@ -1918,111 +1934,142 @@ Example output:
   :ensure t
   :diminish company-posframe-mode
   :after company
-  :config
-  (company-posframe-mode 1)
+  :hook
+  (company-mode . company-posframe-mode)
+  (global-company-mode . company-posframe-mode)
+  ;;:config
+  ;;(company-posframe-mode 1)
   ;;:hook
   ;;(company-mode . company-posframe-mode)
   ;;(global-company-mode . company-posframe-mode)
 )
 
-;; (use-package company-box
-  ;;   :ensure t
-  ;;   :hook
-  ;;   (company-mode . company-box-mode)
-  ;;   (global-company-mode . company-box-mode)
-  ;; )
 (use-package company-box
   :ensure t
-  :diminish company-box-mode
-  :functions (my-company-box--make-line
-              my-company-box-icons--elisp)
-  :init (setq company-box-icons-alist 'company-box-icons-all-the-icons)
-  :commands (company-box--get-color
-             company-box--resolve-colors
-             company-box--add-icon
-             company-box--apply-color
-             company-box--make-line
-             company-box-icons--elisp)
-  :hook (company-mode . company-box-mode)
+  :defer t
+  :hook
+  (company-mode . company-box-mode)
+  (global-company-mode . company-box-mode)
+)
+  ;; (use-package company-box
+  ;;   :ensure t
+  ;;   :diminish company-box-mode
+  ;;   :functions (my-company-box--make-line
+  ;;               my-company-box-icons--elisp)
+  ;;   :init (setq company-box-icons-alist 'company-box-icons-all-the-icons)
+  ;;   :commands (company-box--get-color
+  ;;              company-box--resolve-colors
+  ;;              company-box--add-icon
+  ;;              company-box--apply-color
+  ;;              company-box--make-line
+  ;;              company-box-icons--elisp)
+  ;;   :hook (company-mode . company-box-mode)
+  ;;   :custom
+  ;;   (company-box-backends-colors nil)
+  ;;   (company-box-show-single-candidate t)
+  ;;   (company-box-max-candidates 50)
+  ;;   (company-box-doc-delay 0.3)
+  ;;   :config
+  ;;   ;; Support `company-common'
+  ;;   (defun my-company-box--make-line (candidate)
+  ;;     (-let* (((candidate annotation len-c len-a backend) candidate)
+  ;;             (color (company-box--get-color backend))
+  ;;             ((c-color a-color i-color s-color) (company-box--resolve-colors color))
+  ;;             (icon-string (and company-box--with-icons-p (company-box--add-icon candidate)))
+  ;;             (candidate-string (concat (propertize (or company-common "") 'face 'company-tooltip-common)
+  ;;                                       (substring (propertize candidate 'face 'company-box-candidate) (length company-common) nil)))
+  ;;             (align-string (when annotation
+  ;;                             (concat " " (and company-tooltip-align-annotations
+  ;;                                              (propertize " " 'display `(space :align-to (- right-fringe ,(or len-a 0) 1)))))))
+  ;;             (space company-box--space)
+  ;;             (icon-p company-box-enable-icon)
+  ;;             (annotation-string (and annotation (propertize annotation 'face 'company-box-annotation)))
+  ;;             (line (concat (unless (or (and (= space 2) icon-p) (= space 0))
+  ;;                             (propertize " " 'display `(space :width ,(if (or (= space 1) (not icon-p)) 1 0.75))))
+  ;;                           (company-box--apply-color icon-string i-color)
+  ;;                           (company-box--apply-color candidate-string c-color)
+  ;;                           align-string
+  ;;                           (company-box--apply-color annotation-string a-color)))
+  ;;             (len (length line)))
+  ;;       (add-text-properties 0 len (list 'company-box--len (+ len-c len-a)
+  ;;                                        'company-box--color s-color)
+  ;;                            line)
+  ;;       line))
+  ;;   (advice-add #'company-box--make-line :override #'my-company-box--make-line)
+
+  ;;   ;; Prettify icons
+  ;;   (defun my-company-box-icons--elisp (candidate)
+  ;;     (when (derived-mode-p 'emacs-lisp-mode)
+  ;;       (let ((sym (intern candidate)))
+  ;;         (cond ((fboundp sym) 'Function)
+  ;;               ((featurep sym) 'Module)
+  ;;               ((facep sym) 'Color)
+  ;;               ((boundp sym) 'Variable)
+  ;;               ((symbolp sym) 'Text)
+  ;;               (t . nil)))))
+  ;;   (advice-add #'company-box-icons--elisp :override #'my-company-box-icons--elisp)
+
+  ;;   (when (and (display-graphic-p)
+  ;;              (require 'all-the-icons nil t))
+  ;;     (declare-function all-the-icons-faicon 'all-the-icons)
+  ;;     (declare-function all-the-icons-material 'all-the-icons)
+  ;;     (declare-function all-the-icons-octicon 'all-the-icons)
+  ;;     (setq company-box-icons-all-the-icons
+  ;;           `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.85 :v-adjust -0.2))
+  ;;             (Text . ,(all-the-icons-faicon "text-width" :height 0.8 :v-adjust -0.05))
+  ;;             (Method . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+  ;;             (Function . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+  ;;             (Constructor . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+  ;;             (Field . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
+  ;;             (Variable . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
+  ;;             (Class . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+  ;;             (Interface . ,(all-the-icons-material "share" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+  ;;             (Module . ,(all-the-icons-material "view_module" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+  ;;             (Property . ,(all-the-icons-faicon "wrench" :height 0.8 :v-adjust -0.05))
+  ;;             (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.85 :v-adjust -0.2))
+  ;;             (Value . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+  ;;             (Enum . ,(all-the-icons-material "storage" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+  ;;             (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.85 :v-adjust -0.2))
+  ;;             (Snippet . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2))
+  ;;             (Color . ,(all-the-icons-material "palette" :height 0.85 :v-adjust -0.2))
+  ;;             (File . ,(all-the-icons-faicon "file-o" :height 0.85 :v-adjust -0.05))
+  ;;             (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.85 :v-adjust -0.2))
+  ;;             (Folder . ,(all-the-icons-faicon "folder-open" :height 0.85 :v-adjust -0.05))
+  ;;             (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+  ;;             (Constant . ,(all-the-icons-faicon "square-o" :height 0.85 :v-adjust -0.05))
+  ;;             (Struct . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+  ;;             (Event . ,(all-the-icons-faicon "bolt" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-orange))
+  ;;             (Operator . ,(all-the-icons-material "control_point" :height 0.85 :v-adjust -0.2))
+  ;;             (TypeParameter . ,(all-the-icons-faicon "arrows" :height 0.8 :v-adjust -0.05))
+  ;;             (Template . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2)))
+  ;;           company-box-icons-alist 'company-box-icons-all-the-icons))
+  ;; )
+
+(use-package company-lsp
+  :ensure t
+  :defer t
+  :after company lsp-mode
   :custom
-  (company-box-backends-colors nil)
-  (company-box-show-single-candidate t)
-  (company-box-max-candidates 50)
-  (company-box-doc-delay 0.3)
+  ;; debug
+  (lsp-print-io nil)
+  (lsp-trace nil)
+  (lsp-print-performance nil)
+  ;; general
+  (lsp-auto-guess-root t)
+  (lsp-document-sync-method 'incremental) ;; none, full, incremental, or nil
+  (lsp-response-timeout 10)
+  (lsp-prefer-flymake nil) ;; t(flymake), nil(lsp-ui), or :none
+  :init
+  (setq company-lsp-enable-snippet t)
+  (setq company-lsp-async t)
+  ;; When `company-lsp-cache-candidates' is setting is auto, company-lsp will filter the candidates client side without retrieving them from the server when you type. This means that the candidates might not be the same(e. g. might be sorted in a different order) but from a functional standpoint of view you should not notice any difference.
+  ;;(setq company-lsp-cache-candidates t)
+  (setq company-lsp-cache-candidates 'auto)
+  (setq company-lsp-enable-recompletion t)
+
   :config
-  ;; Support `company-common'
-  (defun my-company-box--make-line (candidate)
-    (-let* (((candidate annotation len-c len-a backend) candidate)
-            (color (company-box--get-color backend))
-            ((c-color a-color i-color s-color) (company-box--resolve-colors color))
-            (icon-string (and company-box--with-icons-p (company-box--add-icon candidate)))
-            (candidate-string (concat (propertize (or company-common "") 'face 'company-tooltip-common)
-                                      (substring (propertize candidate 'face 'company-box-candidate) (length company-common) nil)))
-            (align-string (when annotation
-                            (concat " " (and company-tooltip-align-annotations
-                                             (propertize " " 'display `(space :align-to (- right-fringe ,(or len-a 0) 1)))))))
-            (space company-box--space)
-            (icon-p company-box-enable-icon)
-            (annotation-string (and annotation (propertize annotation 'face 'company-box-annotation)))
-            (line (concat (unless (or (and (= space 2) icon-p) (= space 0))
-                            (propertize " " 'display `(space :width ,(if (or (= space 1) (not icon-p)) 1 0.75))))
-                          (company-box--apply-color icon-string i-color)
-                          (company-box--apply-color candidate-string c-color)
-                          align-string
-                          (company-box--apply-color annotation-string a-color)))
-            (len (length line)))
-      (add-text-properties 0 len (list 'company-box--len (+ len-c len-a)
-                                       'company-box--color s-color)
-                           line)
-      line))
-  (advice-add #'company-box--make-line :override #'my-company-box--make-line)
-
-  ;; Prettify icons
-  (defun my-company-box-icons--elisp (candidate)
-    (when (derived-mode-p 'emacs-lisp-mode)
-      (let ((sym (intern candidate)))
-        (cond ((fboundp sym) 'Function)
-              ((featurep sym) 'Module)
-              ((facep sym) 'Color)
-              ((boundp sym) 'Variable)
-              ((symbolp sym) 'Text)
-              (t . nil)))))
-  (advice-add #'company-box-icons--elisp :override #'my-company-box-icons--elisp)
-
-  (when (and (display-graphic-p)
-             (require 'all-the-icons nil t))
-    (declare-function all-the-icons-faicon 'all-the-icons)
-    (declare-function all-the-icons-material 'all-the-icons)
-    (declare-function all-the-icons-octicon 'all-the-icons)
-    (setq company-box-icons-all-the-icons
-          `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.85 :v-adjust -0.2))
-            (Text . ,(all-the-icons-faicon "text-width" :height 0.8 :v-adjust -0.05))
-            (Method . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
-            (Function . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
-            (Constructor . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
-            (Field . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
-            (Variable . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
-            (Class . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
-            (Interface . ,(all-the-icons-material "share" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
-            (Module . ,(all-the-icons-material "view_module" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
-            (Property . ,(all-the-icons-faicon "wrench" :height 0.8 :v-adjust -0.05))
-            (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.85 :v-adjust -0.2))
-            (Value . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
-            (Enum . ,(all-the-icons-material "storage" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
-            (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.85 :v-adjust -0.2))
-            (Snippet . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2))
-            (Color . ,(all-the-icons-material "palette" :height 0.85 :v-adjust -0.2))
-            (File . ,(all-the-icons-faicon "file-o" :height 0.85 :v-adjust -0.05))
-            (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.85 :v-adjust -0.2))
-            (Folder . ,(all-the-icons-faicon "folder-open" :height 0.85 :v-adjust -0.05))
-            (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
-            (Constant . ,(all-the-icons-faicon "square-o" :height 0.85 :v-adjust -0.05))
-            (Struct . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
-            (Event . ,(all-the-icons-faicon "bolt" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-orange))
-            (Operator . ,(all-the-icons-material "control_point" :height 0.85 :v-adjust -0.2))
-            (TypeParameter . ,(all-the-icons-faicon "arrows" :height 0.8 :v-adjust -0.05))
-            (Template . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2)))
-          company-box-icons-alist 'company-box-icons-all-the-icons))
+  ;; add company-lsp to company backends
+  (push 'company-lsp company-backends)
 )
 
 (use-package company-go
@@ -2079,29 +2126,7 @@ Example output:
   (setq lsp-print-io nil)
   (setq lsp-trace nil)
   (setq lsp-print-performance nil)
-  (setq lsp-prefer-flymake t) ;; t(flymake), nil(lsp-ui), or :none
-)
-
-(use-package company-lsp
-  :ensure t
-  :after company lsp-mode
-  :custom
-  ;; debug
-  (lsp-print-io nil)
-  (lsp-trace nil)
-  (lsp-print-performance nil)
-  ;; general
-  (lsp-auto-guess-root t)
-  (lsp-document-sync-method 'incremental) ;; none, full, incremental, or nil
-  (lsp-response-timeout 10)
-  (lsp-prefer-flymake nil) ;; t(flymake), nil(lsp-ui), or :none
-  :config
-  (setq company-lsp-enable-snippet t)
-  (setq company-lsp-async t)
-  ;; When `company-lsp-cache-candidates' is setting is auto, company-lsp will filter the candidates client side without retrieving them from the server when you type. This means that the candidates might not be the same(e. g. might be sorted in a different order) but from a functional standpoint of view you should not notice any difference.
-  ;;(setq company-lsp-cache-candidates t)
-  (setq company-lsp-cache-candidates 'auto)
-  (setq company-lsp-enable-recompletion t)
+  (setq lsp-prefer-flymake nil) ;; t(flymake), nil(lsp-ui), or :none
 )
 
 (use-package lsp-ui
@@ -2115,11 +2140,25 @@ Example output:
     (if lsp-ui-doc-mode
       (progn
         (lsp-ui-doc-mode -1)
-        (lsp-ui-doc--hide-frame)
-      )
-    (lsp-ui-doc-mode 1)
-    )
-  )
+        (lsp-ui-doc--hide-frame))
+    (lsp-ui-doc-mode 1)))
+  :bind
+    (:map lsp-mode-map
+      ("C-c u f r" . lsp-ui-peek-find-references)
+      ("C-c u f d" . lsp-ui-peek-find-definitions)
+      ("C-c u f i" . lsp-ui-peek-find-implementation)
+      ("C-c u g d" . lsp-goto-type-definition)
+      ("C-c f d" . lsp-find-definition)
+      ("C-c g i" . lsp-goto-implementation)
+      ("C-c f i" . lsp-find-implementation)
+      ("C-c m"   . lsp-ui-imenu)
+      ("C-c s"   . lsp-ui-sideline-mode)
+      ("C-c d"   . tau/toggle-lsp-ui-doc))
+    ;; remap native find-definitions and references to use lsp-ui
+    (:map lsp-ui-mode-map
+      ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+      ([remap xref-find-references] . lsp-ui-peek-find-references)
+      ("C-c u" . lsp-ui-imenu))
   :config
   ;; lsp-ui appearance
   (set-face-attribute 'lsp-ui-doc-background  nil :background "#f9f2d9")
@@ -2130,54 +2169,36 @@ Example output:
   (set-face-attribute 'lsp-ui-sideline-global nil
                       :inherit 'shadow
                       :background "#f9f2d9")
-  (setq ;; lsp-ui-doc
-        lsp-ui-doc-enable t
-        lsp-ui-doc-header t
-        lsp-ui-doc-include-signature nil
-        lsp-ui-doc-position 'at-point ;; top, bottom, or at-point
-        lsp-ui-doc-max-width 100
-        lsp-ui-doc-max-height 30
-        lsp-ui-doc-use-childframe t
-        lsp-ui-doc-use-webkit t
-        ;; lsp-ui-flycheck
-        lsp-ui-flycheck-enable t
-        lsp-ui-flycheck-list-position 'right
-        lsp-ui-flycheck-live-reporting t
-        ;; lsp-ui-sideline
-        lsp-ui-sideline-enable t
-        lsp-ui-sideline-ignore-duplicate t
-        lsp-ui-sideline-show-symbol t
-        lsp-ui-sideline-show-hover t
-        lsp-ui-sideline-show-diagnostics nil
-        lsp-ui-sideline-show-code-actions t
-        lsp-ui-sideline-code-actions-prefix ""
-        lsp-ui-sideline-update-mode 'point
-        ;; lsp-ui-imenu
-        lsp-ui-imenu-enable t
-        lsp-ui-imenu-kind-position 'top
-        ;; lsp-ui-peek
-        lsp-ui-peek-enable t
-        lsp-ui-peek-peek-height 20
-        lsp-ui-peek-list-width 40
-        lsp-ui-peek-fontify 'on-demand) ;; never, on-demand, or always
-  :bind
-    (:map lsp-mode-map
-      ("C-c u f r" . lsp-ui-peek-find-references)
-      ("C-c u f d" . lsp-ui-peek-find-definitions)
-      ("C-c u f i" . lsp-ui-peek-find-implementation)
-      ("C-c g d" . lsp-goto-type-definition)
-      ("C-c f d" . lsp-find-definition)
-      ("C-c g i" . lsp-goto-implementation)
-      ("C-c f i" . lsp-find-implementation)
-      ("C-c m"   . lsp-ui-imenu)
-      ("C-c s"   . lsp-ui-sideline-mode)
-      ("C-c d"   . tau/toggle-lsp-ui-doc)
-    )
-    ;; remap native find-definitions and references to use lsp-ui
-    (:map lsp-ui-mode-map
-      ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-      ([remap xref-find-references] . lsp-ui-peek-find-references)
-      ("C-c u" . lsp-ui-imenu))
+   ;; lsp-ui-doc
+   (setq lsp-ui-doc-enable t)
+   (setq lsp-ui-doc-header t)
+   (setq lsp-ui-doc-include-signature nil)
+   (setq lsp-ui-doc-position 'at-point) ;; top, bottom, or at-point
+   (setq lsp-ui-doc-max-width 100)
+   (setq lsp-ui-doc-max-height 30)
+   (setq lsp-ui-doc-use-childframe t)
+   (setq lsp-ui-doc-use-webkit t)
+   ;; lsp-ui-flycheck
+   (setq lsp-ui-flycheck-enable t)
+   (setq lsp-ui-flycheck-list-position 'right)
+   (setq lsp-ui-flycheck-live-reporting t)
+   ;; lsp-ui-sideline
+   (setq lsp-ui-sideline-enable nil)
+   (setq lsp-ui-sideline-ignore-duplicate t)
+   (setq lsp-ui-sideline-show-symbol t)
+   (setq lsp-ui-sideline-show-hover t)
+   (setq lsp-ui-sideline-show-diagnostics nil) ;; show flycheck diagnostics
+   (setq lsp-ui-sideline-show-code-actions t)
+   (setq lsp-ui-sideline-code-actions-prefix "")
+   (setq lsp-ui-sideline-update-mode 'point)
+   ;; lsp-ui-imenu
+   (setq lsp-ui-imenu-enable t)
+   (setq lsp-ui-imenu-kind-position 'top)
+   ;; lsp-ui-peek
+   (setq lsp-ui-peek-enable t)
+   (setq lsp-ui-peek-peek-height 20)
+   (setq lsp-ui-peek-list-width 40)
+   (setq lsp-ui-peek-fontify 'on-demand) ;; never, on-demand, or always
 )
 
 (use-package lsp-treemacs
@@ -2190,6 +2211,8 @@ Example output:
 (use-package lsp-ivy
   :ensure t
   :defer t
+  :bind
+  ("C-c l i s" . lsp-ivy-workspace-symbol)
 )
 
 (use-package dap-mode
@@ -2237,9 +2260,9 @@ Example output:
                                  '("~/dotfiles/emacs.d/snippets/angular/"))))
   (setq yas-verbosity 1)                      ; No need to be so verbose
   (setq yas-wrap-around-region t)
-  (yas-reload-all)
+  (yas-reload-all) ;; tell yasnippet about updates to yas-snippet-dirs
   ;; disabled global mode in favor or hooks in prog and text modes only
-  (yas-global-mode 1)
+  ;; (yas-global-mode 1)
 )
 
 (use-package yasnippet-snippets         ; Collection of snippets
@@ -2521,7 +2544,7 @@ Example output:
 (setq echo-keystrokes 0.02)
 
 (setq-default show-trailing-whitespace t)
-(set-face-background 'trailing-whitespace "orange1")
+(set-face-background 'trailing-whitespace "#f44545")
 
 (setq-default indicate-buffer-boundaries 'left)
 (setq-default indicate-empty-lines t)
@@ -3409,6 +3432,7 @@ Example output:
 ;; Pulse current line
 (use-package pulse
   :ensure nil
+  :defer t
   :preface
   (defun my-pulse-momentary-line (&rest _)
     "Pulse the current line."
@@ -3516,6 +3540,7 @@ Example output:
 
 (use-package hideshowvis
   :ensure nil
+  :defer t
   :load-path "packages/hideshowvis"
   :hook
   (display-line-numbers-mode . hideshowvis-enable)
@@ -3525,6 +3550,7 @@ Example output:
 
 (use-package paren
   :ensure nil
+  :defer t
   ;;:hook
   ;;(after-init . show-paren-mode)
   :custom-face
@@ -3541,6 +3567,7 @@ Example output:
 
 (use-package color-identifiers-mode
   :ensure t
+  :defer t
 ;;:config
 ;;(add-hook 'after-init-hook 'global-color-identifiers-mode)
 ;; the following code disabled highlighting for all other keywords and only highlights and color variables
@@ -3560,8 +3587,7 @@ Example output:
 
 (use-package highlight-numbers
   :ensure t
-  :hook
-  (prog-mode . highlight-numbers-mode)
+  :defer t
 )
 
 (use-package highlight-operators
@@ -3587,7 +3613,8 @@ Example output:
 
 (use-package diff-hl
   :ensure t
-    :custom-face (diff-hl-change ((t (:foreground ,(face-background 'highlight)))))
+  :defer t
+  :custom-face (diff-hl-change ((t (:foreground ,(face-background 'highlight)))))
   :hook
   (prog-mode . diff-hl-mode)
   (dired-mode . diff-hl-mode)
@@ -3639,9 +3666,6 @@ Example output:
 ;; NOTE that the highlighting works even in comments.
 (use-package hl-todo
   :ensure t
-  :hook
-  (prog-mode . hl-todo-mode)
-  (text-mode . hl-todo-mode)
   :init
   ;; (add-hook 'text-mode-hook (lambda () (hl-todo-mode t)))
   :config
@@ -3890,15 +3914,16 @@ Example output:
 )
 
 (use-package smartparens
-   :ensure t
-   ;;:hook
-   ;;(after-init . smartparens-global-mode)
-   :config
-   (require 'smartparens-config)
-   (sp-pair "=" "=" :actions '(wrap))
-   (sp-pair "+" "+" :actions '(wrap))
-   (sp-pair "<" ">" :actions '(wrap))
-   (sp-pair "$" "$" :actions '(wrap))
+  :ensure t
+  :defer t
+  ;;:hook
+  ;;(after-init . smartparens-global-mode)
+  :config
+  (require 'smartparens-config)
+  (sp-pair "=" "=" :actions '(wrap))
+  (sp-pair "+" "+" :actions '(wrap))
+  (sp-pair "<" ">" :actions '(wrap))
+  (sp-pair "$" "$" :actions '(wrap))
 )
 
 (use-package evil-smartparens
@@ -3909,15 +3934,13 @@ Example output:
 
 (use-package smartscan
   :ensure t
-  :config
-  (smartscan-mode 1)
+  :defer t
 )
 
 (use-package editorconfig
   :ensure t
+  :defer t
   :diminish editorconfig-mode
-  :config
-  (editorconfig-mode 1)
 )
 
 (use-package multiple-cursors
@@ -4265,11 +4288,13 @@ Example output:
     (company-mode 1)
     (flycheck-mode 1)
     (smartparens-mode 1)
+    (emmet-mode 1)
     (aggressive-indent-mode 1)
     (prettier-js-mode 1)
     (highlight-indent-guides-mode 1)
     (show-paren-mode 1)
     (editorconfig-mode 1)
+    (smartscan-mode 1)
     (turn-on-visual-line-mode)
   )
   :hook
@@ -4620,15 +4645,20 @@ Example output:
     (tide-hl-identifier-mode 1)
     (eldoc-mode 1)
     (company-mode 1)
+    (yas-minor-mode 1)
     (flycheck-mode 1)
     (setq flycheck-check-syntax-automatically '(save mode-enabled idle-change))
-    (setq flycheck-idle-change-delay 1)
+    (setq flycheck-idle-change-delay 1.3)
+    (lsp)
     (smartparens-mode 1)
     (prettier-js-mode 1)
     (highlight-indent-guides-mode 1)
     (aggressive-indent-mode 1)
     (show-paren-mode 1)
     (editorconfig-mode 1)
+    (dumb-jump-mode 1)
+    (hl-todo-mode 1)
+    (smartscan-mode 1)
     (turn-on-visual-line-mode)
   )
   :hook
@@ -4659,6 +4689,26 @@ Example output:
   ;;(add-hook 'typescript-mode-hook #'setup-tide-mode)
   ;;(add-hook 'js2-mode-hook #'setup-tide-mode)
 )
+
+(defun ng2--counterpart-name (file)
+  "Return the file name of FILE's counterpart, or FILE if there is no counterpart."
+  (when (not (ng2--is-component file)) file)
+  (let ((ext (file-name-extension file))
+        (base (file-name-sans-extension file)))
+    (if (equal ext "ts")
+        (concat base ".html")
+      (concat base ".ts"))))
+
+(defun ng2--is-component (file)
+  "Return whether FILE is a component file."
+  (equal (file-name-extension (file-name-sans-extension file)) "component"))
+
+(defun ng2-open-counterpart ()
+  "Opens the corresponding template or component file to this one."
+  (interactive)
+  (find-file (ng2--counterpart-name (buffer-file-name))))
+
+(global-set-key (kbd "C-x o") #'ng2-open-counterpart)
 
 (use-package ng2-mode
   :defer t
