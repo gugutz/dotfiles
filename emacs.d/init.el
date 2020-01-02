@@ -1023,16 +1023,17 @@ Example output:
     (turn-on-visual-line-mode)
     (rainbow-mode)
     (diff-hl-mode)
-    (add-pretty-lambda)
+    (prettify-symbols-mode)
     (org-bullets-mode 1)
   )
   :hook
   (org-mode . setup-org-mode)
   :bind
+  (:map org-mode-map
   ("C-c l" . org-store-link)
   ("C-c a" . org-agenda)
   ("C-c c" . org-capture)
-  ("C-c b" . org-switch)
+  ("C-c b" . org-switch))
 
   ;; this map is to delete de bellow commented lambda that does the same thing
   ;; Resolve issue with Tab not working with ORG only in Normal VI Mode in terminal
@@ -3470,7 +3471,6 @@ Example output:
     (advice-add cmd :after #'my-recenter-and-pulse))
 )
 
-(global-prettify-symbols-mode 1)
 (defun add-pretty-lambda ()
   "Make some word or string show as pretty Unicode symbols. See https://unicodelookup.com for more."
   (setq prettify-symbols-alist
@@ -3482,6 +3482,7 @@ Example output:
           ("<=" . 8804)
           (">=" . 8805)
           )))
+;;(global-prettify-symbols-mode 1)
 (add-hook 'prog-mode-hook 'add-pretty-lambda)
 (add-hook 'org-mode-hook 'add-pretty-lambda)
 
