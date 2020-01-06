@@ -306,7 +306,8 @@ tangled, and the tangled file is compiled."
 (global-set-key (kbd "C-S-)") #'text-scale-adjust)
 
 (use-package expand-region
-  :ensure nil
+  :ensure t
+  :defer t
   :bind
   ([(control shift iso-lefttab)] . 'er/expand-region)
 )
@@ -1590,8 +1591,9 @@ Example output:
   (after-init . hydra-posframe-mode)
 )
 
-(use-package occur
+(use-package occur-mode
   :ensure nil
+  :defer t
   :config
   (evil-add-hjkl-bindings occur-mode-map 'emacs
     (kbd "/")       'evil-search-forward
@@ -1877,12 +1879,14 @@ Example output:
   '(company-tooltip-common ((t (:inherit font-lock-constant-face))))
   '(company-tooltip-selection ((t (:inherit company-tooltip-common :background "#2a2a2a" )))))
 
+  ;; Frontends
+  (setq company-frontends '(company-pseudo-tooltip-frontend)) ;; dont show substring completion, even if only 1 backend
   ;; Use Company for completion
   (progn
     (bind-key [remap completion-at-point] #'company-complete company-mode-map))
   (setq company-tooltip-limit 20)                      ; bigger popup window
   (setq company-minimum-prefix-length 1)               ; start completing after 1st char typed
-  (setq company-idle-delay 0)                         ; decrease delay before autocompletion popup shows
+  (setq company-idle-delay 0.2)                         ; decrease delay before autocompletion popup shows
   (setq company-echo-delay 0)                          ; remove annoying blinking
   (setq company-begin-commands '(self-insert-command)) ; start autocompletion only after typing
   ;; company-dabbrev
@@ -1952,125 +1956,23 @@ Example output:
   (company-mode . company-box-mode)
   (global-company-mode . company-box-mode)
 )
-  ;; (use-package company-box
-  ;;   :ensure t
-  ;;   :diminish company-box-mode
-  ;;   :functions (my-company-box--make-line
-  ;;               my-company-box-icons--elisp)
-  ;;   :init (setq company-box-icons-alist 'company-box-icons-all-the-icons)
-  ;;   :commands (company-box--get-color
-  ;;              company-box--resolve-colors
-  ;;              company-box--add-icon
-  ;;              company-box--apply-color
-  ;;              company-box--make-line
-  ;;              company-box-icons--elisp)
-  ;;   :hook (company-mode . company-box-mode)
-  ;;   :custom
-  ;;   (company-box-backends-colors nil)
-  ;;   (company-box-show-single-candidate t)
-  ;;   (company-box-max-candidates 50)
-  ;;   (company-box-doc-delay 0.3)
-  ;;   :config
-  ;;   ;; Support `company-common'
-  ;;   (defun my-company-box--make-line (candidate)
-  ;;     (-let* (((candidate annotation len-c len-a backend) candidate)
-  ;;             (color (company-box--get-color backend))
-  ;;             ((c-color a-color i-color s-color) (company-box--resolve-colors color))
-  ;;             (icon-string (and company-box--with-icons-p (company-box--add-icon candidate)))
-  ;;             (candidate-string (concat (propertize (or company-common "") 'face 'company-tooltip-common)
-  ;;                                       (substring (propertize candidate 'face 'company-box-candidate) (length company-common) nil)))
-  ;;             (align-string (when annotation
-  ;;                             (concat " " (and company-tooltip-align-annotations
-  ;;                                              (propertize " " 'display `(space :align-to (- right-fringe ,(or len-a 0) 1)))))))
-  ;;             (space company-box--space)
-  ;;             (icon-p company-box-enable-icon)
-  ;;             (annotation-string (and annotation (propertize annotation 'face 'company-box-annotation)))
-  ;;             (line (concat (unless (or (and (= space 2) icon-p) (= space 0))
-  ;;                             (propertize " " 'display `(space :width ,(if (or (= space 1) (not icon-p)) 1 0.75))))
-  ;;                           (company-box--apply-color icon-string i-color)
-  ;;                           (company-box--apply-color candidate-string c-color)
-  ;;                           align-string
-  ;;                           (company-box--apply-color annotation-string a-color)))
-  ;;             (len (length line)))
-  ;;       (add-text-properties 0 len (list 'company-box--len (+ len-c len-a)
-  ;;                                        'company-box--color s-color)
-  ;;                            line)
-  ;;       line))
-  ;;   (advice-add #'company-box--make-line :override #'my-company-box--make-line)
-
-  ;;   ;; Prettify icons
-  ;;   (defun my-company-box-icons--elisp (candidate)
-  ;;     (when (derived-mode-p 'emacs-lisp-mode)
-  ;;       (let ((sym (intern candidate)))
-  ;;         (cond ((fboundp sym) 'Function)
-  ;;               ((featurep sym) 'Module)
-  ;;               ((facep sym) 'Color)
-  ;;               ((boundp sym) 'Variable)
-  ;;               ((symbolp sym) 'Text)
-  ;;               (t . nil)))))
-  ;;   (advice-add #'company-box-icons--elisp :override #'my-company-box-icons--elisp)
-
-  ;;   (when (and (display-graphic-p)
-  ;;              (require 'all-the-icons nil t))
-  ;;     (declare-function all-the-icons-faicon 'all-the-icons)
-  ;;     (declare-function all-the-icons-material 'all-the-icons)
-  ;;     (declare-function all-the-icons-octicon 'all-the-icons)
-  ;;     (setq company-box-icons-all-the-icons
-  ;;           `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.85 :v-adjust -0.2))
-  ;;             (Text . ,(all-the-icons-faicon "text-width" :height 0.8 :v-adjust -0.05))
-  ;;             (Method . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
-  ;;             (Function . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
-  ;;             (Constructor . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
-  ;;             (Field . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
-  ;;             (Variable . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
-  ;;             (Class . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
-  ;;             (Interface . ,(all-the-icons-material "share" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
-  ;;             (Module . ,(all-the-icons-material "view_module" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
-  ;;             (Property . ,(all-the-icons-faicon "wrench" :height 0.8 :v-adjust -0.05))
-  ;;             (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.85 :v-adjust -0.2))
-  ;;             (Value . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
-  ;;             (Enum . ,(all-the-icons-material "storage" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
-  ;;             (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.85 :v-adjust -0.2))
-  ;;             (Snippet . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2))
-  ;;             (Color . ,(all-the-icons-material "palette" :height 0.85 :v-adjust -0.2))
-  ;;             (File . ,(all-the-icons-faicon "file-o" :height 0.85 :v-adjust -0.05))
-  ;;             (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.85 :v-adjust -0.2))
-  ;;             (Folder . ,(all-the-icons-faicon "folder-open" :height 0.85 :v-adjust -0.05))
-  ;;             (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
-  ;;             (Constant . ,(all-the-icons-faicon "square-o" :height 0.85 :v-adjust -0.05))
-  ;;             (Struct . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
-  ;;             (Event . ,(all-the-icons-faicon "bolt" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-orange))
-  ;;             (Operator . ,(all-the-icons-material "control_point" :height 0.85 :v-adjust -0.2))
-  ;;             (TypeParameter . ,(all-the-icons-faicon "arrows" :height 0.8 :v-adjust -0.05))
-  ;;             (Template . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2)))
-  ;;           company-box-icons-alist 'company-box-icons-all-the-icons))
-  ;; )
 
 (use-package company-lsp
   :ensure t
   :defer t
   :after company lsp-mode
-  :custom
-  ;; debug
-  (lsp-print-io nil)
-  (lsp-trace nil)
-  (lsp-print-performance nil)
-  ;; general
-  (lsp-auto-guess-root t)
-  (lsp-document-sync-method 'incremental) ;; none, full, incremental, or nil
-  (lsp-response-timeout 10)
-  (lsp-prefer-flymake nil) ;; t(flymake), nil(lsp-ui), or :none
+  :hook
+  (lsp-mode . (lambda () (push 'company-lsp company-backends)))
   :init
   (setq company-lsp-enable-snippet t)
   (setq company-lsp-async t)
   ;; When `company-lsp-cache-candidates' is setting is auto, company-lsp will filter the candidates client side without retrieving them from the server when you type. This means that the candidates might not be the same(e. g. might be sorted in a different order) but from a functional standpoint of view you should not notice any difference.
-  ;;(setq company-lsp-cache-candidates t)
-  (setq company-lsp-cache-candidates 'auto)
+  (setq company-lsp-cache-candidates nil)
   (setq company-lsp-enable-recompletion t)
-
   :config
-  ;; add company-lsp to company backends
-  (push 'company-lsp company-backends)
+  ;; add company-lsp to company backends (made via hooks above)
+  ;; (with-eval-after-load 'company
+  ;;   (push 'company-lsp company-backends))
 )
 
 (use-package company-go
@@ -2090,7 +1992,8 @@ Example output:
 ;;    ("C-z t" . company-tabnine))
 ;;   :config
 ;;   ;; Enable TabNine on default
-;;   (add-to-list 'company-backends #'company-tabnine)
+;;   (with-eval-after-load 'company
+;;     (add-to-list 'company-backends #'company-tabnine))
 
 ;;   ;; Integrate company-tabnine with lsp-mode
 ;;   (defun company//sort-by-tabnine (candidates)
@@ -2121,20 +2024,25 @@ Example output:
   :ensure t
   :commands lsp
   :init
+  ;; general
   (setq lsp-inhibit-message nil) ;; was `t`, changed to nil to see what it does
-  (setq lsp-eldoc-render-all t)  ;; was `nil`, changed to nil to see what it does
+  (setq lsp-eldoc-render-all nil)  ;; was `nil`, changed to t to see what it does
   (setq lsp-highlight-symbol-at-point t)  ;; was `nil`, changed to nil to see what it does
+  (setq lsp-auto-guess-root t)
+  (setq lsp-document-sync-method 'incremental) ;; none, full, incremental, or nil
+  (setq lsp-response-timeout 10)
+  (setq lsp-prefer-flymake :none) ;; t(flymake), nil(lsp-ui), or :none
+  ;debug
   (setq lsp-print-io nil)
   (setq lsp-trace nil)
   (setq lsp-print-performance nil)
-  (setq lsp-prefer-flymake nil) ;; t(flymake), nil(lsp-ui), or :none
 )
 
 (use-package lsp-ui
   :ensure t
   :after lsp-mode
-  :hook
-  (lsp-mode . lsp-ui-mode)
+  ;;:hook
+  ;;(lsp-mode . lsp-ui-mode)
   :preface
   (defun tau/toggle-lsp-ui-doc ()
     (interactive)
@@ -2145,16 +2053,16 @@ Example output:
     (lsp-ui-doc-mode 1)))
   :bind
     (:map lsp-mode-map
-      ("C-c u f r" . lsp-ui-peek-find-references)
-      ("C-c u f d" . lsp-ui-peek-find-definitions)
-      ("C-c u f i" . lsp-ui-peek-find-implementation)
-      ("C-c u g d" . lsp-goto-type-definition)
-      ("C-c f d" . lsp-find-definition)
-      ("C-c g i" . lsp-goto-implementation)
-      ("C-c f i" . lsp-find-implementation)
-      ("C-c m"   . lsp-ui-imenu)
-      ("C-c s"   . lsp-ui-sideline-mode)
-      ("C-c d"   . tau/toggle-lsp-ui-doc))
+      ("C-c l p f r" . lsp-ui-peek-find-references)
+      ("C-c l p f d" . lsp-ui-peek-find-definitions)
+      ("C-c l p f i" . lsp-ui-peek-find-implementation)
+      ("C-c l g d" . lsp-goto-type-definition)
+      ("C-c l f d" . lsp-find-definition)
+      ("C-c l g i" . lsp-goto-implementation)
+      ("C-c l f i" . lsp-find-implementation)
+      ("C-c l m"   . lsp-ui-imenu)
+      ("C-c l s"   . lsp-ui-sideline-mode)
+      ("C-c l d"   . tau/toggle-lsp-ui-doc))
     ;; remap native find-definitions and references to use lsp-ui
     (:map lsp-ui-mode-map
       ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
@@ -2165,7 +2073,7 @@ Example output:
   (set-face-attribute 'lsp-ui-doc-background  nil :background "#f9f2d9")
   (add-hook 'lsp-ui-doc-frame-hook
     (lambda (frame _w)
-      (set-face-attribute 'default frame :font "Overpass Mono 11")))
+      (set-face-attribute 'default frame :font "Hack 11")))
 
   (set-face-attribute 'lsp-ui-sideline-global nil
                       :inherit 'shadow
@@ -2180,7 +2088,7 @@ Example output:
    (setq lsp-ui-doc-use-childframe t)
    (setq lsp-ui-doc-use-webkit t)
    ;; lsp-ui-flycheck
-   (setq lsp-ui-flycheck-enable t)
+   (setq lsp-ui-flycheck-enable nil) ;; disable to leave tsling as checker for ts files
    (setq lsp-ui-flycheck-list-position 'right)
    (setq lsp-ui-flycheck-live-reporting t)
    ;; lsp-ui-sideline
@@ -2217,6 +2125,7 @@ Example output:
 )
 
 (use-package dap-mode
+  :disabled
   :ensure t
   :defer t
   :config
@@ -2231,9 +2140,6 @@ Example output:
   (add-hook 'dap-stopped-hook
           (lambda (arg) (call-interactively #'dap-hydra)))
 )
-
-;; (define-key ac-completing-map [return] nil)
-;; (define-key ac-completing-map "\r" nil)
 
 (use-package yasnippet
   :ensure t
@@ -3201,11 +3107,11 @@ Example output:
          (session-restore)))))
 )
 
-(use-package auto-save
-  :ensure nil
-  :config
-  (setq auto-save-default nil)  ;; dont auto save files
-)
+;; (use-package auto-save
+  ;;   :ensure nil
+  ;;   :config
+(setq auto-save-default nil)  ;; stop creating those #auto-save# files
+  ;;  )
 
 (use-package saveplace
   :ensure nil
@@ -3248,7 +3154,7 @@ Example output:
   (recentf-mode +1)
 )
 
-(use-package auto-save-visited
+(use-package auto-save-visited-mode
   :ensure nil
   :config
   (auto-save-visited-mode)
@@ -4526,18 +4432,17 @@ Example output:
   (prettier . "npm install -g prettier")
   :init
   (setq prettier-js-show-errors 'buffer) ;; options: 'buffer, 'echo or nil
+  ;;(setq prettier-js-args '("--bracket-spacing" "false"
+  ;;                         "--print-width" "80"
+  ;;                         "--tab-width" "2"
+  ;;                         "--use-tabs" "false"
+  ;;                         "--no-semi" "true"
+  ;;                         "--single-quote" "true"
+  ;;                         "--trailing-comma" "none"
+  ;;                         "--no-bracket-spacing" "true"
+  ;;                         "--jsx-bracket-same-line" "false"
+  ;;                         "--arrow-parens" "avoid"))
   :config
-  (setq prettier-js-args '("--bracket-spacing" "false"
-                           "--print-width" "80"
-                           "--tab-width" "2"
-                           "--use-tabs" "false"
-                           "--no-semi" "true"
-                           "--single-quote" "true"
-                           "--trailing-comma" "none"
-                           "--no-bracket-spacing" "true"
-                           "--jsx-bracket-same-line" "false"
-                           "--arrow-parens" "avoid"))
-
   ;; use prettier from local `node_modules' folder if available
   (defun tau/use-prettier-if-in-node-modules ()
     "Enable prettier-js-mode iff prettier was found installed locally in project"
@@ -4559,7 +4464,7 @@ Example output:
           (message "Falling back to aggressive-indent-mode")
           (aggressive-indent-mode 1)))))
   ;; disabled cause my current project doenst have prettier local
-  ;; (add-hook 'prettier-js-mode-hook #'tau/use-prettier-if-in-node-modules)
+  (add-hook 'prettier-js-mode-hook #'tau/use-prettier-if-in-node-modules)
 
 )
 
@@ -4576,7 +4481,8 @@ Example output:
   (add-hook 'json-mode-hook #'prettier-js-mode)
   (setq json-reformat:indent-width 2)
   (setq json-reformat:pretty-string? t)
-  (setq js-indent-level 2))
+  (setq js-indent-level 2)
+)
 
 (use-package eslintd-fix
   :ensure t
@@ -4631,8 +4537,8 @@ Example output:
 
 (use-package typescript-mode
   :ensure t
-  :ensure-system-package
-  ((typescript . "npm i -g typescript"))
+  ;;:ensure-system-package
+  ;;((typescript . "npm i -g typescript"))
   :defer t
   ;;:after indium tide company flycheck
   :mode
@@ -4642,21 +4548,23 @@ Example output:
   (defun setup-typescript-mode ()
     (interactive)
     (message "Trying to setup typescript-mode for buffer")
+    ;; (lsp)
+    ;; (lsp-ui-mode)
     (tide-setup)
     (tide-hl-identifier-mode 1)
-    (eldoc-mode 1)
-    (company-mode 1)
-    (yas-minor-mode 1)
     (flycheck-mode 1)
+    (company-mode 1)
+    (eldoc-mode 1)
+    (yas-minor-mode 1)
+    (add-node-modules-path)
+    (editorconfig-mode 1)
+    (prettier-js-mode 1)
     (setq flycheck-check-syntax-automatically '(save mode-enabled idle-change))
     (setq flycheck-idle-change-delay 1.3)
-    (lsp)
     (smartparens-mode 1)
-    (prettier-js-mode 1)
     (highlight-indent-guides-mode 1)
-    (aggressive-indent-mode 1)
+    ;;(aggressive-indent-mode 1)
     (show-paren-mode 1)
-    (editorconfig-mode 1)
     (dumb-jump-mode 1)
     (hl-todo-mode 1)
     (smartscan-mode 1)
@@ -4743,7 +4651,9 @@ Example output:
 
   ;;Flycheck setup for JSON Mode
   ;; disable json-jsonlist checking for json files
-  (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(json-jsonlist)))
+  (with-eval-after-load 'flycheck
+    (setq-default flycheck-disabled-checkers
+      (append flycheck-disabled-checkers '(json-jsonlist))))
 )
 
 (use-package rjsx-mode

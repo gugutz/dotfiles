@@ -1,14 +1,18 @@
 # Editor configuration, see https://editorconfig.org
 # This file is for unifying the coding style for different editors and IDEs
-
+#
+# A full list of supported properties can be found at:
+# https://github.com/editorconfig/editorconfig/wiki/EditorConfig-Properties
 root = true
 
 [*]
 charset = utf-8
-end_of_line = lf
 indent_style = space
 indent_size = 2
+# Unix-style newlines with a newline ending every file
+end_of_line = lf
 insert_final_newline = true
+# remove all trailing whitespace from files
 trim_trailing_whitespace = true
 
 

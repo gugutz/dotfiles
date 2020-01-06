@@ -1,13 +1,13 @@
 
 ;; ----- amx-history -----
 (
- tide-fix
+ customize
  rainbow-mode
  bug-hunter-init-file
  package-install
  toggle-debug-on-error
  counsel-yank-pop
- switch-to-buffer
+ scss-mode
 )
 
 ;; ----- amx-data -----
@@ -80,7 +80,7 @@
  (web-beautify-html . 2)
  (editorconfig-apply . 1)
  (er/expand-region . 2)
- (prettier-js . 6)
+ (prettier-js . 8)
  (highlight-operators-mode . 3)
  (highlight-parentheses-mode . 4)
  (show-paren-mode . 2)
@@ -97,4 +97,5 @@
  (switch-to-buffer . 2)
  (ivy-switch-buffer . 1)
  (counsel-yank-pop . 1)
+ (customize . 1)
 )

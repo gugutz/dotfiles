@@ -1,0 +1,206 @@
+Info 0    [12:36:18.963] Starting TS Server
+Info 1    [12:36:18.964] Version: 3.7.4
+Info 2    [12:36:18.964] Arguments: /home/gustavo/.nvm/versions/node/v10.16.3/bin/node /home/gustavo/.nvm/versions/node/v10.16.3/bin/tsserver --logFile /home/gustavo/dotfiles/.log/tsserver.log --logVerbosity info --cancellationPipeName /tmp/82f40e461c6726bffb4850d54b9af420/tscancellation*
+Info 3    [12:36:18.964] Platform: linux NodeVersion: 10 CaseSensitive: true
+Info 4    [12:36:18.973] Search path: /home/gustavo/dotfiles/emacs.d
+Info 5    [12:36:18.974] For info: /home/gustavo/dotfiles/emacs.d/emacs-removed-packages.ts :: Config file name: /home/gustavo/dotfiles/tsconfig.json
+Info 6    [12:36:18.975] Opened configuration file /home/gustavo/dotfiles/tsconfig.json
+Info 7    [12:36:21.623] Config: /home/gustavo/dotfiles/tsconfig.json : {
+ "rootNames": [
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.core.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.core.es6.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.dom.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.dom.iterable.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2015.collection.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2015.core.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2015.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2015.generator.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2015.iterable.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2015.promise.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2015.proxy.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2015.reflect.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2015.symbol.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2015.symbol.wellknown.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2016.array.include.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2016.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2016.full.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2017.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2017.full.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2017.intl.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2017.object.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2017.sharedmemory.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2017.string.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2017.typedarrays.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2018.asyncgenerator.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2018.asynciterable.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2018.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2018.full.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2018.intl.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2018.promise.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2018.regexp.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2019.array.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2019.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2019.full.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2019.object.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2019.string.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2019.symbol.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2020.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2020.full.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2020.string.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es2020.symbol.wellknown.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es5.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.es6.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.esnext.array.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.esnext.asynciterable.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.esnext.bigint.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.esnext.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.esnext.full.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.esnext.intl.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.esnext.promise.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.esnext.symbol.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.scripthost.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.webworker.d.ts",
+  "/home/gustavo/dotfiles/emacs.d/elpa/tide-20200101.638/tsserver/lib.webworker.importscripts.d.ts",
+  "/home/gustavo/dotfiles/vim/plugged/ale/test/command_callback/tsserver_paths/src/file1.ts",
+  "/home/gustavo/dotfiles/vim/plugged/ale/test/command_callback/tsserver_paths/src/level-1/file2.ts",
+  "/home/gustavo/dotfiles/vim/plugged/ale/test/command_callback/tsserver_paths/src/level-1/level-2/file3.ts",
+  "/home/gustavo/dotfiles/vim/plugged/ale/test/prettier-test-files/testfile.ts"
+ ],
+ "options": {
+  "baseUrl": "/home/gustavo/dotfiles",
+  "outDir": "/home/gustavo/dotfiles/dist/out-tsc",
+  "sourceMap": true,
+  "declaration": false,
+  "downlevelIteration": true,
+  "experimentalDecorators": true,
+  "module": 99,
+  "moduleResolution": 2,
+  "importHelpers": true,
+  "target": 2,
+  "typeRoots": [
+   "/home/gustavo/dotfiles/node_modules/@types"
+  ],
+  "lib": [
+   "lib.es2018.d.ts",
+   "lib.dom.d.ts"
+  ],
+  "configFilePath": "/home/gustavo/dotfiles/tsconfig.json"
+ }
+}
+Info 8    [12:36:22.112] Starting updateGraphWorker: Project: /home/gustavo/dotfiles/tsconfig.json
+Info 9    [12:36:25.735] Finishing updateGraphWorker: Project: /home/gustavo/dotfiles/tsconfig.json Version: 1 structureChanged: true Elapsed: 3623ms
+Info 10   [12:36:25.735] Project '/home/gustavo/dotfiles/tsconfig.json' (Configured) 
+Info 11   [12:36:25.735] 	Files (99)
+
+Info 12   [12:36:25.735] -----------------------------------------------
+Info 13   [12:36:25.741] Starting updateGraphWorker: Project: /dev/null/inferredProject1*
+Info 14   [12:36:25.907] Finishing updateGraphWorker: Project: /dev/null/inferredProject1* Version: 1 structureChanged: true Elapsed: 166ms
+Info 15   [12:36:25.907] Project '/dev/null/inferredProject1*' (Inferred) 
+Info 16   [12:36:25.907] 	Files (6)
+
+Info 17   [12:36:25.907] -----------------------------------------------
+Info 18   [13:30:47.534] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 19   [13:30:47.535] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 20   [13:30:47.535] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 21   [13:30:47.537] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 22   [13:30:47.537] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 23   [13:30:47.537] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 24   [13:40:19.266] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/tslint.json :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 25   [13:40:19.266] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/tslint.json
+Info 26   [13:40:19.266] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/tslint.json :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 27   [13:40:19.268] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/tslint.json.bkp :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 28   [13:40:19.268] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/tslint.json.bkp
+Info 29   [13:40:19.268] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/tslint.json.bkp :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 30   [13:42:20.550] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 31   [13:42:20.550] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 32   [13:42:20.550] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 33   [13:42:20.552] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 34   [13:42:20.552] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 35   [13:42:20.552] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 36   [14:4:49.343] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 37   [14:4:49.343] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 38   [14:4:49.343] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 39   [14:4:49.346] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 40   [14:4:49.346] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 41   [14:4:49.346] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 42   [14:14:21.510] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 43   [14:14:21.510] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 44   [14:14:21.510] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 45   [14:14:21.514] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 46   [14:14:21.514] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 47   [14:14:21.514] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 48   [14:16:45.810] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 49   [14:16:45.810] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 50   [14:16:45.810] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 51   [14:16:45.815] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 52   [14:16:45.815] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 53   [14:16:45.815] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 54   [14:38:17.968] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 55   [14:38:17.968] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 56   [14:38:17.968] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 57   [14:38:17.971] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 58   [14:38:17.971] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 59   [14:38:17.971] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 60   [14:41:32.67] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 61   [14:41:32.67] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 62   [14:41:32.67] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 63   [14:41:32.71] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 64   [14:41:32.71] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 65   [14:41:32.71] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 66   [14:43:4.646] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 67   [14:43:4.646] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 68   [14:43:4.646] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 69   [14:43:4.651] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 70   [14:43:4.651] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 71   [14:43:4.651] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 72   [14:56:47.378] Search path: /home/gustavo/dotfiles/emacs.d
+Info 73   [14:56:47.378] For info: /home/gustavo/dotfiles/emacs.d/emacs-removed-packages.ts :: Config file name: /home/gustavo/dotfiles/tsconfig.json
+Info 74   [14:56:47.380] Starting updateGraphWorker: Project: /dev/null/inferredProject1*
+Info 75   [14:56:47.386] Finishing updateGraphWorker: Project: /dev/null/inferredProject1* Version: 2 structureChanged: false Elapsed: 6ms
+Info 76   [14:56:47.386] Project '/dev/null/inferredProject1*' (Inferred) 
+Info 77   [14:56:47.386] 	Files (6)
+
+Info 78   [14:56:47.386] -----------------------------------------------
+Info 79   [15:1:7.73] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 80   [15:1:7.74] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 81   [15:1:7.74] Elapsed:: 1ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 82   [15:1:7.77] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 83   [15:1:7.78] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 84   [15:1:7.78] Elapsed:: 1ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 85   [15:18:59.547] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 86   [15:18:59.547] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 87   [15:18:59.547] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 88   [15:18:59.555] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 89   [15:18:59.555] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 90   [15:18:59.555] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 91   [16:4:31.414] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 92   [16:4:31.414] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 93   [16:4:31.414] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 94   [16:4:31.419] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 95   [16:4:31.419] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 96   [16:4:31.419] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 97   [16:16:39.537] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 98   [16:16:39.574] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 99   [16:16:39.600] Elapsed:: 26ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 100  [16:16:40.10] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 101  [16:16:40.10] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 102  [16:16:40.10] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 103  [17:31:9.444] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 104  [17:31:9.444] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 105  [17:31:9.444] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 106  [17:31:9.448] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 107  [17:31:9.448] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/init.el
+Info 108  [17:31:9.448] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/init.el :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 109  [18:38:43.180] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/auto-save-list/.saves-1375-gustavo-pc~ :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 110  [18:38:43.181] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/auto-save-list/.saves-1375-gustavo-pc~
+Info 111  [18:38:43.181] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/auto-save-list/.saves-1375-gustavo-pc~ :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 112  [18:38:43.181] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/auto-save-list/.saves-1375-gustavo-pc~ :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 113  [18:38:43.181] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/auto-save-list/.saves-1375-gustavo-pc~
+Info 114  [18:38:43.181] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/auto-save-list/.saves-1375-gustavo-pc~ :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 115  [18:38:43.309] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/auto-save-list/.saves-1469-gustavo-pc~ :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 116  [18:38:43.309] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/auto-save-list/.saves-1469-gustavo-pc~
+Info 117  [18:38:43.309] Elapsed:: 0ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/auto-save-list/.saves-1469-gustavo-pc~ :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 118  [18:38:43.326] DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/auto-save-list/.saves-1469-gustavo-pc~ :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
+Info 119  [18:38:43.327] Project: /home/gustavo/dotfiles/tsconfig.json Detected file add/remove of non supported extension: /home/gustavo/dotfiles/emacs.d/auto-save-list/.saves-1469-gustavo-pc~
+Info 120  [18:38:43.327] Elapsed:: 1ms DirectoryWatcher:: Triggered with /home/gustavo/dotfiles/emacs.d/auto-save-list/.saves-1469-gustavo-pc~ :: WatchInfo: /home/gustavo/dotfiles 1 Project: /home/gustavo/dotfiles/tsconfig.json WatchType: Wild card directory
