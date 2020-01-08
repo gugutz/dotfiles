@@ -375,3 +375,94 @@ There is another official flycheck-pos-tip extension for displaying errors under
   ;;             (Template . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2)))
   ;;           company-box-icons-alist 'company-box-icons-all-the-icons))
   ;; )
+
+* Indium
+
+A JavaScript development environment for Emacs.
+
+Indium connects to a browser tab or nodejs process and provides many features for JavaScript development, including:
+
++ a REPL (with auto completion) & object inspection;
++ an inspector, with history and navigation;
++ a scratch buffer (M-x indium-scratch);
++ JavaScript evaluation in JS buffers with indium-interaction-mode;
++ a stepping Debugger, similar to edebug, or cider.
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package indium
+  :ensure t
+  :defer t
+  :ensure-system-package
+  (indium . "npm i -g indium")
+  :after js2-mode typescript-mode
+  :bind
+  (:map js2-mode-map
+  ("C-c C-l" . indium-eval-buffer))
+  (:map typescript-mode-map
+  ("C-c C-l" . indium-eval-buffer))
+  :config
+  (setq indium-update-script-on-save t)
+)
+#+END_SRC
+
+* Company emoji suport
+
+  : use `:` to use emojis
+  #+BEGIN_SRC emacs-lisp :tangle init.el
+    (use-package company-emoji
+      :disabled
+      :ensure t
+      :config
+      (add-to-list 'company-backends 'company-emoji)
+      )
+#+END_SRC
+
+
+
+* web-beautify
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package web-beautify
+  :ensure t
+  :defer t
+  :ensure-system-package
+  (js-beautify . "npm i -g js-beautify")
+  :commands (web-beautify-css
+             web-beautify-css-buffer
+             web-beautify-html
+             web-beautify-html-buffer
+             web-beautify-js
+             web-beautify-js-buffer)
+)
+#+END_SRC
+
+* ng2-mode
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package ng2-mode
+  :defer t
+  :disabled
+  :mode
+  ("\\.component.ts$\\'" "\\.component.html$\\'")
+  :hook
+  (ng2-mode . rainbow-mode)
+  (ng2-mode . flycheck-mode)
+  (ng2-mode . company-mode)
+  (ng2-mode . editorconfig-mode)
+  (ng2-mode . color-identifiers-mode)
+  (ng2-mode . lsp-mode)
+  (ng2-mode . prettier-js-mode)
+  (ng2-mode . eldoc-mode)
+)
+#+END_SRC
+
+* emojify
+
+display emojis inside emacs
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package emojify
+  :ensure t
+  :config
+  (add-hook 'after-init-hook #'global-emojify-mode)
+)
+#+END_SRC

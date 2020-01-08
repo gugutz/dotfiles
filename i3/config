@@ -815,9 +815,11 @@ bindsym $mod+Shift+b move container to workspace back_and_forth; workspace back_
 
 # WORK - Use dual-screen layout
 bindsym $mod+Control+Shift+KP_1 exec ~/dotfiles/stairs/stairs-single-screen-layout.sh
+bindsym $mod+Control+Shift+1 exec ~/dotfiles/stairs/stairs-single-screen-layout.sh
 
 # WORK - Use dual-screen layout
 bindsym $mod+Control+Shift+KP_2 exec ~/dotfiles/stairs/stairs-dual-screen-layout.sh
+bindsym $mod+Control+Shift+2 exec ~/dotfiles/stairs/stairs-dual-screen-layout.sh
 
 ################################################
 # RESIZE MODE

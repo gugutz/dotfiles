@@ -728,6 +728,7 @@ Show eldoc info in a childframe
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package aggressive-indent
   :ensure t
+  :defer t
   :custom
   (aggressive-indent-comments-too t)
   :hook
@@ -815,20 +816,7 @@ Emacs jump to definition tool
 (use-package dumb-jump
   :ensure t
   :after helm
-  :bind
-  ("M-g o" . dumb-jump-go-other-window)
-  ("M-g j" . dumb-jump-go)
-  ("M-g b" . dumb-jump-back)
-  ("M-g i" . dumb-jump-go-prompt)
-  ("M-g x" . dumb-jump-go-prefer-external)
-  ("M-g z" . dumb-jump-go-prefer-external-other-window)
-  ("M-S-h d" . dumb-jump-hydra/body)
-  :config
-  (eval-when-compile
-    (require 'helm-source nil t))
-  (setq dumb-jump-selector 'ivy)
-  ;;(setq dumb-jump-selector 'helm)
-
+  :preface
   (defhydra dumb-jump-hydra (:color blue :columns 3)
       "Dumb Jump"
       ("j" dumb-jump-go "Go")
@@ -838,6 +826,23 @@ Emacs jump to definition tool
       ("i" dumb-jump-go-prompt "Prompt")
       ("l" dumb-jump-quick-look "Quick look")
       ("b" dumb-jump-back "Back"))
+  :bind
+  ;;("M-g o" . dumb-jump-go-other-window)
+  ;;("M-g j" . dumb-jump-go)
+  ;;("M-g b" . dumb-jump-back)
+  ;;("M-g i" . dumb-jump-go-prompt)
+  ;;("M-g x" . dumb-jump-go-prefer-external)
+  ;;("M-g z" . dumb-jump-go-prefer-external-other-window)
+  ;;("M-S-h d" . dumb-jump-hydra/body)
+  (:map prog-mode-map
+  ("C-c C-o" . dumb-jump-go-other-window)
+   ("C-c C-j" . dumb-jump-go)
+   ("C-c C-i" . dumb-jump-go-prompt))
+  :custom
+  (dumb-jump-selector 'ivy)
+  :config
+  (eval-when-compile
+    (require 'helm-source nil t))
 )
 #+END_SRC
 
@@ -1152,39 +1157,38 @@ Make emacs use $PATH defined in the systems shell
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package evil
   :ensure t
-  :init
-  (setq evil-ex-complete-emacs-commands nil)
-  (setq evil-vsplit-window-right t)
-  (setq evil-split-window-below t)
-  (setq evil-shift-round nil)
-  (setq evil-esc-delay 0)  ;; Don't wait for any other keys after escape is pressed.
+  :custom
+  (evil-ex-complete-emacs-commands nil)
+  (evil-vsplit-window-right t)
+  (evil-split-window-below t)
+  (evil-shift-round nil)
+  (evil-esc-delay 0)  ;; Don't wait for any other keys after escape is pressed.
   ;; Make Evil look a bit more like (n) vim  (??)
-  (setq evil-search-module 'isearch-regexp)
+  (evil-search-module 'isearch-regexp)
   ;; (setq evil-search-module 'evil-search)
-  (setq evil-magic 'very-magic)
-  (setq evil-shift-width (symbol-value 'tab-width))
-  (setq evil-regexp-search t)
-  (setq evil-search-wrap t)
+  (evil-magic 'very-magic)
+  (evil-shift-width (symbol-value 'tab-width))
+  (evil-regexp-search t)
+  (evil-search-wrap t)
   ;; (setq evil-want-C-i-jump t)
-  (setq evil-want-C-u-scroll t)
-  (setq evil-want-fine-undo nil)
-  (setq evil-want-integration nil)
+  (evil-want-C-u-scroll t)
+  (evil-want-fine-undo nil)
+  (evil-want-integration nil)
   ;; (setq evil-want-abbrev-on-insert-exit nil)
-  (setq evil-want-abbrev-expand-on-insert-exit nil)
-  (setq evil-mode-line-format '(before . mode-line-front-space)) ;; move evil tag to beginning of modeline
+  (evil-want-abbrev-expand-on-insert-exit nil)
+  (evil-mode-line-format '(before . mode-line-front-space)) ;; move evil tag to beginning of modeline
   ;; Cursor is alway black because of evil.
   ;; Here is the workaround
   ;; (@see https://bitbucket.org/lyro/evil/issue/342/evil-default-cursor-setting-should-default)
-  (setq evil-default-cursor t)
+  (evil-default-cursor t)
   ;; change cursor color according to mode
-  (setq evil-emacs-state-cursor '("#ff0000" box))
-  (setq evil-motion-state-cursor '("#FFFFFF" box))
-  (setq evil-normal-state-cursor '("#00ff00" box))
-  (setq evil-visual-state-cursor '("#abcdef" box))
-  (setq evil-insert-state-cursor '("#e2f00f" bar))
-  (setq evil-replace-state-cursor '("red" hbar))
-  (setq evil-operator-state-cursor '("red" hollow))
-
+  (evil-emacs-state-cursor '("#ff0000" box))
+  (evil-motion-state-cursor '("#FFFFFF" box))
+  (evil-normal-state-cursor '("#00ff00" box))
+  (evil-visual-state-cursor '("#abcdef" box))
+  (evil-insert-state-cursor '("#e2f00f" bar))
+  (evil-replace-state-cursor '("red" hbar))
+  (evil-operator-state-cursor '("red" hollow))
   :bind
   (:map evil-normal-state-map
   (", w" . evil-window-vsplit)
@@ -1203,12 +1207,10 @@ Make emacs use $PATH defined in the systems shell
   ;; check if global-set-key also maps to evil insert mode; if yes delete bellow snippets
   :config
   (evil-mode)
-
   ;; unset evil bindings that conflits with other stuff
   (define-key evil-insert-state-map (kbd "<tab>") nil)
   (define-key evil-normal-state-map (kbd "<tab>") nil)
   (define-key evil-visual-state-map (kbd "<tab>") nil)
-
   ;; vim-like navigation with C-w hjkl
   (define-prefix-command 'evil-window-map)
   (define-key evil-window-map (kbd "h") 'evil-window-left)
@@ -1218,7 +1220,6 @@ Make emacs use $PATH defined in the systems shell
   (define-key evil-window-map (kbd "b") 'evil-window-bottom-right)
   (define-key evil-window-map (kbd "c") 'evil-window-delete)
   (define-key evil-motion-state-map (kbd "M-w") 'evil-window-map)
-
   ;; make esc quit or cancel everything in Emacs
   (defun minibuffer-keyboard-quit ()
     "Abort recursive edit.
@@ -1238,44 +1239,43 @@ Make emacs use $PATH defined in the systems shell
   (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
   (global-set-key [escape] 'keyboard-quit)
   ;;-----------------------------------------
-
-      ;; recover native emacs commands that are overriden by evil
-      ;; this gives priority to native emacs behaviour rathen than Vim's
-      (define-key evil-normal-state-map (kbd "C-e") 'evil-end-of-line)
-      (define-key evil-insert-state-map (kbd "C-e") 'move-end-of-line)
-      (define-key evil-visual-state-map (kbd "C-e") 'evil-end-of-line)
-      (define-key evil-motion-state-map (kbd "C-e") 'evil-end-of-line)
-      (define-key evil-insert-state-map (kbd "C-d") 'evil-delete-char)
-      (define-key evil-normal-state-map (kbd "C-d") 'evil-delete-char)
-      (define-key evil-visual-state-map (kbd "C-d") 'evil-delete-char)
-      (define-key evil-normal-state-map (kbd "C-k") 'kill-line)
-      (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
-      (define-key evil-visual-state-map (kbd "C-k") 'kill-line)
-      (define-key evil-insert-state-map (kbd "C-w") 'kill-region)
-      (define-key evil-normal-state-map (kbd "C-w") 'kill-region)
-      (define-key evil-visual-state-map (kbd "C-w") 'kill-region)
-      (define-key evil-normal-state-map (kbd "C-w") 'evil-delete)
-      (define-key evil-insert-state-map (kbd "C-w") 'evil-delete)
-      (define-key evil-visual-state-map (kbd "C-w") 'evil-delete)
-      (define-key evil-normal-state-map (kbd "C-y") 'yank)
-      (define-key evil-insert-state-map (kbd "C-y") 'yank)
-      (define-key evil-visual-state-map (kbd "C-y") 'yank)
-      (define-key evil-normal-state-map (kbd "C-f") 'evil-forward-char)
-      (define-key evil-insert-state-map (kbd "C-f") 'evil-forward-char)
-      (define-key evil-insert-state-map (kbd "C-f") 'evil-forward-char)
-      (define-key evil-normal-state-map (kbd "C-b") 'evil-backward-char)
-      (define-key evil-insert-state-map (kbd "C-b") 'evil-backward-char)
-      (define-key evil-visual-state-map (kbd "C-b") 'evil-backward-char)
-      (define-key evil-normal-state-map (kbd "C-n") 'evil-next-line)
-      (define-key evil-insert-state-map (kbd "C-n") 'evil-next-line)
-      (define-key evil-visual-state-map (kbd "C-n") 'evil-next-line)
-      (define-key evil-normal-state-map (kbd "C-p") 'evil-previous-line)
-      (define-key evil-insert-state-map (kbd "C-p") 'evil-previous-line)
-      (define-key evil-visual-state-map (kbd "C-p") 'evil-previous-line)
-      (define-key evil-normal-state-map (kbd "Q") 'call-last-kbd-macro)
-      (define-key evil-visual-state-map (kbd "Q") 'call-last-kbd-macro)
-      (define-key evil-insert-state-map (kbd "C-r") 'search-backward)
-    )
+  ;; recover native emacs commands that are overriden by evil
+  ;; this gives priority to native emacs behaviour rathen than Vim's
+  (define-key evil-normal-state-map (kbd "C-e") 'evil-end-of-line)
+  (define-key evil-insert-state-map (kbd "C-e") 'move-end-of-line)
+  (define-key evil-visual-state-map (kbd "C-e") 'evil-end-of-line)
+  (define-key evil-motion-state-map (kbd "C-e") 'evil-end-of-line)
+  (define-key evil-insert-state-map (kbd "C-d") 'evil-delete-char)
+  (define-key evil-normal-state-map (kbd "C-d") 'evil-delete-char)
+  (define-key evil-visual-state-map (kbd "C-d") 'evil-delete-char)
+  (define-key evil-normal-state-map (kbd "C-k") 'kill-line)
+  (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
+  (define-key evil-visual-state-map (kbd "C-k") 'kill-line)
+  (define-key evil-insert-state-map (kbd "C-w") 'kill-region)
+  (define-key evil-normal-state-map (kbd "C-w") 'kill-region)
+  (define-key evil-visual-state-map (kbd "C-w") 'kill-region)
+  (define-key evil-normal-state-map (kbd "C-w") 'evil-delete)
+  (define-key evil-insert-state-map (kbd "C-w") 'evil-delete)
+  (define-key evil-visual-state-map (kbd "C-w") 'evil-delete)
+  (define-key evil-normal-state-map (kbd "C-y") 'yank)
+  (define-key evil-insert-state-map (kbd "C-y") 'yank)
+  (define-key evil-visual-state-map (kbd "C-y") 'yank)
+  (define-key evil-normal-state-map (kbd "C-f") 'evil-forward-char)
+  (define-key evil-insert-state-map (kbd "C-f") 'evil-forward-char)
+  (define-key evil-insert-state-map (kbd "C-f") 'evil-forward-char)
+  (define-key evil-normal-state-map (kbd "C-b") 'evil-backward-char)
+  (define-key evil-insert-state-map (kbd "C-b") 'evil-backward-char)
+  (define-key evil-visual-state-map (kbd "C-b") 'evil-backward-char)
+  (define-key evil-normal-state-map (kbd "C-n") 'evil-next-line)
+  (define-key evil-insert-state-map (kbd "C-n") 'evil-next-line)
+  (define-key evil-visual-state-map (kbd "C-n") 'evil-next-line)
+  (define-key evil-normal-state-map (kbd "C-p") 'evil-previous-line)
+  (define-key evil-insert-state-map (kbd "C-p") 'evil-previous-line)
+  (define-key evil-visual-state-map (kbd "C-p") 'evil-previous-line)
+  (define-key evil-normal-state-map (kbd "Q") 'call-last-kbd-macro)
+  (define-key evil-visual-state-map (kbd "Q") 'call-last-kbd-macro)
+  (define-key evil-insert-state-map (kbd "C-r") 'search-backward)
+)
 #+END_SRC
 
 
@@ -1563,26 +1563,23 @@ fifteen = 15
   (defun setup-org-mode ()
     (interactive)
     (message "Trying to setup org-mode for buffer")
-    (company-mode 1)
-    (color-identifiers-mode 1)
+    (color-identifiers-mode)
     (flycheck-mode 1)
-    (smartparens-mode 1)
-    (aggressive-indent-mode 1)
-    (show-paren-mode 1)
     (turn-on-visual-line-mode)
     (rainbow-mode)
     (diff-hl-mode)
     (prettify-symbols-mode)
-    (org-bullets-mode 1)
+    (org-bullets-mode)
   )
   :hook
   (org-mode . setup-org-mode)
   :bind
   (:map org-mode-map
-  ("C-c l" . org-store-link)
-  ("C-c a" . org-agenda)
-  ("C-c c" . org-capture)
-  ("C-c b" . org-switch))
+  ("C-c o l" . org-store-link)
+  ("C-c o l" . org-store-link)
+  ("C-c o a" . org-agenda)
+  ("C-c o c" . org-capture)
+  ("C-c o b" . org-switch))
 
   ;; this map is to delete de bellow commented lambda that does the same thing
   ;; Resolve issue with Tab not working with ORG only in Normal VI Mode in terminal
@@ -1684,12 +1681,24 @@ Dragging-and-releasing with mouse buttons (as opposed to clicking and releasing 
 - <drag-mouse-2>: Jump to heading using default jump function, and also show all descendant headings and their entry text.
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package org-sidebar
-:ensure t
-:defer t
-:after org
-:bind
-("S-<f8>" . org-sidebar-tree-toggle)
+  (use-package org-sidebar
+    :ensure t
+    :requires org-ql
+    :defer t
+    :after org
+    :bind
+    ("<S-f8>" . org-sidebar-tree-toggle)
+  )
+#+END_SRC
+** org-ql
+
+This package is required by org-sidebar
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package org-ql
+  :ensure t
+  :defer t
+  :after org
 )
 #+END_SRC
 
@@ -2020,6 +2029,7 @@ UTF8 pretty bullets in org mode
   :bind
   ([remap execute-extended-command] . counsel-M-x)
   ([remap find-file] . counsel-find-file)
+  ([find-file] . counsel-find-file)
   ([remap switch-to-buffer] . ivy-switch-buffer)
   ("C-s" . swiper)
   ("C-c C-r" . ivy-resume)
@@ -2373,24 +2383,47 @@ Requires: Emacs >= 26
   :ensure t
   :defer t
   :diminish flycheck-mode
-  :ensure-system-package
-  ((tslint . "npm i -g tslint"))
   :hook
   (flycheck-mode . flycheck-posframe-mode)
   :custom
+  (flycheck-check-syntax-automatically '(save mode-enabled idle-change newline))
+  (flycheck-idle-change-delay 1.5)
   (flycheck-display-errors-delay 1)
-  :init
-  ;; Only check while saving and opening files
-  (setq flycheck-check-syntax-automatically '(save mode-enabled idle-change))
-  (setq flycheck-idle-change-delay 1)
-  ;; Set fringe style
-  (setq flycheck-indication-mode 'left-fringe)
+  (flycheck-indication-mode 'left-fringe)
   ;; force flycheck to use its own xml parser instead of libxml32 (was giving me errors)
-  (setq flycheck-xml-parser 'flycheck-parse-xml-region)
+  (flycheck-xml-parser 'flycheck-parse-xml-region)
+  :config
   ;; customize flycheck temp file prefix
   (setq-default flycheck-temp-prefix ".flycheck")
+  ;;
+  ;;=======================================
+  ;; Flycheck Setup for JavaScript
+  ;;
+  ;; disable jshint since we prefer eslint checking
+  (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))
+  ;; enable eslint as default js flycheck linter
+  (setq flycheck-checkers '(javascript-eslint))
+  ;; use eslint_d instead of eslint for faster linting
+  (setq flycheck-javascript-eslint-executable "eslint_d")
+  (flycheck-add-mode 'javascript-eslint 'js-mode)
+  (flycheck-add-mode 'javascript-eslint 'js2-mode)
+  ;;
+  ;;=======================================
+  ;; Flycheck Setup for Typescript
+  (flycheck-add-mode 'typescript-tslint 'rjsx-mode)
+  (flycheck-add-mode 'typescript-tslint 'typescript-mode)
+  ;;
+  ;;=======================================
+  ;; Flycheck Setup for WebMode
+  ;;
+  (eval-after-load 'flycheck
+    '(flycheck-add-mode 'javascript-eslint 'web-mode))
+  ;; Use tidy to check HTML buffers with web-mode.
+  (eval-after-load 'flycheck
+    '(flycheck-add-mode 'html-tidy 'web-mode))
+  (eval-after-load 'flycheck
+    '(flycheck-add-mode 'typescript-tslint 'web-mode))
 )
-
 #+END_SRC
 
 ** flycheck posframe
@@ -2654,11 +2687,27 @@ A better replacement for emacs help system
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package company
   :ensure t
-  :diminish company-mode
-  :defer t
-  ;;:init
-  ;;(global-company-mode)
+  ;; :diminish company-mode
+  :preface
+  (defun smarter-yas-expand-next-field-complete ()
+    "Try to `yas-expand' and `yas-next-field' at current cursor position.
+If failed try to complete the common part with `company-complete-common'"
+    (interactive)
+    (if yas-minor-mode
+        (let ((old-point (point))
+              (old-tick (buffer-chars-modified-tick)))
+          (yas-expand)
+          (when (and (eq old-point (point))
+                     (eq old-tick (buffer-chars-modified-tick)))
+            (ignore-errors (yas-next-field))
+            (when (and (eq old-point (point))
+                       (eq old-tick (buffer-chars-modified-tick)))
+              (company-complete-common))))
+      (company-complete-common)))
   :bind
+  (:map company-active-map
+        ([tab] . smarter-yas-expand-next-field-complete)
+        ("TAB" . smarter-yas-expand-next-field-complete))
   (:map evil-insert-state-map
   ;; ("<tab>" . company-indent-or-complete-common)
   ("C-SPC" . company-indent-or-complete-common))
@@ -2667,74 +2716,46 @@ A better replacement for emacs help system
   ("M-p" . nil)
   ("C-n" . company-select-next)
   ("C-p" . company-select-previous)
-  ;;("C-n" . company-select-next-or-abort)
-  ;;("C-p" . company-select-previous-or-abort)
-  ;;("<tab>" . company-complete-common-or-cycle)
-  ("<tab>" . company-complete)
   ("S-<backtab>" . company-select-previous)
   ("<backtab>" . company-select-previous)
   ("C-d" . company-show-doc-buffer))
   (:map company-search-map
   ("C-p" . company-select-previous)
   ("C-n" . company-select-next))
-  ;;("C-p" . company-select-previous-or-abort)
-  ;;("C-n" . company-select-next-or-abort))
+  :custom-face
+  (company-preview-common ((t (:foreground unspecified :background "#111111"))))
+  (company-scrollbar-bg ((t (:background "#111111"))))
+  (company-scrollbar-fg ((t (:background "#555555"))))
+  (company-tooltip ((t (:inherit default :background "#202029"))))
+  (company-tooltip-common ((t (:inherit font-lock-constant-face))))
+  (company-tooltip-selection ((t (:inherit company-tooltip-common :background "#2a2a2a" ))))
+  :custom
+  (company-minimum-prefix-length 1)                      ; start completing after 1st char typed
+  (company-tooltip-align-annotations t)
+  (company-tooltip-limit 20)                             ; bigger popup window
+  (company-begin-commands '(self-insert-command))        ; start autocompletion only after typing
+  (company-idle-delay 0.1)                               ; decrease delay before autocompletion popup shows
+  (company-echo-delay 0)                                 ; remove annoying blinking
+  (company-selection-wrap-around t)                      ; continue from top when reaching bottom
+  (company-auto-complete 'company-explicit-action-p)
+  (company-require-match nil)
+  (company-complete-number t)                            ;; Allow (lengthy) numbers to be eligible for completion.
+  (company-show-numbers t)                               ;; Number the candidates (use M-1, M-2 etc to select completions).
+  (company-transformers '(company-sort-by-occurrence))   ; weight by frequency
+  ;; company-dabbrev
+  (company-dabbrev-downcase nil)                         ;; Do not downcase completions by default.
+  (company-dabbrev-ignore-case t)                        ;; Even if I write something with the ‘wrong’ case, provide the ‘correct’ casing.
+  (company-dabbrev-code-everywhere t)
+  (company-dabbrev-other-buffers t)
+  (company-dabbrev-code-other-buffers t)
   :config
-  ;; define company appearance
-  (custom-set-faces
-  '(company-preview-common ((t (:foreground unspecified :background "#111111"))))
-  '(company-scrollbar-bg ((t (:background "#111111"))))
-  '(company-scrollbar-fg ((t (:background "#555555"))))
-  '(company-tooltip ((t (:inherit default :background "#202029"))))
-  '(company-tooltip-common ((t (:inherit font-lock-constant-face))))
-  '(company-tooltip-selection ((t (:inherit company-tooltip-common :background "#2a2a2a" )))))
-
-  ;; Frontends
-  (setq company-frontends '(company-pseudo-tooltip-frontend)) ;; dont show substring completion, even if only 1 backend
-                                                              ;; Use Company for completion
+  (global-company-mode)
   (progn
     (bind-key [remap completion-at-point] #'company-complete company-mode-map))
-  (setq company-tooltip-limit 20)                             ; bigger popup window
-  (setq company-minimum-prefix-length 1)                      ; start completing after 1st char typed
-  (setq company-idle-delay 0.2)                               ; decrease delay before autocompletion popup shows
-  (setq company-echo-delay 0)                                 ; remove annoying blinking
-  (setq company-begin-commands '(self-insert-command))        ; start autocompletion only after typing
-  (setq company-selection-wrap-around t)                      ; continue from top when reaching bottom
-  (setq company-auto-complete 'company-explicit-action-p)
-  (setq company-require-match nil)
-  (setq company-tooltip-align-annotations t)
-  (setq company-complete-number t)                            ;; Allow (lengthy) numbers to be eligible for completion.
-  (setq company-show-numbers t)                               ;; M-⟪num⟫ to select an option according to its number.
-  (setq company-transformers '(company-sort-by-occurrence))   ; weight by frequency
-                                                              ;; company-dabbrev
-  (setq company-dabbrev-downcase nil)                         ;; Do not downcase completions by default.
-  (setq company-dabbrev-ignore-case t)                        ;; Even if I write something with the ‘wrong’ case, provide the ‘correct’ casing.
-  (setq company-dabbrev-code-everywhere t)
-  (setq company-dabbrev-other-buffers t)
-  (setq company-dabbrev-code-other-buffers t)
-  ;; (setq company-tooltip-flip-when-above t)
-  ;; DELETE THIS PART IF USE PACKAGE :MAP WORKS
-  ;; (define-key company-active-map (kbd "M-n") nil)
-  ;; (define-key company-active-map (kbd "M-p") nil)
-  ;; (define-key company-active-map (kbd "C-n") 'company-select-next)
-  ;; (define-key company-active-map (kbd "C-p") 'company-select-previous)
-  ;; (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
-  ;; (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
-  ;; (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
-  ;; (define-key company-active-map (kbd "<backtab>") 'company-select-previous)
+  ;; Frontends
+  (setq company-frontends '(company-pseudo-tooltip-frontend
+                          company-echo-metadata-frontend))
 )
-#+END_SRC
-
-** Company emoji suport
-
-: use `:` to use emojis
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package company-emoji
-  :disabled
-  :ensure t
-  :config
-  (add-to-list 'company-backends 'company-emoji)
-  )
 #+END_SRC
 
 ** Company-QuickHelp
@@ -2765,41 +2786,120 @@ A better replacement for emacs help system
   :hook
   (company-mode . company-posframe-mode)
   (global-company-mode . company-posframe-mode)
-  ;;:config
-  ;;(company-posframe-mode 1)
-  ;;:hook
-  ;;(company-mode . company-posframe-mode)
-  ;;(global-company-mode . company-posframe-mode)
 )
 #+END_SRC
 
 ** Company Box (icons in suggestions)
 #+BEGIN_SRC emacs-lisp :tangle init.el
+;; CompanyBoxPac
 (use-package company-box
   :ensure t
-  :defer t
-  :hook
-  (company-mode . company-box-mode)
-  (global-company-mode . company-box-mode)
-)
+  :diminish
+  :functions (my-company-box--make-line
+              my-company-box-icons--elisp)
+  :commands (company-box--get-color
+             company-box--resolve-colors
+             company-box--add-icon
+             company-box--apply-color
+             company-box--make-line
+             company-box-icons--elisp)
+  :hook ((global-company-mode company-mode) . company-box-mode)
+  :custom
+  (company-box-backends-colors nil)
+  (company-box-show-single-candidate t)
+  (company-box-max-candidates 50)
+  (company-box-doc-delay 0.3)
+  :config
+  ;; Support `company-common'
+  (defun my-company-box--make-line (candidate)
+    (-let* (((candidate annotation len-c len-a backend) candidate)
+            (color (company-box--get-color backend))
+            ((c-color a-color i-color s-color) (company-box--resolve-colors color))
+            (icon-string (and company-box--with-icons-p (company-box--add-icon candidate)))
+            (candidate-string (concat (propertize (or company-common "") 'face 'company-tooltip-common)
+                                      (substring (propertize candidate 'face 'company-box-candidate) (length company-common) nil)))
+            (align-string (when annotation
+                            (concat " " (and company-tooltip-align-annotations
+                                             (propertize " " 'display `(space :align-to (- right-fringe ,(or len-a 0) 1)))))))
+            (space company-box--space)
+            (icon-p company-box-enable-icon)
+            (annotation-string (and annotation (propertize annotation 'face 'company-box-annotation)))
+            (line (concat (unless (or (and (= space 2) icon-p) (= space 0))
+                            (propertize " " 'display `(space :width ,(if (or (= space 1) (not icon-p)) 1 0.75))))
+                          (company-box--apply-color icon-string i-color)
+                          (company-box--apply-color candidate-string c-color)
+                          align-string
+                          (company-box--apply-color annotation-string a-color)))
+            (len (length line)))
+      (add-text-properties 0 len (list 'company-box--len (+ len-c len-a)
+                                       'company-box--color s-color)
+                           line)
+      line))
+  (advice-add #'company-box--make-line :override #'my-company-box--make-line)
+
+  ;; Prettify icons
+  (defun my-company-box-icons--elisp (candidate)
+    (when (derived-mode-p 'emacs-lisp-mode)
+      (let ((sym (intern candidate)))
+        (cond ((fboundp sym) 'Function)
+              ((featurep sym) 'Module)
+              ((facep sym) 'Color)
+              ((boundp sym) 'Variable)
+              ((symbolp sym) 'Text)
+              (t . nil)))))
+  (advice-add #'company-box-icons--elisp :override #'my-company-box-icons--elisp)
+
+  (when (and (window-system)
+             (require 'all-the-icons nil t))
+    (declare-function all-the-icons-faicon 'all-the-icons)
+    (declare-function all-the-icons-material 'all-the-icons)
+    (declare-function all-the-icons-octicon 'all-the-icons)
+    (setq company-box-icons-all-the-icons
+          `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.85 :v-adjust -0.2))
+            (Text . ,(all-the-icons-faicon "text-width" :height 0.8 :v-adjust -0.05))
+            (Method . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+            (Function . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+            (Constructor . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+            (Field . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
+            (Variable . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
+            (Class . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+            (Interface . ,(all-the-icons-material "share" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+            (Module . ,(all-the-icons-material "view_module" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+            (Property . ,(all-the-icons-faicon "wrench" :height 0.8 :v-adjust -0.05))
+            (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.85 :v-adjust -0.2))
+            (Value . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+            (Enum . ,(all-the-icons-material "storage" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+            (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.85 :v-adjust -0.2))
+            (Snippet . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2))
+            (Color . ,(all-the-icons-material "palette" :height 0.85 :v-adjust -0.2))
+            (File . ,(all-the-icons-faicon "file-o" :height 0.85 :v-adjust -0.05))
+            (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.85 :v-adjust -0.2))
+            (Folder . ,(all-the-icons-faicon "folder-open" :height 0.85 :v-adjust -0.05))
+            (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+            (Constant . ,(all-the-icons-faicon "square-o" :height 0.85 :v-adjust -0.05))
+            (Struct . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+            (Event . ,(all-the-icons-faicon "bolt" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-orange))
+            (Operator . ,(all-the-icons-material "control_point" :height 0.85 :v-adjust -0.2))
+            (TypeParameter . ,(all-the-icons-faicon "arrows" :height 0.8 :v-adjust -0.05))
+            (Template . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2)))
+          company-box-icons-alist 'company-box-icons-all-the-icons)))
+;; -CompanyBoxPac
 #+END_SRC
 
-** Company Backends
-*** company-lsp
+** company-lsp
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package company-lsp
   :ensure t
   :defer t
   :after company lsp-mode
-  :hook
-  (lsp-mode . (lambda () (push 'company-lsp company-backends)))
-  :init
-  (setq company-lsp-enable-snippet t)
-  (setq company-lsp-async t)
-  ;; When `company-lsp-cache-candidates' is setting is auto, company-lsp will filter the candidates client side without retrieving them from the server when you type. This means that the candidates might not be the same(e. g. might be sorted in a different order) but from a functional standpoint of view you should not notice any difference.
-  (setq company-lsp-cache-candidates nil)
-  (setq company-lsp-enable-recompletion t)
+  ;;:hook
+  ;;(lsp-mode . (lambda () (push 'company-lsp company-backends)))
+  :custom
+  (company-lsp-enable-snippet t)
+  (company-lsp-async t)
+  (company-lsp-cache-candidates 'auto)
+  (company-lsp-enable-recompletion t)
   :config
   ;; add company-lsp to company backends (made via hooks above)
   ;; (with-eval-after-load 'company
@@ -2807,7 +2907,52 @@ A better replacement for emacs help system
 )
 #+END_SRC
 
-*** company-go
+** Company TabNine
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;; CompanyTabNinePac
+(use-package company-tabnine
+  :disabled
+  :ensure t
+  :defer 1
+  :custom
+  (company-tabnine-max-num-results 9)
+  :bind
+  (("C-c c o" . company-other-backend)
+   ("C-c c t" . company-tabnine))
+  :hook
+  (lsp-after-open . (lambda ()
+                      (setq company-tabnine-max-num-results 3)
+                      (add-to-list 'company-transformers 'company//sort-by-tabnine t)
+                      (add-to-list 'company-backends '(company-lsp :with company-tabnine :separate))))
+  (kill-emacs . company-tabnine-kill-process)
+  :config
+  ;; Enable TabNine on default
+  (add-to-list 'company-backends #'company-tabnine)
+
+  ;; Integrate company-tabnine with lsp-mode
+  (defun company//sort-by-tabnine (candidates)
+    (if (or (functionp company-backend)
+            (not (and (listp company-backend) (memq 'company-tabnine company-backend))))
+        candidates
+      (let ((candidates-table (make-hash-table :test #'equal))
+            candidates-lsp
+            candidates-tabnine)
+        (dolist (candidate candidates)
+          (if (eq (get-text-property 0 'company-backend candidate)
+                  'company-tabnine)
+              (unless (gethash candidate candidates-table)
+                (push candidate candidates-tabnine))
+            (push candidate candidates-lsp)
+            (puthash candidate t candidates-table)))
+        (setq candidates-lsp (nreverse candidates-lsp))
+        (setq candidates-tabnine (nreverse candidates-tabnine))
+        (nconc (seq-take candidates-tabnine 3)
+               (seq-take candidates-lsp 6))))))
+;; -CompanyTabNinePac#+END_SRC
+#+END_SRC
+
+** company-go
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package company-go
   :ensure t
@@ -2816,48 +2961,6 @@ A better replacement for emacs help system
   (with-eval-after-load 'company
     (add-to-list 'company-backends 'company-go))
 )
-#+END_SRC
-
-*** Company TabNine
-: this part is commented because TabNine is paid software
-: and not sure if i want to use it
-#+BEGIN_SRC emacs-lisp :tangle init.el
-  ;; (use-package company-tabnine
-  ;;   :demand
-  ;;   :custom
-  ;;   (company-tabnine-max-num-results 9)
-  ;;   :bind
-  ;;   (("M-q" . company-other-backend)
-  ;;    ("C-z t" . company-tabnine))
-  ;;   :config
-  ;;   ;; Enable TabNine on default
-  ;;   (with-eval-after-load 'company
-  ;;     (add-to-list 'company-backends #'company-tabnine))
-
-  ;;   ;; Integrate company-tabnine with lsp-mode
-  ;;   (defun company//sort-by-tabnine (candidates)
-  ;;     (if (or (functionp company-backend)
-  ;;             (not (and (listp company-backend) (memq 'company-tabnine company-backend))))
-  ;;         candidates
-  ;;       (let ((candidates-table (make-hash-table :test #'equal))
-  ;;             candidates-lsp
-  ;;             candidates-tabnine)
-  ;;         (dolist (candidate candidates)
-  ;;           (if (eq (get-text-property 0 'company-backend candidate)
-  ;;                   'company-tabnine)
-  ;;               (unless (gethash candidate candidates-table)
-  ;;                 (push candidate candidates-tabnine))
-  ;;             (push candidate candidates-lsp)
-  ;;             (puthash candidate t candidates-table)))
-  ;;         (setq candidates-lsp (nreverse candidates-lsp))
-  ;;         (setq candidates-tabnine (nreverse candidates-tabnine))
-  ;;         (nconc (seq-take candidates-tabnine 3)
-  ;;                (seq-take candidates-lsp 6)))))
-  ;;   (add-hook 'lsp-after-open-hook
-  ;;             (lambda ()
-  ;;               (setq company-tabnine-max-num-results 3)
-  ;;               (add-to-list 'company-transformers 'company//sort-by-tabnine t)
-  ;;               (add-to-list 'company-backends '(company-lsp :with company-tabnine :separate)))))
 #+END_SRC
 
 
@@ -2869,23 +2972,34 @@ A better replacement for emacs help system
 (use-package lsp-mode
   :ensure t
   :commands lsp
-  :init
+  :custom
   ;; general
-  (setq lsp-inhibit-message nil) ;; was `t`, changed to nil to see what it does
-  (setq lsp-eldoc-render-all nil)  ;; was `nil`, changed to t to see what it does
-  (setq lsp-highlight-symbol-at-point t)  ;; was `nil`, changed to nil to see what it does
-  (setq lsp-auto-guess-root t)
-  (setq lsp-document-sync-method 'incremental) ;; none, full, incremental, or nil
-  (setq lsp-response-timeout 10)
-  (setq lsp-prefer-flymake :none) ;; t(flymake), nil(lsp-ui), or :none
+  (lsp-inhibit-message nil) ;; was `t`, changed to nil to see what it does
+  (lsp-eldoc-render-all nil)  ;; was `nil`, changed to t to see what it does
+  (lsp-highlight-symbol-at-point t)  ;; was `nil`, changed to nil to see what it does
+  (lsp-auto-guess-root t)
+  (lsp-document-sync-method 'incremental) ;; none, full, incremental, or nil
+  (lsp-response-timeout 10)
+  (lsp-prefer-flymake nil) ;; use flycheck instead of flymake
+  (lsp-enable-symbol-highlighting nil)
+  (lsp-signature-auto-activate nil)
   ;debug
-  (setq lsp-print-io nil)
-  (setq lsp-trace nil)
-  (setq lsp-print-performance nil)
+  (lsp-print-io nil)
+  (lsp-trace nil)
+  (lsp-print-performance nil)
+  :config
+  ;; angular language server
+  (setq lsp-clients-angular-language-server-command
+    '("node"
+      "~/.nvm/versions/node/v10.16.3/lib/node_modules/@angular/language-server"
+      "--ngProbeLocations"
+      "~/.nvm/versions/node/v10.16.3/lib/node_modules"
+      "--tsProbeLocations"
+      "~/.nvm/versions/node/v10.16.3/lib/node_modules"
+      "--stdio"))
 )
 
 #+END_SRC
-
 ** lsp ui
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package lsp-ui
@@ -2893,6 +3007,9 @@ A better replacement for emacs help system
   :after lsp-mode
   ;;:hook
   ;;(lsp-mode . lsp-ui-mode)
+  :custom-face
+  (lsp-ui-doc-background ((t (:background nil))))
+  (lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic)))))
   :preface
   (defun tau/toggle-lsp-ui-doc ()
     (interactive)
@@ -2918,6 +3035,37 @@ A better replacement for emacs help system
       ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
       ([remap xref-find-references] . lsp-ui-peek-find-references)
       ("C-c u" . lsp-ui-imenu))
+  :custom
+  ;; lsp-ui-doc
+  (lsp-ui-doc-enable t)
+  (lsp-ui-doc-header t)
+  (lsp-ui-doc-include-signature t)
+  (lsp-ui-doc-position 'top) ;; top, bottom, or at-point
+  (lsp-ui-doc-border (face-foreground 'default))
+  (lsp-ui-doc-max-width 100)
+  (lsp-ui-doc-max-height 30)
+  (lsp-ui-doc-use-childframe t)
+  ;; lsp-ui-flycheck
+  (lsp-ui-flycheck-enable nil) ;; disable to leave tsling as checker for ts files
+  (lsp-ui-flycheck-list-position 'right)
+  (lsp-ui-flycheck-live-reporting t)
+  ;; lsp-ui-sideline
+  (lsp-ui-sideline-enable nil)
+  (lsp-ui-sideline-ignore-duplicate t)
+  (lsp-ui-sideline-show-symbol t)
+  (lsp-ui-sideline-show-hover t)
+  (lsp-ui-sideline-show-diagnostics nil) ;; show flycheck diagnostics
+  (lsp-ui-sideline-show-code-actions t)
+  (lsp-ui-sideline-code-actions-prefix "")
+  (lsp-ui-sideline-update-mode 'point)
+  ;; lsp-ui-imenu
+  (lsp-ui-imenu-enable t)
+  (lsp-ui-imenu-kind-position 'top)
+  ;; lsp-ui-peek
+  (lsp-ui-peek-enable t)
+  (lsp-ui-peek-peek-height 20)
+  (lsp-ui-peek-list-width 40)
+  (lsp-ui-peek-fontify 'on-demand) ;; never, on-demand, or always
   :config
   ;; lsp-ui appearance
   (set-face-attribute 'lsp-ui-doc-background  nil :background "#f9f2d9")
@@ -2928,36 +3076,48 @@ A better replacement for emacs help system
   (set-face-attribute 'lsp-ui-sideline-global nil
                       :inherit 'shadow
                       :background "#f9f2d9")
-   ;; lsp-ui-doc
-   (setq lsp-ui-doc-enable t)
-   (setq lsp-ui-doc-header t)
-   (setq lsp-ui-doc-include-signature nil)
-   (setq lsp-ui-doc-position 'at-point) ;; top, bottom, or at-point
-   (setq lsp-ui-doc-max-width 100)
-   (setq lsp-ui-doc-max-height 30)
-   (setq lsp-ui-doc-use-childframe t)
-   (setq lsp-ui-doc-use-webkit t)
-   ;; lsp-ui-flycheck
-   (setq lsp-ui-flycheck-enable nil) ;; disable to leave tsling as checker for ts files
-   (setq lsp-ui-flycheck-list-position 'right)
-   (setq lsp-ui-flycheck-live-reporting t)
-   ;; lsp-ui-sideline
-   (setq lsp-ui-sideline-enable nil)
-   (setq lsp-ui-sideline-ignore-duplicate t)
-   (setq lsp-ui-sideline-show-symbol t)
-   (setq lsp-ui-sideline-show-hover t)
-   (setq lsp-ui-sideline-show-diagnostics nil) ;; show flycheck diagnostics
-   (setq lsp-ui-sideline-show-code-actions t)
-   (setq lsp-ui-sideline-code-actions-prefix "")
-   (setq lsp-ui-sideline-update-mode 'point)
-   ;; lsp-ui-imenu
-   (setq lsp-ui-imenu-enable t)
-   (setq lsp-ui-imenu-kind-position 'top)
-   ;; lsp-ui-peek
-   (setq lsp-ui-peek-enable t)
-   (setq lsp-ui-peek-peek-height 20)
-   (setq lsp-ui-peek-list-width 40)
-   (setq lsp-ui-peek-fontify 'on-demand) ;; never, on-demand, or always
+  ;; Use lsp-ui-doc-webkit only in GUI
+  (if (window-system)
+    (setq lsp-ui-doc-use-webkit t))
+)
+#+END_SRC
+
+** dap - debug adapter protocol
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package dap-mode
+  :ensure t
+  :defer t
+  :diminish
+  :bind
+  (:map dap-mode-map
+        (("<M-f12>" . dap-debug)
+         ("<M-f8>" . dap-continue)
+         ("<M-f9>" . dap-next)
+         ("<M-f11>" . dap-step-in)
+         ("C-M-<f11>" . dap-step-out)
+         ("<M-f7>" . dap-breakpoint-toggle)))
+  :hook ((after-init . dap-mode)
+         (dap-mode . dap-ui-mode)
+         (python-mode . (lambda () (require 'dap-python)))
+         (ruby-mode . (lambda () (require 'dap-ruby)))
+         (go-mode . (lambda () (require 'dap-go)))
+         (java-mode . (lambda () (require 'dap-java)))
+         ((c-mode c++-mode objc-mode swift) . (lambda () (require 'dap-lldb)))
+         (php-mode . (lambda () (require 'dap-php)))
+         (elixir-mode . (lambda () (require 'dap-elixir)))
+         ((js-mode js2-mode typescript-mode) . (lambda () (require 'dap-chrome))))
+  :config
+  ;; (dap-mode 1)
+  ;; (dap-ui-mode 1)
+  ;; enables mouse hover support
+  ;; (dap-tooltip-mode 1)
+  ;; use tooltips for mouse hover
+  ;; if it is not enabled `dap-mode' will use the minibuffer.
+  ;; (tooltip-mode 1)
+  ;; dap-mode also provides a hydra with dap-hydra. You can automatically trigger the hydra when the program hits a breakpoint by using the following code.
+  (add-hook 'dap-stopped-hook
+          (lambda (arg) (call-interactively #'dap-hydra)))
 )
 #+END_SRC
 
@@ -2980,27 +3140,6 @@ A better replacement for emacs help system
   :defer t
   :bind
   ("C-c l i s" . lsp-ivy-workspace-symbol)
-)
-#+END_SRC
-
-** dap - debug adapter protocol
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package dap-mode
-  :disabled
-  :ensure t
-  :defer t
-  :config
-  (dap-mode 1)
-  (dap-ui-mode 1)
-  ;; enables mouse hover support
-  (dap-tooltip-mode 1)
-  ;; use tooltips for mouse hover
-  ;; if it is not enabled `dap-mode' will use the minibuffer.
-  (tooltip-mode 1)
-  ;; dap-mode also provides a hydra with dap-hydra. You can automatically trigger the hydra when the program hits a breakpoint by using the following code.
-  (add-hook 'dap-stopped-hook
-          (lambda (arg) (call-interactively #'dap-hydra)))
 )
 #+END_SRC
 
@@ -3365,6 +3504,11 @@ A better replacement for emacs help system
 (setq echo-keystrokes 0.02)
 #+END_SRC
 
+** all the icons
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package all-the-icons :if window-system)
+#+END_SRC
+
 ** Highlight trailing whitespace
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (setq-default show-trailing-whitespace t)
@@ -3562,17 +3706,6 @@ Focus current window and dim unused ones
   :disabled
   :ensure t
   :config (dimmer-mode)
-)
-#+END_SRC
-
-** emojify
-
-display emojis inside emacs
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package emojify
-  :ensure t
-  :config
-  (add-hook 'after-init-hook #'global-emojify-mode)
 )
 #+END_SRC
 
@@ -4840,14 +4973,14 @@ Package Download: https://github.com/emacsmirror/hideshowvis/blob/master/hidesho
 
 ** show paren mode
 
-Highlight matching parenthesis
+Highlight (by bolding) the matching parenthesis
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package paren
   :ensure nil
   :defer t
-  ;;:hook
-  ;;(after-init . show-paren-mode)
+  :hook
+  (prog-mode . show-paren-mode)
   :custom-face
   (show-paren-match ((nil (:background "#44475a" :foreground "#f1fa8c")))) ;; :box t
   :config
@@ -4918,12 +5051,14 @@ Highlight matching parenthesis
 
 ** Highlighting parentheses
 
+This mode highlights (bolds) the current pair in which the point (cursor) is
+
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package highlight-parentheses
   :ensure t
   :defer t
-  ;:hook
-  ;;(prog-mode . highlight-parentheses-mode)
+  :hook
+  (prog-mode . highlight-parentheses-mode)
 )
 #+END_SRC
 
@@ -5117,16 +5252,15 @@ Highlight portions of text
 
 ** Rainbow Delimiters
 
-This highlights matching parentheses acording to their depth
-Helps editing lisp code
+This highlights matching parentheses by coloring them acording to their depth
+Specially helpful for editing lisp code
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package rainbow-delimiters
   :ensure t
   :defer t
-  ;;:hook
-  ;;(emacs-lisp-mode . rainbow-delimiters-mode)
-  ;;(prog-mode . rainbow-delimiters-mode)
+  :hook
+  (prog-mode . rainbow-delimiters-mode)
 )
 #+END_SRC
 
@@ -5233,6 +5367,7 @@ The line of your Emacs buffer that is at the top of the window before you start 
   (highlight-context-line-mode 1)
 )
 #+END_SRC
+
 
 * Scrolling settings
 
@@ -5370,8 +5505,8 @@ Make sure :ensure nil
 (use-package smartparens
   :ensure t
   :defer t
-  ;;:hook
-  ;;(after-init . smartparens-global-mode)
+  :hook
+  (prog-mode . smartparens-mode)
   :config
   (require 'smartparens-config)
   (sp-pair "=" "=" :actions '(wrap))
@@ -5601,11 +5736,11 @@ Set HTML indentation to 4 spaces by default (only on html-mode)
   (sgml-mode . rainbow-mode)
   (sgml-mode . emmet-mode)
   :init
-  (setq sgml-basic-offset 4)
+  ;; (setq sgml-basic-offset 4)
   :config
-  (add-hook 'html-mode-hook
-    (lambda ()
-      (set (make-local-variable 'sgml-basic-offset) 4)))
+  ;;(add-hook 'html-mode-hook
+  ;;  (lambda ()
+  ;;    (set (make-local-variable 'sgml-basic-offset) 4)))
 )
 
 #+END_SRC
@@ -5623,12 +5758,10 @@ Set HTML indentation to 4 spaces by default (only on html-mode)
   (defun setup-css-mode ()
     (interactive)
     (message "Trying to setup css-mode for buffer")
-    (company-mode 1)
     (flycheck-mode 1)
     (smartparens-mode 1)
     (prettier-js-mode 1)
     (aggressive-indent-mode 1)
-    (show-paren-mode 1)
     (editorconfig-mode 1)
     (turn-on-visual-line-mode)
   )
@@ -5864,7 +5997,6 @@ Unfortunatelly this package has to be installed manually, as its not available o
 * Web-Mode
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package web-mode
-  :after flycheck company
   :defer t
   :custom-face
   (css-selector ((t (:inherit default :foreground "#66CCFF"))))
@@ -5886,59 +6018,31 @@ Unfortunatelly this package has to be installed manually, as its not available o
     (interactive)
     ;;(message "Trying to setup web-mode for buffer %s (file: %s)" buffer-name buffer-file-name)
     (message "Trying to setup web-mode for buffer")
-    (eldoc-mode 1)
-    (company-mode 1)
     (flycheck-mode 1)
-    (smartparens-mode 1)
+    (eldoc-mode 1)
     (emmet-mode 1)
-    (aggressive-indent-mode 1)
     (prettier-js-mode 1)
     (highlight-indent-guides-mode 1)
-    (show-paren-mode 1)
     (editorconfig-mode 1)
     (smartscan-mode 1)
     (turn-on-visual-line-mode)
   )
   :hook
   (web-mode . setup-web-mode)
-  :init
-  ;;=======================================
-  ;; Web Mode setup variables
-  (setq web-mode-markup-indent-offset 4)
-  (setq web-mode-css-indent-offset 2)
-  (setq web-mode-code-indent-offset 2)
-  (setq web-mode-enable-auto-pairing t)
-  (setq web-mode-enable-current-element-highlight t)
-  (setq web-mode-enable-block-face t)
-  (setq web-mode-enable-part-face t)
-  ;;=======================================
-  ;; Flycheck Setup for web-mode
-  ;;---------------------------------------
-  ;; Javascript
-  ;;
-  ;; disable jshint since we prefer eslint checking
-  (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))
-  ;; enable eslint as default js flycheck linter
-  (setq flycheck-checkers '(javascript-eslint))
-  ;; use eslint_d instead of eslint for faster linting
-  (setq flycheck-javascript-eslint-executable "eslint_d")
-  ;; add flycheck linter for webmode
-  (eval-after-load 'flycheck
-     '(flycheck-add-mode 'javascript-eslint 'web-mode))
-  ;; Use tidy to check HTML buffers with web-mode.
-  (eval-after-load 'flycheck
-     '(flycheck-add-mode 'html-tidy 'web-mode))
-  ;;---------------------------------------
+  :custom
+  (web-mode-markup-indent-offset 2)
+  (web-mode-css-indent-offset 2)
+  (web-mode-code-indent-offset 2)
+  (web-mode-enable-auto-pairing t)
+  (web-mode-enable-current-element-highlight t)
+  (web-mode-enable-block-face t)
+  (web-mode-enable-part-face t)
+  :config
   ;; TSX
-  ;;
   (add-hook 'web-mode-hook
             (lambda ()
               (when (string-equal "tsx" (file-name-extension buffer-file-name))
                 (setup-tide-mode))))
-  ;; enable typescript-tslint checker
-  (flycheck-add-mode 'typescript-tslint 'web-mode)
-    (setq flycheck-check-syntax-automatically '(save mode-enabled idle-change))
-    (setq flycheck-idle-change-delay 2)
   ;; Template
   (setq web-mode-engines-alist
         '(("php"    . "\\.phtml\\'")
@@ -5946,24 +6050,6 @@ Unfortunatelly this package has to be installed manually, as its not available o
   ;;---------------------------------------
 )
 #+END_SRC
-
-** web-beautify
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package web-beautify
-  :ensure t
-  :defer t
-  :ensure-system-package
-  (js-beautify . "npm i -g js-beautify")
-  :commands (web-beautify-css
-             web-beautify-css-buffer
-             web-beautify-html
-             web-beautify-html-buffer
-             web-beautify-js
-             web-beautify-js-buffer)
-)
-#+END_SRC
-
 
 ** web-mode-edit-element
 
@@ -6020,8 +6106,6 @@ https://github.com/mooz/js2-mode
   ("\\.js$" . js2-mode)
   :hook
   (js2-mode . flycheck-mode)
-  (js2-mode . company-mode)
-  ;;(js2-mode . tide-mode)
   (js2-mode . add-node-modules-path)
   (js2-mode . lsp)
   (js2-jsx-mode . lsp)
@@ -6029,7 +6113,6 @@ https://github.com/mooz/js2-mode
   (js2-mode . color-identifiers-mode)
   (js2-mode . prettier-js-mode)
   (js2-mode . aggressive-indent-mode)
-  (js2-mode . indium-interaction-mode)
   :init
   ;; have 2 space indentation by default
   (setq js-indent-level 2)
@@ -6193,35 +6276,6 @@ Keybindings
     (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
 )
 #+END_SRC
-** Indium
-
-A JavaScript development environment for Emacs.
-
-Indium connects to a browser tab or nodejs process and provides many features for JavaScript development, including:
-
-+ a REPL (with auto completion) & object inspection;
-+ an inspector, with history and navigation;
-+ a scratch buffer (M-x indium-scratch);
-+ JavaScript evaluation in JS buffers with indium-interaction-mode;
-+ a stepping Debugger, similar to edebug, or cider.
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package indium
-  :ensure t
-  :defer t
-  :ensure-system-package
-  (indium . "npm i -g indium")
-  :after js2-mode typescript-mode
-  :bind
-  (:map js2-mode-map
-  ("C-c C-l" . indium-eval-buffer))
-  (:map typescript-mode-map
-  ("C-c C-l" . indium-eval-buffer))
-  :config
-  (setq indium-update-script-on-save t)
-)
-#+END_SRC
-
 ** add-json-modules-path
 
 Adds the node_modules/.bin directory to the buffer exec_path. E.g. support project local eslint installations.
@@ -6272,44 +6326,31 @@ https://github.com/jakoblind/js-import
 (use-package prettier-js
   :ensure t
   :defer t
-  :ensure-system-package
-  (prettier . "npm install -g prettier")
-  :init
-  (setq prettier-js-show-errors 'buffer) ;; options: 'buffer, 'echo or nil
-  ;;(setq prettier-js-args '("--bracket-spacing" "false"
-  ;;                         "--print-width" "80"
-  ;;                         "--tab-width" "2"
-  ;;                         "--use-tabs" "false"
-  ;;                         "--no-semi" "true"
-  ;;                         "--single-quote" "true"
-  ;;                         "--trailing-comma" "none"
-  ;;                         "--no-bracket-spacing" "true"
-  ;;                         "--jsx-bracket-same-line" "false"
-  ;;                         "--arrow-parens" "avoid"))
+  :custom
+  (prettier-js-show-errors 'buffer) ;; options: 'buffer, 'echo or nil
   :config
-  ;; use prettier from local `node_modules' folder if available
-  (defun tau/use-prettier-if-in-node-modules ()
-    "Enable prettier-js-mode iff prettier was found installed locally in project"
-    (interactive)
-    (let* ((file-name (or (buffer-file-name) default-directory))
-           (root (locate-dominating-file file-name "node_modules"))
-           (prettier (and root
-                          (expand-file-name "node_modules/prettier/bin-prettier.js" root))))
-      (if (and prettier (file-executable-p prettier))
-          (progn
-            (message "Found local prettier executable at %s. Enabling prettier-js-mode" prettier)
-            (setq prettier-js-command prettier)
-            (make-variable-buffer-local 'prettier-js-command)
-            (prettier-js-mode)
-            (message "Disabling aggressive-indent-mode in favour of prettier")
-            (aggressive-indent-mode -1))
-        (progn
-          (message "Prettier not found in %s. Not enabling prettier-js-mode" root)
-          (message "Falling back to aggressive-indent-mode")
-          (aggressive-indent-mode 1)))))
-  ;; disabled cause my current project doenst have prettier local
-  (add-hook 'prettier-js-mode-hook #'tau/use-prettier-if-in-node-modules)
-
+;;   ;; use prettier from local `node_modules' folder if available
+;;   (defun tau/use-prettier-if-in-node-modules ()
+;;     "Enable prettier-js-mode iff prettier was found installed locally in project"
+;;     (interactive)
+;;     (let* ((file-name (or (buffer-file-name) default-directory))
+;;            (root (locate-dominating-file file-name "node_modules"))
+;;            (prettier (and root
+;;                           (expand-file-name "node_modules/prettier/bin-prettier.js" root))))
+;;       (if (and prettier (file-executable-p prettier))
+;;           (progn
+;;             (message "Found local prettier executable at %s. Enabling prettier-js-mode" prettier)
+;;             (setq prettier-js-command prettier)
+;;             (make-variable-buffer-local 'prettier-js-command)
+;;             (prettier-js-mode)
+;;             (message "Disabling aggressive-indent-mode in favour of prettier")
+;;             (aggressive-indent-mode -1))
+;;         (progn
+;;           (message "Prettier not found in %s. Not enabling prettier-js-mode" root)
+;;           (message "Falling back to aggressive-indent-mode")
+;;           (aggressive-indent-mode 1)))))
+;;   (add-hook 'prettier-js-mode-hook #'tau/use-prettier-if-in-node-modules)
+;;
 )
 #+END_SRC
 
@@ -6409,10 +6450,8 @@ https://github.com/felipeochoa/rjsx-mode
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package typescript-mode
   :ensure t
-  ;;:ensure-system-package
-  ;;((typescript . "npm i -g typescript"))
   :defer t
-  ;;:after indium tide company flycheck
+  :after company
   :mode
   (("\\.ts\\'" . typescript-mode)
    ("\\.tsx\\'" . typescript-mode))
@@ -6420,23 +6459,17 @@ https://github.com/felipeochoa/rjsx-mode
   (defun setup-typescript-mode ()
     (interactive)
     (message "Trying to setup typescript-mode for buffer")
-    ;; (lsp)
-    ;; (lsp-ui-mode)
-    (tide-setup)
-    (tide-hl-identifier-mode 1)
+    (lsp)
+    (lsp-ui-mode)
+    ;; (tide-setup)
+    ;; (tide-hl-identifier-mode 1)
     (flycheck-mode 1)
-    (company-mode 1)
     (eldoc-mode 1)
     (yas-minor-mode 1)
     (add-node-modules-path)
     (editorconfig-mode 1)
     (prettier-js-mode 1)
-    (setq flycheck-check-syntax-automatically '(save mode-enabled idle-change))
-    (setq flycheck-idle-change-delay 1.3)
-    (smartparens-mode 1)
     (highlight-indent-guides-mode 1)
-    ;;(aggressive-indent-mode 1)
-    (show-paren-mode 1)
     (dumb-jump-mode 1)
     (hl-todo-mode 1)
     (smartscan-mode 1)
@@ -6507,28 +6540,7 @@ Taken from ng2-mode
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(global-set-key (kbd "C-x o") #'ng2-open-counterpart)
-#+END_SRC
-
-** ng2-mode
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package ng2-mode
-  :defer t
-  :disabled
-  :mode
-  ("\\.component.ts$\\'" "\\.component.html$\\'")
-  :hook
-  (ng2-mode . rainbow-mode)
-  (ng2-mode . flycheck-mode)
-  (ng2-mode . company-mode)
-  (ng2-mode . smartparens-mode)
-  (ng2-mode . editorconfig-mode)
-  (ng2-mode . color-identifiers-mode)
-  (ng2-mode . lsp-mode)
-  (ng2-mode . prettier-js-mode)
-  (ng2-mode . eldoc-mode)
-)
+(global-set-key (kbd "C-x a o") #'ng2-open-counterpart)
 #+END_SRC
 
 * format-all

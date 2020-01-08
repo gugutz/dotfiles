@@ -1,18 +1,18 @@
 
 ;; ----- amx-history -----
 (
- customize
- rainbow-mode
- bug-hunter-init-file
+ lsp
+ describe-face
  package-install
  toggle-debug-on-error
- counsel-yank-pop
- scss-mode
+ bug-hunter-init-file
+ format-all-buffer
+ customize
 )
 
 ;; ----- amx-data -----
 (
- (bug-hunter-init-file . 4)
+ (bug-hunter-init-file . 5)
  (scss-mode . 12)
  (eslintd-fix-mode . 3)
  (helm-M-x . 1)
@@ -22,7 +22,7 @@
  (counsel-projectile-mode . 2)
  (swiper-avy . 2)
  (align-regexp . 3)
- (package-install . 22)
+ (package-install . 24)
  (package-refresh-contents . 2)
  (package-delete . 11)
  (electric-indent-mode . 1)
@@ -80,7 +80,7 @@
  (web-beautify-html . 2)
  (editorconfig-apply . 1)
  (er/expand-region . 2)
- (prettier-js . 8)
+ (prettier-js . 9)
  (highlight-operators-mode . 3)
  (highlight-parentheses-mode . 4)
  (show-paren-mode . 2)
@@ -88,14 +88,18 @@
  (hl-line-mode . 4)
  (volatile-highlights-mode . 1)
  (hydra-frame-window/body . 3)
- (toggle-debug-on-error . 2)
+ (toggle-debug-on-error . 5)
  (shell-pop . 1)
  (dumb-jump-go . 2)
- (lsp . 1)
+ (lsp . 2)
  (dumb-jump-quick-look . 1)
  (hydra-ivy/body . 1)
  (switch-to-buffer . 2)
  (ivy-switch-buffer . 1)
  (counsel-yank-pop . 1)
  (customize . 1)
+ (format-all-buffer . 1)
+ (dap-chrome-setup . 1)
+ (company-tabnine-install-binary . 1)
+ (describe-face . 1)
 )
