@@ -2,12 +2,12 @@
 ;; ----- amx-history -----
 (
  lsp
+ yas-minor-mode
+ prettier-js-mode
+ prettier-js
  describe-face
  package-install
  toggle-debug-on-error
- bug-hunter-init-file
- format-all-buffer
- customize
 )
 
 ;; ----- amx-data -----
@@ -69,7 +69,7 @@
  (org-table-create . 1)
  (org-table-create-or-convert-from-region . 5)
  (revert-buffer . 1)
- (prettier-js-mode . 6)
+ (prettier-js-mode . 8)
  (org-mode . 6)
  (which-key-mode . 1)
  (eval-region . 1)
@@ -80,7 +80,7 @@
  (web-beautify-html . 2)
  (editorconfig-apply . 1)
  (er/expand-region . 2)
- (prettier-js . 9)
+ (prettier-js . 13)
  (highlight-operators-mode . 3)
  (highlight-parentheses-mode . 4)
  (show-paren-mode . 2)
@@ -91,7 +91,7 @@
  (toggle-debug-on-error . 5)
  (shell-pop . 1)
  (dumb-jump-go . 2)
- (lsp . 2)
+ (lsp . 3)
  (dumb-jump-quick-look . 1)
  (hydra-ivy/body . 1)
  (switch-to-buffer . 2)
@@ -102,4 +102,5 @@
  (dap-chrome-setup . 1)
  (company-tabnine-install-binary . 1)
  (describe-face . 1)
+ (yas-minor-mode . 4)
 )
