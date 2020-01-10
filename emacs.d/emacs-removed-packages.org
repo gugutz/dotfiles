@@ -654,3 +654,433 @@ this was commented with C-c ; so it doenst get exported in favor of doom-modelin
   (setq dired-sidebar-use-custom-font t)
 )
   #+END_SRC
+
+* dashboard (replaced by MEMACS dashboard section)
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package dashboard
+  :ensure t
+  :bind ("C-S-D" . open-dashboard)
+  :hook
+  (after-init . dashboard-setup-startup-hook)
+  :preface
+  (defun tau/dashboard-banner ()
+    "Sets a dashboard banner including information on package initialization
+     time and garbage collections."
+    (setq dashboard-banner-logo-title
+          (format "Emacs ready in %.2f seconds with %d garbage collections."
+                  (float-time
+                   (time-subtract after-init-time before-init-time)) gcs-done)))
+  :custom-face
+  (dashboard-heading ((t (:foreground "#f1fa8c" :weight bold))))
+  :init
+
+  ;; set widgets to show
+  (setq dashboard-items '((recents  . 5)
+                         (bookmarks . 5)
+                         (projects . 5)
+                         (agenda . 5)
+                         (registers . 5))
+  )
+
+
+  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))) ;; sets dashboard as emacs initial buffer on startup
+
+  ;; Set the title
+  (setq dashboard-banner-logo-title "Hi 😊 ")
+  (setq dashboard-banner-logo-title
+          (message " ★ Emacs initialized in %.2fs ★ "
+                   (float-time (time-subtract (current-time) my-init-el-start-time))))
+
+
+  (setq dashboard-startup-banner 'logo) ;; Set the banner ;; values: ('oficial, 'logo, 1, 2, 3, or "path/to/image.png")
+  (setq dashboard-center-content t) ;; Content is not centered by default. To center, set
+  (setq dashboard-show-shortcuts t) ;; To disable shortcut "jump" indicators for each section, set
+
+  ;; To add icons to the widget headings and their items:
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+
+  (setq dashboard-set-navigator t) ;; To show navigator below the banner
+  (setq dashboard-set-init-info t) ;;To show info about the packages loaded and the init time:
+
+  ;; A randomly selected footnote will be displayed. To disable it:
+  ;;(setq dashboard-set-footer nil)
+
+  :config
+  ;; Org mode’s agenda
+  ;; To display today’s agenda items on the dashboard, add agenda to dashboard-items:
+  (add-to-list 'dashboard-items '(agenda) t)
+  ;; To show agenda for the upcoming seven days set the variable show-week-agenda-p to t.
+  (setq show-week-agenda-p t)
+  ;; Note that setting list-size for the agenda list is intentionally ignored; all agenda items for the current day will be displayed.
+  ;; To customize which categories from the agenda items should be visible in the dashboard set the dashboard-org-agenda-categories to the list of categories you need.
+  (setq dashboard-org-agenda-categories '("Tasks" "Appointments"))
+
+  ;; adds fireplace as a widget
+;;  (defun dashboard-insert-custom (list-size)
+;;    (fireplace))
+;;  (add-to-list 'dashboard-item-generators  '(fireplace . dashboard-insert-custom))
+;;  (add-to-list 'dashboard-items '(fireplace) t)
+
+
+)
+#+END_SRC
+
+* scrolling options
+** native keyboard scrolling
+
+Several combinations can be made of this
+Bellow are some resources on how to combine them:
+
+Centered Scrolling: https://two-wrongs.com/centered-cursor-mode-in-vanilla-emacs
+Simulate Vim-Scrolof: https://wolfecub.github.io/dotfiles/#orgff34878
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;;(setq redisplay-dont-pause t)
+(setq scroll-preserve-screen-position 1)  ;; centered screen scrolling
+  ;; (setq scroll-margin 10
+  ;; (setq maximum-scroll-margin 0.5)
+  ;; (setq scroll-step 1)
+  ;; (setq scroll-conservatively 10000) ;; scroll one line at a time when you move the cursor past the top or bottom of the window
+  ;; (setq scroll-step 1) ;; keyboard scroll one line at a time
+#+END_SRC
+
+** sublimity-scroll
+This is part of the sublimity package.
+Therefore, sublimity needs to be required for this to work
+Make sure :ensure nil
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package sublimity-scroll
+  :ensure nil
+  :config
+  (setq sublimity-scroll-weight 10)  ;; default 10
+  (setq sublimity-scroll-drift-length 5)  ;; default 5
+  (setq sublimity-scroll-hide-cursor t) ;; default t
+)
+#+END_SRC
+** scrollkeeper
+
+: i think this highlights scrolling stopping points? not sure though
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (use-package scrollkeeper
+  :disabled
+  :ensure t
+  :bind
+  ([remap scroll-up-command] . scrollkeeper-contents-up)
+  ([remap scroll-down-command] . scrollkeeper-contents-down)
+  )
+#+END_SRC
+
+** fast-scroll
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (use-package fast-scroll
+  :disabled
+  :ensure t
+  ;; If you would like to turn on/off other modes, like flycheck, add
+  ;; your own hooks.
+  :init
+  (setq fast-scroll-throttle 0.5)
+  :config
+  (add-hook 'fast-scroll-start-hook (lambda () (flycheck-mode -1)))
+  (add-hook 'fast-scroll-end-hook (lambda () (flycheck-mode 1)))
+  (fast-scroll-config)
+  (fast-scroll-mode 1)
+  )
+#+END_SRC
+
+
+
+** centered-cursor-mode
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package centered-cursor-mode
+  :ensure t
+  :disabled
+  :config
+  (global-centered-cursor-mode)
+)
+#+END_SRC
+* helm
+(use-package helm
+  :ensure t
+  :defer t
+  :diminish helm-mode
+  :bind
+  ;; ("M-x" . helm-M-x)
+  ("C-c h" . helm-command-prefix)
+  ("C-x b" . helm-buffers-list)
+  ("C-x C-b" . helm-mini)
+  ("C-x C-f" . helm-find-files)
+  ("C-x r b" . helm-bookmarks)
+  ("M-y" . helm-show-kill-ring)
+  ("M-:" . helm-eval-expression-with-eldoc)
+  (:map helm-map
+        ("C-z" . helm-select-action)
+        ("C-h a" . helm-apropos)
+        ("C-c h" . helm-execute-persistent-action)
+        ("<tab>" . helm-execute-persistent-action)
+        )
+  :init
+  (setq helm-autoresize-mode t)
+  (setq helm-buffer-max-length 40)
+  (setq helm-bookmark-show-location t)
+  (setq helm-buffer-max-length 40)
+  (setq helm-split-window-inside-p t)
+
+  ;; turn on helm fuzzy matching
+  (setq helm-M-x-fuzzy-match t)
+  (setq helm-mode-fuzzy-match t)
+
+  (setq helm-ff-file-name-history-use-recentf t)
+  (setq helm-ff-skip-boring-files t)
+  (setq helm-follow-mode-persistent t)
+  ;; take between 10-30% of screen space
+  (setq helm-autoresize-min-height 10)
+  (setq helm-autoresize-max-height 30)
+  :config
+  (require 'helm-config)
+  (helm-mode 1)
+  ;; Make helm replace the default Find-File and M-x
+  ;;(global-set-key [remap execute-extended-command] #'helm-M-x)
+  ;; (global-set-key [remap find-file] #'helm-find-files)
+  ;; helm bindings
+  (global-unset-key (kbd "C-x c"))
+  )
+
+
+** helm-ag
+
+
+(use-package helm-ag
+  :ensure helm-ag
+  :bind ("M-p" . helm-projectile-ag)
+  :commands (helm-ag helm-projectile-ag)
+  :init
+  (setq helm-ag-insert-at-point 'symbol)
+  (setq  helm-ag-command-option "--path-to-ignore ~/.agignore")
+  )
+
+
+** helm-rg
+
+
+(use-package helm-rg
+  :ensure t
+  :defer t
+  )
+
+
+** helm-fuzzier
+: supposed better fuzzy matching for helm
+: for instance, plp, plpa, paclp, should all match package-list-packages
+
+
+
+(use-package helm-fuzzier
+  :disabled nil
+  :ensure t
+  :after helm
+  :config
+  (helm-fuzzier-mode 1)
+  )
+
+* fun packages
+
+** activate-power-mode
+;; inspired from the function with same name from Atom Editor
+;; Source;
+
+
+(defun animated-self-insert ()
+  (let* ((undo-entry (car buffer-undo-list))
+         (beginning (and (consp undo-entry) (car undo-entry)))
+         (end (and (consp undo-entry) (cdr undo-entry)))
+         (str (when (and (numberp beginning)
+                         (numberp end))
+                (buffer-substring-no-properties beginning end)))
+         (animate-n-steps 3))
+    (when str
+      (delete-region beginning end)
+      (animate-string str (1- (line-number-at-pos)) (current-column)))))
+
+;; to disable simply comment this hook
+;;; (add-hook 'post-self-insert-hook 'animated-self-insert)
+
+
+** c-c-combo
+
+;; This package lets you have some kind of encouragement if you are typing fast, it has some unreal tournament sounds, and after 15 seconds of mantaining your WPM, an animation for each insertion will appear. Then it will enable selectric-mode, and highlight trail (WIP) package randomly.
+
+
+(use-package c-c-combo
+  :ensure t
+  :defer t
+  )
+
+
+** xkcd
+
+
+(use-package xkcd
+  :ensure t
+  :defer t
+  )
+
+
+** fireplaces
+
+
+(use-package fireplace
+  :ensure t
+  :defer t
+  :init (defvar fireplace-mode-map)
+  :bind (:map fireplace-mode-map
+              ("d" . fireplace-down)
+              ("s" . fireplace-toggle-smoke)
+              ("u" . fireplace-up))
+  :config
+  (setq fireplace-toggle-smoke t)
+  ;; (fireplace)
+  )
+
+
+** selectric mode
+
+;; make emacs sound like a typewritter
+
+
+(use-package selectric-mode
+  :ensure t
+  :defer t
+  )
+
+
+** tetris
+
+
+(defvar tetris-mode-map
+  (make-sparse-keymap 'tetris-mode-map))
+(define-key tetris-mode-map (kbd "C-p") 'tetris-rotate-prev)
+(define-key tetris-mode-map (kbd "C-n") 'tetris-move-down)
+(define-key tetris-mode-map (kbd "C-b") 'tetris-move-left)
+(define-key tetris-mode-map (kbd "C-f") 'tetris-move-right)
+(define-key tetris-mode-map (kbd "C-SPC") 'tetris-move-bottom)
+(defadvice tetris-end-game (around zap-scores activate)
+  (save-window-excursion ad-do-it))
+
+
+** pacmacs
+
+
+(use-package pacmacs
+  :ensure t
+  :defer t
+  )
+
+
+** epaint
+
+(use-package epaint
+  :defer t
+  :if window-system
+  :commands (epaint)
+  :init
+  (with-eval-after-load (quote epaint-context)
+    (unless (boundp (quote cl-struct-epaint-drawable))
+      (defvar cl-struct-epaint-drawable (quote epaint-drawable)))
+    (unless (boundp (quote cl-struct-epaint-gc))
+      (defvar cl-struct-epaint-gc (quote epaint-gc))))
+  )
+
+
+** Speed type, a game to practice touch/speed typing in Emacs.
+
+
+(use-package speed-type
+  :defer t
+  )
+
+
+** 2048 Game, an implementation of 2048 in Emacs.
+
+(use-package 2048-game
+  :defer t
+  )
+
+
+** Zone
+
+(use-package zone
+  :ensure nil
+  :defer 5
+  :config
+  ;; (zone-when-idle 600) ; in seconds
+  (defun zone-choose (pgm)
+    "Choose a PGM to run for `zone'."
+    (interactive
+     (list
+      (completing-read
+       "Program: "
+       (mapcar 'symbol-name zone-programs))))
+    (let ((zone-programs (list (intern pgm))))
+      (zone))))
+
+
+** meme
+
+
+(use-package meme
+  :ensure nil
+  :defer t
+  :commands (meme meme-file)
+  )
+
+
+** zone-nyan
+
+
+(use-package zone-nyan
+  :ensure t
+  :defer t
+  )
+
+
+** zone-rainbow
+
+(use-package zone-nyan
+  :ensure t
+  :defer t
+  )
+
+* saveplace
+(use-package saveplace
+  :disabled
+  :ensure t
+  :hook
+  (after-init . save-place-mode)
+  :init
+  (setq-default save-place t)
+  (setq save-place-file (expand-file-name ".places" user-emacs-directory))
+  )
+
+* saveplace (appearantly it was doubled in the config)
+
+;; Save the place you were in file when you last edited it
+
+
+(use-package saveplace
+  :ensure nil
+  :config
+  (defconst savefile-dir (expand-file-name "savefile" user-emacs-directory))
+
+  ;; create the savefile dir if it doesn't exist
+  (unless (file-exists-p savefile-dir)
+    (make-directory savefile-dir))
+
+  (setq save-place-file (expand-file-name "saveplace" savefile-dir))
+  ;; activate it for all buffers
+  (setq-default save-place t)
+  (save-place-mode t)
+  )

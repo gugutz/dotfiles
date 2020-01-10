@@ -1,13 +1,13 @@
 
 ;; ----- amx-history -----
 (
- lsp
- yas-minor-mode
- prettier-js-mode
- prettier-js
- describe-face
- package-install
+ ag
+ counsel-ag
+ counsel-rg
+ lsp-execute-code-action
  toggle-debug-on-error
+ outline-mode
+ outshine-menu
 )
 
 ;; ----- amx-data -----
@@ -22,7 +22,7 @@
  (counsel-projectile-mode . 2)
  (swiper-avy . 2)
  (align-regexp . 3)
- (package-install . 24)
+ (package-install . 25)
  (package-refresh-contents . 2)
  (package-delete . 11)
  (electric-indent-mode . 1)
@@ -88,7 +88,7 @@
  (hl-line-mode . 4)
  (volatile-highlights-mode . 1)
  (hydra-frame-window/body . 3)
- (toggle-debug-on-error . 5)
+ (toggle-debug-on-error . 10)
  (shell-pop . 1)
  (dumb-jump-go . 2)
  (lsp . 3)
@@ -103,4 +103,11 @@
  (company-tabnine-install-binary . 1)
  (describe-face . 1)
  (yas-minor-mode . 4)
+ (eval-buffer . 1)
+ (outshine-menu . 1)
+ (outline-mode . 1)
+ (lsp-execute-code-action . 1)
+ (counsel-rg . 1)
+ (counsel-ag . 1)
+ (ag . 1)
 )

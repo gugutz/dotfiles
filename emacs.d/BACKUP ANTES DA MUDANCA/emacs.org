@@ -41,6 +41,8 @@ Put here for convenient editing
 (defvar tau/font-size-title        140        "The font size to use for titles.")
 (defvar tau/indent-js                2        "The font size to use for titles.")
 (defvar tau/indent-html              4        "The font size to use for titles.")
+
+(setq my-theme 'vscode-default-dark)
 #+END_SRC
 
 * Observations about this config
@@ -96,14 +98,52 @@ tangled, and the tangled file is compiled."
   #+END_SRC
 * Garbage Collection
 
+This part was taken from MEMACS
+Source: https://github.com/MatthewZMD/.emacs.d/blob/master/init.el
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;; BetterGC
+(defvar better-gc-cons-threshold 67108864 ; 64mb
+  "The default value to use for `gc-cons-threshold'.
+If you experience freezing, decrease this.  If you experience stuttering, increase this.")
+
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold better-gc-cons-threshold)
+            (setq file-name-handler-alist file-name-handler-alist-original)
+            (makunbound 'file-name-handler-alist-original)))
+;; -BetterGC
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;; AutoGC
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (if (boundp 'after-focus-change-function)
+                (add-function :after after-focus-change-function
+                              (lambda ()
+                                (unless (frame-focus-state)
+                                  (garbage-collect))))
+              (add-hook 'after-focus-change-function 'garbage-collect))
+            (defun gc-minibuffer-setup-hook ()
+              (setq gc-cons-threshold (* better-gc-cons-threshold 2)))
+
+            (defun gc-minibuffer-exit-hook ()
+              (garbage-collect)
+              (setq gc-cons-threshold better-gc-cons-threshold))
+
+            (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
+            (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
+;; -AutoGC
+#+END_SRC
+
 #+BEGIN_SRC emacs-lisp :tangle init.el
 ;; First save the current value of gc-cons-threshold to restore it after the init file is loaded at the very bottom of this file
-(setq gc-threshold-original gc-cons-threshold)
+;;(setq gc-threshold-original gc-cons-threshold)
 
 ;; reduce the frequency of garbage collection by making it happen on
 ;; each 50MB of allocated data (the default is on every 0.76MB)
-(setq gc-cons-threshold 50000000) ;; 50mb
-;;(setq gc-cons-threshold 100000000) ;; 100mb
+;;(setq gc-cons-threshold 50000000) ;; 50mb
 
 ;; GC only with 500mb of data allocated
 ;; (setq gc-cons-percentage 0.5)
@@ -111,8 +151,8 @@ tangled, and the tangled file is compiled."
 ;; GC after 5s idle time
 ;; (run-with-idle-timer 5 t #'garbage-collect)
 
-(setq garbage-collection-messages t)
-(setq inhibit-compacting-font-caches t)      ;; Don’t compact font caches during GC (garbage collection).
+;;(setq garbage-collection-messages t)
+;;(setq inhibit-compacting-font-caches t)      ;; Don’t compact font caches during GC (garbage collection).
 
 ;; Restore original gc value after init
 ;; (add-hook 'after-init-hook (lambda () (setq gc-cons-threshold gc-threshold-original)))
@@ -2946,7 +2986,7 @@ Company-lsp is auto inserted into company backends
   (use-package lsp-ui
     :ensure t
     :after lsp-mode
-    ;;:hook
+    :hook
     (lsp-mode . lsp-ui-mode)
     :custom-face
     (lsp-ui-doc-background ((t (:background nil))))
@@ -3506,7 +3546,6 @@ Company-lsp is auto inserted into company backends
   ; gruvbox-dark-medium
   ; base16-default-dark-theme -- this one is good
 
-(setq my-theme 'darkplus)
 #+END_SRC
 
  Load the theme
@@ -4515,74 +4554,58 @@ This package ruins the scrolling from either sublimity-scroll or the smooth-scro
 ** dashboard
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
+;; DashboardPac
 (use-package dashboard
-  :ensure t
-  :bind ("C-S-D" . open-dashboard)
-  :hook
-  (after-init . dashboard-setup-startup-hook)
-  :preface
-  (defun tau/dashboard-banner ()
-    "Sets a dashboard banner including information on package initialization
-     time and garbage collections."
-    (setq dashboard-banner-logo-title
-          (format "Emacs ready in %.2f seconds with %d garbage collections."
-                  (float-time
-                   (time-subtract after-init-time before-init-time)) gcs-done)))
+  :demand
+  :diminish (dashboard-mode page-break-lines-mode)
+  :bind ("C-z d" . open-dashboard)
+  :custom
+  (dashboard-banner-logo-title "Close the world. Open the nExt.")
+  (dashboard-startup-banner (expand-file-name "images/KEC_Dark_BK_Small.png" user-emacs-directory))
+  (dashboard-items '((recents  . 7)
+                     (bookmarks . 7)
+                     (agenda . 5)))
+  (initial-buffer-choice (lambda () (get-buffer dashboard-buffer-name)))
+  (dashboard-set-heading-icons t)
+  (dashboard-set-navigator t)
+  (dashboard-navigator-buttons
+   (if (featurep 'all-the-icons)
+       `(((,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust -0.05)
+           "M-EMACS" "Browse M-EMACS Homepage"
+           (lambda (&rest _) (browse-url "https://github.com/MatthewZMD/.emacs.d")))
+          (,(all-the-icons-fileicon "elisp" :height 1.0 :v-adjust -0.1)
+           "Configuration" "" (lambda (&rest _) (edit-configs)))
+          (,(all-the-icons-faicon "cogs" :height 1.0 :v-adjust -0.1)
+           "Update" "" (lambda (&rest _) (auto-package-update-now)))))
+     `((("" "M-EMACS" "Browse M-EMACS Homepage"
+         (lambda (&rest _) (browse-url "https://github.com/MatthewZMD/.emacs.d")))
+        ("" "Configuration" "" (lambda (&rest _) (edit-configs)))
+        ("" "Update" "" (lambda (&rest _) (auto-package-update-now)))))))
   :custom-face
-  (dashboard-heading ((t (:foreground "#f1fa8c" :weight bold))))
-  :init
-
-  ;; set widgets to show
-  (setq dashboard-items '((recents  . 5)
-                         (bookmarks . 5)
-                         (projects . 5)
-                         (agenda . 5)
-                         (registers . 5))
-  )
-
-
-  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))) ;; sets dashboard as emacs initial buffer on startup
-
-  ;; Set the title
-  (setq dashboard-banner-logo-title "Hi 😊 ")
-  (setq dashboard-banner-logo-title
-          (message " ★ Emacs initialized in %.2fs ★ "
-                   (float-time (time-subtract (current-time) my-init-el-start-time))))
-
-
-  (setq dashboard-startup-banner 'logo) ;; Set the banner ;; values: ('oficial, 'logo, 1, 2, 3, or "path/to/image.png")
-  (setq dashboard-center-content t) ;; Content is not centered by default. To center, set
-  (setq dashboard-show-shortcuts t) ;; To disable shortcut "jump" indicators for each section, set
-
-  ;; To add icons to the widget headings and their items:
-  (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t)
-
-  (setq dashboard-set-navigator t) ;; To show navigator below the banner
-  (setq dashboard-set-init-info t) ;;To show info about the packages loaded and the init time:
-
-  ;; A randomly selected footnote will be displayed. To disable it:
-  ;;(setq dashboard-set-footer nil)
-
+  (dashboard-banner-logo-title ((t (:family "Love LetterTW" :height 123))))
   :config
-  ;; Org mode’s agenda
-  ;; To display today’s agenda items on the dashboard, add agenda to dashboard-items:
-  (add-to-list 'dashboard-items '(agenda) t)
-  ;; To show agenda for the upcoming seven days set the variable show-week-agenda-p to t.
-  (setq show-week-agenda-p t)
-  ;; Note that setting list-size for the agenda list is intentionally ignored; all agenda items for the current day will be displayed.
-  ;; To customize which categories from the agenda items should be visible in the dashboard set the dashboard-org-agenda-categories to the list of categories you need.
-  (setq dashboard-org-agenda-categories '("Tasks" "Appointments"))
+  (dashboard-modify-heading-icons '((recents . "file-text")
+                                    (bookmarks . "book")))
+  (dashboard-setup-startup-hook)
+  ;; Open Dashboard function
+  (defun open-dashboard ()
+    "Open the *dashboard* buffer and jump to the first widget."
+    (interactive)
+    (if (get-buffer dashboard-buffer-name)
+        (kill-buffer dashboard-buffer-name))
+    (dashboard-insert-startupify-lists)
+    (switch-to-buffer dashboard-buffer-name)
+    (goto-char (point-min))
+    (delete-other-windows)))
+;; -DashboardPac
 
-  ;; adds fireplace as a widget
-;;  (defun dashboard-insert-custom (list-size)
-;;    (fireplace))
-;;  (add-to-list 'dashboard-item-generators  '(fireplace . dashboard-insert-custom))
-;;  (add-to-list 'dashboard-items '(fireplace) t)
-
-
-)
+;; PBLPac
+(use-package page-break-lines
+  :diminish
+  :init (global-page-break-lines-mode))
+;; -PBLPac
 #+END_SRC
+
 
 *** add fireplace as a widged in the dashboard
 
@@ -5176,25 +5199,48 @@ The line of your Emacs buffer that is at the top of the window before you start 
 )
 #+END_SRC
 
-
-* Scrolling settings
-
-** native keyboard scrolling
-
-Several combinations can be made of this
-Bellow are some resources on how to combine them:
-
-Centered Scrolling: https://two-wrongs.com/centered-cursor-mode-in-vanilla-emacs
-Simulate Vim-Scrolof: https://wolfecub.github.io/dotfiles/#orgff34878
+* crux
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-;;(setq redisplay-dont-pause t)
-(setq scroll-preserve-screen-position 1)  ;; centered screen scrolling
-  ;; (setq scroll-margin 10
-  ;; (setq maximum-scroll-margin 0.5)
-  ;; (setq scroll-step 1)
-  ;; (setq scroll-conservatively 10000) ;; scroll one line at a time when you move the cursor past the top or bottom of the window
-  ;; (setq scroll-step 1) ;; keyboard scroll one line at a time
+;; CruxPac
+(use-package crux
+  :bind
+  ("C-a" . crux-move-beginning-of-line)
+  ("C-x 4 t" . crux-transpose-windows)
+  ("C-x K" . crux-kill-other-buffers)
+  ("C-k" . crux-smart-kill-line)
+  :config
+  (crux-with-region-or-buffer indent-region)
+  (crux-with-region-or-buffer untabify)
+  (crux-with-region-or-point-to-eol kill-ring-save)
+  (defalias 'rename-file-and-buffer #'crux-rename-file-and-buffer))
+  (global-set-key [remap move-beginning-of-line] #'crux-move-beginning-of-line)
+  (global-set-key (kbd "C-c o") #'crux-open-with)
+  (global-set-key [(shift return)] #'crux-smart-open-line)
+  (global-set-key (kbd "s-r") #'crux-recentf-find-file)
+  (global-set-key (kbd "C-<backspace>") #'crux-kill-line-backwards)
+  (global-set-key [remap kill-whole-line] #'crux-kill-whole-line)
+;; -CruxPac
+#+END_SRC
+* Scrolling settings
+** memacs scrolling (trying it out)
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;; SmoothScroll
+;; Vertical Scroll
+(setq scroll-step 1)
+(setq scroll-margin 1)
+(setq scroll-conservatively 101)
+(setq scroll-up-aggressively 0.01)
+(setq scroll-down-aggressively 0.01)
+(setq auto-window-vscroll nil)
+(setq fast-but-imprecise-scrolling nil)
+(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
+(setq mouse-wheel-progressive-speed nil)
+;; Horizontal Scroll
+(setq hscroll-step 1)
+(setq hscroll-margin 1)
+;; -SmoothScroll
 #+END_SRC
 
 ** native mouse scrolling
@@ -5215,65 +5261,6 @@ Simulate Vim-Scrolof: https://wolfecub.github.io/dotfiles/#orgff34878
 (global-set-key (kbd "<S-mouse-4>") 'scroll-down-line)
 (global-set-key (kbd "<S-mouse-5>") 'scroll-up-line)
 #+END_SRC
-
-** sublimity-scroll
-This is part of the sublimity package.
-Therefore, sublimity needs to be required for this to work
-Make sure :ensure nil
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package sublimity-scroll
-  :ensure nil
-  :config
-  (setq sublimity-scroll-weight 10)  ;; default 10
-  (setq sublimity-scroll-drift-length 5)  ;; default 5
-  (setq sublimity-scroll-hide-cursor t) ;; default t
-)
-#+END_SRC
-** scrollkeeper
-
-: i think this highlights scrolling stopping points? not sure though
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-  (use-package scrollkeeper
-  :disabled
-  :ensure t
-  :bind
-  ([remap scroll-up-command] . scrollkeeper-contents-up)
-  ([remap scroll-down-command] . scrollkeeper-contents-down)
-  )
-#+END_SRC
-
-** fast-scroll
-#+BEGIN_SRC emacs-lisp :tangle init.el
-  (use-package fast-scroll
-  :disabled
-  :ensure t
-  ;; If you would like to turn on/off other modes, like flycheck, add
-  ;; your own hooks.
-  :init
-  (setq fast-scroll-throttle 0.5)
-  :config
-  (add-hook 'fast-scroll-start-hook (lambda () (flycheck-mode -1)))
-  (add-hook 'fast-scroll-end-hook (lambda () (flycheck-mode 1)))
-  (fast-scroll-config)
-  (fast-scroll-mode 1)
-  )
-#+END_SRC
-
-
-
-** centered-cursor-mode
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package centered-cursor-mode
-  :ensure t
-  :disabled
-  :config
-  (global-centered-cursor-mode)
-)
-#+END_SRC
-
 
 
 * Global minor modes
@@ -5812,8 +5799,8 @@ Unfortunatelly this package has to be installed manually, as its not available o
 )
 #+END_SRC
 
-
-* Web-Mode
+* webdev
+** Web-Mode
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package web-mode
   :defer t
@@ -5870,7 +5857,7 @@ Unfortunatelly this package has to be installed manually, as its not available o
 )
 #+END_SRC
 
-** web-mode-edit-element
+*** web-mode-edit-element
 
 **** General Keymaps
 | C-(           | web-mode-element-wrap                                 |
@@ -5912,7 +5899,6 @@ Unfortunatelly this package has to be installed manually, as its not available o
 )
 #+END_SRC
 
-* JavaScript JS2-mode
 
 ** js2-mode
 js2-mode: enhanced JavaScript editing mode
@@ -5967,7 +5953,7 @@ https://github.com/mooz/js2-mode
   )
 #+END_SRC
 
-** eslint
+*** eslint
 
 eslintd-fix: Emacs minor-mode to automatically fix javascript with eslint_d.
 https://github.com/aaronjensen/eslintd-fix/tree/master
@@ -6003,7 +5989,7 @@ https://github.com/aaronjensen/eslintd-fix/tree/master
 #+END_SRC
 
 
-** js2-refactor
+*** js2-refactor
 js2-refactor uses 2 char mnemonic for refactorings.
 So C-c C-r ef would be "extract-function", and so on
 
@@ -6098,7 +6084,7 @@ There are also some minor conveniences bundled:
 )
 #+END_SRC
 
-** xref-js2
+*** xref-js2
 
 Jump to references/definitions using ag & js2-mode's AST in Emacs
 
@@ -6210,7 +6196,7 @@ https://github.com/jakoblind/js-import
 )
 #+END_SRC
 
-* Typescript
+** Typescript
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package typescript-mode

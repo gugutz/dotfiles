@@ -1,25 +1,14 @@
-;; -*- outshine-startup-folded-p: t; eval: (outshine-mode); -*-
-;;; package.el
-
-;; * Personal information
-
 (setq user-full-name "Gustavo P Borges")
-(setq user-mail-address "gugutz@gmail.com")
-(setq work-mail-address "gugutz@stairs.studio")
-(setq gmail-address "gugutz@gmail.com")
-(setq nickname "gugutz")
+  (setq user-mail-address "gugutz@gmail.com")
+  (setq work-mail-address "gugutz@stairs.studio")
+  (setq gmail-address "gugutz@gmail.com")
+  (setq nickname "gugutz")
 
-;; my secrets
+  ;; my secrets
 (let ((secret.el (expand-file-name ".secret.el" user-emacs-directory)))
   (when (file-exists-p secret.el)
     (load secret.el)))
-;; (load-library "~/dotfiles/emacs.d/secrets.el.gpg")
-
-;; * Configuration variables
-
-;; These are values that are used throuhgout this configuration
-;; Put here for convenient editing
-
+  ;; (load-library "~/dotfiles/emacs.d/secrets.el.gpg")
 
 (defvar tau/erc-nick               nil        "The ERC nick to use.")
 (defvar tau/erc-password           nil        "The ERC password to use.")
@@ -36,16 +25,6 @@
 
 (setq my-theme 'vscode-default-dark)
 
-
-
-
-;; * Recompile init.el everytime emacs.org is changed and saved
-
-                                        ;: Moved this to beggining of the file to avoid it not being parsed when theres an error in the middle of the file
-                                        ;: It was being recompiled without this function so i had to manually re-copy first-init.el to make it compile first time again and again
-
-
-
 (defun /util/tangle-init ()
   (interactive)
   "If the current buffer is init.org' the code-blocks are
@@ -57,33 +36,7 @@ tangled, and the tangled file is compiled."
       (org-babel-tangle)
       (byte-compile-file (concat user-emacs-directory "init.el")))))
 
-
-
 (add-hook 'after-save-hook #'/util/tangle-init)
-
-;; * Check version (taken from memacs)
-;; this uses emacs 26.1 feature 'early-init' to set a few things before init.el is loaded
-
-;; CheckVer
-(cond ((version< emacs-version "26.1")
-       (warn "M-EMACS requires Emacs 26.1 and above!"))
-      ((let* ((early-init-f (expand-file-name "early-init.el" user-emacs-directory))
-              (early-init-do-not-edit-d (expand-file-name "early-init-do-not-edit/" user-emacs-directory))
-              (early-init-do-not-edit-f (expand-file-name "early-init.el" early-init-do-not-edit-d)))
-         (and (version< emacs-version "27")
-              (or (not (file-exists-p early-init-do-not-edit-f))
-                  (file-newer-than-file-p early-init-f early-init-do-not-edit-f)))
-         (make-directory early-init-do-not-edit-d t)
-         (copy-file early-init-f early-init-do-not-edit-f t t t t)
-         (add-to-list 'load-path early-init-do-not-edit-d)
-         (require 'early-init))))
-;; -CheckVer
-
-;; * Garbage Collection
-
-;; This part was taken from MEMACS
-;; Source: https://github.com/MatthewZMD/.emacs.d/blob/master/init.el
-
 
 ;; BetterGC
 (defvar better-gc-cons-threshold 67108864 ; 64mb
@@ -96,8 +49,6 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
             (setq file-name-handler-alist file-name-handler-alist-original)
             (makunbound 'file-name-handler-alist-original)))
 ;; -BetterGC
-
-
 
 ;; AutoGC
 (add-hook 'emacs-startup-hook
@@ -119,8 +70,6 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
             (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
 ;; -AutoGC
 
-
-
 ;; First save the current value of gc-cons-threshold to restore it after the init file is loaded at the very bottom of this file
 ;;(setq gc-threshold-original gc-cons-threshold)
 
@@ -140,106 +89,56 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 ;; Restore original gc value after init
 ;; (add-hook 'after-init-hook (lambda () (setq gc-cons-threshold gc-threshold-original)))
 
-
-
-;; * Packages
-
-;; outshine mode
-
-;;;; To enable the keybindings, you must set the variable outline-minor-mode-prefix (note the variable name carefully) before loading Outshine, e.g.:
-
-(defvar outline-minor-mode-prefix "\M-#")
-(add-hook 'emacs-lisp-mode-hook 'outshine-mode)
-
-;; ** package repositories
-
-
 (require 'package)
 ;; add melpa stable emacs package repository
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
 (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t) ; Org-mode's repository
 
-
-;; ** initialize packages
-
 (package-initialize)
 
-
-;; moved this part to beggining of the file because if the
-;; custom-safe-themes variable is not set before smart-mode-line (sml) activates
-;; emacs asks 2 annoying confirmations on every startup before actually starting
-
-
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
+;; custom-set-variables was added by Custom.
+;; If you edit it by hand, you could mess it up, so be careful.
+;; Your init file should contain only one such instance.
+;; If there is more than one, they won't work right.
+'(custom-safe-themes
    (quote
-    ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
- '(fci-rule-color "#3E4451")
- '(package-selected-packages
-   (quote
-    (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-
-
-;; ** Add the folder 'config' to emacs load-path so i can require stuff from there
-
+   ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
+   '(fci-rule-color "#3E4451")
+   '(package-selected-packages
+     (quote
+     (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
+   (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   )
 
 (add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
 ;; (add-to-list 'load-path "~/dotfiles/emacs.d/config")
 
-
-;; ** preparing environment to load stuff
-
-
 ;; Init time start
 (defvar my-init-el-start-time (current-time) "Time when init.el was started")
-
-
-;; ** use-package
-
-;; *** Install use-package if not already installed
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package)
-  )
-
-
-;; *** load use-package
+)
 
 (eval-when-compile
   (require 'use-package))
-
-
-;; *** Enable use-package extension `ensure-system-package`
 
 (use-package use-package-ensure-system-package
   :ensure t
   :init
   ;; use sudo when needed
   (setq system-packages-use-sudo t)
-  )
-
-
-;; *** Set `:ensure t` globally for all packages using use-package
-
-;; this is disabled for now as i preffer to specify for each package
+)
 
 (require 'use-package-ensure)
 ;; (setq use-package-always-ensure t)
-
-
-;; *** Auto update packages
 
 (use-package auto-package-update
   :config
@@ -248,20 +147,11 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
   (setq auto-package-update-delete-old-versions t)
   (setq auto-package-update-hide-results t)
   (auto-package-update-maybe)
-  )
-
-
-;; ** install diminish
-
+)
 
 (use-package diminish
   :ensure t
-  )
-
-
-
-;; * GPG Encryption
-
+)
 
 (use-package epa-file
   :config
@@ -272,13 +162,7 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
   (setq epa-file-select-keys 0)
   ;; Cache passphrase for symmetric encryption.
   (setq epa-file-cache-passphrase-for-symmetric-encryption t)
-  )
-
-
-
-;; * email
-
-
+)
 
 (use-package gnus
   :ensure nil
@@ -288,9 +172,9 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
   (setq gnus-select-method
         '(nnimap "gmail"
-                 (nnimap-address "imap.gmail.com")
-                 (nnimap-server-port 993)
-                 (nnimap-stream ssl)))
+           (nnimap-address "imap.gmail.com")
+           (nnimap-server-port 993)
+           (nnimap-stream ssl)))
 
   (setq smtpmail-smtp-server "smtp.gmail.com"
         smtpmail-smtp-service 587
@@ -307,16 +191,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
   (define-key gnus-group-mode-map
     ;; list all the subscribed groups even they contain zero un-read messages
-    (kbd "o") 'my-gnus-group-list-subscribed-groups)
-  )
-
-
-;; * General editor settings
-
-;; ** Emacs Server
-
-;;Allow access from emacsclient
-
+        (kbd "o") 'my-gnus-group-list-subscribed-groups)
+)
 
 ;; (use-package server
 ;;   :ensure nil
@@ -325,17 +201,9 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 ;;     (server-start))
 ;;   :hook (after-init . server-mode))
 
-
-
 (require 'server)
 (unless (or (daemonp) (server-running-p))
   (server-start))
-
-
-;; ** set default font
-
-;; Find the first font in the list and use it
-
 
 (require 'cl)
 (defun font-candidate (&rest fonts)
@@ -345,46 +213,24 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 ;; define list of fonts to be used in the above function
 ;; the first one found will be used
 (set-face-attribute 'default nil :font (font-candidate '"DejaVu Sans Mono-10:weight=normal"
-                                                       "Hack-10:weight=normal"
-                                                       "Consolas-10:weight=normal"
-                                                       "Droid Sans Mono-10:weight=normal"
-                                                       "DejaVu Sans Mono-10:weight=normal"
-                                                       "Ubuntu Mono-12:weight=normal"))
-
-
-;; ** visual-line-mode (word wrap)
+                                                        "Hack-10:weight=normal"
+                                                        "Consolas-10:weight=normal"
+                                                        "Droid Sans Mono-10:weight=normal"
+                                                        "DejaVu Sans Mono-10:weight=normal"
+                                                        "Ubuntu Mono-12:weight=normal"))
 
 (use-package visual-line-mode
   :ensure nil
   :hook
   (prog-mode . turn-on-visual-line-mode)
   (text-mode . turn-on-visual-line-mode)
-  )
-
-
-;; ** Prevent emacs to create lockfiles (.#files#).
-
-;; PS: this also stops preventing editing colisions, so watch out
+)
 
 (setq create-lockfiles nil)
 
-
-;; ** Use the system clipboard
-
-;; Enable copy/past-ing from clipboard
-
-
 (setq x-select-enable-clipboard t)
 
-
-;; ** Always follow symbolic links to edit the 'actual' file it points to
-
-
 (setq vc-follow-symlinks t)
-
-
-;; ** Save all tempfiles in $TMPDIR/emacs$UID/
-
 
 (defconst emacs-tmp-dir (expand-file-name (format "emacs%d" (user-uid)) temporary-file-directory))
 (setq backup-directory-alist
@@ -392,11 +238,7 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 (setq auto-save-file-name-transforms
     `((".*" ,emacs-tmp-dir t)))
 (setq auto-save-list-file-prefix
-      emacs-tmp-dir)
-
-
-;; ** dont make backup files
-
+    emacs-tmp-dir)
 
 (use-package files
   :ensure nil
@@ -404,38 +246,16 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
   (setq make-backup-files nil)
   ;; dont ask confirmation to kill processes
   ;;(setq confirm-kill-processes nil)
-  )
-
-
-;; ** dont ask confirmation to kill processes
-
+)
 
 (setq confirm-kill-processes nil)
 
-
-;; ** Disable the annoying Emacs bell ring (beep)
-
-
 (setq ring-bell-function 'ignore)
-
-
-;; ** Create alias to yes-or-no anwsers (y-or-n-p
-
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 (fset 'yes-or-no-p 'y-or-n-p)
 
-
-;; ** dont ask for confirmation for opening large files
-
-
 (setq large-file-warning-threshold nil) ;; Don’t warn me about opening large files
-
-
-;; ** display-line-numbers
-
-;; Released with Emacs 26 (released in 2018-05)
-
 
 (use-package display-line-numbers
   :if (version<= "26.0.50" emacs-version)
@@ -458,49 +278,40 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
   (defvar *linum-mdown-line* nil)
   (defun line-at-click ()
     (save-excursion
-      (let ((click-y (cdr (cdr (mouse-position))))
-            (line-move-visual-store line-move-visual))
-        (setq line-move-visual t)
-        (goto-char (window-start))
-        (next-line (1- click-y))
-        (setq line-move-visual line-move-visual-store)
-        ;; If you are using tabbar substitute the next line with
-        (line-number-at-pos))))
+    (let ((click-y (cdr (cdr (mouse-position))))
+        (line-move-visual-store line-move-visual))
+      (setq line-move-visual t)
+      (goto-char (window-start))
+      (next-line (1- click-y))
+      (setq line-move-visual line-move-visual-store)
+      ;; If you are using tabbar substitute the next line with
+      (line-number-at-pos))))
 
   (defun md-select-linum ()
     (interactive)
     (goto-line (line-at-click))
     (set-mark (point))
     (setq *linum-mdown-line*
-          (line-number-at-pos)))
+      (line-number-at-pos)))
 
   (defun mu-select-linum ()
     (interactive)
     (when *linum-mdown-line*
-      (let (mu-line)
-        ;; (goto-line (line-at-click))
-        (setq mu-line (line-at-click))
-        (goto-line (max *linum-mdown-line* mu-line))
-        (set-mark (line-end-position))
-        (goto-line (min *linum-mdown-line* mu-line))
-        (setq *linum-mdown*
-              nil))))
+    (let (mu-line)
+      ;; (goto-line (line-at-click))
+      (setq mu-line (line-at-click))
+      (goto-line (max *linum-mdown-line* mu-line))
+      (set-mark (line-end-position))
+      (goto-line (min *linum-mdown-line* mu-line))
+      (setq *linum-mdown*
+        nil))))
 
   (global-set-key (kbd "<left-margin> <down-mouse-1>") 'md-select-linum)
   (global-set-key (kbd "<left-margin> <mouse-1>") 'mu-select-linum)
   (global-set-key (kbd "<left-margin> <drag-mouse-1>") 'mu-select-linum)
-  )
-
-
-
-;; ** minibuffer history
-
+)
 
 (savehist-mode 1)
-
-
-;; ** Turn on auto-revert mode (auto updates files changed on disk)
-
 
 (use-package autorevert
   :ensure nil
@@ -511,146 +322,64 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
   (setq auto-revert-interval 2)
   (setq auto-revert-check-vc-info t)
   (setq auto-revert-verbose nil)
-  )
-
-
-;; ** C-n insert newlines if the point is at the end of the buffer.
-
-;; : Useful, as it means you won’t have to reach for the return key to add newlines!
+)
 
 (setq next-line-add-newlines t)
-
-
-;; ** Remove the ^M characters from files that contains Unix and DOS line endings
-
 
 (defun remove-dos-eol ()
   "Do not show ^M in files containing mixed UNIX and DOS line endings."
   (interactive)
   (setq buffer-display-table (make-display-table))
   (aset buffer-display-table ?\^M [])
-  )
-
-
-;; *** Hook it to text-mode and prog-mode
+)
 
 (add-hook 'text-mode-hook 'remove-dos-eol)
 (add-hook 'prog-mode-hook 'remove-dos-eol)
 
-
-;; ** Increase, decrease and adjust font size
-
-
 (global-set-key (kbd "C-S-+") #'text-scale-increase)
 (global-set-key (kbd "C-S-_") #'text-scale-decrease)
 (global-set-key (kbd "C-S-)") #'text-scale-adjust)
-
-
-;; ** expand-region
-
 
 (use-package expand-region
   :ensure t
   :defer t
   :bind
   ([(control shift iso-lefttab)] . 'er/expand-region)
-  )
-
-
-;; ** refresh buffer with F5
+)
 
 (global-set-key [f5] '(lambda () (interactive) (revert-buffer nil t nil)))
-
-;; ** C-k kills current buffer without having to select which buffer
-
-;; By default C-x k prompts to select which buffer should be selected.
-;; I almost always want to kill the current buffer, so this snippet helps in that.
 
 ;; Kill current buffer; prompt only if
 ;; there are unsaved changes.
 (global-set-key (kbd "C-x k")
-                '(lambda () (interactive) (kill-buffer (current-buffer)))
-                )
-
-
-;; ** warn when opening large files
-
+  '(lambda () (interactive) (kill-buffer (current-buffer)))
+)
 
 ;; warn when opening files bigger than 100MB
 (setq large-file-warning-threshold 100000000)
 
-
-;; ** add final newline
-
-
 (setq require-final-newline t)
-
-
-;; ** fill column
-
-;; Sets a 80 character line width
-
 
 (setq-default fill-column 80)
 (setq auto-fill-mode 1)
-
-
-;; ** preffer UTF-8 coding system
 
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 
-
-;; ** delete selection mode
-
-;; Delete Selection mode lets you treat an Emacs region much like a typical text selection outside of Emacs: You can replace the active region just by typing text, and you can delete the selected text just by hitting the Backspace key (‘DEL’).
-
-;; According to the Emacs manual,
-;; If you enable Delete Selection mode, a minor mode, then inserting text while the mark is active causes the selected text to be deleted first. This also deactivates the mark. Many graphical applications follow this convention, but Emacs does not.
-
-
 (delete-selection-mode 1)
 
-
-;; ** auto balance windows on opening and closing frames
-
-
 (setq window-combination-resize t)
-
-
-;; ** set default line spacing
-
 
 ;; (setq-default line-spacing 1) ;; A nice line height
 (setq-default line-spacing 3)
 
-
-;; ** fix wierd color escape system
-
-
 (setq system-uses-terminfo nil) ;; Fix weird color escape sequences
-
-
-;; ** confirm before closing emacs
-
 
 ;; (setq confirm-kill-emacs 'yes-or-no-p) ;; Ask for confirmation before closing emacs
 
-
-;; ** select window for help
-
-
 (setq help-window-select t)
-
-
-;; * Code editing settings
-;; ** subword-mode
-
-;; : Alt+x subword-mode. It change all cursor movement/edit commands to stop in-between the “camelCase” words.
-;; : subword-mode and superword-mode are mutally exclusive. Turning one on turns off the other.
-
 
 (use-package subword
   :ensure nil
@@ -659,23 +388,13 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
   (ruby-mode . subword-mode)
   (enh-ruby-mode . subword-mode)
   (elixir-mode . subword-mode)
-  )
-
-
-;; ** superword-mode
-
-;; : Alt+x superword-mode (emacs 24.4) is similar. It treats text like “x_y” as one word. Useful for “snake_case”.
-;; : subword-mode and superword-mode are mutally exclusive. Turning one on turns off the other.
-
+)
 
 (use-package superword
   :ensure nil
   :hook
   (js2-mode . superword-mode)
-  )
-
-
-;; ** default indentation
+)
 
 (setq-default indent-tabs-mode nil)
 ;; C e C-like langs default indent size
@@ -684,41 +403,30 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 (setq-default cperl-basic-offset 2)
 (setq-default c-basic-offset 2)
 
-
-;; ** Use unix-conf-mode for .*rc files
-
 (use-package conf-mode
   :mode
   (;; systemd
-   ("\\.service\\'"     . conf-unix-mode)
-   ("\\.timer\\'"      . conf-unix-mode)
-   ("\\.target\\'"     . conf-unix-mode)
-   ("\\.mount\\'"      . conf-unix-mode)
-   ("\\.automount\\'"  . conf-unix-mode)
-   ("\\.slice\\'"      . conf-unix-mode)
-   ("\\.socket\\'"     . conf-unix-mode)
-   ("\\.path\\'"       . conf-unix-mode)
+    ("\\.service\\'"     . conf-unix-mode)
+    ("\\.timer\\'"      . conf-unix-mode)
+    ("\\.target\\'"     . conf-unix-mode)
+    ("\\.mount\\'"      . conf-unix-mode)
+    ("\\.automount\\'"  . conf-unix-mode)
+    ("\\.slice\\'"      . conf-unix-mode)
+    ("\\.socket\\'"     . conf-unix-mode)
+    ("\\.path\\'"       . conf-unix-mode)
 
-   ;; general
-   ("conf\\(ig\\)?$"   . conf-mode)
-   ("rc$"              . conf-mode))
-  )
+    ;; general
+    ("conf\\(ig\\)?$"   . conf-mode)
+    ("rc$"              . conf-mode))
+)
 ;; (add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode))
-
-
-;; ** iedit
 
 (use-package iedit
   :config
   (set-face-background 'iedit-occurrence "Magenta")
   :bind
   ("C-;" . iedit-mode)
-  )
-
-
-;; ** eldoc
-;; Enable documentation for programming languages
-
+)
 
 (use-package eldoc
   :ensure nil
@@ -730,13 +438,7 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
   ;; (global-eldoc-mode -1)
   ;; (add-hook 'prog-mode-hook 'eldoc-mode)
   (setq eldoc-idle-delay 0.4)
-  )
-
-
-;; *** eldoc-box
-
-;; Show eldoc info in a childframe
-
+)
 
 (use-package eldoc-box
   :ensure t
@@ -750,11 +452,7 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
   ;;(setq eldoc-box-only-multi-line)   ;;  Set this to non-nil and eldoc-box only display multi-line message in childframe. One line messages are left in minibuffer.
   ;; (eldoc-box-hover-mode)
   (eldoc-box-hover-at-point-mode)
-  )
-
-
-;; ** aggressive-indent-mode
-
+)
 
 (use-package aggressive-indent
   :ensure t
@@ -764,29 +462,7 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
   :hook
   (emacs-lisp-mode . aggressive-indent-mode)
   :config
-  )
-
-
-;; ** interactive-align
-
-;; Keymap used in the minibuffer when ialign command is executed.
-;; |---------+--------------------------|
-;; | Key     | Command                  |
-;; |---------+--------------------------|
-;; | C-c C-r | ialign-toggle-repeat     |
-;; | C-c C-t | ialign-toggle-tabs       |
-;; | C-c M-c | ialign-toggle-case-fold  |
-;; | C-c +   | ialign-increment-spacing |
-;; | C-c -   | ialign-decrement-spacing |
-;; | C-c [   | ialign-decrement-group   |
-;;             | C-c ]   | ialign-increment-group   |
-;; | C-c C-f | ialign-set-group         |
-;; | C-c C-s | ialign-set-spacing       |
-;; | C-c RET | ialign-commit            |
-;; | C-c C-c | ialign-update            |
-;; | C-c ?   | ialign-show-help         |
-;; |---------+--------------------------|
-
+)
 
 (use-package ialign
   :ensure t
@@ -796,26 +472,7 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
   ;;(setq ialign-default-spacing 32)
   (setq ialign-align-with-tabs nil) ;; default nil
   (setq ialign-auto-update t) ;; default t
-  )
-
-
-;; ** align.el
-
-;; align text to a specific column, by regexp
-
-;; This mode allows you to align regions in a context-sensitive fashion.
-;; The classic use is to align assignments:
-
-;; int a = 1;
-;; short foo = 2;
-;; double blah = 4;
-
-;; becomes
-
-;; int    a    = 1;
-;; short  foo  = 2;
-;; double blah = 4;
-
+)
 
 (defun align-values (start end)
   "Vertically aligns region based on lengths of the first value of each line.
@@ -826,36 +483,25 @@ Example output:
 	foofoofoo  bar"
   (interactive "r")
   (align-regexp start end
-                "\\S-+\\(\\s-+\\)"
-                1 1 nil))
-
-
-
-
-;; ** align-regexp
-
+				"\\S-+\\(\\s-+\\)"
+				1 1 nil))
 
 ;; align code in a pretty way
 (global-set-key (kbd "C-x \\") #'align-regexp)
-
-
-;; ** dumb-jump
-;; Emacs jump to definition tool
-
 
 (use-package dumb-jump
   :ensure t
   :after helm
   :preface
   (defhydra dumb-jump-hydra (:color blue :columns 3)
-    "Dumb Jump"
-    ("j" dumb-jump-go "Go")
-    ("o" dumb-jump-go-other-window "Other window")
-    ("e" dumb-jump-go-prefer-external "Go external")
-    ("x" dumb-jump-go-prefer-external-other-window "Go external other window")
-    ("i" dumb-jump-go-prompt "Prompt")
-    ("l" dumb-jump-quick-look "Quick look")
-    ("b" dumb-jump-back "Back"))
+      "Dumb Jump"
+      ("j" dumb-jump-go "Go")
+      ("o" dumb-jump-go-other-window "Other window")
+      ("e" dumb-jump-go-prefer-external "Go external")
+      ("x" dumb-jump-go-prefer-external-other-window "Go external other window")
+      ("i" dumb-jump-go-prompt "Prompt")
+      ("l" dumb-jump-quick-look "Quick look")
+      ("b" dumb-jump-back "Back"))
   :bind
   ;;("M-g o" . dumb-jump-go-other-window)
   ;;("M-g j" . dumb-jump-go)
@@ -865,117 +511,55 @@ Example output:
   ;;("M-g z" . dumb-jump-go-prefer-external-other-window)
   ;;("M-S-h d" . dumb-jump-hydra/body)
   (:map prog-mode-map
-        ("C-c C-o" . dumb-jump-go-other-window)
-        ("C-c C-j" . dumb-jump-go)
-        ("C-c C-i" . dumb-jump-go-prompt))
+  ("C-c C-o" . dumb-jump-go-other-window)
+   ("C-c C-j" . dumb-jump-go)
+   ("C-c C-i" . dumb-jump-go-prompt))
   :custom
   (dumb-jump-selector 'ivy)
   :config
   (eval-when-compile
     (require 'helm-source nil t))
-  )
-
-
-;; * Global Hooks
-
-;; Delete trailing whitespace on save
+)
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
-
-
-;; * Native Command Remappings
-
-;; These remap commands instead of keybindings
-;; This allows to use different functions but preserve the original keybindings
-;; See C-h i g (elisp) Remapping Commands RET
-
-;; Example: (global-set-key [remap backward-up-list] 'my-backward-up-list)
-
-;; Keybindings and remaps
-
-;; Vector is array in other languages. Vector was used for mapping function keys, such as [left], [right], [up], [down], [f1]...[f12]. But now, you can also map function keys in (kbd ...) function using angle brackets:
-
-;; (global-set-key (kbd "<f3>") 'kmacro-start-macro-or-insert-counter)
-
-;; Here are common function keys (remember to wrap them in a pair of angle bracket):
-;; | Key                                            | Description                                        |
-;; | left, up, right, down                          | Cursor arrow keys                                  |
-;; | begin, end, home, next, prior                  | Other cursor re-positioning keys                   |
-;; |                                                | prior means PageUp                                 |
-;; |                                                | next means PageDOwn                                |
-;; | select, print, execute, backtab                | Miscellaneous keys                                 |
-;; | insert, undo, redo, clearline                  | backtab means S-TAB or C-iso-tab                   |
-;; | insertline, deleteline, insertchar, deletechar |                                                    |
-;; | f1, f2, ... F35                                | Numbered function keys on top of your keyboard     |
-;; | kp-add, kp-subtract, kp-multiply, kp-divide    | Keypad keys (to the right of the regular keyboard) |
-;; | kp-backtab, kp-space, kp-tab, kp-enter         | , with names or punctuation.                       |
-;; | kp-separator, kp-decimal, kp-equal             |                                                    |
-;; |                                                |                                                    |
-;; |                                                |                                                    |
-;; | kp-0, kp-1, ... kp-9                           | Keypad keys with digits.                           |
-;; |                                                |                                                    |
-;; | kp-f1, kp-f2, kp-f3, kp-f4                     | Keypad PF keys.                                    |
-
-;; * Text editing settings
-
-;; ** Helper functions for casing words
-
 
 (defun upcase-backward-word (arg)
   (interactive "p")
   (upcase-word (- arg))
-  )
-
-
+)
 
 (defun downcase-backward-word (arg)
   (interactive "p")
   (downcase-word (- arg))
 )
 
-
-
 (defun capitalize-backward-word (arg)
   (interactive "p")
   (capitalize-word (- arg))
 )
-
-
 
 (global-set-key (kbd "C-M-u")	 'upcase-backward-word)
 (global-set-key (kbd "C-M-l")	 'downcase-backward-WORD)
 ;; this replaces native capitlize word!
 (global-set-key (kbd "C-M-c")	 'capitalize-backward-word)
 
-
-;; * Spellchecking
-
-
 (defconst *spell-check-support-enabled* nil) ;; Enable with t if you prefer
 
+;(defun fd-switch-dictionary()
+;(interactive)
+;(let* ((dic ispell-current-dictionary)
+;    (change (if (string= dic "deutsch8") "english" "deutsch8")))
+;  (ispell-change-dictionary change)
+;  (message "Dictionary switched from %s to %s" dic change)
+;  ))
 
-;; ** Flyspell
-
-;; Change dictionaries with F12
-
-
-                                        ;(defun fd-switch-dictionary()
-                                        ;(interactive)
-                                        ;(let* ((dic ispell-current-dictionary)
-                                        ;    (change (if (string= dic "deutsch8") "english" "deutsch8")))
-                                        ;  (ispell-change-dictionary change)
-                                        ;  (message "Dictionary switched from %s to %s" dic change)
-                                        ;  ))
-
-                                        ;(global-set-key (kbd "<f12>")   'fd-switch-dictionary)
-
-
+;(global-set-key (kbd "<f12>")   'fd-switch-dictionary)
 
 ;; Change dictionaries with F12 (teste pt-br)
 (let ((langs '("american" "brasileiro")))
   (setq lang-ring (make-ring (length langs)))
   (dolist (elem langs) (ring-insert lang-ring elem))
-  )
+)
 
 (defun cycle-ispell-languages ()
    (interactive)
@@ -986,8 +570,6 @@ Example output:
 
 (global-set-key (kbd "<f12>")   'cycle-ispell-languages)
 
-
-
 (use-package flyspell
   :defer 1
   :disabled
@@ -996,7 +578,7 @@ Example output:
   :config
   ;; ignore org source blocks from spellchecking
   (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
-  (add-to-list 'ispell-skip-region-alist '("^#+BEGIN_SRC" . "^"))
+  (add-to-list 'ispell-skip-region-alist '("^#+BEGIN_SRC" . "^#+END_SRC"))
 
   ;; global ispell settings (disabled in favor of conditional hunspell setup bellow)
   ;; (setenv "LANG" "en_US.UTF-8")
@@ -1008,39 +590,32 @@ Example output:
 
   ;; Hunspell settings
   ;; find aspell and hunspell automatically
-  ;;  (cond
-  ;;    ;; try aspell first in case both aspell and hunspell are installed, it will
-  ;;    ;; set `ispell-program-name' to use hunspell
-  ;;    ((executable-find "aspell")
-  ;;      (setq ispell-program-name "aspell")
-  ;;      ;; Please note `ispell-extra-args' contains ACTUAL parameters passed to aspell
-  ;;      (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US"))
-  ;;      ;;(setq ispell-local-dictionary "pt_BR")
-  ;;    )
-  ;;   ;; if hunspell is available, use it instead of aspell for multilang support
-  ;;    ((executable-find "hunspell")
-  ;;      (setq ispell-program-name "hunspell")
-  ;;      ;; i could set `ispell-dictionary' instead but `ispell-local-dictionary' has higher priority
-  ;;      (setq ispell-local-dictionary "en_US")
-  ;;      ;; setup both en_US and pt_BR dictionaries in hunspell
-  ;;      (ispell-hunspell-add-multi-dic "en_US,pt_BR")
-  ;;
-  ;;      (setq ispell-local-dictionary-alist
-  ;;         ;; Please note the list `("-d" "en_US")` contains ACTUAL parameters passed to hunspell
-  ;;         ;; You could use `("-d" "en_US,en_US-med")` to check with multiple dictionaries
-  ;;         '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US,pt_BR") nil utf-8))
-  ;;      )
-  ;;    )
-  ;;  )
+;;  (cond
+;;    ;; try aspell first in case both aspell and hunspell are installed, it will
+;;    ;; set `ispell-program-name' to use hunspell
+;;    ((executable-find "aspell")
+;;      (setq ispell-program-name "aspell")
+;;      ;; Please note `ispell-extra-args' contains ACTUAL parameters passed to aspell
+;;      (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US"))
+;;      ;;(setq ispell-local-dictionary "pt_BR")
+;;    )
+;;   ;; if hunspell is available, use it instead of aspell for multilang support
+;;    ((executable-find "hunspell")
+;;      (setq ispell-program-name "hunspell")
+;;      ;; i could set `ispell-dictionary' instead but `ispell-local-dictionary' has higher priority
+;;      (setq ispell-local-dictionary "en_US")
+;;      ;; setup both en_US and pt_BR dictionaries in hunspell
+;;      (ispell-hunspell-add-multi-dic "en_US,pt_BR")
+;;
+;;      (setq ispell-local-dictionary-alist
+;;         ;; Please note the list `("-d" "en_US")` contains ACTUAL parameters passed to hunspell
+;;         ;; You could use `("-d" "en_US,en_US-med")` to check with multiple dictionaries
+;;         '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US,pt_BR") nil utf-8))
+;;      )
+;;    )
+;;  )
 
-  )
-
-
-;; ** guess-language
-
-;; Automatic guess the language of the paragraph im writing in
-;; Works with mutilang documents
-
+)
 
 (use-package guess-language         ; Automatically detect language for Flyspell
   :ensure t
@@ -1054,12 +629,7 @@ Example output:
                                    (pt . ("pt_BR" "Portuguese Brazilian"))))
   (setq guess-language-languages '(en pt))
   (setq guess-language-min-paragraph-length 45)
-  )
-
-
-
-;; ** move-text
-
+)
 
 (use-package move-text
   :ensure t
@@ -1084,15 +654,7 @@ Example output:
   (define-key evil-normal-state-map (kbd "M-k") 'move-text-up)
   (define-key evil-visual-state-map (kbd "M-j") 'move-text-region-up)
   (define-key evil-visual-state-map (kbd "M-k") 'move-text-region-down)
-  )
-
-
-
-;; * exec-path-from-shell
-
-;; Make emacs use $PATH defined in the systems shell
-
-;; : snippet taken from oficial use package github page
+)
 
 (use-package exec-path-from-shell
   :if (memq window-system '(mac ns x))
@@ -1108,25 +670,14 @@ Example output:
   ;; either using the `exec-path-from-shell-copy-env' functon or setting the variable `exec-path-from-shell-variables'
   ;; (exec-path-from-shell-copy-env "PYTHONPATH")
   ;; (setq exec-path-from-shell-variables '("PYTHONPATH" "GOPATH"))
-  )
-
-
-;; * Mouse configuration
-;; ** Enable mouse support in terminal mode
-
+)
 
 (when (eq window-system nil)
   (xterm-mouse-mode 1))
 
-
-
 ;; (use-package mouse3
 ;;     :config
 ;; (global-set-key (kbd "<mouse-3>") 'mouse3-popup-menu))
-
-
-;; ** right-click-context-menu
-
 
 (use-package right-click-context
   :ensure t
@@ -1139,27 +690,19 @@ Example output:
 
   ;; customize the right-click-context-menu
   (let ((right-click-context-local-menu-tree
-         (append right-click-context-global-menu-tree
-                 '(("Insert"
-                    ("Go to definition" :call (lsp-goto-type-definition)
-                     ("FooBar" :call (insert "FooBar"))
-                     )))))
-        (right-click-context-menu)))
-  )
-
-
-;; ** zoom buffers with Mouse+Scroll<Up/Down> like in the browser
-
+       (append right-click-context-global-menu-tree
+             '(("Insert"
+                ("Go to definition" :call (lsp-goto-type-definition)
+                ("FooBar" :call (insert "FooBar"))
+                )))))
+  (right-click-context-menu)))
+)
 
 ;; zoom in/out like we do everywhere else.
 (global-set-key (kbd "C-=") 'text-scale-increase)
 (global-set-key (kbd "C--") 'text-scale-decrease)
 (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
 (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
-
-
-;; * hippie-expand (native emacs expand function)
-
 
 (use-package hippie-exp
   :ensure nil
@@ -1169,21 +712,17 @@ Example output:
   ("<C-return>" . hippie-expand)
   ("C-M-SPC" . hippie-expand)
   (:map evil-insert-state-map
-        ("<tab>" . hippie-expand)
-        )
+  ("<tab>" . hippie-expand)
+  )
   :config
   (setq-default hippie-expand-try-functions-list
-                '(yas-hippie-try-expand
-                  company-indent-or-complete-common
-                  emmet-expand-yas
-                  emmet-expand-line
-                  indent-according-to-mode
-                  ))
-  )
-
-
-;; * Evil
-
+        '(yas-hippie-try-expand
+          company-indent-or-complete-common
+          emmet-expand-yas
+          emmet-expand-line
+          indent-according-to-mode
+          ))
+)
 
 (use-package evil
   :ensure t
@@ -1221,18 +760,18 @@ Example output:
   (evil-operator-state-cursor '("red" hollow))
   :bind
   (:map evil-normal-state-map
-        (", w" . evil-window-vsplit)
-        ("C-r" . undo-tree-redo))
+  (", w" . evil-window-vsplit)
+  ("C-r" . undo-tree-redo))
   (:map evil-insert-state-map
-        ;; this is also defined globally above in the config
-        ("C-S-<backtab>" . er/expand-region))
+  ;; this is also defined globally above in the config
+  ("C-S-<backtab>" . er/expand-region))
   (:map evil-visual-state-map
-        ;; this is also defined globally above in the config
-        ("<tab>" . indent-region)
-        ("C-/" . comment-line)
-        ("C-S-/" . comment-region)
-        ("C-S-M-/" . comment-box)
-        ("M-=" . #'align-values))
+  ;; this is also defined globally above in the config
+  ("<tab>" . indent-region)
+  ("C-/" . comment-line)
+  ("C-S-/" . comment-region)
+  ("C-S-M-/" . comment-box)
+  ("M-=" . #'align-values))
 
   ;; check if global-set-key also maps to evil insert mode; if yes delete bellow snippets
   :config
@@ -1241,15 +780,6 @@ Example output:
   (define-key evil-insert-state-map (kbd "<tab>") nil)
   (define-key evil-normal-state-map (kbd "<tab>") nil)
   (define-key evil-visual-state-map (kbd "<tab>") nil)
-  ;; unset change to emacs state and rebind it
-  ;; (define-key evil-insert-state-map (kbd "C-z") nil)
-  ;; (define-key evil-normal-state-map (kbd "C-z") nil)
-  ;; (define-key evil-visual-state-map (kbd "C-z") nil)
-  ;; (define-key evil-insert-state-map (kbd "C-z e") evil-emacs-state)
-  ;; (define-key evil-normal-state-map (kbd "C-z e") evil-emacs-state)
-  ;; (define-key evil-visual-state-map (kbd "C-z e") evil-emacs-state)
-  ;; use esc while in emacs state to return to normal evil mode
-  (define-key evil-emacs-state-map [escape] 'evil-normal-state)
   ;; vim-like navigation with C-w hjkl
   (define-prefix-command 'evil-window-map)
   (define-key evil-window-map (kbd "h") 'evil-window-left)
@@ -1314,14 +844,7 @@ Example output:
   (define-key evil-normal-state-map (kbd "Q") 'call-last-kbd-macro)
   (define-key evil-visual-state-map (kbd "Q") 'call-last-kbd-macro)
   (define-key evil-insert-state-map (kbd "C-r") 'search-backward)
-  )
-
-
-
-;; * Evil packages / plugins
-
-;; ** Evil-ORG
-
+)
 
 (use-package evil-org
   :after org evil
@@ -1330,28 +853,21 @@ Example output:
   :config
   (lambda ()
     (evil-org-set-key-theme))
-  )
-
-
-;; ** evil-numbers
+)
 
 (use-package evil-numbers
   :ensure t
   :after evil
   :bind
   (:map evil-normal-state-map
-        ("C-c C-+" . evil-numbers/inc-at-pt)
-        ("C-c C--" . evil-numbers/dec-at-pt)
-        ("<kp-add>" . evil-numbers/inc-at-pt)
-        ("<kp-subtract>" . evil-numbers/dec-at-pt))
+  ("C-c C-+" . evil-numbers/inc-at-pt)
+  ("C-c C--" . evil-numbers/dec-at-pt)
+  ("<kp-add>" . evil-numbers/inc-at-pt)
+  ("<kp-subtract>" . evil-numbers/dec-at-pt))
   :config
   (global-set-key (kbd "C-c C-+") 'evil-numbers/inc-at-pt)
   (global-set-key (kbd "C-c C--") 'evil-numbers/dec-at-pt)
-  )
-
-
-;; ** evil-leader
-
+)
 
 (use-package evil-leader
   :ensure t
@@ -1379,11 +895,11 @@ Example output:
     "f" 'counsel-projectile-find-file
     "cg" 'counsel-ag
     "r" 'counsel-rg
-                                        ; "gg" 'git-gutter+:toggle
-                                        ; "gd" 'git-gutter+:popup-diff
-                                        ; "gp" 'git-gutter+:previous-hunk
-                                        ; "gn" 'git-gutter+:next-hunk
-                                        ; "gr" 'git-gutter+:revert-hunk
+    ; "gg" 'git-gutter+:toggle
+    ; "gd" 'git-gutter+:popup-diff
+    ; "gp" 'git-gutter+:previous-hunk
+    ; "gn" 'git-gutter+:next-hunk
+    ; "gr" 'git-gutter+:revert-hunk
     "gb" 'mo-git-blame-current
     "gL" 'magit-log
     "gs" 'magit-status
@@ -1405,19 +921,13 @@ Example output:
     "mf" 'elixir-format
     "ll" 'longlines-mode
     "x" 'smex)
-  "|" 'split-window-right
-  )
-
-
-;; ** Evil Surround
-
+    "|" 'split-window-right
+)
 
 (use-package evil-surround
   :config
   (global-evil-surround-mode 1)
-  )
-
-
+)
 
 (defun evil-surround-prog-mode-hook-setup ()
   "Documentation string, idk, put something here later."
@@ -1429,8 +939,6 @@ Example output:
 )
 (add-hook 'prog-mode-hook 'evil-surround-prog-mode-hook-setup)
 
-
-
 (defun evil-surround-js-mode-hook-setup ()
   "ES6." ;  this is a documentation string, a feature in Lisp
   ;; I believe this is for auto closing pairs
@@ -1441,8 +949,6 @@ Example output:
   (push '(?3 . ("classNames(" . ")")) evil-surround-pairs-alist)
 )
 (add-hook 'js2-mode-hook 'evil-surround-js-mode-hook-setup)
-
-
 
 (defun evil-surround-emacs-lisp-mode-hook-setup ()
   (push '(?` . ("`" . "'")) evil-surround-pairs-alist)
@@ -1456,48 +962,22 @@ Example output:
 )
 (add-hook 'org-mode-hook 'evil-surround-org-mode-hook-setup)
 
-
-;; ** evil-commentary
-
-
 (use-package evil-commentary
   :config
   (evil-commentary-mode)
-  )
-
-
-;; ** Evil-Matchit
+)
 
 (use-package evil-matchit
   :config
   (global-evil-matchit-mode 1)
-  )
-
-
-;; ** evil-paredit
-
+)
 
 (use-package evil-paredit
   :ensure t
   :defer t
   :hook
   (emacs-lisp-mode . evil-paredit-mode)
-  )
-
-
-;; ** evil-mc
-
-;; Multiple cursors for evil mode
-
-;; |------------+---------------------------------|
-;; | Key        | action                          |
-;; |------------+---------------------------------|
-;; | C-t or grn | skip creating a cursor forward  |
-;; | grp        | skip creating a cursor backward |
-;; | gru        | undo last addded cursor         |
-;; | grq        | remove all cursors              |
-;; |------------+---------------------------------|
-
+)
 
 (use-package evil-mc
   :ensure t
@@ -1505,17 +985,13 @@ Example output:
   :after evil
   :bind
   (:map evil-visual-state-map
-        ("C-d" . evil-mc-make-and-goto-next-match) ;; Make a cursor at point and go to the next match of the selected region or the symbol under cursor.
-        ("C-a" . evil-mc-make-all-cursors) ;; Create cursors for all strings that match the selected region or the symbol under cursor.
-        ("C-q" . evil-mc-undo-all-cursors)  ;; Remove all cursors.
-        )
+  ("C-d" . evil-mc-make-and-goto-next-match) ;; Make a cursor at point and go to the next match of the selected region or the symbol under cursor.
+  ("C-a" . evil-mc-make-all-cursors) ;; Create cursors for all strings that match the selected region or the symbol under cursor.
+  ("C-q" . evil-mc-undo-all-cursors)  ;; Remove all cursors.
+  )
   :config
   (global-evil-mc-mode  1)
-  )
-
-
-;; ** evil-goggles
-
+)
 
 (use-package evil-goggles
   :ensure t
@@ -1525,70 +1001,46 @@ Example output:
   (setq evil-goggles-pulse t) ;; default is to pulse when running in a graphic display
   (setq evil-goggles-duration 0.200) ;; default is 0.200
 
-  ;; list of all on/off variables, their default value is `t`:
+;; list of all on/off variables, their default value is `t`:
 
   (setq evil-goggles-enable-paste nil) ;; to disable the hint when pasting
-  ;;(setq  evil-goggles-enable-delete t)
-  ;;(setq  evil-goggles-enable-change t)
-  ;;(setq evil-goggles-enable-indent t)
-  ;;(setq  evil-goggles-enable-yank t)
-  ;;(setq  evil-goggles-enable-join t)
-  ;;(setq evil-goggles-enable-fill-and-move t)
-  ;;(setq evil-goggles-enable-paste t)
-  ;;(setq evil-goggles-enable-shift t)
-  ;;(setq evil-goggles-enable-surround t)
-  ;;(setq evil-goggles-enable-commentary)
-  ;;(setq evil-goggles-enable-nerd-commenter t)
-  ;;(setq evil-goggles-enable-replace-with-register t)
-  ;;(setq evil-goggles-enable-set-marker t)
-  ;;(setq evil-goggles-enable-undo t)
-  ;;(setq evil-goggles-enable-redo t)
-  ;;(setq evil-goggles-enable-record-macro t)
+;;(setq  evil-goggles-enable-delete t)
+;;(setq  evil-goggles-enable-change t)
+;;(setq evil-goggles-enable-indent t)
+;;(setq  evil-goggles-enable-yank t)
+;;(setq  evil-goggles-enable-join t)
+;;(setq evil-goggles-enable-fill-and-move t)
+;;(setq evil-goggles-enable-paste t)
+;;(setq evil-goggles-enable-shift t)
+;;(setq evil-goggles-enable-surround t)
+;;(setq evil-goggles-enable-commentary)
+;;(setq evil-goggles-enable-nerd-commenter t)
+;;(setq evil-goggles-enable-replace-with-register t)
+;;(setq evil-goggles-enable-set-marker t)
+;;(setq evil-goggles-enable-undo t)
+;;(setq evil-goggles-enable-redo t)
+;;(setq evil-goggles-enable-record-macro t)
 
   ;; optionally use diff-mode's faces; as a result, deleted text
   ;; will be highlighed with `diff-removed` face which is typically
   ;; some red color (as defined by the color theme)
   ;; other faces such as `diff-added` will be used for other actions
   (evil-goggles-use-diff-faces)
-  )
-
-
-;; ** evil-lion
-
-;; : Align by operators
-
-;; Example, left align gl:
-;; After pressing glip= (gl is the operator, ip text object paragraph, = separator)
-
-;; one = 1
-;; three = 3
-;; fifteen = 15
-
-;; will become:
-
-;; one     = 1
-;; three   = 3
-;; fifteen = 15
-
+)
 
 (use-package evil-lion
   :ensure t
   :bind
   (:map evil-normal-state-map
-        ("g l " . evil-lion-left)
-        ("g L " . evil-lion-right)
-        :map evil-visual-state-map
-        ("g l " . evil-lion-left)
-        ("g L " . evil-lion-right))
+  ("g l " . evil-lion-left)
+  ("g L " . evil-lion-right)
+  :map evil-visual-state-map
+  ("g l " . evil-lion-left)
+  ("g L " . evil-lion-right))
   :config
   (setq evil-lion-squeeze-spaces t) ;; default t
   (evil-lion-mode)
-  )
-
-
-;; * org-mode
-
-;; ** org-mode setup
+)
 
 (use-package org
   :ensure org-plus-contrib
@@ -1605,22 +1057,22 @@ Example output:
     (diff-hl-mode)
     (prettify-symbols-mode)
     (org-bullets-mode)
-    )
+  )
   :hook
   (org-mode . setup-org-mode)
   :bind
   (:map org-mode-map
-        ("C-c o l" . org-store-link)
-        ("C-c o l" . org-store-link)
-        ("C-c o a" . org-agenda)
-        ("C-c o c" . org-capture)
-        ("C-c o b" . org-switch))
+  ("C-c o l" . org-store-link)
+  ("C-c o l" . org-store-link)
+  ("C-c o a" . org-agenda)
+  ("C-c o c" . org-capture)
+  ("C-c o b" . org-switch))
 
   ;; this map is to delete de bellow commented lambda that does the same thing
   ;; Resolve issue with Tab not working with ORG only in Normal VI Mode in terminal
   ;; (something with TAB on terminals being related to C-i...)
   (:map evil-normal-state-map
-        ("<tab>" . org-cycle))
+  ("<tab>" . org-cycle))
   :init
   ;; general org config variables
   (setq org-log-done 'time)
@@ -1639,7 +1091,7 @@ Example output:
 
   (setq org-confirm-babel-evaluate 'nil)
   (setq org-todo-keywords
-        '((sequence "TODO" "IN-PROGRESS" "REVIEW" "|" "DONE")))
+   '((sequence "TODO" "IN-PROGRESS" "REVIEW" "|" "DONE")))
   (setq org-agenda-window-setup 'other-window)
   (setq org-log-done 'time) ;; Show CLOSED tag line in closed TODO items
   (setq org-log-done 'note) ;; Prompt to leave a note when closing an item
@@ -1674,47 +1126,30 @@ Example output:
 
   ;; compile with xelatex to use the Arial font
   (setq org-latex-pdf-process
-        '("xelatex -interaction nonstopmode %f"
-          "xelatex -interaction nonstopmode %f")) ;; for multiple passes
+    '("xelatex -interaction nonstopmode %f"
+       "xelatex -interaction nonstopmode %f")) ;; for multiple passes
 
-  (setq org-emphasis-alist '(("*" bold)
-                             ("/" italic)
-                             ("_" underline)
-                             ("=" org-verbatim verbatim)
-                             ("~" org-code verbatim)))
-
-
-  (require 'org-habit)
-  '(org-emphasis-alist
-    (quote
-     (
-      ("!" org-habit-overdue-face)
-      ("%" org-habit-alert-face)
-      ("*" bold)
-      ("/" italic)
-      ("_" underline)
-      ("=" org-verbatim verbatim)
-      ("~" org-code verbatim)
-      ("+" (:strike-through t))
-      )))
-  )
+    (setq org-emphasis-alist '(("*" bold)
+                           ("/" italic)
+                           ("_" underline)
+                           ("=" org-verbatim verbatim)
+                           ("~" org-code verbatim)))
 
 
-;; ** org-sidebar
-
-;; In the tree buffer, the keymap org-sidebar-tree-map is used, which is based on org-mode-map (so you can use Org keybindings to manipulate nodes), and has these additional bindings by default:
-
-;; - <S-tab>: Cycle global node visibility.
-;; - <tab>: Toggle visibility of child nodes.
-;; - <mouse-3>: Toggle visibility of child nodes.
-;; - <mouse-2>: Jump to heading using default jump function; or, if heading stars are clicked, toggle visibility of child nodes.
-;; - <return>: Jump to heading using default jump function (adding universal prefix arguments to display more subtree content, corresponding with the click-and-drag mouse events below).
-
-;; Dragging-and-releasing with mouse buttons (as opposed to clicking and releasing at a single position) shows additional subtree and entry content:
-
-;; - <drag-mouse-1>: Jump to heading using default jump function, and also show all descendant headings.
-;; - <drag-mouse-2>: Jump to heading using default jump function, and also show all descendant headings and their entry text.
-
+    (require 'org-habit)
+    '(org-emphasis-alist
+     (quote
+      (
+       ("!" org-habit-overdue-face)
+       ("%" org-habit-alert-face)
+       ("*" bold)
+       ("/" italic)
+       ("_" underline)
+       ("=" org-verbatim verbatim)
+       ("~" org-code verbatim)
+       ("+" (:strike-through t))
+       )))
+)
 
 (use-package org-sidebar
   :ensure t
@@ -1723,25 +1158,13 @@ Example output:
   :after org
   :bind
   ("<S-f8>" . org-sidebar-tree-toggle)
-  )
-
-;; ** org-ql
-
-;; This package is required by org-sidebar
-
+)
 
 (use-package org-ql
   :ensure t
   :defer t
   :after org
-  )
-
-
-;; ** ox-extra (org-plus-contrib)
-
-;; ox-extras
-;; add suport for the ignore tag (ignores a headline without ignoring its content)
-
+)
 
 (use-package ox-extra
   :ensure nil
@@ -1749,13 +1172,7 @@ Example output:
   :config
   (ox-extras-activate '(ignore-headlines))
   (ox-extras-activate '(latex-header-blocks ignore-headlines))
-  )
-
-
-;; ** add more custom emacs emphasis characters
-
-;; first test
-
+)
 
 (require 'org-habit nil t)
 
@@ -1765,9 +1182,6 @@ Example output:
   (add-to-list 'org-font-lock-extra-keywords '("\\(%\\)\\([^\n\r\t]+\\)\\(%\\)" (1 '(face org-habit-overdue-face invisible t)) (2 'org-habit-overdue-face) (3 '(face org-habit-overdue-face invisible t)))))
 
 (add-hook 'org-font-lock-set-keywords-hook #'org-add-my-extra-fonts)
-
-
-;; ** ox-latex
 
 (use-package ox-latex
   :ensure nil
@@ -1792,13 +1206,7 @@ Example output:
   ;;   ;; LaTeX compilation command
   ;;   (setq org-latex-to-pdf-process (list texcmd)))
   ;; (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-cmd)
-  )
-
-
-;; ** ox-pandoc
-
-
-
+)
 
 (use-package ox-pandoc
   :after (org ox)
@@ -1813,13 +1221,7 @@ Example output:
   (setq org-pandoc-options-for-latex-pdf '((pdf-engine . "luatex")))
   ;; special extensions for markdown_github output
   (setq org-pandoc-format-extensions '(markdown_github+pipe_tables+raw_html))
-  )
-
-
-;; ** org-bullets
-
-;; UTF8 pretty bullets in org mode
-
+)
 
 (use-package org-bullets
   :ensure t
@@ -1828,13 +1230,7 @@ Example output:
   :config
   ;;(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   (setq org-bullets-bullet-list '("◉" "○" "●" "►" "•"))
-  )
-
-
-;; ** ReveaJS org-reveal:
-
-;; : This delay makes the options to export to RevealJS appear on the exporter menu (C-c C-e)
-
+)
 
 (use-package ox-reveal
   :ensure t
@@ -1842,10 +1238,7 @@ Example output:
   :after ox
   :config
   ;;(setq org-reveal-root "https://cdn.jsdelivr.net/reveal.js/3.0.0/")
-  )
-
-
-;; ** ox-markdown
+)
 
 (use-package ox-md
   :ensure nil
@@ -1853,21 +1246,11 @@ Example output:
   :after org
 )
 
-
-;; ** ox-gfm (github-flavored markdown)
-
 (use-package ox-gfm
   :ensure t
   :defer t
   :after org
 )
-
-
-
-;; * Shell
-
-;; ** shell-pop
-
 
 (use-package shell-pop
   :ensure t
@@ -1883,76 +1266,59 @@ Example output:
   (setq shell-pop-window-position "bottom")
   :bind
   ("C-c s" . shell-pop)
-  )
-
-
-;; ** System Shell
-;; *** Make system shell open in a split-window buffer at the bottom of the screen
-
+)
 
 (defun /shell/new-window ()
-  "Opens up a new shell in the directory associated with the current buffer's file."
-  (interactive)
-  (let* ((parent (if (buffer-file-name)
-                     (file-name-directory (buffer-file-name))
-                   default-directory))
-         (height (/ (window-total-height) 3))
-         (name   (car (last (split-string parent "/" t)))))
-    (split-window-vertically (- height))
-    (other-window 1)
-    (shell "new")
-    (rename-buffer (concat "*shell: " name "*"))
-    (insert (concat "ls"))
+    "Opens up a new shell in the directory associated with the current buffer's file."
+    (interactive)
+    (let* ((parent (if (buffer-file-name)
+                        (file-name-directory (buffer-file-name))
+                    default-directory))
+            (height (/ (window-total-height) 3))
+            (name   (car (last (split-string parent "/" t)))))
+        (split-window-vertically (- height))
+        (other-window 1)
+        (shell "new")
+        (rename-buffer (concat "*shell: " name "*"))
+        (insert (concat "ls"))
     )
-  )
+)
 
 ; Pull system shell in a new bottom window
 (define-key evil-normal-state-map (kbd "\"") #'/shell/new-window)
 (define-key evil-visual-state-map (kbd "\"") #'/shell/new-window)
 (define-key evil-motion-state-map (kbd "\"") #'/shell/new-window)
 
-
-
-;; ** Eshell
-
-;; *** Make eshell open in a split-window buffer at the bottom of the screen
-
-
 (defun /eshell/new-window ()
-  "Opens up a new eshell in the directory associated with the current buffer's file.  The eshell is renamed to match that directory to make multiple eshell windows easier."
-  (interactive)
-  (let* ((parent (if (buffer-file-name)
-                     (file-name-directory (buffer-file-name))
-                   default-directory))
-         (height (/ (window-total-height) 3))
-         (name   (car (last (split-string parent "/" t)))))
-    (split-window-vertically (- height))
-    (other-window 1)
-    (eshell "new")
-    (rename-buffer (concat "*eshell: " name "*"))
+    "Opens up a new eshell in the directory associated with the current buffer's file.  The eshell is renamed to match that directory to make multiple eshell windows easier."
+    (interactive)
+    (let* ((parent (if (buffer-file-name)
+                       (file-name-directory (buffer-file-name))
+                     default-directory))
+           (height (/ (window-total-height) 3))
+           (name   (car (last (split-string parent "/" t)))))
+      (split-window-vertically (- height))
+      (other-window 1)
+      (eshell "new")
+      (rename-buffer (concat "*eshell: " name "*"))
 
-    (insert (concat "ls"))
-    (eshell-send-input)))
+      (insert (concat "ls"))
+      (eshell-send-input)))
 
-                                        ; Pull eshell in a new bottom window
+; Pull eshell in a new bottom window
 (define-key evil-normal-state-map (kbd "!") #'/eshell/new-window)
 (define-key evil-visual-state-map (kbd "!") #'/eshell/new-window)
 (define-key evil-motion-state-map (kbd "!") #'/eshell/new-window)
-
-
-;; * Project Management
-
-;; ** Projectile
 
 (use-package projectile
   :ensure t
   :diminish projectile-mode
   :bind
   (:map projectile-mode-map
-        ("s-p" . projectile-command-map)
-        ("C-c p" . projectile-command-map)
-        ("M-S-O p" . counsel-projectile-switch-project)
-        )
+  ("s-p" . projectile-command-map)
+  ("C-c p" . projectile-command-map)
+  ("M-S-O p" . counsel-projectile-switch-project)
+  )
   :custom
   (projectile-completion-system 'ivy)
   :init
@@ -1965,21 +1331,15 @@ Example output:
                   ".swp"
                   ".pyc")
                 projectile-globally-ignored-files))
-  )
-
-
+)
 
 (use-package helm-projectile
   :ensure t
-                                        ;  :after projectile
-                                        ;  :demand t
+;  :after projectile
+;  :demand t
   :config
   (helm-projectile-on)
-  )
-
-
-;; ** org-kanban
-
+)
 
 (use-package org-kanban
   :ensure t
@@ -1987,12 +1347,7 @@ Example output:
   :after org
   :commands  (org-kanban/initialize)
   :config
-  )
-
-
-
-;; * Ivy
-
+)
 
 (use-package ivy
   :ensure t
@@ -2001,24 +1356,20 @@ Example output:
   (after-init . ivy-mode)
   :custom
   (ivy-re-builders-alist
-   '((t . ivy--regex-plus)))
+  '((t . ivy--regex-plus)))
   :config
   (ivy-mode)
   ;; display an arrow on the selected item in the list
   (setf (cdr (assoc t ivy-format-functions-alist)) #'ivy-format-function-arrow)
 
   (setq ivy-display-style 'fancy
-        ivy-use-virtual-buffers t
-        enable-recursive-minibuffers t
-        ivy-use-selectable-prompt t)
+     ivy-use-virtual-buffers t
+     enable-recursive-minibuffers t
+     ivy-use-selectable-prompt t)
   (ivy-set-actions  t
-                    '(("I" insert "insert")))
+  '(("I" insert "insert")))
   (ivy-set-occur 'ivy-switch-buffer 'ivy-switch-buffer-occur)
-  )
-
-
-;; ** counsel
-
+)
 
 (use-package counsel
   :ensure t
@@ -2044,14 +1395,14 @@ Example output:
     (ivy--format-function-generic
      (lambda (str)
        (concat
-        (all-the-icons-faicon "hand-o-right" :height .85 :v-adjust .05 :face 'font-lock-constant-face)
-        (ivy--add-face str 'ivy-current-match)))
+           (all-the-icons-faicon "hand-o-right" :height .85 :v-adjust .05 :face 'font-lock-constant-face)
+           (ivy--add-face str 'ivy-current-match)))
 
      (lambda (str)
        (concat "  " str))
      cands
      "\n")
-    )
+  )
   :bind
   ([remap execute-extended-command] . counsel-M-x)
   ([remap find-file] . counsel-find-file)
@@ -2082,28 +1433,28 @@ Example output:
   ("M-s r" . counsel-recentf)
   ("M-y" . counsel-yank-pop)
   (:map ivy-minibuffer-map
-        ("C-w" . ivy-backward-kill-word)
-        ("C-k" . ivy-kill-line)
-        ("C-j" . ivy-immediate-done)
-        ("RET" . ivy-alt-done)
-        ("C-h" . ivy-backward-delete-char))
+  ("C-w" . ivy-backward-kill-word)
+  ("C-k" . ivy-kill-line)
+  ("C-j" . ivy-immediate-done)
+  ("RET" . ivy-alt-done)
+  ("C-h" . ivy-backward-delete-char))
   (:map minibuffer-local-map
-        ("C-r" . counsel-minibuffer-history))
+  ("C-r" . counsel-minibuffer-history))
   :config
   ;; NOTE: this variable do not work if defined in :custom
   (setq ivy-format-function 'ivy-format-function-pretty)
   (setq counsel-yank-pop-separator
-        (propertize "\n────────────────────────────────────────────────────────\n"
-                    'face `(:foreground "#6272a4")))
+      (propertize "\n────────────────────────────────────────────────────────\n"
+             'face `(:foreground "#6272a4")))
 
   (setq counsel-find-file-ignore-regexp "\\(?:^[#.]\\)\\|\\(?:[#~]$\\)\\|\\(?:^Icon?\\)"
-        counsel-describe-function-function #'helpful-callable
-        counsel-describe-variable-function #'helpful-variable
-        ;; Add smart-casing (-S) to default command arguments:
-        counsel-rg-base-command "rg -S --no-heading --line-number --color never %s ."
-        counsel-ag-base-command "ag -S --nocolor --nogroup %s"
-        counsel-pt-base-command "pt -S --nocolor --nogroup -e %s"
-        counsel-find-file-at-point t)
+     counsel-describe-function-function #'helpful-callable
+     counsel-describe-variable-function #'helpful-variable
+     ;; Add smart-casing (-S) to default command arguments:
+     counsel-rg-base-command "rg -S --no-heading --line-number --color never %s ."
+     counsel-ag-base-command "ag -S --nocolor --nogroup %s"
+     counsel-pt-base-command "pt -S --nocolor --nogroup -e %s"
+    counsel-find-file-at-point t)
 
   ;; Integration with `projectile'
   (with-eval-after-load 'projectile
@@ -2112,40 +1463,22 @@ Example output:
   ;; Integration with `magit'
   (with-eval-after-load 'magit
     (setq magit-completing-read-function 'ivy-completing-read))
-  )
-
-
-;; *** Enhance fuzzy matching
-
+)
 
 (use-package flx
   :ensure t
-  )
-
-
-;; *** Enhance M-x
-
+)
 
 (use-package amx
-  :disabled
+:disabled
   :ensure t
-  )
-
-
-;; *** Ivy integration for Projectile
-
+)
 
 (use-package counsel-projectile
   :ensure t
   :after ivy projectile
   :config (counsel-projectile-mode 1)
-  )
-
-
-;; ** ivy-posframe
-
-;; Requires: Emacs >= 26
-
+)
 
 (use-package ivy-posframe
   :ensure t
@@ -2169,11 +1502,7 @@ Example output:
           (counsel-M-x     . ivy-posframe-display-at-frame-center)
           (t               . ivy-posframe-display-at-frame-center)))
   (ivy-posframe-mode 1)
-  )
-
-
-;; ** ivy-rich
-
+)
 
 (use-package ivy-rich
   :ensure t
@@ -2183,76 +1512,124 @@ Example output:
 
   ;; use all-the-icons for `ivy-switch-buffer'
   (defun ivy-rich-switch-buffer-icon (candidate)
-    (with-current-buffer
-        (get-buffer candidate)
+     (with-current-buffer
+      (get-buffer candidate)
       (let ((icon (all-the-icons-icon-for-mode major-mode)))
         (if (symbolp icon)
-            (all-the-icons-icon-for-mode 'fundamental-mode)
+        (all-the-icons-icon-for-mode 'fundamental-mode)
           icon))))
   ;; add the above function to `ivy-rich--display-transformers-list'
   (setq ivy-rich--display-transformers-list
-        '(ivy-switch-buffer
-          (:columns
-           ((ivy-rich-switch-buffer-icon :width 2)
-            (ivy-rich-candidate (:width 30))
-            (ivy-rich-switch-buffer-size (:width 7))
-            (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
-            (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))
-            (ivy-rich-switch-buffer-project (:width 15 :face success))
-            (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
-           :predicate
-           (lambda (cand) (get-buffer cand)))))
+      '(ivy-switch-buffer
+        (:columns
+         ((ivy-rich-switch-buffer-icon :width 2)
+          (ivy-rich-candidate (:width 30))
+          (ivy-rich-switch-buffer-size (:width 7))
+          (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
+          (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))
+          (ivy-rich-switch-buffer-project (:width 15 :face success))
+          (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
+         :predicate
+         (lambda (cand) (get-buffer cand)))))
+)
+
+(use-package helm
+  :ensure t
+  :defer t
+  :diminish helm-mode
+  :bind
+  ;; ("M-x" . helm-M-x)
+  ("C-c h" . helm-command-prefix)
+  ("C-x b" . helm-buffers-list)
+  ("C-x C-b" . helm-mini)
+  ("C-x C-f" . helm-find-files)
+  ("C-x r b" . helm-bookmarks)
+  ("M-y" . helm-show-kill-ring)
+  ("M-:" . helm-eval-expression-with-eldoc)
+  (:map helm-map
+  ("C-z" . helm-select-action)
+  ("C-h a" . helm-apropos)
+  ("C-c h" . helm-execute-persistent-action)
+  ("<tab>" . helm-execute-persistent-action)
   )
+  :init
+  (setq helm-autoresize-mode t)
+  (setq helm-buffer-max-length 40)
+  (setq helm-bookmark-show-location t)
+  (setq helm-buffer-max-length 40)
+  (setq helm-split-window-inside-p t)
 
+  ;; turn on helm fuzzy matching
+  (setq helm-M-x-fuzzy-match t)
+  (setq helm-mode-fuzzy-match t)
 
-;; * Helm
+  (setq helm-ff-file-name-history-use-recentf t)
+  (setq helm-ff-skip-boring-files t)
+  (setq helm-follow-mode-persistent t)
+  ;; take between 10-30% of screen space
+  (setq helm-autoresize-min-height 10)
+  (setq helm-autoresize-max-height 30)
+  :config
+  (require 'helm-config)
+  (helm-mode 1)
+  ;; Make helm replace the default Find-File and M-x
+  ;;(global-set-key [remap execute-extended-command] #'helm-M-x)
+  ;; (global-set-key [remap find-file] #'helm-find-files)
+  ;; helm bindings
+  (global-unset-key (kbd "C-x c"))
+)
 
+(use-package helm-ag
+  :ensure helm-ag
+  :bind ("M-p" . helm-projectile-ag)
+  :commands (helm-ag helm-projectile-ag)
+  :init
+  (setq helm-ag-insert-at-point 'symbol)
+  (setq  helm-ag-command-option "--path-to-ignore ~/.agignore")
+)
 
-;; * abbrev
+(use-package helm-rg
+  :ensure t
+  :defer t
+)
 
+(use-package helm-fuzzier
+  :disabled nil
+  :ensure t
+  :after helm
+  :config
+  (helm-fuzzier-mode 1)
+)
 
 (use-package abbrev
   :ensure nil
   :config
   (define-abbrev-table 'global-abbrev-table '(
-                                              ("alpha" "α")
-                                              ("infinity" "∞")
-                                              ("arrow" "→")
-                                              ))
-  )
-
-;; * Hydra
-
+      ("alpha" "α")
+      ("infinity" "∞")
+      ("arrow" "→")
+      ))
+)
 
 (use-package hydra
   :ensure t
   :defer t
-  )
-
-
-;; ** major mode hydra
+)
 
 (use-package major-mode-hydra
   :ensure t)
-
-
-;; **  hydra-posframe
-
 
 (use-package hydra-posframe
   :load-path "packages/hydra-posframe"
   :custom
   (hydra-posframe-parameters
-   '((left-fringe . 5)
-     (right-fringe . 5)))
+    '((left-fringe . 5)
+      (right-fringe . 5)))
   :custom-face
   (hydra-posframe-border-face ((t (:background "#6272a4"))))
   :hook
   (after-init . hydra-posframe-mode)
-  )
-
-;; * occur mode
-
+)
 
 (use-package occur-mode
   :ensure nil
@@ -2265,10 +1642,7 @@ Example output:
     (kbd "C-d")     'evil-scroll-down
     (kbd "C-u")     'evil-scroll-up
     (kbd "C-w C-w") 'other-window)
-  )
-
-
-;; * ag
+)
 
 (use-package ag
   :ensure t
@@ -2283,11 +1657,7 @@ Example output:
   ("M-s a" . ag-project)
   :config
   (use-package wgrep-ag)
-  )
-
-
-;; * wgrep
-
+)
 
 (use-package wgrep
   :ensure t
@@ -2296,11 +1666,7 @@ Example output:
   (wgrep-enable-key "e")
   (wgrep-auto-save-buffer t)
   (wgrep-change-readonly-file t)
-  )
-
-
-;; * ripgrep
-
+)
 
 (use-package rg
   :ensure t
@@ -2313,13 +1679,7 @@ Example output:
   (rg-enable-default-bindings)
   ;;(rg-enable-menu)
 
-  )
-
-
-
-
-;; * FlyCheck linter
-
+)
 
 (use-package flycheck
   :ensure t
@@ -2365,11 +1725,7 @@ Example output:
     '(flycheck-add-mode 'html-tidy 'web-mode))
   (eval-after-load 'flycheck
     '(flycheck-add-mode 'typescript-tslint 'web-mode))
-  )
-
-
-;; ** flycheck posframe
-
+)
 
 (use-package flycheck-posframe
   :ensure t
@@ -2390,18 +1746,7 @@ Example output:
   (setq flycheck-posframe-border-width 2)
   ;; Calling (flycheck-posframe-configure-pretty-defaults) will configure flycheck-posframe to show warnings and errors with nicer faces (inheriting from warning and error respectively), and set the prefix for each to nicer unicode characters.
   ;;(flycheck-posframe-configure-pretty-defaults)
-  )
-
-
-
-;; * Version Control
-
-;; Always try to make bindings like this:
-;; M-g for magit
-;; C-c g for any git related stuff other than magit's
-
-;; ** Magit
-
+)
 
 (use-package magit
   :ensure t
@@ -2417,10 +1762,7 @@ Example output:
   :config
   (add-hook 'after-save-hook 'magit-after-save-refresh-status t)
 
-  )
-
-
-;; ** evil-magit
+)
 
 (use-package evil-magit
   :ensure t
@@ -2433,7 +1775,7 @@ Example output:
   (evil-define-key evil-magit-state magit-mode-map "l" 'magit-log-popup)
   (evil-define-key evil-magit-state magit-mode-map "j" 'evil-next-visual-line)
   (evil-define-key evil-magit-state magit-mode-map "k" 'evil-previous-visual-line)
-                                        ;(evil-define-key evil-magit-state magit-diff-map "k" 'evil-previous-visual-line)
+  ;(evil-define-key evil-magit-state magit-diff-map "k" 'evil-previous-visual-line)
   (evil-define-key evil-magit-state magit-staged-section-map "K" 'magit-discard)
   (evil-define-key evil-magit-state magit-unstaged-section-map "K" 'magit-discard)
   (evil-define-key evil-magit-state magit-unstaged-section-map "K" 'magit-discard)
@@ -2441,21 +1783,12 @@ Example output:
   (evil-define-key evil-magit-state magit-remote-section-map "K" 'magit-remote-remove)
   (evil-define-key evil-magit-state magit-stash-section-map "K" 'magit-stash-drop)
   (evil-define-key evil-magit-state magit-stashes-section-map "K" 'magit-stash-clear)
-  )
-
-
-;; ** diffview
-;; View diffs side by side
-
+)
 
 (use-package diffview
   :ensure t
   :defer t
-  )
-
-
-;; ** magit-todo
-
+)
 
 (use-package magit-todos
   :ensure t
@@ -2464,11 +1797,7 @@ Example output:
   ("M-g t" . magit-todos-list)
   :config
   (magit-todos-mode)
-  )
-
-
-;; ** git-messenger
-
+)
 
 (use-package git-messenger
   :ensure t
@@ -2480,11 +1809,7 @@ Example output:
   :config
   (progn
     (define-key git-messenger-map (kbd "RET") 'git-messenger:popup-close))
-  )
-
-
-;; ** vc-msg
-
+)
 
 (use-package vc-msg
   :ensure t
@@ -2497,49 +1822,26 @@ Example output:
   :config
   (progn
     (define-key git-messenger-map (kbd "RET") 'git-messenger:popup-close))
-  )
-
-
-;; ** git-ignore mode
-
-
-;; ** git-modes
-
-;; Major modes for git related files
-
+)
 
 ;; Mode for .gitignore files.
 (use-package gitignore-mode :ensure t :defer t)
 (use-package gitconfig-mode :ensure t :defer t)
 (use-package gitattributes-mode :ensure t :defer t)
 
-
-;; ** git-time-machine
-
-;; Navigation through the history of files
-
-
 (use-package git-timemachine
   :ensure t
   :bind
   ("C-c g t" . git-timemachine-toggle)
-  )
-
-
-
+)
 
 (use-package forge
-  :ensure t
-  :after magit
-  :config
-  (setq forge-topic-list-limit '(30 . 5)
-        forge-pull-notifications t)
-  )
-
-
-
-;; * restclient
-
+    :ensure t
+    :after magit
+    :config
+    (setq forge-topic-list-limit '(30 . 5)
+          forge-pull-notifications t)
+)
 
 (use-package restclient
   :ensure t
@@ -2554,13 +1856,7 @@ Example output:
                  (local-set-key
                   (kbd "C-c C-c")
                   'restclient-http-send-current-stay-in-window))))
-  )
-
-
-;; ** ob-restclient
-
-;; Org source blocks and exporter for restclient
-
+)
 
 (use-package ob-restclient
   :ensure t
@@ -2570,24 +1866,15 @@ Example output:
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((restclient . t)))
-  )
-
-
-;; * undo-tree
+)
 
 (use-package undo-tree
   :ensure t
   :diminish undo-tree-mode
   :init
   (global-undo-tree-mode)
-  ;;  (undo-tree-mode)
-  )
-
-
-;; * helpfull
-
-;; A better replacement for emacs help system
-
+;;  (undo-tree-mode)
+)
 
 (use-package helpful
   :ensure t
@@ -2612,20 +1899,12 @@ Example output:
   ;; don't find this very useful, but it's frequently useful to only
   ;; look at interactive functions.
   (global-set-key (kbd "C-h C") #'helpful-command)
-  )
-
-
-;; * elisp-format
-
+)
 
 (use-package elisp-format
   :ensure t
   :defer t
-  )
-
-
-;; * Company
-
+)
 
 (use-package company
   :ensure t
@@ -2653,19 +1932,19 @@ If failed try to complete the common part with `company-complete-common'"
         ([tab] . smarter-yas-expand-next-field-complete)
         ("TAB" . smarter-yas-expand-next-field-complete))
   (:map evil-insert-state-map
-        ;; ("<tab>" . company-indent-or-complete-common)
-        ("C-SPC" . company-indent-or-complete-common))
+  ;; ("<tab>" . company-indent-or-complete-common)
+  ("C-SPC" . company-indent-or-complete-common))
   (:map company-active-map
-        ("M-n" . nil)
-        ("M-p" . nil)
-        ("C-n" . company-select-next)
-        ("C-p" . company-select-previous)
-        ("S-<backtab>" . company-select-previous)
-        ("<backtab>" . company-select-previous)
-        ("C-d" . company-show-doc-buffer))
+  ("M-n" . nil)
+  ("M-p" . nil)
+  ("C-n" . company-select-next)
+  ("C-p" . company-select-previous)
+  ("S-<backtab>" . company-select-previous)
+  ("<backtab>" . company-select-previous)
+  ("C-d" . company-show-doc-buffer))
   (:map company-search-map
-        ("C-p" . company-select-previous)
-        ("C-n" . company-select-next))
+  ("C-p" . company-select-previous)
+  ("C-n" . company-select-next))
   :custom-face
   (company-preview-common ((t (:foreground unspecified :background "#111111"))))
   (company-scrollbar-bg ((t (:background "#111111"))))
@@ -2698,30 +1977,22 @@ If failed try to complete the common part with `company-complete-common'"
     (bind-key [remap completion-at-point] #'company-complete company-mode-map))
   ;; Frontends
   (setq company-frontends '(company-pseudo-tooltip-frontend
-                            company-echo-metadata-frontend))
-  )
-
-
-;; ** Company-QuickHelp
+                          company-echo-metadata-frontend))
+)
 
 (use-package company-quickhelp          ; Documentation popups for Company
-  :ensure t
-  ;; :defer t
-  :hook
-  (global-company-mode . company-quickhelp-mode)
-  :bind
-  (:map company-active-map
-        ("M-h" . company-quickhelp-manual-begin)
-        )
-  :config
-  (setq company-quickhelp-delay 0.7)
-  (company-quickhelp-mode)
-  )
-
-
-;; ** Company postframe
-
-;; : PS: this looks exactly the same as the usual company popup, except it doesn't disturb other overlays (like line numbers) in the buffer.
+   :ensure t
+   ;; :defer t
+   :hook
+   (global-company-mode . company-quickhelp-mode)
+   :bind
+   (:map company-active-map
+   ("M-h" . company-quickhelp-manual-begin)
+   )
+   :config
+   (setq company-quickhelp-delay 0.7)
+   (company-quickhelp-mode)
+)
 
 (use-package company-posframe
   :ensure t
@@ -2730,10 +2001,7 @@ If failed try to complete the common part with `company-complete-common'"
   :hook
   (company-mode . company-posframe-mode)
   (global-company-mode . company-posframe-mode)
-  )
-
-
-;; ** Company Box (icons in suggestions)
+)
 
 ;; CompanyBoxPac
 (use-package company-box
@@ -2829,11 +2097,6 @@ If failed try to complete the common part with `company-complete-common'"
           company-box-icons-alist 'company-box-icons-all-the-icons)))
 ;; -CompanyBoxPac
 
-
-;; ** company-lsp
-
-;; Company-lsp is auto inserted into company backends
-
 (use-package company-lsp
   :ensure t
   :custom
@@ -2841,14 +2104,7 @@ If failed try to complete the common part with `company-complete-common'"
   (company-lsp-async t)
   (company-lsp-cache-candidates 'auto)
   (company-lsp-enable-recompletion t)
-  )
-
-
-
-;; * LSP
-
-;; ** LSP (language server protocol implementation for emacs)
-
+)
 
 (use-package lsp-mode
   :ensure t
@@ -2864,29 +2120,26 @@ If failed try to complete the common part with `company-complete-common'"
   (lsp-prefer-flymake nil) ;; use flycheck instead of flymake
   (lsp-enable-symbol-highlighting nil)
   (lsp-signature-auto-activate nil)
-                                        ;debug
+  ;debug
   (lsp-print-io nil)
   (lsp-trace nil)
   (lsp-print-performance nil)
   :config
   ;; angular language server
   (setq lsp-clients-angular-language-server-command
-        '("node"
-          "~/.nvm/versions/node/v10.16.3/lib/node_modules/@angular/language-server"
-          "--ngProbeLocations"
-          "~/.nvm/versions/node/v10.16.3/lib/node_modules"
-          "--tsProbeLocations"
-          "~/.nvm/versions/node/v10.16.3/lib/node_modules"
-          "--stdio"))
-  )
-
-
-;; ** lsp ui
+    '("node"
+      "~/.nvm/versions/node/v10.16.3/lib/node_modules/@angular/language-server"
+      "--ngProbeLocations"
+      "~/.nvm/versions/node/v10.16.3/lib/node_modules"
+      "--tsProbeLocations"
+      "~/.nvm/versions/node/v10.16.3/lib/node_modules"
+      "--stdio"))
+)
 
 (use-package lsp-ui
   :ensure t
   :after lsp-mode
-  :hook
+  ;;:hook
   (lsp-mode . lsp-ui-mode)
   :custom-face
   (lsp-ui-doc-background ((t (:background nil))))
@@ -2895,27 +2148,27 @@ If failed try to complete the common part with `company-complete-common'"
   (defun tau/toggle-lsp-ui-doc ()
     (interactive)
     (if lsp-ui-doc-mode
-        (progn
-          (lsp-ui-doc-mode -1)
-          (lsp-ui-doc--hide-frame))
-      (lsp-ui-doc-mode 1)))
+      (progn
+        (lsp-ui-doc-mode -1)
+        (lsp-ui-doc--hide-frame))
+    (lsp-ui-doc-mode 1)))
   :bind
-  (:map lsp-mode-map
-        ("C-c l p f r" . lsp-ui-peek-find-references)
-        ("C-c l p f d" . lsp-ui-peek-find-definitions)
-        ("C-c l p f i" . lsp-ui-peek-find-implementation)
-        ("C-c l g d" . lsp-goto-type-definition)
-        ("C-c l f d" . lsp-find-definition)
-        ("C-c l g i" . lsp-goto-implementation)
-        ("C-c l f i" . lsp-find-implementation)
-        ("C-c l m"   . lsp-ui-imenu)
-        ("C-c l s"   . lsp-ui-sideline-mode)
-        ("C-c l d"   . tau/toggle-lsp-ui-doc))
-  ;; remap native find-definitions and references to use lsp-ui
-  (:map lsp-ui-mode-map
-        ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-        ([remap xref-find-references] . lsp-ui-peek-find-references)
-        ("C-c u" . lsp-ui-imenu))
+    (:map lsp-mode-map
+      ("C-c l p f r" . lsp-ui-peek-find-references)
+      ("C-c l p f d" . lsp-ui-peek-find-definitions)
+      ("C-c l p f i" . lsp-ui-peek-find-implementation)
+      ("C-c l g d" . lsp-goto-type-definition)
+      ("C-c l f d" . lsp-find-definition)
+      ("C-c l g i" . lsp-goto-implementation)
+      ("C-c l f i" . lsp-find-implementation)
+      ("C-c l m"   . lsp-ui-imenu)
+      ("C-c l s"   . lsp-ui-sideline-mode)
+      ("C-c l d"   . tau/toggle-lsp-ui-doc))
+    ;; remap native find-definitions and references to use lsp-ui
+    (:map lsp-ui-mode-map
+      ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+      ([remap xref-find-references] . lsp-ui-peek-find-references)
+      ("C-c u" . lsp-ui-imenu))
   :custom
   ;; lsp-ui-doc
   (lsp-ui-doc-enable nil)
@@ -2951,23 +2204,16 @@ If failed try to complete the common part with `company-complete-common'"
   ;; lsp-ui appearance
   (set-face-attribute 'lsp-ui-doc-background  nil :background "#f9f2d9")
   (add-hook 'lsp-ui-doc-frame-hook
-            (lambda (frame _w)
-              (set-face-attribute 'default frame :font "Hack 11")))
+    (lambda (frame _w)
+      (set-face-attribute 'default frame :font "Hack 11")))
 
   (set-face-attribute 'lsp-ui-sideline-global nil
                       :inherit 'shadow
                       :background "#f9f2d9")
   ;; Use lsp-ui-doc-webkit only in GUI
   (if (window-system)
-      (setq lsp-ui-doc-use-webkit t))
-  )
-
-
-
-;; ** lsp flycheck
-
-;; ** dap - debug adapter protocol
-
+    (setq lsp-ui-doc-use-webkit t))
+)
 
 (use-package dap-mode
   :ensure t
@@ -3001,35 +2247,22 @@ If failed try to complete the common part with `company-complete-common'"
   ;; (tooltip-mode 1)
   ;; dap-mode also provides a hydra with dap-hydra. You can automatically trigger the hydra when the program hits a breakpoint by using the following code.
   (add-hook 'dap-stopped-hook
-            (lambda (arg) (call-interactively #'dap-hydra)))
-  )
-
-
-;; ** lsp treemacs
-
+          (lambda (arg) (call-interactively #'dap-hydra)))
+)
 
 (use-package lsp-treemacs
   :ensure t
   :defer t
   :init
   (setq lsp-treemacs-sync-mode 1)
-  )
-
-
-;; ** lsp-ivy
-
+)
 
 (use-package lsp-ivy
   :ensure t
   :defer t
   :bind
   ("C-c l i s" . lsp-ivy-workspace-symbol)
-  )
-
-
-
-;; * Yasnippets
-
+)
 
 (use-package yasnippet
   :ensure t
@@ -3041,38 +2274,30 @@ If failed try to complete the common part with `company-complete-common'"
   ;; ("<tab>" . yas-maybe-expand)
   ("C-<tab>" . yas-maybe-expand)
   (:map yas-minor-mode-map
-        ;; yas-maybe-expand only expands if there are candidates.
-        ;; if not, acts like binding is unbound and run whatever command is bound to that key normally
-        ;; ("<tab>" . yas-maybe-expand)
-        ;; Bind `C-c y' to `yas-expand' ONLY.
-        ("C-c y" . yas-expand)
-        ("C-SPC" . yas-expand)
-        )
+  ;; yas-maybe-expand only expands if there are candidates.
+  ;; if not, acts like binding is unbound and run whatever command is bound to that key normally
+  ;; ("<tab>" . yas-maybe-expand)
+  ;; Bind `C-c y' to `yas-expand' ONLY.
+  ("C-c y" . yas-expand)
+  ("C-SPC" . yas-expand)
+  )
   :config
   ;; set snippets directory
   ;;  (setq yas-snippet-dirs '(yasnippet-snippets-dir))
   ;; add angular snippets folder
   (with-eval-after-load 'yasnippets-snippets
-    (setq yas-snippet-dirs (append yas-snippet-dirs
-                                   '("~/dotfiles/emacs.d/snippets/angular/"))))
+  (setq yas-snippet-dirs (append yas-snippet-dirs
+                                 '("~/dotfiles/emacs.d/snippets/angular/"))))
   (setq yas-verbosity 1)                      ; No need to be so verbose
   (setq yas-wrap-around-region t)
   (yas-reload-all) ;; tell yasnippet about updates to yas-snippet-dirs
   ;; disabled global mode in favor or hooks in prog and text modes only
   ;; (yas-global-mode 1)
-  )
-
-
+)
 
 (use-package yasnippet-snippets         ; Collection of snippets
   :ensure t
-  )
-
-
-
-;; * File Explorers
-
-;; ** ivy-explorer
+)
 
 (use-package ivy-explorer
   :ensure t
@@ -3081,11 +2306,7 @@ If failed try to complete the common part with `company-complete-common'"
   (after-init . ivy-explorer-mode)
   :config
   ;; use ivy explorer for all file dialogs
-  )
-
-
-;; ** Dired
-
+)
 
 (use-package dired-k
   :after dired
@@ -3094,259 +2315,233 @@ If failed try to complete the common part with `company-complete-common'"
   (setq dired-k-human-readable t)
   (setq dired-dwin-target t)
   (add-hook 'dired-initial-position-hook #'dired-k)
-  )
-
-
-;; ** all the icons dired
+)
 
 (use-package all-the-icons-dired
   :ensure t
   :defer t
   :hook
   (dired-mode . all-the-icons-dired-mode)
-  )
-
-
-;; ** Treemacs (neotree like navigation)
-
-
-;; *** Treemacs itself
+)
 
 (use-package treemacs
-  :ensure t
-  :defer t
-  :hook
-  (after-init . treemacs)
-  :bind
-  (:map global-map
-        ("<f8>"       . treemacs)
-        ("M-0"       . treemacs-select-window)
-        ("C-x t 1"   . treemacs-delete-other-windows)
-        ("C-x t t"   . treemacs)
-        ("C-x t B"   . treemacs-bookmark)
-        ("C-x t C-t" . treemacs-find-file)
-        ("C-x t M-t" . treemacs-find-tag))
-  :custom
-  ;; general variables
-  (treemacs-no-png-images nil)
-  (treemacs-deferred-git-apply-delay 0.5)
-  (treemacs-display-in-side-window t)
-  (treemacs-eldoc-display t)
-  (treemacs-file-event-delay 5000)
-  (treemacs-file-follow-delay 0.2)
-  (treemacs-follow-after-init t)
-  (treemacs-git-command-pipe "")
-  (treemacs-goto-tag-strategy 'refetch-index)
-  (treemacs-indentation 2)
-  (treemacs-indentation-string " ")
-  (treemacs-is-never-other-window nil)
-  (treemacs-max-git-entries 5000)
-  (treemacs-missing-project-action 'ask)
-  (treemacs-no-delete-other-windows t)
-  (treemacs-project-follow-cleanup nil)
-  (treemacs-persist-file (expand-file-name ".cache/treemacs-persist" user-emacs-directory))
-  (treemacs-position 'left)
-  (treemacs-recenter-distance 0.1)
-  (treemacs-recenter-after-file-follow nil)
-  (treemacs-recenter-after-tag-follow nil)
-  (treemacs-recenter-after-project-jump 'always)
-  (treemacs-recenter-after-project-expand 'on-distance)
-  (treemacs-show-cursor nil)
-  (treemacs-show-hidden-files t)
-  (treemacs-silent-filewatch nil)
-  (treemacs-silent-refresh nil)
-  (treemacs-sorting 'alphabetic-desc)
-  (treemacs-space-between-root-nodes t)
-  (treemacs-tag-follow-cleanup t)
-  (treemacs-tag-follow-delay 1.5)
-  (treemacs-width 35)
-  :config
+   :ensure t
+   :defer t
+   :hook
+   (after-init . treemacs)
+   :bind
+   (:map global-map
+         ("<f8>"       . treemacs)
+         ("M-0"       . treemacs-select-window)
+         ("C-x t 1"   . treemacs-delete-other-windows)
+         ("C-x t t"   . treemacs)
+         ("C-x t B"   . treemacs-bookmark)
+         ("C-x t C-t" . treemacs-find-file)
+         ("C-x t M-t" . treemacs-find-tag))
+   :init
+   ;; general variables
+   (setq treemacs-no-png-images nil)
+   (setq treemacs-deferred-git-apply-delay 0.5)
+   (setq treemacs-display-in-side-window t)
+   (setq treemacs-eldoc-display t)
+   (setq treemacs-file-event-delay 5000)
+   (setq treemacs-file-follow-delay 0.2)
+   (setq treemacs-follow-after-init t)
+   (setq treemacs-git-command-pipe "")
+   (setq treemacs-goto-tag-strategy 'refetch-index)
+   (setq treemacs-indentation 2)
+   (setq treemacs-indentation-string " ")
+   (setq treemacs-is-never-other-window nil)
+   (setq treemacs-max-git-entries 5000)
+   (setq treemacs-missing-project-action 'ask)
+   (setq treemacs-no-delete-other-windows t)
+   (setq treemacs-project-follow-cleanup nil)
+   (setq treemacs-persist-file (expand-file-name ".cache/treemacs-persist" user-emacs-directory))
+   (setq treemacs-position 'left)
+   (setq treemacs-recenter-distance 0.1)
+   (setq treemacs-recenter-after-file-follow nil)
+   (setq treemacs-recenter-after-tag-follow nil)
+   (setq treemacs-recenter-after-project-jump 'always)
+   (setq treemacs-recenter-after-project-expand 'on-distance)
+   (setq treemacs-show-cursor nil)
+   (setq treemacs-show-hidden-files t)
+   (setq treemacs-silent-filewatch nil)
+   (setq treemacs-silent-refresh nil)
+   (setq treemacs-sorting 'alphabetic-desc)
+   (setq treemacs-space-between-root-nodes t)
+   (setq treemacs-tag-follow-cleanup t)
+   (setq treemacs-tag-follow-delay 1.5)
+   (setq treemacs-width 35)
+   :config
 
-  (setq treemacs-collapse-dirs (if treemacs-python-executable 3 0))
-  (add-hook 'treemacs-mode-hook #'hide-mode-line-mode)
-  (add-hook 'treemacs-mode-hook (lambda ()
-                                  (linum-mode -1)
-                                  (fringe-mode 0)
-                                  ;; (setq buffer-face-mode-face `(:background "#211C1C"))
-                                  (buffer-face-mode 1)))
+   (setq treemacs-collapse-dirs (if treemacs-python-executable 3 0))
+   (add-hook 'treemacs-mode-hook #'hide-mode-line-mode)
+   (add-hook 'treemacs-mode-hook (lambda ()
+                                   (linum-mode -1)
+                                   (fringe-mode 0)
+                                   ;; (setq buffer-face-mode-face `(:background "#211C1C"))
+                                   (buffer-face-mode 1)))
 
 
-  (treemacs-follow-mode t)
-  (treemacs-filewatch-mode t)
-  (treemacs-fringe-indicator-mode t)
-  (pcase (cons (not (null (executable-find "git")))
-               (not (null treemacs-python-executable)))
-    (`(t . t)
-     (treemacs-git-mode 'deferred))
-    (`(t . _)
-     (treemacs-git-mode 'simple)))
+   (treemacs-follow-mode t)
+   (treemacs-filewatch-mode t)
+   (treemacs-fringe-indicator-mode t)
+   (pcase (cons (not (null (executable-find "git")))
+                (not (null treemacs-python-executable)))
+     (`(t . t)
+      (treemacs-git-mode 'deferred))
+     (`(t . _)
+      (treemacs-git-mode 'simple)))
 
   ;; my vscode icon theme, using vscode-icons
   ;; i just placed the vscode-icons folder inside the treemacs icons vfolder and changed paths
   (defcustom tau-themes-treemacs-theme "vscode"
-    "Default treemacs theme."
-    :type '(radio (const :doc "A minimalistic atom-inspired icon theme" "doom-atom")
-                  (const :doc "A colorful icon theme leveraging all-the-icons" "doom-colors"))
-    :group 'tau-themes-treemacs)
+  "Default treemacs theme."
+  :type '(radio (const :doc "A minimalistic atom-inspired icon theme" "doom-atom")
+                (const :doc "A colorful icon theme leveraging all-the-icons" "doom-colors"))
+  :group 'tau-themes-treemacs)
 
   ;; warn if all-the-icons isnt sinstalled
   (with-eval-after-load 'treemacs
-    (unless (require 'all-the-icons nil t)
-      (error "all-the-icons isn't installed"))
+  (unless (require 'all-the-icons nil t)
+    (error "all-the-icons isn't installed"))
 
-    (let ((face-spec '(:inherit font-lock-doc-face :slant normal)))  ;; taken from doom-treemacs -theme to use all theicons in some parts
-      (treemacs-create-theme "vscode"
-                             :icon-directory (f-join treemacs-dir "icons/default")
-                             :config
-                             (progn
-                               ;; directory and other icons
-                               ;; (treemacs-create-icon :file "root.png"        :extensions (root)       :fallback "")
-                               (treemacs-create-icon
-                                :icon (format " %s\t" (all-the-icons-octicon "repo" :height 1.2 :v-adjust -0.1 :face face-spec))
-                                :extensions (root))
-                               (treemacs-create-icon :file "vscode/default_folder.png"  :extensions (dir-closed) :fallback (propertize "+ " 'face 'treemacs-term-node-face))
-                               (treemacs-create-icon :file "vscode/default_folder_opened.png"    :extensions (dir-open)   :fallback (propertize "- " 'face 'treemacs-term-node-face))
-                               (treemacs-create-icon :file "tags-leaf.png"   :extensions (tag-leaf)   :fallback (propertize "• " 'face 'font-lock-constant-face))
-                               (treemacs-create-icon :file "tags-open.png"   :extensions (tag-open)   :fallback (propertize "▸ " 'face 'font-lock-string-face))
-                               (treemacs-create-icon :file "tags-closed.png" :extensions (tag-closed) :fallback (propertize "▾ " 'face 'font-lock-string-face))
-                               (treemacs-create-icon :file "error.png"       :extensions (error)      :fallback (propertize "• " 'face 'font-lock-string-face))
-                               (treemacs-create-icon :file "warning.png"     :extensions (warning)    :fallback (propertize "• " 'face 'font-lock-string-face))
-                               (treemacs-create-icon :file "info.png"        :extensions (info)       :fallback (propertize "• " 'face 'font-lock-string-face))
+  (let ((face-spec '(:inherit font-lock-doc-face :slant normal)))  ;; taken from doom-treemacs -theme to use all theicons in some parts
+  (treemacs-create-theme "vscode"
+    :icon-directory (f-join treemacs-dir "icons/default")
+    :config
+    (progn
+      ;; directory and other icons
+      ;; (treemacs-create-icon :file "root.png"        :extensions (root)       :fallback "")
+       (treemacs-create-icon
+         :icon (format " %s\t" (all-the-icons-octicon "repo" :height 1.2 :v-adjust -0.1 :face face-spec))
+         :extensions (root))
+      (treemacs-create-icon :file "vscode/default_folder.png"  :extensions (dir-closed) :fallback (propertize "+ " 'face 'treemacs-term-node-face))
+      (treemacs-create-icon :file "vscode/default_folder_opened.png"    :extensions (dir-open)   :fallback (propertize "- " 'face 'treemacs-term-node-face))
+      (treemacs-create-icon :file "tags-leaf.png"   :extensions (tag-leaf)   :fallback (propertize "• " 'face 'font-lock-constant-face))
+      (treemacs-create-icon :file "tags-open.png"   :extensions (tag-open)   :fallback (propertize "▸ " 'face 'font-lock-string-face))
+      (treemacs-create-icon :file "tags-closed.png" :extensions (tag-closed) :fallback (propertize "▾ " 'face 'font-lock-string-face))
+      (treemacs-create-icon :file "error.png"       :extensions (error)      :fallback (propertize "• " 'face 'font-lock-string-face))
+      (treemacs-create-icon :file "warning.png"     :extensions (warning)    :fallback (propertize "• " 'face 'font-lock-string-face))
+      (treemacs-create-icon :file "info.png"        :extensions (info)       :fallback (propertize "• " 'face 'font-lock-string-face))
 
-                               ;; common file types icons
-                               (treemacs-create-icon :file "vscode/default_file.png"         :extensions (fallback))
-                               (treemacs-create-icon :file "vscode/image.png"       :extensions ("jpg" "jpeg" "bmp" "svg" "png" "xpm" "gif"))
-                               (treemacs-create-icon :file "vscode/video.png"       :extensions ("webm" "mp4" "avi" "mkv" "flv" "mov" "wmv" "mpg" "mpeg" "mpv"))
-                               (treemacs-create-icon :file "vscode/pdf.png"         :extensions ("pdf"))
-                               (treemacs-create-icon :file "vscode/emacs.png"       :extensions ("el" "elc"))
-                               (treemacs-create-icon :file "ledger.png"      :extensions ("ledger"))
-                               (treemacs-create-icon :file "vscode/config.png"        :extensions ("properties" "conf" "config" "cfg" "ini" "xdefaults" "xresources" "terminalrc" "ledgerrc"))
-                               (treemacs-create-icon :file "vscode/shell.png"       :extensions ("sh" "zsh" "fish"))
-                               (treemacs-create-icon :file "asciidoc.png"    :extensions ("adoc" "asciidoc"))
-                               ;; git
-                               (treemacs-create-icon :file "vscode/git.png"         :extensions ("git" "gitignore" "gitconfig" "gitmodules" "gitattributes"))
-                               ;; dev lib
-                               (treemacs-create-icon :file "vscode/editorconfig.png"         :extensions ("editorconfig"))
-                               ;; frontend universe
-                               (treemacs-create-icon :file "vscode/json.png"        :extensions ("json"))
-                               (treemacs-create-icon :file "vscode/html.png"        :extensions ("html" "htm"))
-                               (treemacs-create-icon :file "vscode/css.png"         :extensions ("css"))
-                               (treemacs-create-icon :file "vscode/scss.png"         :extensions ("scss"))
-                               (treemacs-create-icon :file "vscode/js_official.png"          :extensions ("js" "jsx"))
-                               (treemacs-create-icon :file "vscode/typescript.png"          :extensions ("ts" "tsx"))
-                               (treemacs-create-icon :file "vscode/typescriptdef.png"          :extensions ("spec"))
-                               (treemacs-create-icon :file "vscode/tslint.png"          :extensions ("tslint"))
-                               (treemacs-create-icon :file "vscode/tsconfig.png"          :extensions ("tsconfig"))
-                               (treemacs-create-icon :file "vscode/vue.png"         :extensions ("vue"))
-                               (treemacs-create-icon :file "vscode/elm.png"         :extensions ("elm"))
-                               ;; markupgs
-                               (treemacs-create-icon :file "vscode/org.png"     :extensions ("org"))
-                               (treemacs-create-icon :file "vscode/markdown.png"    :extensions ("md"))
-                               (treemacs-create-icon :file "vscode/tex.png"         :extensions ("tex"))
-                               (treemacs-create-icon :file "vscode/yaml.png"        :extensions ("yml" "yaml"))
-                               (treemacs-create-icon :file "vscode/toml.png"        :extensions ("toml"))
-                               (treemacs-create-icon :file "vscode/dartlang.png"        :extensions ("dart"))
-                               (treemacs-create-icon :file "vscode/julia.png"       :extensions ("jl"))
-                               ;; erlang / elixir
-                               (treemacs-create-icon :file "vscode/erlang2.png"      :extensions ("erl" "hrl"))
-                               (treemacs-create-icon :file "vscode/elixir.png"         :extensions ("ex"))
-                               (treemacs-create-icon :file "elx-light.png"   :extensions ("exs" "eex"))
-                               ;; ruby
-                               (treemacs-create-icon :file "ruby.png"   :extensions ("rb"))
-                               (treemacs-create-icon :file "erb.png"   :extensions ("erb"))
-                               ;; backend languages file types
-                               (treemacs-create-icon :file "vscode/rust.png"        :extensions ("rs"))
-                               (treemacs-create-icon :file "vscode/clojure.png"     :extensions ("clj" "cljs" "cljc"))
-                               (treemacs-create-icon :file "vscode/java.png"        :extensions ("java"))
-                               (treemacs-create-icon :file "vscode/kotlin.png"      :extensions ("kt"))
-                               (treemacs-create-icon :file "vscode/scala.png"       :extensions ("scala"))
-                               (treemacs-create-icon :file "sbt.png"         :extensions ("sbt"))
-                               (treemacs-create-icon :file "vscode/go.png"          :extensions ("go"))
-                               (treemacs-create-icon :file "vscode/php.png"         :extensions ("php"))
-                               (treemacs-create-icon :file "vscode/c.png"           :extensions ("c" "h"))
-                               (treemacs-create-icon :file "vscode/cpp.png"         :extensions ("cpp" "cxx" "hpp" "tpp" "cc" "hh"))
-                               ;; lisp ecosystem
-                               (treemacs-create-icon :file "racket.png"      :extensions ("racket" "rkt" "rktl" "rktd" "scrbl" "scribble" "plt"))
-                               ;; haskell
-                               (treemacs-create-icon :file "vscode/haskell.png"     :extensions ("hs" "lhs"))
-                               (treemacs-create-icon :file "cabal.png"       :extensions ("cabal"))
-                               ;; python
-                               (treemacs-create-icon :file "python.png"      :extensions ("py" "pyc"))
-                               (treemacs-create-icon :file "hy.png"          :extensions ("hy"))
-                               (treemacs-create-icon :file "ocaml.png"       :extensions ("ml" "mli"))
-                               (treemacs-create-icon :file "puppet.png"      :extensions ("pp"))
-                               ;; devops tools
-                               (treemacs-create-icon :file "vscode/docker.png"      :extensions ("dockerfile"))
-                               (treemacs-create-icon :file "vagrant.png"     :extensions ("vagrantfile"))
-                               (treemacs-create-icon :file "jinja2.png"      :extensions ("j2" "jinja2"))
-                               (treemacs-create-icon :file "purescript.png"  :extensions ("purs"))
-                               (treemacs-create-icon :file "nix.png"         :extensions ("nix"))
-                               (treemacs-create-icon :file "scons.png"       :extensions ("sconstruct" "sconstript"))
-                               (treemacs-create-icon :file "vscode/make.png"    :extensions ("makefile"))
-                               (treemacs-create-icon :file "vscode/license.png" :extensions ("license"))
-                               (treemacs-create-icon :file "vscode/zip.png"     :extensions ("zip" "7z" "tar" "gz" "rar"))
-                               (treemacs-create-icon :file "vscode/elm.png"     :extensions ("elm"))
-                               (treemacs-create-icon :file "vscode/xml.png"     :extensions ("xml" "xsl"))
-                               (treemacs-create-icon :file "vscode/binary.png"  :extensions ("exe" "dll" "obj" "so" "o"))
-                               (treemacs-create-icon :file "vscode/ruby.png"    :extensions ("rb"))
-                               (treemacs-create-icon :file "vscode/scss.png"    :extensions ("scss"))
-                               (treemacs-create-icon :file "vscode/lua.png"     :extensions ("lua"))
-                               (treemacs-create-icon :file "vscode/log.png"     :extensions ("log"))
-                               (treemacs-create-icon :file "vscode/lisp.png"    :extensions ("lisp"))
-                               (treemacs-create-icon :file "vscode/sql.png"     :extensions ("sql"))
-                               (treemacs-create-icon :file "vscode/nim.png"     :extensions ("nim"))
-                               (treemacs-create-icon :file "vscode/perl.png"    :extensions ("pl" "pm" "perl"))
-                               (treemacs-create-icon :file "vscode/vim.png"     :extensions ("vimrc" "tridactylrc" "vimperatorrc" "ideavimrc" "vrapperrc"))
-                               (treemacs-create-icon :file "vscode/deps.png"    :extensions ("cask"))
-                               (treemacs-create-icon :file "vscode/r.png"       :extensions ("r"))
-                               (treemacs-create-icon :file "vscode/reason.png"  :extensions ("re" "rei")))))
+      ;; common file types icons
+      (treemacs-create-icon :file "vscode/default_file.png"         :extensions (fallback))
+      (treemacs-create-icon :file "vscode/image.png"       :extensions ("jpg" "jpeg" "bmp" "svg" "png" "xpm" "gif"))
+      (treemacs-create-icon :file "vscode/video.png"       :extensions ("webm" "mp4" "avi" "mkv" "flv" "mov" "wmv" "mpg" "mpeg" "mpv"))
+      (treemacs-create-icon :file "vscode/pdf.png"         :extensions ("pdf"))
+      (treemacs-create-icon :file "vscode/emacs.png"       :extensions ("el" "elc"))
+      (treemacs-create-icon :file "ledger.png"      :extensions ("ledger"))
+      (treemacs-create-icon :file "vscode/config.png"        :extensions ("properties" "conf" "config" "cfg" "ini" "xdefaults" "xresources" "terminalrc" "ledgerrc"))
+      (treemacs-create-icon :file "vscode/shell.png"       :extensions ("sh" "zsh" "fish"))
+      (treemacs-create-icon :file "asciidoc.png"    :extensions ("adoc" "asciidoc"))
+      ;; git
+      (treemacs-create-icon :file "vscode/git.png"         :extensions ("git" "gitignore" "gitconfig" "gitmodules" "gitattributes"))
+      ;; dev lib
+      (treemacs-create-icon :file "vscode/editorconfig.png"         :extensions ("editorconfig"))
+      ;; frontend universe
+      (treemacs-create-icon :file "vscode/json.png"        :extensions ("json"))
+      (treemacs-create-icon :file "vscode/html.png"        :extensions ("html" "htm"))
+      (treemacs-create-icon :file "vscode/css.png"         :extensions ("css"))
+      (treemacs-create-icon :file "vscode/scss.png"         :extensions ("scss"))
+      (treemacs-create-icon :file "vscode/js_official.png"          :extensions ("js" "jsx"))
+      (treemacs-create-icon :file "vscode/typescript.png"          :extensions ("ts" "tsx"))
+      (treemacs-create-icon :file "vscode/typescriptdef.png"          :extensions ("spec"))
+      (treemacs-create-icon :file "vscode/tslint.png"          :extensions ("tslint"))
+      (treemacs-create-icon :file "vscode/tsconfig.png"          :extensions ("tsconfig"))
+      (treemacs-create-icon :file "vscode/vue.png"         :extensions ("vue"))
+      (treemacs-create-icon :file "vscode/elm.png"         :extensions ("elm"))
+      ;; markupgs
+      (treemacs-create-icon :file "vscode/org.png"     :extensions ("org"))
+      (treemacs-create-icon :file "vscode/markdown.png"    :extensions ("md"))
+      (treemacs-create-icon :file "vscode/tex.png"         :extensions ("tex"))
+      (treemacs-create-icon :file "vscode/yaml.png"        :extensions ("yml" "yaml"))
+      (treemacs-create-icon :file "vscode/toml.png"        :extensions ("toml"))
+      (treemacs-create-icon :file "vscode/dartlang.png"        :extensions ("dart"))
+      (treemacs-create-icon :file "vscode/julia.png"       :extensions ("jl"))
+      ;; erlang / elixir
+      (treemacs-create-icon :file "vscode/erlang2.png"      :extensions ("erl" "hrl"))
+      (treemacs-create-icon :file "vscode/elixir.png"         :extensions ("ex"))
+      (treemacs-create-icon :file "elx-light.png"   :extensions ("exs" "eex"))
+      ;; ruby
+      (treemacs-create-icon :file "ruby.png"   :extensions ("rb"))
+      (treemacs-create-icon :file "erb.png"   :extensions ("erb"))
+      ;; backend languages file types
+      (treemacs-create-icon :file "vscode/rust.png"        :extensions ("rs"))
+      (treemacs-create-icon :file "vscode/clojure.png"     :extensions ("clj" "cljs" "cljc"))
+      (treemacs-create-icon :file "vscode/java.png"        :extensions ("java"))
+      (treemacs-create-icon :file "vscode/kotlin.png"      :extensions ("kt"))
+      (treemacs-create-icon :file "vscode/scala.png"       :extensions ("scala"))
+      (treemacs-create-icon :file "sbt.png"         :extensions ("sbt"))
+      (treemacs-create-icon :file "vscode/go.png"          :extensions ("go"))
+      (treemacs-create-icon :file "vscode/php.png"         :extensions ("php"))
+      (treemacs-create-icon :file "vscode/c.png"           :extensions ("c" "h"))
+      (treemacs-create-icon :file "vscode/cpp.png"         :extensions ("cpp" "cxx" "hpp" "tpp" "cc" "hh"))
+      ;; lisp ecosystem
+      (treemacs-create-icon :file "racket.png"      :extensions ("racket" "rkt" "rktl" "rktd" "scrbl" "scribble" "plt"))
+      ;; haskell
+      (treemacs-create-icon :file "vscode/haskell.png"     :extensions ("hs" "lhs"))
+      (treemacs-create-icon :file "cabal.png"       :extensions ("cabal"))
+      ;; python
+      (treemacs-create-icon :file "python.png"      :extensions ("py" "pyc"))
+      (treemacs-create-icon :file "hy.png"          :extensions ("hy"))
+      (treemacs-create-icon :file "ocaml.png"       :extensions ("ml" "mli"))
+      (treemacs-create-icon :file "puppet.png"      :extensions ("pp"))
+      ;; devops tools
+      (treemacs-create-icon :file "vscode/docker.png"      :extensions ("dockerfile"))
+      (treemacs-create-icon :file "vagrant.png"     :extensions ("vagrantfile"))
+      (treemacs-create-icon :file "jinja2.png"      :extensions ("j2" "jinja2"))
+      (treemacs-create-icon :file "purescript.png"  :extensions ("purs"))
+      (treemacs-create-icon :file "nix.png"         :extensions ("nix"))
+      (treemacs-create-icon :file "scons.png"       :extensions ("sconstruct" "sconstript"))
+      (treemacs-create-icon :file "vscode/make.png"    :extensions ("makefile"))
+      (treemacs-create-icon :file "vscode/license.png" :extensions ("license"))
+      (treemacs-create-icon :file "vscode/zip.png"     :extensions ("zip" "7z" "tar" "gz" "rar"))
+      (treemacs-create-icon :file "vscode/elm.png"     :extensions ("elm"))
+      (treemacs-create-icon :file "vscode/xml.png"     :extensions ("xml" "xsl"))
+      (treemacs-create-icon :file "vscode/binary.png"  :extensions ("exe" "dll" "obj" "so" "o"))
+      (treemacs-create-icon :file "vscode/ruby.png"    :extensions ("rb"))
+      (treemacs-create-icon :file "vscode/scss.png"    :extensions ("scss"))
+      (treemacs-create-icon :file "vscode/lua.png"     :extensions ("lua"))
+      (treemacs-create-icon :file "vscode/log.png"     :extensions ("log"))
+      (treemacs-create-icon :file "vscode/lisp.png"    :extensions ("lisp"))
+      (treemacs-create-icon :file "vscode/sql.png"     :extensions ("sql"))
+      (treemacs-create-icon :file "vscode/nim.png"     :extensions ("nim"))
+      (treemacs-create-icon :file "vscode/perl.png"    :extensions ("pl" "pm" "perl"))
+      (treemacs-create-icon :file "vscode/vim.png"     :extensions ("vimrc" "tridactylrc" "vimperatorrc" "ideavimrc" "vrapperrc"))
+      (treemacs-create-icon :file "vscode/deps.png"    :extensions ("cask"))
+      (treemacs-create-icon :file "vscode/r.png"       :extensions ("r"))
+      (treemacs-create-icon :file "vscode/reason.png"  :extensions ("re" "rei")))))
 
-    ;; finally apply the custom theme
-    (treemacs-load-theme tau-themes-treemacs-theme))
+  ;; finally apply the custom theme
+  (treemacs-load-theme tau-themes-treemacs-theme))
 
-  ;;apply treemacs icon theme
-  (treemacs-load-theme "vscode")
-  (treemacs-resize-icons 18) ;; usefull on high dpi monitors.  default icon size is 22
+   ;;apply treemacs icon theme
+   (treemacs-load-theme "vscode")
+   (treemacs-resize-icons 18) ;; usefull on high dpi monitors.  default icon size is 22
 
-  )
-
-
-;; *** Treemacs Evil
+)
 
 (use-package treemacs-evil
-  :after treemacs evil
-  :ensure t
-  )
-
-
-;; *** Treemacs Projectile
+   :after treemacs evil
+   :ensure t
+)
 
 (use-package treemacs-projectile
-  :after treemacs projectile
-  :ensure t
-  )
-
-
-;; *** Treemacs Dired
-
+   :after treemacs projectile
+   :ensure t
+)
 
 (use-package treemacs-icons-dired
   :after treemacs dired
   :ensure t
   :config (treemacs-icons-dired-mode)
-  )
-
-
-;; *** Treemacs Magit
+)
 
 (use-package treemacs-magit
-  :after treemacs magit
-  :ensure t
-  )
-
-
-;; ** ranger
-
+   :after treemacs magit
+   :ensure t
+)
 
 (use-package ranger
   :ensure t
@@ -3355,42 +2550,20 @@ If failed try to complete the common part with `company-complete-common'"
   ("C-x C-j" . ranger)
   :config
   (setq ranger-show-hidden t) ;; show hidden files
-  )
-
-
-
-
-;; * Appearance
-
+)
 
 (setq echo-keystrokes 0.02)
 
-
-;; ** all the icons
-
 (use-package all-the-icons :if window-system)
-
-
-;; ** Highlight trailing whitespace
 
 (setq-default show-trailing-whitespace t)
 (set-face-background 'trailing-whitespace "#f44545")
 
-
-;; ** Add some information about buffer boundaries in the left fringe.
-
-
 (setq-default indicate-buffer-boundaries 'left)
 (setq-default indicate-empty-lines t)
 
-
-
 (setq display-time-24hr-format t)
 (display-time-mode +1)
-
-
-;; ** startup stuff (splash and start screen, scratch message, etc...)
-
 
 ;; appearantly the `inhibit-splash-screen' was deprecaded. uses `inhibit-startup-screen' now
 (setq inhibit-splash-screen t)
@@ -3414,48 +2587,25 @@ If failed try to complete the common part with `company-complete-common'"
 
 (setq frame-title-format '("Emacs"))
 
-
-;; ** scroll bars from frames
-
 (scroll-bar-mode -1)
-
-
-;; ** Remove menu bar and tool bar
 
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 
-
-;; ** set background and foreground color
-
-
 (set-background-color "#111111")
 (set-foreground-color "#dddddd")
 
-
-;; ** Applying my theme
-
-
 (add-to-list 'custom-theme-load-path "~/dotfiles/emacs.d/themes/")
-                                        ; theme options:
-                                        ; atom-one-dark (doenst work well with emacsclient, ugly blue bg)
-                                        ; dracula
-                                        ; darktooth
-                                        ; gruvbox-dark-hard
-                                        ; gruvbox-dark-light
-                                        ; gruvbox-dark-medium
-                                        ; base16-default-dark-theme -- this one is good
-
-
-
-;;  Load the theme
-
+  ; theme options:
+  ; atom-one-dark (doenst work well with emacsclient, ugly blue bg)
+  ; dracula
+  ; darktooth
+  ; gruvbox-dark-hard
+  ; gruvbox-dark-light
+  ; gruvbox-dark-medium
+  ; base16-default-dark-theme -- this one is good
 
 (load-theme my-theme t)
-
-
-
-
 
 (defun load-my-theme (frame)
   "Function to load the theme in current FRAME.
@@ -3465,14 +2615,10 @@ If failed try to complete the common part with `company-complete-common'"
   (select-frame frame)
   (load-theme my-theme t))
 
-;;                                         ; make emacs load the theme after loading the frame
-;;                                         ; resolves issue with the theme not loading properly in terminal mode on emacsclient
+; make emacs load the theme after loading the frame
+; resolves issue with the theme not loading properly in terminal mode on emacsclient
 ;; NOTE this if was breaking my emacs!!!!!
 ;; (add-hook 'after-make-frame-functions #'load-my-theme)
-
-
-
-;; ** doom themes
 
 (use-package doom-themes
   :ensure t
@@ -3487,13 +2633,7 @@ If failed try to complete the common part with `company-complete-common'"
 
   ;; Enable custom treemacs theme (all-the-icons must be installed!)
   (doom-themes-treemacs-config)
-  )
-
-
-;; ** Uniquify (unique files names in buffers)
-
-;; This package is included in emacs, so `:ensure nil` prevents use-package from trying to download it on Melpa
-
+)
 
 (use-package uniquify
   :defer 1
@@ -3502,32 +2642,16 @@ If failed try to complete the common part with `company-complete-common'"
   (uniquify-after-kill-buffer-p t)
   (uniquify-buffer-name-style 'post-forward)
   (uniquify-strip-common-suffix t)
-  )
-
-
-;; ** All The Icons - Icon package
-
+)
 
 (use-package all-the-icons
   :ensure t
-  )
-
-
-;; ** vscode-icons
-
+)
 
 (use-package vscode-icon
   :ensure t
   :commands (vscode-icon-for-file)
-  )
-
-
-;; ** solaire-mode
-
-;; solaire-mode is an aesthetic plugin that helps visually distinguish
-;; file-visiting windows from other types of windows (like popups or sidebars)
-;; by giving them a slightly different -- often brighter -- background.
-
+)
 
 ;; (use-package solaire-mode
 ;;   :config
@@ -3548,61 +2672,39 @@ If failed try to complete the common part with `company-complete-common'"
 ;;   ;;  NOTE: This is necessary for themes in the doom-themes package!
 ;;   (solaire-mode-swap-bg))
 
-
-;; ** fancy-battery-mode
-
 (use-package fancy-battery
   :ensure t
   :config
   (add-hook 'after-init-hook #'fancy-battery-mode)
-  )
-
-;; ** dimmer
-
-;; Dim unused frames and windows
-;; Focus current window and dim unused ones
-
+)
 
 (use-package dimmer
   :disabled
   :ensure t
   :config (dimmer-mode)
-  )
-
-
-
-;; * Frame and Windows
-
+)
 
 (dolist (frame (frame-list))
   (set-frame-parameter frame 'bottom-divider-width 1)
   (set-frame-parameter frame 'right-divider-width 1))
 
 
-(push (cons 'bottom-divider-width 1) default-frame-alist)
-(push (cons 'right-divider-width 1) default-frame-alist)
-
-
-;; * Window and frame management and navigation
-
-;; ** auto balance windows area
-
+           (push (cons 'bottom-divider-width 1) default-frame-alist)
+           (push (cons 'right-divider-width 1) default-frame-alist)
 
 (global-set-key (kbd "C-M-+") 'balance-windows-area)
 
-
-;; ** eyebrowse
 (use-package eyebrowse
   :hook
   (after-init . eyebrowse-mode)
   :bind
   (:map eyebrowse-mode-map
-        ("M-1" . eyebrowse-switch-to-window-config-1)
-        ("M-2" . eyebrowse-switch-to-window-config-2)
-        ("M-3" . eyebrowse-switch-to-window-config-3)
-        ("M-4" . eyebrowse-switch-to-window-config-4)
-        ("H-<right>" . eyebrowse-next-window-config)
-        ("H-<left>" . eyebrowse-prev-window-config))
+  ("M-1" . eyebrowse-switch-to-window-config-1)
+  ("M-2" . eyebrowse-switch-to-window-config-2)
+  ("M-3" . eyebrowse-switch-to-window-config-3)
+  ("M-4" . eyebrowse-switch-to-window-config-4)
+  ("H-<right>" . eyebrowse-next-window-config)
+  ("H-<left>" . eyebrowse-prev-window-config))
   :config
   ;;(define-key eyebrowse-mode-map (kbd "M-1") 'eyebrowse-switch-to-window-config-1)
   ;;(define-key eyebrowse-mode-map (kbd "M-2") 'eyebrowse-switch-to-window-config-2)
@@ -3612,11 +2714,7 @@ If failed try to complete the common part with `company-complete-common'"
   ;;(define-key eyebrowse-mode-map (kbd "H-<left>") 'eyebrowse-prev-window-config)
   (eyebrowse-mode t)
   (setq eyebrowse-new-workspace t)
-  )
-
-
-;; ** ace-window
-
+)
 
 (use-package ace-window
   :ensure t
@@ -3628,12 +2726,7 @@ If failed try to complete the common part with `company-complete-common'"
   :config
   ;; (setq aw-keys '(?j ?k ?l ?i ?o ?h ?y ?u ?p))
   (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)) ;; set the window labels in the home row
-  )
-
-;; ** emacsrotate
-
-;; This shares bindings with ace-window
-
+)
 
 (use-package rotate
   :ensure t
@@ -3647,19 +2740,19 @@ If failed try to complete the common part with `company-complete-common'"
   :preface
   (defvar is-window-maximized nil)
   (defun tau/toggle-window-maximize ()
-    (interactive)
-    (progn
-      (if is-window-maximized
-          (balance-windows)
-        (maximize-window))
-      (setq is-window-maximized
-            (not is-window-maximized))))
+      (interactive)
+      (progn
+        (if is-window-maximized
+            (balance-windows)
+          (maximize-window))
+        (setq is-window-maximized
+              (not is-window-maximized))))
   (defun hydra-title(title) (propertize title 'face `(:inherit font-lock-warning-face :weight bold)))
   (defun command-name(title) (propertize title 'face `(:foreground "#f8f8f2")))
   (defun spacer() (propertize "." 'face `(:foreground "#282a36")))
   :config
   (with-eval-after-load 'hydra
-    (defhydra hydra-frame-window (:color blue :hint nil)
+      (defhydra hydra-frame-window (:color blue :hint nil)
       (format
        (format "%s" (propertize "                                                                       ╔════════╗
   ((%s))^^^^^^^^   ((%s))^^^^  ((%s))^^  ((%s))^^  ((%s))^^^^^^  ((%s))^   ║ Window ║
@@ -3671,60 +2764,56 @@ If failed try to complete the common part with `company-complete-common'"
       ^_j_^        %s_=_         _/_       %s
 ^^^^^^ ┌──────────────────────────────────────────────────────────────────────────────┘
                          [_q_]: %s, [_<SPC>_]: %s" 'face `(:inherit font-lock-doc-face)))
-       (hydra-title "Size")
-       (hydra-title "Zoom")
-       (hydra-title "Split")
-       (hydra-title "Window")
-       (hydra-title "Buffer")
-       (hydra-title "Misc")
-       (all-the-icons-material "zoom_in" :height .85 :face 'font-lock-doc-face)
-       (command-name "_o_ther")
-       (command-name "page")
-       (command-name "_r_centf")
-       (command-name "_s_wap")
-       (all-the-icons-faicon "slideshare" :height .85 :face 'font-lock-doc-face)
-       (command-name "_p_mode")
-       (command-name "w_i_ndow")
-       (command-name "_m_aximize")
-       (command-name "_s_witch")
-       (command-name "_d_elete")
-       (command-name "_D_elete")
-       (all-the-icons-material "zoom_out" :height .85 :face 'font-lock-doc-face)
-       (command-name "del_O_thers")
-       (command-name "quit")
-       (command-name "rotate")
-       )
+                         (hydra-title "Size")
+                         (hydra-title "Zoom")
+                         (hydra-title "Split")
+                         (hydra-title "Window")
+                         (hydra-title "Buffer")
+                         (hydra-title "Misc")
+                         (all-the-icons-material "zoom_in" :height .85 :face 'font-lock-doc-face)
+                         (command-name "_o_ther")
+                         (command-name "page")
+                         (command-name "_r_centf")
+                         (command-name "_s_wap")
+                         (all-the-icons-faicon "slideshare" :height .85 :face 'font-lock-doc-face)
+                         (command-name "_p_mode")
+                         (command-name "w_i_ndow")
+                         (command-name "_m_aximize")
+                         (command-name "_s_witch")
+                         (command-name "_d_elete")
+                         (command-name "_D_elete")
+                         (all-the-icons-material "zoom_out" :height .85 :face 'font-lock-doc-face)
+                         (command-name "del_O_thers")
+                         (command-name "quit")
+                         (command-name "rotate")
+                         )
 
-      ("K" kill-current-buffer :exit t)
-      ("D" kill-buffer-and-window :exit t)
-      ("O" delete-other-windows  :exit t)
-      ("F" toggle-frame-fullscreen)
-      ("i" ace-window)
-      ("s" ace-swap-window :exit t)
-      ("d" ace-delete-window)
-      ("m" tau/toggle-window-maximize :exit t)
-      ("=" text-scale-decrease)
-      ("+" text-scale-increase)
-      ("-" split-window-vertically)
-      ("/" split-window-horizontally)
-      ("h" shrink-window-horizontally)
-      ("k" shrink-window)
-      ("j" enlarge-window)
-      ("l" enlarge-window-horizontally)
-      ("," previous-buffer)
-      ("." next-buffer)
-      ("o" other-window)
-      ("p" presentation-mode)
-      ("r" counsel-recentf :exit t)
-      ("s" switch-to-buffer :exit t)
-      ("D" kill-buffer-and-window)
-      ("<SPC>" rotate-layout)
-      ("q" nil)))
-  )
-
-
-
-;; ** windmove
+        ("K" kill-current-buffer :exit t)
+        ("D" kill-buffer-and-window :exit t)
+        ("O" delete-other-windows  :exit t)
+        ("F" toggle-frame-fullscreen)
+        ("i" ace-window)
+        ("s" ace-swap-window :exit t)
+        ("d" ace-delete-window)
+        ("m" tau/toggle-window-maximize :exit t)
+        ("=" text-scale-decrease)
+        ("+" text-scale-increase)
+        ("-" split-window-vertically)
+        ("/" split-window-horizontally)
+        ("h" shrink-window-horizontally)
+        ("k" shrink-window)
+        ("j" enlarge-window)
+        ("l" enlarge-window-horizontally)
+        ("," previous-buffer)
+        ("." next-buffer)
+        ("o" other-window)
+        ("p" presentation-mode)
+        ("r" counsel-recentf :exit t)
+        ("s" switch-to-buffer :exit t)
+        ("D" kill-buffer-and-window)
+        ("<SPC>" rotate-layout)
+        ("q" nil)))
+)
 
 (use-package windmove
   :ensure t
@@ -3736,13 +2825,7 @@ If failed try to complete the common part with `company-complete-common'"
   (global-set-key (kbd "C-S-L") 'windmove-right)
   (global-set-key (kbd "C-S-K") 'windmove-up)
   (global-set-key (kbd "C-S-J") 'windmove-down)
-  )
-
-
-;; ** zoom
-
-;; Zoom in selected window and resize othersAuto balance windows and frames
-
+)
 
 (use-package zoom
   :ensure t
@@ -3755,15 +2838,7 @@ If failed try to complete the common part with `company-complete-common'"
   (setq zoom-ignored-buffer-name-regexps '("^*calc"))
   :config
   (zoom-mode t)
-  )
-
-
-
-;; * File navigation
-;; ** swiper
-
-;; Swiper is an alternative to isearch that uses ivy to show an overview of all matches.
-
+)
 
 (use-package swiper
   :disabled
@@ -3780,11 +2855,7 @@ If failed try to complete the common part with `company-complete-common'"
    "rg -i -M 120 --no-heading --line-number --color never %s .")
   (counsel-grep-base-command
    "rg -i -M 120 --no-heading --line-number --color never '%s' %s")
-  )
-
-
-;; ** avy
-
+)
 
 (use-package avy
   :ensure t
@@ -3798,11 +2869,11 @@ If failed try to complete the common part with `company-complete-common'"
   ("M-g w" . avy-goto-word-1)
   ("M-g e" . avy-goto-word-0)
   (:map isearch-mode-map
-        ("C-'" . avy-search))
+  ("C-'" . avy-search))
   (:map evil-normal-state-map
-        ("SPC" . avy-goto-char))
+  ("SPC" . avy-goto-char))
   (:map evil-visual-state-map
-        ("SPC" . avy-goto-char))
+  ("SPC" . avy-goto-char))
   :config
   (setq avy-background t) ;; default nil ;; gray background will be added during the selection.
   (setq avy-highlight-first t) ;; When non-nil highlight the first decision char with avy-lead-face-0. Do this even when the char is terminating.
@@ -3811,31 +2882,16 @@ If failed try to complete the common part with `company-complete-common'"
   ;; t: use all windows on the selected frame
   ;; all-frames: use all windows on all frames
   (setq avy-all-windows nil) ;;
-  )
-
-
-;; ** goto-line-preview
-
+)
 
 (use-package goto-line-preview
   :ensure t
   :config
   (global-set-key [remap goto-line] 'goto-line-preview)
-  )
-
-
-
-;; * miniwindow and minibuffer
-
+)
 
 (setq resize-mini-windows t)
 (setq max-mini-window-height 0.33)
-
-
-;; * mode line and headerline
-
-;; ** My personal modeline
-
 
 (setq mode-line-format
       (list
@@ -3848,37 +2904,18 @@ If failed try to complete the common part with `company-complete-common'"
        "-- user: "
        ;; value of user
        (getenv "USER"))
-      )
-
-
-;; *** Diplay file info (line and column number and size)
-
+)
 
 (line-number-mode t)
 (column-number-mode t)
 (size-indication-mode t)
-
-
-;; Display the value of point in the mode line. It is displayed in brackets, adjacent to the line and/or column number if those are being displayed.
-
 
 (use-package show-point-mode
   :ensure nil
   :load-path "packages/show-point-mode"
   :config
   (show-point-mode t)
-  )
-
-
-;; *** mode line personal customizations
-
-;; Cool background colors
-;; #fdf6e3
-;; #eee8d5
-;; #007ad3 - vscode statusbar blue
-;; Cool foreground colors
-;; #93a1a1
-
+)
 
 (set-face-attribute 'mode-line nil :height tau/font-size-mode-line)
 (set-face-attribute 'mode-line nil
@@ -3896,19 +2933,12 @@ If failed try to complete the common part with `company-complete-common'"
                     :overline nil
                     :underline nil)
 
-
-
-;; ** anzu
-
-;; anzu.el is an Emacs port of anzu.vim. anzu.el provides a minor mode which displays current match and total matches information in the mode-line in various search modes.
-
-
 (use-package anzu
   :ensure t
   :bind
   (:map isearch-mode-map
-        ([remap isearch-query-replace] . anzu-isearch-query-replace)
-        ([remap isearch-query-replace-regexp] . anzu-isearch-query-replace-regexp))
+  ([remap isearch-query-replace] . anzu-isearch-query-replace)
+  ([remap isearch-query-replace-regexp] . anzu-isearch-query-replace-regexp))
   :config
   (global-anzu-mode +1)
 
@@ -3921,13 +2951,9 @@ If failed try to complete the common part with `company-complete-common'"
   (set-face-attribute 'anzu-mode-line nil
                       :foreground "yellow" :weight 'bold)
 
-  ;;  (define-key isearch-mode-map [remap isearch-query-replace]  #'anzu-isearch-query-replace)
-  ;;  (define-key isearch-mode-map [remap isearch-query-replace-regexp] #'anzu-isearch-query-replace-regexp)
-  )
-
-
-;; ** hide mode line mode
-
+;;  (define-key isearch-mode-map [remap isearch-query-replace]  #'anzu-isearch-query-replace)
+;;  (define-key isearch-mode-map [remap isearch-query-replace-regexp] #'anzu-isearch-query-replace-regexp)
+)
 
 (use-package hide-mode-line
   :ensure t
@@ -3935,94 +2961,16 @@ If failed try to complete the common part with `company-complete-common'"
   (completion-list-mode . hide-mode-line-mode)
   (neotree-mode . hide-mode-line-mode)
   (treemacs-mode . hide-mode-line-mode)
-  )
+)
 
-
-
-
-
-;; ** example of modeline custom
-
-;; Screenshot: [[./img/modeline.png]]
-;; Source: http://emacs-fu.blogspot.com/2011/08/customizing-mode-line.html
-
-;; use setq-default to set it for /all/ modes
-(setq mode-line-format
-      (list
-       ;; the buffer name; the file name as a tool tip
-       '(:eval (propertize "%b " 'face 'font-lock-keyword-face
-                           'help-echo (buffer-file-name)))
-
-       ;; line and column
-       "(" ;; '%02' to set to 2 chars at least; prevents flickering
-       (propertize "%02l" 'face 'font-lock-type-face) ","
-       (propertize "%02c" 'face 'font-lock-type-face)
-       ") "
-
-       ;; relative position, size of file
-       "["
-       (propertize "%p" 'face 'font-lock-constant-face) ;; % above top
-       "/"
-       (propertize "%I" 'face 'font-lock-constant-face) ;; size
-       "] "
-
-       ;; the current major mode for the buffer.
-       "["
-
-       '(:eval (propertize "%m" 'face 'font-lock-string-face
-                           'help-echo buffer-file-coding-system))
-       "] "
-
-
-       "[" ;; insert vs overwrite mode, input-method in a tooltip
-       '(:eval (propertize (if overwrite-mode "Ovr" "Ins")
-                           'face 'font-lock-preprocessor-face
-                           'help-echo (concat "Buffer is in "
-                                              (if overwrite-mode "overwrite" "insert") " mode")))
-
-       ;; was this buffer modified since the last save?
-       '(:eval (when (buffer-modified-p)
-                 (concat ","  (propertize "Mod"
-                                          'face 'font-lock-warning-face
-                                          'help-echo "Buffer has been modified"))))
-
-       ;; is this buffer read-only?
-       '(:eval (when buffer-read-only
-                 (concat ","  (propertize "RO"
-                                          'face 'font-lock-type-face
-                                          'help-echo "Buffer is read-only"))))
-       "] "
-
-       ;; add the time, with the date and the emacs uptime in the tooltip
-       '(:eval (propertize (format-time-string "%H:%M")
-                           'help-echo
-                           (concat (format-time-string "%c; ")
-                                   (emacs-uptime "Uptime:%hh"))))
-       " --"
-       ;; i don't want to see minor-modes; but if you want, uncomment this:
-       ;; minor-mode-alist  ;; list of minor modes
-       "%-" ;; fill with '-'
-       ))
-
-;; ** examples of mode-line-format lists
-;; (setq-default mode-line-format
-;;               (list
-;;                evil-mode-line-tag
-;;                mode-line-front-space
-;;                mode-line-mule-info
-;;                mode-line-modified
-;;                mode-line-frame-identification
-;;                mode-line-buffer-identification
-;;                " "
-;;                mode-line-position
-;;                mode-line-my-vc
-;;                mode-line-modes))
-;; (concat evil-mode-line-tag)
-
-;; ** mini-modeline
-
-;; Display the modeline in the minibuffer
-
+(use-package saveplace
+  :ensure t
+  :hook
+  (after-init . save-place-mode)
+  :init
+  (setq-default save-place t)
+  (setq save-place-file (expand-file-name ".places" user-emacs-directory))
+)
 
 (use-package mini-modeline
   :ensure t
@@ -4037,15 +2985,7 @@ If failed try to complete the common part with `company-complete-common'"
   (setq mini-modeline-frame nil) ;; default nil ; Frame to display mini-modeline on. nil means current selected frame.
   (setq mini-modeline-truncate-p nil) ;; Truncates the mini-modeline to fit in one line.
   ;;(mini-modeline-mode t)
-  )
-
-
-
-;; ** feebleline
-
-;; Same as mini-modeline, different package
-;; put it here to test it to see what is best
-
+)
 
 (use-package feebleline
   :ensure t
@@ -4060,18 +3000,7 @@ If failed try to complete the common part with `company-complete-common'"
           (feebleline-git-branch          :face feebleline-git-face :pre " : ")
           (feebleline-project-name        :align right)))
   (feebleline-mode 1)
-  )
-
-
-;; ** common-header-mode-line
-
-;; This package is not available on melpa
-
-;; Source: https://github.com/Bad-ptr/common-header-mode-line.el
-
-;; : update: this didnt work :(
-;; : try again in the future
-
+)
 
 (use-package common-header-mode-line
   :load-path "packages/common-header-mode-line"
@@ -4084,23 +3013,13 @@ If failed try to complete the common part with `company-complete-common'"
   ;;(with-eval-after-load "common-header-mode-line-autoloads"
   ;;  (common-mode-line-mode 1)
   ;;  (common-header-line-mode 1))
-  )
-
-
-;; ** minions
-
-;; group all minor modes in a single menu in the modeline
+)
 
 (use-package minions
   :ensure t
   :config
   (minions-mode 1)
-  )
-
-
-;; ** doom-modeline
-
-;; Require and enable the doom-modeline
+)
 
 (use-package doom-modeline
   :ensure t
@@ -4166,23 +3085,7 @@ If failed try to complete the common part with `company-complete-common'"
   (setq doom-modeline-env-go-executable "go")
   (setq doom-modeline-env-elixir-executable "iex")
   (setq doom-modeline-env-rust-executable "rustc")
-  )
-
-
-
-
-;; ** parrot-mode
-
-;; Type of parrots available:
-
-;; - default
-;; - confused
-;; - emacs
-;; - nyan
-;; - rotating
-;; - science
-;; - thumbsup
-
+)
 
 (use-package parrot
   :ensure t
@@ -4198,28 +3101,17 @@ If failed try to complete the common part with `company-complete-common'"
   (define-key evil-normal-state-map (kbd "[r") 'parrot-rotate-prev-word-at-point)
   (define-key evil-normal-state-map (kbd "]r") 'parrot-rotate-next-word-at-point)
   (add-hook 'mu4e-index-updated-hook #'parrot-start-animation)
-  )
-
-
-;; ** nyan-mode
-
+)
 
 (use-package nyan-mode
-  :if window-system
-  :hook
-  (after-init . nyan-mode)
-  :config
-  (setq nyan-cat-face-number 4)
-  (setq nyan-animate-nyancat t)
-  (setq nyan-wavy-trail t)
-  (nyan-start-animation))
-
-
-
-;; * Session
-
-;; ** use personal folder for storing stuff
-
+   :if window-system
+   :hook
+   (after-init . nyan-mode)
+   :config
+   (setq nyan-cat-face-number 4)
+   (setq nyan-animate-nyancat t)
+   (setq nyan-wavy-trail t)
+   (nyan-start-animation))
 
 (defconst tau-savefile-dir (expand-file-name "savefile" user-emacs-directory))
 
@@ -4227,96 +3119,90 @@ If failed try to complete the common part with `company-complete-common'"
 (unless (file-exists-p tau-savefile-dir)
   (make-directory tau-savefile-dir))
 
-
-;; ** desktop-mode
-
-;; Save emacs sessions
-
-
 (use-package desktop
-  :ensure nil
-  :bind
-  ("C-c s" . desktop-save-in-desktop-dir)
-  :init
-  ;; use only one desktop
-  (setq desktop-path '("~/.emacs.d/"))
-  (setq desktop-dirname "~/.emacs.d/")
-  (setq desktop-base-file-name "emacs-desktop")
+:ensure nil
+:bind
+("C-c s" . desktop-save-in-desktop-dir)
+:init
+;; use only one desktop
+(setq desktop-path '("~/.emacs.d/"))
+(setq desktop-dirname "~/.emacs.d/")
+(setq desktop-base-file-name "emacs-desktop")
 
-  (setq desktop-restore-eager 5) ;; restore 5 buffers immediately. the others restore lazily
-  (setq desktop-load-locked-desktop t)
-  (setq desktop-files-not-to-save "^$")
-  (setq desktop-save t)
-  (setq desktop-buffers-not-to-save
-        (concat "\\("
-                "^nn\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
-                "\\|\\.emacs.*\\|\\.diary\\|\\.newsrc-dribble\\|\\.bbdb"
-                "\\)$"))
-  :config
-  (desktop-save-mode t)
-  (add-to-list 'desktop-modes-not-to-save 'dired-mode)
-  (add-to-list 'desktop-modes-not-to-save 'Info-mode)
-  (add-to-list 'desktop-modes-not-to-save 'info-lookup-mode)
-  (add-to-list 'desktop-modes-not-to-save 'fundamental-mode)
-  (add-to-list 'desktop-modes-not-to-save 'completion-list-mode)
+(setq desktop-restore-eager 5) ;; restore 5 buffers immediately. the others restore lazily
+(setq desktop-load-locked-desktop t)
+(setq desktop-files-not-to-save "^$")
+(setq desktop-save t)
+(setq desktop-buffers-not-to-save
+     (concat "\\("
+             "^nn\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
+             "\\|\\.emacs.*\\|\\.diary\\|\\.newsrc-dribble\\|\\.bbdb"
+       "\\)$"))
+:config
+(desktop-save-mode t)
+(add-to-list 'desktop-modes-not-to-save 'dired-mode)
+(add-to-list 'desktop-modes-not-to-save 'Info-mode)
+(add-to-list 'desktop-modes-not-to-save 'info-lookup-mode)
+(add-to-list 'desktop-modes-not-to-save 'fundamental-mode)
+(add-to-list 'desktop-modes-not-to-save 'completion-list-mode)
 
-  ;; remove desktop after it's been read
-  (add-hook 'desktop-after-read-hook
-            '(lambda ()
-               ;; desktop-remove clears desktop-dirname
-               (setq desktop-dirname-tmp desktop-dirname)
-               (desktop-remove)
-               (setq desktop-dirname desktop-dirname-tmp)))
+;; remove desktop after it's been read
+(add-hook 'desktop-after-read-hook
+    '(lambda ()
+       ;; desktop-remove clears desktop-dirname
+       (setq desktop-dirname-tmp desktop-dirname)
+       (desktop-remove)
+       (setq desktop-dirname desktop-dirname-tmp)))
 
-  (defun saved-session ()
-    (file-exists-p (concat desktop-dirname "/" desktop-base-file-name)))
+(defun saved-session ()
+  (file-exists-p (concat desktop-dirname "/" desktop-base-file-name)))
 
-  ;; use session-restore to restore the desktop manually
-  (defun session-restore ()
-    "Restore a saved emacs session."
-    (interactive)
-    (if (saved-session)
-        (desktop-read)
-      (message "No desktop found.")))
+;; use session-restore to restore the desktop manually
+(defun session-restore ()
+  "Restore a saved emacs session."
+  (interactive)
+  (if (saved-session)
+      (desktop-read)
+    (message "No desktop found.")))
 
-  ;; use session-save to save the desktop manually
-  (defun session-save ()
-    "Save an emacs session."
-    (interactive)
-    (if (saved-session)
-        (if (y-or-n-p "Overwrite existing desktop? ")
-            (desktop-save-in-desktop-dir)
-          (message "Session not saved."))
-      (desktop-save-in-desktop-dir)))
+;; use session-save to save the desktop manually
+(defun session-save ()
+  "Save an emacs session."
+  (interactive)
+  (if (saved-session)
+      (if (y-or-n-p "Overwrite existing desktop? ")
+    (desktop-save-in-desktop-dir)
+  (message "Session not saved."))
+  (desktop-save-in-desktop-dir)))
 
-  ;; ask user whether to restore desktop at start-up
-  (add-hook 'after-init-hook
-            '(lambda ()
-               (if (saved-session)
-                   (if (y-or-n-p "Restore desktop? ")
-                       (session-restore)))))
-  )
-
-
-;; ** auto-save files
-
-;; From ErgoEmacs:
-
-"emacs has auto-save-mode, however, it's not what you think.
-Emacs's auto-save-mode periodically saves a copy of your file with the name #filename#.
-
-When you save the file, those #files# are deleted automatically. In case of crash or electricity outage, when you open a file afterward, emacs will detect those #files# and ask if you want to recover."
+;; ask user whether to restore desktop at start-up
+(add-hook 'after-init-hook
+    '(lambda ()
+       (if (saved-session)
+     (if (y-or-n-p "Restore desktop? ")
+         (session-restore)))))
+)
 
 ;; (use-package auto-save
-;;   :ensure nil
-;;   :config
+  ;;   :ensure nil
+  ;;   :config
 (setq auto-save-default nil)  ;; stop creating those #auto-save# files
-;;  )
+  ;;  )
 
-;; ** savehist
+(use-package saveplace
+  :ensure nil
+  :config
+  (defconst savefile-dir (expand-file-name "savefile" user-emacs-directory))
 
-;; Save minibuffer stories and others (by setting savehist-additional-variables)
+  ;; create the savefile dir if it doesn't exist
+  (unless (file-exists-p savefile-dir)
+    (make-directory savefile-dir))
 
+  (setq save-place-file (expand-file-name "saveplace" savefile-dir))
+  ;; activate it for all buffers
+  (setq-default save-place t)
+  (save-place-mode t)
+)
 
 (use-package savehist
   :ensure nil
@@ -4330,13 +3216,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
           kmacro-ring
           shell-command-history))
   (savehist-mode)
-  )
-
-
-;; ** recentf
-
-;; Save list of recently opened files across emacs sessions
-
+)
 
 (use-package recentf
   :ensure t
@@ -4348,40 +3228,20 @@ When you save the file, those #files# are deleted automatically. In case of cras
         ;; problems with remote files
         recentf-auto-cleanup 'never)
   (recentf-mode +1)
-  )
-
-
-;; ** auto-save-visited
-
-;; auto-save file-visiting buffers after five seconds of idle time
-
+)
 
 (use-package auto-save-visited-mode
   :ensure nil
   :config
   (auto-save-visited-mode)
-  )
-
-
-;; * Interface Enhancement
-
-;; ** sublimity
-
+)
 
 (use-package sublimity
   :ensure t
   :disabled
   :config
   (sublimity-mode 1)
-  )
-
-
-
-
-;; *** sublimity-map (experimental)
-
-;; This package ruins the scrolling from either sublimity-scroll or the smooth-scrolling package
-
+)
 
 (use-package sublimity-map
   :disabled
@@ -4393,15 +3253,12 @@ When you save the file, those #files# are deleted automatically. In case of cras
   (sublimity-map-set-delay nil) ;; minimap is displayed after 5 seconds of idle time
 
   ;; document this snippet better, not sure what it does, but it defines the font-family
-  ;;  (add-hook 'sublimity-map-setup-hook
-  ;;          (lambda ()
-  ;;            (setq buffer-face-mode-face '(:family "Monospace"))
-  ;;            (buffer-face-mode)))
+;;  (add-hook 'sublimity-map-setup-hook
+;;          (lambda ()
+;;            (setq buffer-face-mode-face '(:family "Monospace"))
+;;            (buffer-face-mode)))
 
-  )
-
-
-;; *** sublimity-attractive
+)
 
 (use-package sublimity-attractive
   :disabled
@@ -4414,68 +3271,37 @@ When you save the file, those #files# are deleted automatically. In case of cras
   ;; (sublimity-attractive-hide-vertical-border)
   ;; (sublimity-attractive-hide-fringes)
   ;; (sublimity-attractive-hide-modelines)
-  )
-
-
-
-;; ** dashboard
-
+)
 
 ;; DashboardPac
 (use-package dashboard
-  :ensure t
   :demand
   :diminish (dashboard-mode page-break-lines-mode)
-  ;;:bind ("C-z d" . open-dashboard)
+  :bind ("C-z d" . open-dashboard)
   :custom
-  ;; Set the banner
-  (dashboard-startup-banner 'logo) ;; values: ('oficial, 'logo, 1, 2, 3, or "path/to/image.png")
-  ;; Set the title
-  (dashboard-banner-logo-title
-   (format "Emacs ready in %.2f seconds with %d garbage collections."
-           (float-time
-            (time-subtract after-init-time before-init-time)) gcs-done))
-  ;; Set dashboard itens
+  (dashboard-banner-logo-title "Close the world. Open the nExt.")
+  (dashboard-startup-banner (expand-file-name "images/KEC_Dark_BK_Small.png" user-emacs-directory))
   (dashboard-items '((recents  . 7)
                      (bookmarks . 7)
                      (agenda . 5)))
-  ;; Set dashboard as the inicial buffer on startup
   (initial-buffer-choice (lambda () (get-buffer dashboard-buffer-name)))
-  ;; Content is not centered by default. To center, set
-  (dashboard-center-content t)
-  ;; To disable shortcut "jump" indicators for each section, set
-  (dashboard-show-shortcuts t)
-  ;; To add icons to the widget headings and their items:
   (dashboard-set-heading-icons t)
-  ;; Set file icons
-  (dashboard-set-file-icons t)
-  ;; set widgets to show
-  (setq dashboard-items '((recents  . 5)
-                          (bookmarks . 5)
-                          (projects . 5)
-                          (agenda . 5)
-                          (registers . 5)))
-  ;; To show navigator below the banner
   (dashboard-set-navigator t)
-  ;;To show info about the packages loaded and the init time:
-  (dashboard-set-init-info t)
-  ;; Set the navigator buttons
   (dashboard-navigator-buttons
    (if (featurep 'all-the-icons)
        `(((,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust -0.05)
            "M-EMACS" "Browse M-EMACS Homepage"
-           (lambda (&rest _) (browse-url "https://github.com/gugutz/dotfiles")))
+           (lambda (&rest _) (browse-url "https://github.com/MatthewZMD/.emacs.d")))
           (,(all-the-icons-fileicon "elisp" :height 1.0 :v-adjust -0.1)
            "Configuration" "" (lambda (&rest _) (edit-configs)))
           (,(all-the-icons-faicon "cogs" :height 1.0 :v-adjust -0.1)
            "Update" "" (lambda (&rest _) (auto-package-update-now)))))
      `((("" "M-EMACS" "Browse M-EMACS Homepage"
-         (lambda (&rest _) (browse-url "https://github.com/gugutz/dotfiles")))
+         (lambda (&rest _) (browse-url "https://github.com/MatthewZMD/.emacs.d")))
         ("" "Configuration" "" (lambda (&rest _) (edit-configs)))
         ("" "Update" "" (lambda (&rest _) (auto-package-update-now)))))))
   :custom-face
   (dashboard-banner-logo-title ((t (:family "Love LetterTW" :height 123))))
-  (dashboard-heading ((t (:foreground "#f1fa8c" :weight bold))))
   :config
   (dashboard-modify-heading-icons '((recents . "file-text")
                                     (bookmarks . "book")))
@@ -4500,13 +3326,6 @@ When you save the file, those #files# are deleted automatically. In case of cras
 
 
 
-;; *** add fireplace as a widged in the dashboard
-
-
-
-;; ** toggle window transparency
-
-
 (defun tau/toggle-window-transparency ()
   "Cycle the frame transparency from default to transparent."
   (interactive)
@@ -4518,10 +3337,6 @@ When you save the file, those #files# are deleted automatically. In case of cras
       (set-frame-parameter nil 'alpha transparency))))
 
 (global-set-key (kbd "M-<f12> t") 'tau/toggle-window-transparency)
-
-
-;; ** minimap
-
 
 (use-package minimap
   :ensure t
@@ -4545,13 +3360,9 @@ When you save the file, those #files# are deleted automatically. In case of cras
   :config
   (custom-set-faces
    '(minimap-active-region-background
-     ((((background dark)) (:background "#555555555555"))
+    ((((background dark)) (:background "#555555555555"))
       (t (:background "#C847D8FEFFFF"))) :group 'minimap))
-  )
-
-
-;; ** pulse
-
+)
 
 ;; Visualize TAB, (HARD) SPACE, NEWLINE
 ;; Pulse current line
@@ -4593,10 +3404,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
                  pop-global-mark
                  goto-last-change))
     (advice-add cmd :after #'my-recenter-and-pulse))
-  )
-
-
-;; ** prettify symbols
+)
 
 (defun add-pretty-lambda ()
   "Make some word or string show as pretty Unicode symbols. See https://unicodelookup.com for more."
@@ -4612,10 +3420,6 @@ When you save the file, those #files# are deleted automatically. In case of cras
 ;;(global-prettify-symbols-mode 1)
 (add-hook 'prog-mode-hook 'add-pretty-lambda)
 (add-hook 'org-mode-hook 'add-pretty-lambda)
-
-
-;; ** centaur-tabs
-
 
 (use-package centaur-tabs
   :ensure t
@@ -4659,26 +3463,16 @@ When you save the file, those #files# are deleted automatically. In case of cras
   ("C-c t p" . centaur-tabs-group-by-projectile-project)
   ("C-c t g" . centaur-tabs-group-buffer-groups)
   (:map evil-normal-state-map
-        ("g t" . centaur-tabs-forward)
-        ("g T" . centaur-tabs-backward))
-  ;;  :init
+  ("g t" . centaur-tabs-forward)
+  ("g T" . centaur-tabs-backward))
+;;  :init
   :config
   ;; functions
   ;; (centaur-tabs-change-fonts "arial" 160)
   (centaur-tabs-headline-match)
   (centaur-tabs-enable-buffer-reordering)
   (centaur-tabs-mode t)
-  )
-
-
-;; ** hideshowvis
-
-;; Add clicable markers for foldable regions in the fringe
-;; This package is not on elpa, it has to be downloaded and installed locally
-
-;; Source:           https://emacs.stackexchange.com/questions/112/actionable-code-folding-in-emacs-fringe
-;; Package Download: https://github.com/emacsmirror/hideshowvis/blob/master/hideshowvis.el
-
+)
 
 (use-package hideshowvis
   :ensure nil
@@ -4688,15 +3482,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
   (display-line-numbers-mode . hideshowvis-enable)
   :config
   (hideshowvis-symbols) ; displaying a + symbol in the fringe for folded regions
-  )
-
-
-;; * Highlights
-
-;; ** show paren mode
-
-;; Highlight (by bolding) the matching parenthesis
-
+)
 
 (use-package paren
   :ensure nil
@@ -4713,79 +3499,53 @@ When you save the file, those #files# are deleted automatically. In case of cras
   (setq show-paren-when-point-inside-paren t)
   (setq show-paren-when-point-in-periphery t)
   (show-paren-mode +1)
-  )
-
-
-;; ** color identifiers mode
-
+)
 
 (use-package color-identifiers-mode
   :ensure t
   :defer t
-  ;;:config
-  ;;(add-hook 'after-init-hook 'global-color-identifiers-mode)
-  ;; the following code disabled highlighting for all other keywords and only highlights and color variables
-  ;;   (defun myfunc-color-identifiers-mode-hook ()
-  ;;     (let ((faces '(font-lock-comment-face font-lock-comment-delimiter-face font-lock-constant-face font-lock-type-face font-lock-function-name-face font-lock-variable-name-face font-lock-keyword-face font-lock-string-face font-lock-builtin-face font-lock-preprocessor-face font-lock-warning-face font-lock-doc-face font-lock-negation-char-face font-lock-regexp-grouping-construct font-lock-regexp-grouping-backslash)))
-  ;;       (dolist (face faces)
-  ;;         (face-remap-add-relative face '((:foreground "" :weight normal :slant normal)))))
-  ;;     (face-remap-add-relative 'font-lock-keyword-face '((:weight bold)))
-  ;;     (face-remap-add-relative 'font-lock-comment-face '((:slant italic)))
-  ;;     (face-remap-add-relative 'font-lock-builtin-face '((:weight bold)))
-  ;;     (face-remap-add-relative 'font-lock-preprocessor-face '((:weight bold)))
-  ;;     (face-remap-add-relative 'font-lock-function-name-face '((:slant italic)))
-  ;;     (face-remap-add-relative 'font-lock-string-face '((:slant italic)))
-  ;;     (face-remap-add-relative 'font-lock-constant-face '((:weight bold))))
-  ;;   (add-hook 'color-identifiers-mode-hook 'myfunc-color-identifiers-mode-hook)
-  )
-
-
-;; ** Highlighting numbers
-
+;;:config
+;;(add-hook 'after-init-hook 'global-color-identifiers-mode)
+;; the following code disabled highlighting for all other keywords and only highlights and color variables
+;;   (defun myfunc-color-identifiers-mode-hook ()
+;;     (let ((faces '(font-lock-comment-face font-lock-comment-delimiter-face font-lock-constant-face font-lock-type-face font-lock-function-name-face font-lock-variable-name-face font-lock-keyword-face font-lock-string-face font-lock-builtin-face font-lock-preprocessor-face font-lock-warning-face font-lock-doc-face font-lock-negation-char-face font-lock-regexp-grouping-construct font-lock-regexp-grouping-backslash)))
+;;       (dolist (face faces)
+;;         (face-remap-add-relative face '((:foreground "" :weight normal :slant normal)))))
+;;     (face-remap-add-relative 'font-lock-keyword-face '((:weight bold)))
+;;     (face-remap-add-relative 'font-lock-comment-face '((:slant italic)))
+;;     (face-remap-add-relative 'font-lock-builtin-face '((:weight bold)))
+;;     (face-remap-add-relative 'font-lock-preprocessor-face '((:weight bold)))
+;;     (face-remap-add-relative 'font-lock-function-name-face '((:slant italic)))
+;;     (face-remap-add-relative 'font-lock-string-face '((:slant italic)))
+;;     (face-remap-add-relative 'font-lock-constant-face '((:weight bold))))
+;;   (add-hook 'color-identifiers-mode-hook 'myfunc-color-identifiers-mode-hook)
+)
 
 (use-package highlight-numbers
   :ensure t
   :defer t
-  )
-
-
-;; ** Highlighting operators
-
+)
 
 (use-package highlight-operators
   :ensure t
   :defer t
   ;;:hook
   ;;(prog-mode . highlight-operators-mode)
-  )
-
-
-;; ** Highlighting escape sequences
-
+)
 
 (use-package highlight-escape-sequences
   :ensure t
   :defer t
   ;;:hook
   ;;(prog-mode . hes-mode)
-  )
-
-
-;; ** Highlighting parentheses
-
-;; This mode highlights (bolds) the current pair in which the point (cursor) is
-
+)
 
 (use-package highlight-parentheses
   :ensure t
   :defer t
   :hook
   (prog-mode . highlight-parentheses-mode)
-  )
-
-
-;; ** diff-hl (highlights uncommited diffs in bar aside from the line numbers)
-
+)
 
 (use-package diff-hl
   :ensure t
@@ -4803,10 +3563,10 @@ When you save the file, those #files# are deleted automatically. In case of cras
 
   ;; Better looking colours for diff indicators
   (custom-set-faces
-   '(diff-hl-change ((t (:background "#3a81c3"))))
-   '(diff-hl-insert ((t (:background "#7ccd7c"))))
-   '(diff-hl-delete ((t (:background "#ee6363"))))
-   )
+    '(diff-hl-change ((t (:background "#3a81c3"))))
+    '(diff-hl-insert ((t (:background "#7ccd7c"))))
+    '(diff-hl-delete ((t (:background "#ee6363"))))
+  )
 
   :config
 
@@ -4822,31 +3582,22 @@ When you save the file, those #files# are deleted automatically. In case of cras
 
 
   (unless (display-graphic-p)
-    (setq diff-hl-margin-symbols-alist
-          '((insert . " ") (delete . " ") (change . " ")
-            (unknown . " ") (ignored . " ")))
-    ;; Fall back to the display margin since the fringe is unavailable in tty
-    (diff-hl-margin-mode 1)
-    ;; Avoid restoring `diff-hl-margin-mode'
-    (with-eval-after-load 'desktop
-      (add-to-list 'desktop-minor-mode-table
-                   '(diff-hl-margin-mode nil))))
+  (setq diff-hl-margin-symbols-alist
+        '((insert . " ") (delete . " ") (change . " ")
+          (unknown . " ") (ignored . " ")))
+  ;; Fall back to the display margin since the fringe is unavailable in tty
+  (diff-hl-margin-mode 1)
+  ;; Avoid restoring `diff-hl-margin-mode'
+  (with-eval-after-load 'desktop
+    (add-to-list 'desktop-minor-mode-table
+                 '(diff-hl-margin-mode nil))))
 
-  ;; Integration with magit
+    ;; Integration with magit
   (with-eval-after-load 'magit
     (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
 
   (global-diff-hl-mode 1) ;; Enable diff-hl globally
-  )
-
-
-;; ** Highlight TODO
-
-;; Basic support todos.
-;; By default these include:
-;; TODO NEXT THEM PROG OKAY DONT FAIL DONE NOTE KLUDGE HACK TEMP FIXME
-;; and any sequence of X's or ?'s of length at least 3: XXX, XXXX, XXXXX, …, ???, ????, ????, ….
-
+)
 
 ;; NOTE that the highlighting works even in comments.
 (use-package hl-todo
@@ -4859,20 +3610,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
   (add-to-list 'hl-todo-keyword-faces '("TEST" . "#dc8cc3"))
   (add-to-list 'hl-todo-keyword-faces '("NOTE" . "#ffff00"))
   (add-to-list 'hl-todo-keyword-faces '("DONE" . "#00ff00"))
-  )
-
-
-;; ** hi-lock mode
-
-;; Highlight regexp
-
-;; From Mastering Emacs:
-;; There is a mechanism for storing and restoring the Hi-Locks you’ve created. If you create highlights interactively you can tell Emacs to insert those patterns into the active buffer by running M-s h w. Emacs will wrap the elisp patterns in the comment format used by the buffer (if one is defined) or ask if you no comment format is defined.
-
-;; The patterns should be added to the top of the file, as Emacs will only search the first 10,000 characters (customize hi-lock-file-patterns-range to change that amount) for the patterns before giving up.
-
-;; Emacs will not highlight patterns found in a file automatically. You must explicitly tell it to do so by manually invoking M-x hi-lock-mode or globally with global-hi-lock-mode.
-
+)
 
 (use-package hi-lock
   :init
@@ -4880,27 +3618,21 @@ When you save the file, those #files# are deleted automatically. In case of cras
   :defer t
   :config
   (add-hook 'hi-lock-mode-hook
-            (lambda nil
-              (highlight-regexp "FIXME" 'hi-red-b)
-              (highlight-regexp "NOTE" 'hi-red-b)
-              (highlight-regexp "TODO" 'hi-red-b))
-            )
+          (lambda nil
+            (highlight-regexp "FIXME" 'hi-red-b)
+            (highlight-regexp "NOTE" 'hi-red-b)
+            (highlight-regexp "TODO" 'hi-red-b))
+  )
   ;; always highlight patterns found in files without confirmation
   (setq hi-lock-file-patterns-policy #'(lambda (dummy) t))
-  )
-
-
-;; ** hl-anything
-
-;; Highlight portions of text
-
+)
 
 (use-package hl-anything
   :ensure t
   :defer t
   :after evil
-  ;;  :hook
-  ;;  (kill-emacs . hl-save-highlights)
+;;  :hook
+;;  (kill-emacs . hl-save-highlights)
   :bind
   ("C-<f8> h" . hl-highlight-thingatpt-local)
   ("C-<f8> S-h" . hl-highlight-thingatpt-global)
@@ -4923,27 +3655,20 @@ When you save the file, those #files# are deleted automatically. In case of cras
     "hp"  'hl-find-prev-thing
     "hr"  'hl-restore-highlights
     "hs"  'hl-save-highlights)
-  )
-
-
-;; ** highlight-tail
-
+)
 
 (use-package highlight-tail
   :load-path "packages/highlight-tail"
   :ensure nil
   :config
   (setq highlight-tail-colors '(("#9310FF" . 0) ;; closest to cursor
-                                ("#9370DB" . 35)  ;; midle of tail
-                                ("#DDA0DD" . 76)))  ;; end of the tail
+                                 ("#9370DB" . 35)  ;; midle of tail
+                                 ("#DDA0DD" . 76)))  ;; end of the tail
   (setq highlight-tail-steps 17)
   (setq highlight-tail-timer 0.05)
   (setq highlight-tail-posterior-type 'const)
   (highlight-tail-mode)
-  )
-
-
-;; ** beacon - flash light where cursor is
+)
 
 (use-package beacon
   :ensure t
@@ -4969,49 +3694,26 @@ When you save the file, those #files# are deleted automatically. In case of cras
   (setq inhibit-modification-hooks nil)
   (add-hook 'after-change-functions #'beacon-blink)
   (beacon-mode 1)
-  )
-
-
-;; ** Rainbow Delimiters
-
-;; This highlights matching parentheses by coloring them acording to their depth
-;; Specially helpful for editing lisp code
-
+)
 
 (use-package rainbow-delimiters
   :ensure t
   :defer t
   :hook
   (prog-mode . rainbow-delimiters-mode)
-  )
-
-
-;; ** rainbow mode
-
-;; : Colorize hex, rgb and named color codes
-
+)
 
 (use-package rainbow-mode
   :ensure t
   :defer t
-  )
-
-
-;; ** Highlight lines
-
-;; : built-in package
-
+)
 
 (use-package hl-line
   :ensure nil
   :defer t
   :config
   (global-hl-line-mode)
-  )
-
-
-;; ** Highlight columns
-
+)
 
 (use-package col-highlight
   :load-path "packages/col-highlight"
@@ -5020,13 +3722,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
   :config
   (col-highlight-toggle-when-idle)
   (col-highlight-set-interval 2)
-  )
-
-
-;; ** Highlight crosshair
-
-;; Highlight crosshair (combination of hl-lines and hl-columns
-
+)
 
 (use-package crosshairs
   :load-path "packages/crosshairs"
@@ -5034,11 +3730,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
   :defer t
   :config
   (crosshairs-mode)
-  )
-
-
-;; ** volatile highlights
-
+)
 
 (use-package volatile-highlights
   :ensure t
@@ -5059,10 +3751,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
   ;;-----------------------------------------------------------------------------
   (vhl/define-extension 'undo-tree 'undo-tree-yank 'undo-tree-move)
   (vhl/install-extension 'undo-tree)
-  )
-
-
-;; ** highlight indent guides
+)
 
 (use-package highlight-indent-guides
   :ensure t
@@ -5073,25 +3762,14 @@ When you save the file, those #files# are deleted automatically. In case of cras
   (highlight-indent-guides-auto-enabled t)
   (highlight-indent-guides-responsive t)
   (highlight-indent-guides-method 'character) ; column
-  )
-
-
-;; ** highlight-context-line
-
-;; The line of your Emacs buffer that is at the top of the window before you start to scroll, is considered the context line. It is the last line in the view after scrolling that was visible before scrolling. Similarly the line at the bottom of the window is the context line for scrolling down.
-;; Whenever you scrolled it painted a line across the document that reflected where the previous view ended.
-
+)
 
 (use-package highlight-context-line
   :ensure t
   :defer t
   :config
   (highlight-context-line-mode 1)
-  )
-
-
-;; * crux
-
+)
 
 ;; CruxPac
 (use-package crux
@@ -5105,17 +3783,13 @@ When you save the file, those #files# are deleted automatically. In case of cras
   (crux-with-region-or-buffer untabify)
   (crux-with-region-or-point-to-eol kill-ring-save)
   (defalias 'rename-file-and-buffer #'crux-rename-file-and-buffer))
-(global-set-key [remap move-beginning-of-line] #'crux-move-beginning-of-line)
-(global-set-key (kbd "C-c o") #'crux-open-with)
-(global-set-key [(shift return)] #'crux-smart-open-line)
-(global-set-key (kbd "s-r") #'crux-recentf-find-file)
-(global-set-key (kbd "C-<backspace>") #'crux-kill-line-backwards)
-(global-set-key [remap kill-whole-line] #'crux-kill-whole-line)
+  (global-set-key [remap move-beginning-of-line] #'crux-move-beginning-of-line)
+  (global-set-key (kbd "C-c o") #'crux-open-with)
+  (global-set-key [(shift return)] #'crux-smart-open-line)
+  (global-set-key (kbd "s-r") #'crux-recentf-find-file)
+  (global-set-key (kbd "C-<backspace>") #'crux-kill-line-backwards)
+  (global-set-key [remap kill-whole-line] #'crux-kill-whole-line)
 ;; -CruxPac
-
-;; * Scrolling settings
-;; ** memacs scrolling (trying it out)
-
 
 ;; SmoothScroll
 ;; Vertical Scroll
@@ -5133,9 +3807,6 @@ When you save the file, those #files# are deleted automatically. In case of cras
 (setq hscroll-margin 1)
 ;; -SmoothScroll
 
-
-;; ** native mouse scrolling
-
 (use-package mwheel
   :ensure nil
   :config
@@ -5143,21 +3814,10 @@ When you save the file, those #files# are deleted automatically. In case of cras
   (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ;; one line at a time
   (setq mouse-wheel-scroll-amount '(1 ((control) . 5)))
   (setq mouse-wheel-follow-mouse 't)                  ;; scroll window under mouse
-  )
-
-
-;; *** Use Shift + MouseWheels for smooth scrolling
-
+)
 
 (global-set-key (kbd "<S-mouse-4>") 'scroll-down-line)
 (global-set-key (kbd "<S-mouse-5>") 'scroll-up-line)
-
-
-
-;; * Global minor modes
-
-;; ** which-key
-
 
 (use-package which-key
   :ensure t
@@ -5168,11 +3828,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
   (setq which-key-min-display-lines 3)
   (setq which-key-max-description-length 20)
   (setq which-key-max-display-columns 6)
-  )
-
-
-;; ** key-frequency
-
+)
 
 (use-package keyfreq
   :ensure t
@@ -5181,12 +3837,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
   :init
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1)
-  )
-
-
-
-;; * Local minor modes
-;; ** smartparens
+)
 
 (use-package smartparens
   :ensure t
@@ -5199,44 +3850,24 @@ When you save the file, those #files# are deleted automatically. In case of cras
   (sp-pair "+" "+" :actions '(wrap))
   (sp-pair "<" ">" :actions '(wrap))
   (sp-pair "$" "$" :actions '(wrap))
-  )
-
-
-;; *** evil-smartparens helps avoid conflicts between evil and smartparens
-
+)
 
 (use-package evil-smartparens
   :ensure t
   :hook
   (smartparens-enabled . evil-smartparens-mode)
-  )
-
-
-;; ** Smartscan mode
-;; : Usage:
-;; : M-n and M-p move between symbols
-;; : M-' to replace all symbols in the buffer matching the one under point
-;; : C-u M-' to replace symbols in your current defun only (as used by narrow-to-defun.)
-
+)
 
 (use-package smartscan
   :ensure t
   :defer t
-  )
-
-
-;; ** editorconfig
-
+)
 
 (use-package editorconfig
   :ensure t
   :defer t
   :diminish editorconfig-mode
-  )
-
-
-;; * multiple cursors
-
+)
 
 (use-package multiple-cursors
   :after evil
@@ -5249,20 +3880,16 @@ When you save the file, those #files# are deleted automatically. In case of cras
   :bind
   ("M-u" . hydra-multiple-cursors/body)
   (:map evil-visual-state-map
-        ("C-d" . mc/mark-next-like-this)
-        ("C-a" . mc/mark-all-like-this)
-        )
+  ("C-d" . mc/mark-next-like-this)
+  ("C-a" . mc/mark-all-like-this)
+  )
   :config
   (define-key evil-visual-state-map (kbd "mn") 'mc/mark-next-like-this)
   (define-key evil-visual-state-map (kbd "ma") 'mc/mark-all-like-this-dwim)
   (define-key evil-visual-state-map (kbd "md") 'mc/mark-all-like-this-in-defun)
   (define-key evil-visual-state-map (kbd "mm") 'ace-mc-add-multiple-cursors)
   (define-key evil-visual-state-map (kbd "ms") 'ace-mc-add-single-cursor)
-  )
-
-
-
-;; * quickrun (compile and execute code)
+)
 
 (use-package quickrun
   :ensure t
@@ -5270,12 +3897,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
   :bind
   ("C-<f5>" . quickrun)
   ("M-<f5>" . quickrun-shell)
-  )
-
-
-
-;; * LaTeX
-
+)
 
 (use-package tex
   :ensure auctex
@@ -5292,7 +3914,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
   (TeX-master nil)
   ;; to use pdfview with auctex
   (TeX-view-program-selection '((output-pdf "pdf-tools"))
-                              TeX-source-correlate-start-server t)
+    TeX-source-correlate-start-server t)
   (TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view")))
   (TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
   :config
@@ -5300,16 +3922,14 @@ When you save the file, those #files# are deleted automatically. In case of cras
   (setq org-export-with-smart-quotes t) ;; convert quotes to LaTeX smartquotes on export
 
   (add-hook 'LaTeX-mode-hook
-            (lambda ()
-              (turn-on-reftex)
-              (setq reftex-plug-into-AUCTeX t)
-              (reftex-isearch-minor-mode)
-              (setq TeX-PDF-mode t)
-              (setq TeX-source-correlate-method 'synctex)
-              (setq TeX-source-correlate-start-server t)))
-  )
-
-
+    (lambda ()
+        (turn-on-reftex)
+        (setq reftex-plug-into-AUCTeX t)
+        (reftex-isearch-minor-mode)
+        (setq TeX-PDF-mode t)
+        (setq TeX-source-correlate-method 'synctex)
+        (setq TeX-source-correlate-start-server t)))
+)
 
 (use-package auctex-latexmk
   :defer t
@@ -5318,100 +3938,56 @@ When you save the file, those #files# are deleted automatically. In case of cras
   :hook
   ;; example of lambda usage in :hooks
   (LaTeX-mode . (lambda () (TeX-fold-mode t)))
-  )
-
-
-
+)
 
 (use-package company-auctex
   :ensure t
   :defer t
   :init
   (add-hook 'LaTeX-mode-hook 'company-auctex-init)
-  )
+)
 
+(with-eval-after-load 'org
+   '(add-to-list 'org-latex-classes
+	      '("beamer"
+	        "\\documentclass\[presentation\]\{beamer\}"
+	        ("\\section\{%s\}" . "\\section*\{%s\}")
+	        ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
+	        ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}"))))
 
+;(add-to-list 'org-latex-classes
+;        '("memoir"
+;          "\\documentclass\[a4paper\]\{memoir\}"
+;          ("\\book\{%s\}" . "\\book*\{%s\}")
+;          ("\\part\{%s\}" . "\\part*\{%s\}")
+;          ("\\chapter\{%s\}" . "\\chapter*\{%s\}")
+;          ("\\section\{%s\}" . "\\section*\{%s\}")
+;          ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
+;          ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}"))
+;)
 
-;; ** Add the beamer presentation class template to org
+;(add-to-list 'org-latex-classes
+  ;             '("abntex2"
+  ;               "\\documentclass{abntex2}"
+  ;               ("\\part{%s}" . "\\part*{%s}")
+  ;               ("\\chapter{%s}" . "\\chapter*{%s}")
+  ;               ("\\section{%s}" . "\\section*{%s}")
+  ;               ("\\subsection{%s}" . "\\subsection*{%s}")
+  ;               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+  ;               ("\\subsubsubsection{%s}" . "\\subsubsubsection*{%s}")
+  ;               ("\\paragraph{%s}" . "\\paragraph*{%s}"))
+  ;)
 
 (with-eval-after-load 'org
   '(add-to-list 'org-latex-classes
-                '("beamer"
-                  "\\documentclass\[presentation\]\{beamer\}"
-                  ("\\section\{%s\}" . "\\section*\{%s\}")
-                  ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
-                  ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}"))))
-
-
-
-;; ** Add the memoir class template to org
-
-;; The Sections and Heading Levels gets configured as follows:
-
-;; | Division       | <c>Level | <c>org-equivalent |
-;; | \book          |       -2 | *                 |
-;; | \part          |       -1 | **                |
-;; | \chapter       |        0 | ***               |
-;; | \section       |        1 | ****              |
-;; | \subsection    |        2 | *****             |
-;; | \subsubsection |        3 | ******            |
-;; | \paragraph     |        4 | *******           |
-;; | \subparagraph  |        5 | ********          |
-
-
-
-                                        ;(add-to-list 'org-latex-classes
-                                        ;        '("memoir"
-                                        ;          "\\documentclass\[a4paper\]\{memoir\}"
-                                        ;          ("\\book\{%s\}" . "\\book*\{%s\}")
-                                        ;          ("\\part\{%s\}" . "\\part*\{%s\}")
-                                        ;          ("\\chapter\{%s\}" . "\\chapter*\{%s\}")
-                                        ;          ("\\section\{%s\}" . "\\section*\{%s\}")
-                                        ;          ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
-                                        ;          ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}"))
-                                        ;)
-
-
-;; ** Add abntex2 class to org list of latex classes
-;; This class is based on the Memoir class
-;; The Sections and Heading Levels gets configured as follows:
-
-;; | Division       | <c>Level | <c>org-equivalent |
-;; | \part          |       -1 | *                 |
-;; | \chapter       |        0 | **                |
-;; | \section       |        1 | ***               |
-;; | \subsection    |        2 | ****              |
-;; | \subsubsection |        3 | *****             |
-;; | \paragraph     |        4 | ******            |
-;; | \subparagraph  |        5 | *******           |
-
-                                        ;(add-to-list 'org-latex-classes
-                                        ;             '("abntex2"
-                                        ;               "\\documentclass{abntex2}"
-                                        ;               ("\\part{%s}" . "\\part*{%s}")
-                                        ;               ("\\chapter{%s}" . "\\chapter*{%s}")
-                                        ;               ("\\section{%s}" . "\\section*{%s}")
-                                        ;               ("\\subsection{%s}" . "\\subsection*{%s}")
-                                        ;               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                                        ;               ("\\subsubsubsection{%s}" . "\\subsubsubsection*{%s}")
-                                        ;               ("\\paragraph{%s}" . "\\paragraph*{%s}"))
-                                        ;)
-
-(with-eval-after-load 'org
-  '(add-to-list 'org-latex-classes
-                '("abntex2"
-                  "\\documentclass{abntex2}"
-                  ;; ("\\chapter{%s}" . "\\chapter*{%s}")
-                  ("\\section{%s}" . "\\section*{%s}")
-                  ("\\subsection{%s}" . "\\subsection*{%s}")
-                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                  ("\\subsubsubsection{%s}" . "\\subsubsubsection*{%s}")
-                  ("\\paragraph{%s}" . "\\paragraph*{%s}"))))
-
-
-;; * HTML
-
-;; Set HTML indentation to 4 spaces by default (only on html-mode)
+               '("abntex2"
+                 "\\documentclass{abntex2}"
+                 ;; ("\\chapter{%s}" . "\\chapter*{%s}")
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsubsection{%s}" . "\\subsubsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}"))))
 
 (use-package sgml-mode
   :ensure nil
@@ -5427,14 +4003,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
   ;;(add-hook 'html-mode-hook
   ;;  (lambda ()
   ;;    (set (make-local-variable 'sgml-basic-offset) 4)))
-  )
-
-
-
-;; * CSS and SCSS
-
-;; ** CSS
-
+)
 
 (use-package css-mode
   :ensure t
@@ -5450,7 +4019,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
     (aggressive-indent-mode 1)
     (editorconfig-mode 1)
     (turn-on-visual-line-mode)
-    )
+  )
   :hook
   (css-mode . setup-css-mode)
   ;;(css-mode . aggressive-indent-mode)
@@ -5458,10 +4027,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
   ;;(css-mode . emmet-mode)
   :init
   (setq css-indent-offset 2)
-  )
-
-
-;; ** SCSS
+)
 
 (use-package scss-mode
   :ensure t
@@ -5478,12 +4044,8 @@ When you save the file, those #files# are deleted automatically. In case of cras
   :config
   (autoload 'scss-mode "scss-mode")
   (setq scss-compile-at-save 'nil)
-  (add-to-list 'auto-mode-alist '("\\.scss$\\'" . scss-mode))
-  )
-
-
-;; ** Helm CSS SCSS
-
+   (add-to-list 'auto-mode-alist '("\\.scss$\\'" . scss-mode))
+)
 
 (use-package helm-css-scss
   :ensure t
@@ -5491,15 +4053,15 @@ When you save the file, those #files# are deleted automatically. In case of cras
   :after helm
   :bind
   (:map isearch-mode-map
-        ("s-i" . helm-css-scss-from-isearch))
+  ("s-i" . helm-css-scss-from-isearch))
   (:map helm-css-scss-map
-        ("s-i" . helm-css-scss-multi-from-helm-css-scss))
+  ("s-i" . helm-css-scss-multi-from-helm-css-scss))
   (:map css-mode-map
-        ("s-i" . helm-css-scss)
-        ("s-S-I" . helm-css-scss-back-to-last-point))
+  ("s-i" . helm-css-scss)
+  ("s-S-I" . helm-css-scss-back-to-last-point))
   (:map scss-mode-map
-        ("s-i" . helm-css-scss)
-        ("s-S-I" . helm-css-scss-back-to-last-point))
+  ("s-i" . helm-css-scss)
+  ("s-S-I" . helm-css-scss-back-to-last-point))
   :config
   (setq helm-css-scss-insert-close-comment-depth 2
         helm-css-scss-split-with-multiple-windows t
@@ -5511,27 +4073,17 @@ When you save the file, those #files# are deleted automatically. In case of cras
      $hook (lambda ()
              (local-set-key (kbd "s-i") 'helm-css-scss)
              (local-set-key (kbd "s-I") 'helm-css-scss-back-to-last-point))))
-  )
-
-
-;; * YAML
+)
 
 (use-package yaml-mode
   :ensure t
   :defer t
-  )
-
-
-;; * TOML
+)
 
 (use-package toml-mode
   :ensure t
   :defer t
-  )
-
-
-;; * Emmet
-
+)
 
 (use-package emmet-mode
   :ensure t
@@ -5545,11 +4097,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
   (unbind-key "C-M-<left>" emmet-mode-keymap)
   (unbind-key "C-M-<right>" emmet-mode-keymap)
   (setq emmet-expand-jsx-className? nil) ;; use emmet with JSX markup
-  )
-
-
-;; * Ruby
-
+)
 
 (use-package ruby-mode
   :defer t
@@ -5578,10 +4126,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
             (lambda ()
               (hs-minor-mode 1) ;; Enables folding
               (modify-syntax-entry ?: "."))) ;; Adds ":" to the word definition
-  )
-
-
-;; ** ruby refactor
+)
 
 ;; Functions to help with refactoring
 (use-package ruby-refactor
@@ -5589,56 +4134,27 @@ When you save the file, those #files# are deleted automatically. In case of cras
   :defer t
   :hook
   (ruby-mode . ruby.refactor-mode-launch)
-  )
-
-
-;; ** ruby hash syntax
-
-;; Easily toggle ruby's hash syntax
-
+)
 
 (use-package ruby-hash-syntax
   :ensure t
   :defer t
-  )
-
-
-;; ** ruby additional
-
-;; Ruby rdoc helpers mostly
-
+)
 
 (use-package ruby-additional
   :ensure t
   :defer t
-  )
-
-
-;; ** ruby-tools
-
+)
 
 (use-package ruby-tools
   :ensure t
   :defer t
-  )
-
-
-;; ** rspec-mode
-
-;; Support for running rspec tests
-
+)
 
 (use-package rspec-mode
   :ensure t
   :defer t
-  )
-
-
-;; ** ruby-blocks
-
-;; Highlights ruby def/end blocks
-;; Unfortunatelly this package has to be installed manually, as its not available on MELPA
-
+)
 
 (use-package ruby-block
   :disabled
@@ -5653,33 +4169,21 @@ When you save the file, those #files# are deleted automatically. In case of cras
   (setq ruby-block-highlight-toggle t)
   :config
   (ruby-block-mode t)
-  )
-
-
-;; ** ruby-extra-highlights
-
+)
 
 (use-package ruby-extra-highlight
   :ensure t
   :defer t
   :hook
   (ruby-mode . ruby-extra-highlight-mode)
-  )
-
-
-
-;; * Go
-
+)
 
 (use-package go-mode
   :ensure t
   :defer t
   :mode "\\.go\\'"
   :hook (before-save . gofmt-before-save)
-  )
-
-
-;; ** company-go
+)
 
 (use-package company-go
   :ensure t
@@ -5687,11 +4191,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
   :init
   (with-eval-after-load 'company
     (add-to-list 'company-backends 'company-go))
-  )
-
-
-;; * webdev
-;; ** Web-Mode
+)
 
 (use-package web-mode
   :defer t
@@ -5723,7 +4223,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
     (editorconfig-mode 1)
     (smartscan-mode 1)
     (turn-on-visual-line-mode)
-    )
+  )
   :hook
   (web-mode . setup-web-mode)
   :custom
@@ -5745,56 +4245,11 @@ When you save the file, those #files# are deleted automatically. In case of cras
         '(("php"    . "\\.phtml\\'")
           ("blade"  . "\\.blade\\.")))
   ;;---------------------------------------
-  )
-
-
-;; *** web-mode-edit-element
-
-;; **** General Keymaps
-;;| C-(           | web-mode-element-wrap                                 |
-;;| M-(           | web-mode-element-rename                               |
-;;| C-M-SPC       | web-mode-element-content-select                       |
-;;
-;;**** Elements Keymaps
-;;| C-<left>      | web-mode-element-previous                             |
-;;| C-<right>     | web-mode-element-next                                 |
-;;| M-<left>      | web-mode-edit-element-elements-contract-over-border   |
-;;| M-<right>     | web-mode-edit-element-elements-expand-over-border     |
-;;| C-M-<left>    | web-mode-edit-element-elements-transpose-backward     |
-;;| C-M-<right>   | web-mode-element-transpose                            |
-;;| C-<up>        | web-mode-element-beginning                            |
-;;| C-<down>      | web-mode-tag-match                                    |
-;;| C-S-<up>      | web-mode-element-parent                               |
-;;| C-S-<down>    | web-mode-element-next                                 |
-;;| M-<up>        | web-mode-edit-element-elements-dissolve               |
-;;| M-<down>      | web-mode-edit-element-elements-raise                  |
-;;| C-M-<up>      | web-mode-element-vanish                               |
-;;| C-M-<down>    | web-mode-edit-element-elements-sibling-next-or-parent |
-;;| C-k           | web-mode-element-kill                                 |
-;;| C-S-k         | web-mode-edit-element-elements-kill-siblings          |
-;;| M-k           | web-mode-edit-element-elements-kill-siblings-previous |
-;;| M-K           | web-mode-edit-element-elements-kill-siblings-next     |
-
-;; **** Attributes Keymaps
-;; | C-S-<left>    | web-mode-attribute-previous                           |
-;; | C-S-<right>   | web-mode-attribute-next                               |
-;; | C-M-S-<left>  | web-mode-edit-element-attributes-transpose-backward   |
-;; | C-M-S-<right> | web-mode-attribute-transpose                          |
-;; | C-M-S-<up>    | web-mode-attribute-beginning                          |
-;; | C-M-S-<down>  | web-mode-edit-element-attributes-end-inside           |
-;; | C-M-K         | web-mode-attribute-kill                               |
-
+)
 
 (use-package web-mode-edit-element
   :ensure t
-  )
-
-
-
-;; ** js2-mode
-;; js2-mode: enhanced JavaScript editing mode
-;; https://github.com/mooz/js2-mode
-
+)
 
 (use-package js2-mode
   :after flycheck company
@@ -5843,13 +4298,6 @@ When you save the file, those #files# are deleted automatically. In case of cras
 
   )
 
-
-;; *** eslint
-
-;; eslintd-fix: Emacs minor-mode to automatically fix javascript with eslint_d.
-;; https://github.com/aaronjensen/eslintd-fix/tree/master
-
-
 (use-package eslintd-fix
   :ensure t
   :defer t
@@ -5876,12 +4324,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
                                        (concat "bin/" module)
                                      (concat "bin/" module ".js"))
                                    package-directory)))))))
-  )
-
-
-
-;; *** js2-refactor
-
+)
 
 (use-package js2-refactor
   :ensure t
@@ -5935,16 +4378,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
     ("ba" js2r-forward-barf)
     ("k" js2r-kill)
     ("q" nil))
-  )
-
-
-;; *** xref-js2
-
-
-;; | M-. | Jump  to definition                         |
-;; | M-? | Jump to references                          |
-;; | M-, | Pop back  to where  M-.  was  last  invoked |
-
+)
 
 (use-package xref-js2
   :ensure t
@@ -5957,26 +4391,13 @@ When you save the file, those #files# are deleted automatically. In case of cras
   (define-key js-mode-map (kbd "M-.") nil)
 
   (add-hook 'js2-mode-hook (lambda ()
-                             (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
-  )
-
-;; ** add-node-modules-path
-
-;; Adds the node_modules/.bin directory to the buffer exec_path. E.g. support project local eslint installations.
-;; https://github.com/codesuki/add-node-modules-path/tree/master
-
+    (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
+)
 
 (use-package add-node-modules-path
   :ensure t
   :defer t
-  )
-
-
-;; ** json-snatcher
-
-;; json-snatcher: get the path of any JSON element easily
-;; https://github.com/Sterlingg/json-snatcher
-
+)
 
 (use-package json-snatcher
   :ensure t
@@ -5988,22 +4409,12 @@ When you save the file, those #files# are deleted automatically. In case of cras
     "Sets a hotkey for using the json-snatcher plugin"
     (when (string-match  "\\.json$" (buffer-name))
       (local-set-key (kbd "C-c C-g") 'jsons-print-path)))
-  )
-
-
-;; ** js-import
-
-;; https://github.com/jakoblind/js-import
-
+)
 
 (use-package js-import
   :ensure t
   :defer t
-  )
-
-
-;; ** PrettierJS
-
+)
 
 ;; prettier-emacs: minor-mode to prettify javascript files on save
 ;; https://github.com/prettier/prettier-emacs
@@ -6013,33 +4424,29 @@ When you save the file, those #files# are deleted automatically. In case of cras
   :custom
   (prettier-js-show-errors 'buffer) ;; options: 'buffer, 'echo or nil
   :config
-  ;;   ;; use prettier from local `node_modules' folder if available
-  ;;   (defun tau/use-prettier-if-in-node-modules ()
-  ;;     "Enable prettier-js-mode iff prettier was found installed locally in project"
-  ;;     (interactive)
-  ;;     (let* ((file-name (or (buffer-file-name) default-directory))
-  ;;            (root (locate-dominating-file file-name "node_modules"))
-  ;;            (prettier (and root
-  ;;                           (expand-file-name "node_modules/prettier/bin-prettier.js" root))))
-  ;;       (if (and prettier (file-executable-p prettier))
-  ;;           (progn
-  ;;             (message "Found local prettier executable at %s. Enabling prettier-js-mode" prettier)
-  ;;             (setq prettier-js-command prettier)
-  ;;             (make-variable-buffer-local 'prettier-js-command)
-  ;;             (prettier-js-mode)
-  ;;             (message "Disabling aggressive-indent-mode in favour of prettier")
-  ;;             (aggressive-indent-mode -1))
-  ;;         (progn
-  ;;           (message "Prettier not found in %s. Not enabling prettier-js-mode" root)
-  ;;           (message "Falling back to aggressive-indent-mode")
-  ;;           (aggressive-indent-mode 1)))))
-  ;;   (add-hook 'prettier-js-mode-hook #'tau/use-prettier-if-in-node-modules)
-  ;;
-  )
-
-
-;; ** Typescript
-
+;;   ;; use prettier from local `node_modules' folder if available
+;;   (defun tau/use-prettier-if-in-node-modules ()
+;;     "Enable prettier-js-mode iff prettier was found installed locally in project"
+;;     (interactive)
+;;     (let* ((file-name (or (buffer-file-name) default-directory))
+;;            (root (locate-dominating-file file-name "node_modules"))
+;;            (prettier (and root
+;;                           (expand-file-name "node_modules/prettier/bin-prettier.js" root))))
+;;       (if (and prettier (file-executable-p prettier))
+;;           (progn
+;;             (message "Found local prettier executable at %s. Enabling prettier-js-mode" prettier)
+;;             (setq prettier-js-command prettier)
+;;             (make-variable-buffer-local 'prettier-js-command)
+;;             (prettier-js-mode)
+;;             (message "Disabling aggressive-indent-mode in favour of prettier")
+;;             (aggressive-indent-mode -1))
+;;         (progn
+;;           (message "Prettier not found in %s. Not enabling prettier-js-mode" root)
+;;           (message "Falling back to aggressive-indent-mode")
+;;           (aggressive-indent-mode 1)))))
+;;   (add-hook 'prettier-js-mode-hook #'tau/use-prettier-if-in-node-modules)
+;;
+)
 
 (use-package typescript-mode
   :ensure t
@@ -6067,13 +4474,10 @@ When you save the file, those #files# are deleted automatically. In case of cras
     (hl-todo-mode 1)
     (smartscan-mode 1)
     (turn-on-visual-line-mode)
-    )
+  )
   :hook
   (typescript-mode . setup-typescript-mode)
-  )
-
-
-;; ** Tide
+)
 
 (use-package tide
   :ensure t
@@ -6088,7 +4492,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
     (eldoc-mode +1)
     (tide-hl-identifier-mode +1)
     (company-mode +1)
-    )
+  )
   ;;:hook
   ;;(tide-mode . setup-tide-mode)
   ;;(before-save . tide-format-before-save)
@@ -6098,26 +4502,13 @@ When you save the file, those #files# are deleted automatically. In case of cras
   ;;(add-hook 'before-save-hook 'tide-format-before-save)
   ;;(add-hook 'typescript-mode-hook #'setup-tide-mode)
   ;;(add-hook 'js2-mode-hook #'setup-tide-mode)
-  )
-
-
-
-
-;; * format-all
-
+)
 
 (use-package format-all
   :ensure t
   :defer t
   :bind ("C-c C-f" . format-all-buffer)
-  )
-
-
-;; * JSON Mode
-
-;; json-mode: Major mode for editing JSON files with emacs
-;; https://github.com/joshwnj/json-mode
-
+)
 
 (use-package json-mode
   :ensure t
@@ -6127,13 +4518,7 @@ When you save the file, those #files# are deleted automatically. In case of cras
   (setq json-reformat:indent-width 2)
   (setq json-reformat:pretty-string? t)
   (setq js-indent-level 2)
-  )
-
-
-;; * RJSX Mode
-
-;; https://github.com/felipeochoa/rjsx-mode
-
+)
 
 (use-package rjsx-mode
   :ensure t
@@ -6153,18 +4538,10 @@ When you save the file, those #files# are deleted automatically. In case of cras
   ;; - courtesy of Patrick @halbtuerke
   (defadvice web-mode-highlight-part (around tweak-jsx activate)
     (if (equal web-mode-content-type "jsx")
-        (let ((web-mode-enable-part-face nil))
-          ad-do-it)
+      (let ((web-mode-enable-part-face nil))
+        ad-do-it)
       ad-do-it))
-  )
-
-
-;; * Angular
-
-;; ** Angular Open Counterpart
-
-;; Taken from ng2-mode
-
+)
 
 (defun ng2--counterpart-name (file)
   "Return the file name of FILE's counterpart, or FILE if there is no counterpart."
@@ -6175,38 +4552,21 @@ When you save the file, those #files# are deleted automatically. In case of cras
         (concat base ".html")
       (concat base ".ts"))))
 
-
-
 (defun ng2--is-component (file)
   "Return whether FILE is a component file."
   (equal (file-name-extension (file-name-sans-extension file)) "component"))
-
-
 
 (defun ng2-open-counterpart ()
   "Opens the corresponding template or component file to this one."
   (interactive)
   (find-file (ng2--counterpart-name (buffer-file-name))))
 
-
-
 (global-set-key (kbd "C-x a o") #'ng2-open-counterpart)
 
-
-;; * format-all
-
-
 (use-package format-all
-  :ensure t
-  :bind ("C-c C-f" . format-all-buffer)
-  )
-
-
-;; * JSON Mode
-
-;; json-mode: Major mode for editing JSON files with emacs
-;; https://github.com/joshwnj/json-mode
-
+:ensure t
+:bind ("C-c C-f" . format-all-buffer)
+)
 
 (use-package json-mode
   :mode "\\.js\\(?:on\\|[hl]int\\(rc\\)?\\)\\'"
@@ -6220,50 +4580,142 @@ When you save the file, those #files# are deleted automatically. In case of cras
   ;; disable json-jsonlist checking for json files
   (with-eval-after-load 'flycheck
     (setq-default flycheck-disabled-checkers
-                  (append flycheck-disabled-checkers '(json-jsonlist))))
-  )
-
-
-
-;; * RJSX Mode
-
-;; https://github.com/felipeochoa/rjsx-mode
-
+      (append flycheck-disabled-checkers '(json-jsonlist))))
+)
 
 (use-package rjsx-mode
-  :after js2-mode
-  :mode
-  ("\\.jsx$" . rjsx-mode)
-  ("components/.+\\.js$" . rjsx-mode)
+    :after js2-mode
+    :mode
+    ("\\.jsx$" . rjsx-mode)
+    ("components/.+\\.js$" . rjsx-mode)
 
-  :config
-  ;; auto register for JS files that are inside a `components' folder
-  (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
+    :config
+    ;; auto register for JS files that are inside a `components' folder
+    (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
 
-  ;; for better jsx syntax-highlighting in web-mode
-  ;; - courtesy of Patrick @halbtuerke
-  (defadvice web-mode-highlight-part (around tweak-jsx activate)
-    (if (equal web-mode-content-type "jsx")
+    ;; for better jsx syntax-highlighting in web-mode
+    ;; - courtesy of Patrick @halbtuerke
+    (defadvice web-mode-highlight-part (around tweak-jsx activate)
+      (if (equal web-mode-content-type "jsx")
         (let ((web-mode-enable-part-face nil))
           ad-do-it)
-      ad-do-it))
-  )
-
-
-;; * Docker
-
+        ad-do-it))
+)
 
 (use-package dockerfile-mode
   :ensure t
   :defer t
   :mode "\\Dockerfile\\'"
-  )
+)
 
+(defun animated-self-insert ()
+  (let* ((undo-entry (car buffer-undo-list))
+         (beginning (and (consp undo-entry) (car undo-entry)))
+         (end (and (consp undo-entry) (cdr undo-entry)))
+         (str (when (and (numberp beginning)
+                       (numberp end))
+                (buffer-substring-no-properties beginning end)))
+         (animate-n-steps 3))
+    (when str
+      (delete-region beginning end)
+      (animate-string str (1- (line-number-at-pos)) (current-column)))))
 
-;; * Helper functions
+;; to disable simply comment this hook
+;;; (add-hook 'post-self-insert-hook 'animated-self-insert)
 
-;; ** Duplicate line
+(use-package c-c-combo
+  :ensure t
+  :defer t
+)
 
+(use-package xkcd
+  :ensure t
+  :defer t
+)
+
+(use-package fireplace
+  :ensure t
+  :defer t
+  :init (defvar fireplace-mode-map)
+  :bind (:map fireplace-mode-map
+              ("d" . fireplace-down)
+              ("s" . fireplace-toggle-smoke)
+              ("u" . fireplace-up))
+  :config
+  (setq fireplace-toggle-smoke t)
+  ;; (fireplace)
+)
+
+(use-package selectric-mode
+  :ensure t
+  :defer t
+)
+
+(defvar tetris-mode-map
+  (make-sparse-keymap 'tetris-mode-map))
+(define-key tetris-mode-map (kbd "C-p") 'tetris-rotate-prev)
+(define-key tetris-mode-map (kbd "C-n") 'tetris-move-down)
+(define-key tetris-mode-map (kbd "C-b") 'tetris-move-left)
+(define-key tetris-mode-map (kbd "C-f") 'tetris-move-right)
+(define-key tetris-mode-map (kbd "C-SPC") 'tetris-move-bottom)
+(defadvice tetris-end-game (around zap-scores activate)
+  (save-window-excursion ad-do-it))
+
+(use-package pacmacs
+  :ensure t
+  :defer t
+)
+
+(use-package epaint
+  :defer t
+  :if window-system
+  :commands (epaint)
+  :init
+  (with-eval-after-load (quote epaint-context)
+    (unless (boundp (quote cl-struct-epaint-drawable))
+      (defvar cl-struct-epaint-drawable (quote epaint-drawable)))
+    (unless (boundp (quote cl-struct-epaint-gc))
+      (defvar cl-struct-epaint-gc (quote epaint-gc))))
+)
+
+(use-package speed-type
+  :defer t
+)
+
+(use-package 2048-game
+  :defer t
+)
+
+(use-package zone
+  :ensure nil
+  :defer 5
+  :config
+  ;; (zone-when-idle 600) ; in seconds
+  (defun zone-choose (pgm)
+    "Choose a PGM to run for `zone'."
+    (interactive
+     (list
+      (completing-read
+       "Program: "
+       (mapcar 'symbol-name zone-programs))))
+    (let ((zone-programs (list (intern pgm))))
+      (zone))))
+
+(use-package meme
+  :ensure nil
+  :defer t
+  :commands (meme meme-file)
+)
+
+(use-package zone-nyan
+  :ensure t
+  :defer t
+)
+
+(use-package zone-nyan
+  :ensure t
+  :defer t
+)
 
 (defun duplicate-line()
   "Duplicate current line."
@@ -6274,55 +4726,37 @@ When you save the file, those #files# are deleted automatically. In case of cras
   (open-line 1)
   (next-line 1)
   (yank)
-  )
-
-
+)
 
 ;;(global-set-key (kbd "M-S-D") 'duplicate-line)
 (global-set-key [(meta shift d)] 'duplicate-line)
-
-
-;; ** Copy/Paste To/From System's Clipboard
-
-;; *** Copy to system clipboard
-
 
 (defun copy-to-clipboard ()
   "Make F8 and F9 Copy and Paste to/from OS Clipboard.  Super usefull."
   (interactive)
   (if (display-graphic-p)
       (progn
-        (message "Yanked region to x-clipboard!")
-        (call-interactively 'clipboard-kill-ring-save)
-        )
-    (if (region-active-p)
-        (progn
+          (message "Yanked region to x-clipboard!")
+          (call-interactively 'clipboard-kill-ring-save)
+          )
+      (if (region-active-p)
+          (progn
           (shell-command-on-region (region-beginning) (region-end) "xsel -i -b")
           (message "Yanked region to clipboard!")
           (deactivate-mark))
       (message "No region active; can't yank to clipboard!")))
-  )
-
-
-;; *** Paste
-
+)
 
 (evil-define-command paste-from-clipboard()
-  (if (display-graphic-p)
-      (progn
+(if (display-graphic-p)
+    (progn
         (clipboard-yank)
         (message "graphics active")
         )
     (insert (shell-command-to-string "xsel -o -b")) ) )
 
-
-
 (global-set-key [f9] 'copy-to-clipboard)
 (global-set-key [f10] 'paste-from-clipboard)
-
-
-
-;; * End init.el file
 
 ;; Local Variables:
 ;; coding: utf-8
