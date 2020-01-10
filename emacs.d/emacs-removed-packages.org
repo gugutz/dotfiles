@@ -466,3 +466,191 @@ display emojis inside emacs
   (add-hook 'after-init-hook #'global-emojify-mode)
 )
 #+END_SRC
+
+* Company TabNine
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;; CompanyTabNinePac
+(use-package company-tabnine
+  :disabled
+  :ensure t
+  :defer 1
+  :custom
+  (company-tabnine-max-num-results 9)
+  :bind
+  (("C-c c o" . company-other-backend)
+   ("C-c c t" . company-tabnine))
+  :hook
+  (lsp-after-open . (lambda ()
+                      (setq company-tabnine-max-num-results 3)
+                      (add-to-list 'company-transformers 'company//sort-by-tabnine t)
+                      (add-to-list 'company-backends '(company-lsp :with company-tabnine :separate))))
+  (kill-emacs . company-tabnine-kill-process)
+  :config
+  ;; Enable TabNine on default
+  (add-to-list 'company-backends #'company-tabnine)
+
+  ;; Integrate company-tabnine with lsp-mode
+  (defun company//sort-by-tabnine (candidates)
+    (if (or (functionp company-backend)
+            (not (and (listp company-backend) (memq 'company-tabnine company-backend))))
+        candidates
+      (let ((candidates-table (make-hash-table :test #'equal))
+            candidates-lsp
+            candidates-tabnine)
+        (dolist (candidate candidates)
+          (if (eq (get-text-property 0 'company-backend candidate)
+                  'company-tabnine)
+              (unless (gethash candidate candidates-table)
+                (push candidate candidates-tabnine))
+            (push candidate candidates-lsp)
+            (puthash candidate t candidates-table)))
+        (setq candidates-lsp (nreverse candidates-lsp))
+        (setq candidates-tabnine (nreverse candidates-tabnine))
+        (nconc (seq-take candidates-tabnine 3)
+               (seq-take candidates-lsp 6))))))
+;; -CompanyTabNinePac#+END_SRC
+#+END_SRC
+* lunar-mode-line
+
+Display lumoon phases in the modeline
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package lunar-mode-line
+  :ensure nil
+  :load-path "packages/lunar-mode-line"
+)
+#+END_SRC
+
+
+* celestial-mode-line
+
+Displaysunrise and sunset info and moon phase
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package celestial-mode-line
+  :ensure t
+  :disabled
+  :config
+  (setq calendar-longitude 25.5)
+  (setq calendar-latitude 17.5)
+  (setq calendar-location-name "Some place")
+  ;; Icons customization
+  (defvar celestial-mode-line-phase-representation-alist '((0 . "○") (1 . "☽") (2 . "●") (3 . "☾")))
+  (defvar celestial-mode-line-sunrise-sunset-alist '((sunrise . "☀↑") (sunset . "☀↓")))
+  ;; add to end of global-mode-string
+  (if (null global-mode-string)
+      (setq global-mode-string '("" celestial-mode-line-string))
+  (add-to-list 'global-mode-string 'celestial-mode-line-string t))
+  ;; Start the timer, to update every few minutes:
+  (celestial-mode-line-start-timer)
+)
+#+END_SRC
+
+
+
+* COMMENT smart-mode-line
+
+this was commented with C-c ; so it doenst get exported in favor of doom-modeline
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+ (require 'smart-mode-line)
+ (if (require 'smart-mode-line nil 'noerror)
+     (progn
+       ;( sml/name-width 20)
+       ;( sml/mode-width 'full)
+       ;( sml/shorten-directory t)
+       ;( sml/shorten-modes t)
+       (require 'smart-mode-line-powerline-theme)
+       ; this must be BEFORE (sml/setup)
+       (sml/apply-theme 'powerline)
+       ;; Alternatives:
+       ;; (sml/apply-theme 'powerline)
+       ;; (sml/apply-theme 'dark)
+       ;; (sml/apply-theme 'light)
+       ;; (sml/apply-theme 'respectful)
+       ;; (sml/apply-theme 'automatic)
+
+
+       (if after-init-time
+           (sml/setup)
+         (add-hook 'after-init-hook 'sml/setup))
+
+
+       (display-time-mode 1)
+
+       (add-to-list 'sml/replacer-regexp-list '("^~/Dropbox/" ":DB:"))
+       (add-to-list 'sml/replacer-regexp-list
+                    '("^~/.*/lib/ruby/gems" ":GEMS" ))
+       (add-to-list 'sml/replacer-regexp-list
+                    '("^~/Projects/" ":CODE:"))))
+   #+END_SRC
+
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+ (use-package which-func
+    :config
+    (which-function-mode t)
+)
+#+END_SRC
+
+
+* discover
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(require 'discover)
+(when (featurep 'discover)
+  (discover-add-context-menu
+    :context-menu '(isearch
+              (description "Isearch, occur and highlighting")
+              (lisp-switches
+               ("-cf" "Case should fold search" case-fold-search t nil))
+              (lisp-arguments
+               ("=l" "context lines to show (occur)"
+                "list-matching-lines-default-context-lines"
+                (lambda (dummy) (interactive) (read-number "Number of context lines to show: "))))
+              (actions
+               ("Isearch"
+                ("_" "isearch forward symbol" isearch-forward-symbol)
+                ("w" "isearch forward word" isearch-forward-word))
+               ("Occur"
+                ("o" "occur" occur))
+               ("More"
+                ("h" "highlighters ..." makey-key-mode-popup-isearch-highlight))))
+    :bind "M-s"
+  )
+
+  (discover-add-context-menu
+    :context-menu '(dired)
+    :bind "?"
+    :mode 'dired-mode
+    :mode-hook 'dired-mode-hook
+  )
+)
+#+END_SRC
+
+* dired-sidebar
+
+  #+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package dired-sidebar
+  :ensure t
+  :commands (dired-sidebar-toggle-sidebar)
+  :bind
+  ("<f6>" . dired-sidebar-toggle-sidebar)
+  :init
+  (add-hook 'dired-sidebar-mode-hook
+         (lambda ()
+           (unless (file-remote-p default-directory)
+             (auto-revert-mode))))
+  :config
+  (push 'toggle-window-split dired-sidebar-toggle-hidden-commands)
+  (push 'rotate-windows dired-sidebar-toggle-hidden-commands)
+
+  (setq dired-sidebar-subtree-line-prefix "__")
+  (setq dired-sidebar-theme 'vscode)
+  (setq dired-sidebar-use-term-integration t)
+  (setq dired-sidebar-use-custom-font t)
+)
+  #+END_SRC

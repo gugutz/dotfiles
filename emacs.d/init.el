@@ -20,6 +20,8 @@
 (defvar tau/font-size-mode-line    100        "The font size to use for the mode-line.")
 (defvar tau/font-size-small        100        "The font size to use for smaller text.")
 (defvar tau/font-size-title        140        "The font size to use for titles.")
+(defvar tau/indent-js                2        "The font size to use for titles.")
+(defvar tau/indent-html              4        "The font size to use for titles.")
 
 (defun /util/tangle-init ()
   (interactive)
@@ -132,8 +134,8 @@ tangled, and the tangled file is compiled."
 (use-package gnus
   :ensure nil
   :config
-  (setq user-mail-address "joshuafwolfe@gmail.com"
-        user-full-name "Josh Wolfe")
+  (setq user-mail-address "gugutz@gmail.com"
+        user-full-name "tau")
 
   (setq gnus-select-method
         '(nnimap "gmail"
@@ -1890,6 +1892,8 @@ If failed try to complete the common part with `company-complete-common'"
                        (eq old-tick (buffer-chars-modified-tick)))
               (company-complete-common))))
       (company-complete-common)))
+  :hook
+  (after-init . global-company-mode)
   :bind
   (:map company-active-map
         ([tab] . smarter-yas-expand-next-field-complete)
@@ -2062,10 +2066,8 @@ If failed try to complete the common part with `company-complete-common'"
 
 (use-package company-lsp
   :ensure t
-  :defer t
-  :after company lsp-mode
-  ;;:hook
-  ;;(lsp-mode . (lambda () (push 'company-lsp company-backends)))
+  :hook
+  (lsp-mode . (lambda () (push 'company-lsp company-backends)))
   :custom
   (company-lsp-enable-snippet t)
   (company-lsp-async t)
@@ -2073,57 +2075,8 @@ If failed try to complete the common part with `company-complete-common'"
   (company-lsp-enable-recompletion t)
   :config
   ;; add company-lsp to company backends (made via hooks above)
-  ;; (with-eval-after-load 'company
-  ;;   (push 'company-lsp company-backends))
-)
-
-;; CompanyTabNinePac
-(use-package company-tabnine
-  :disabled
-  :ensure t
-  :defer 1
-  :custom
-  (company-tabnine-max-num-results 9)
-  :bind
-  (("C-c c o" . company-other-backend)
-   ("C-c c t" . company-tabnine))
-  :hook
-  (lsp-after-open . (lambda ()
-                      (setq company-tabnine-max-num-results 3)
-                      (add-to-list 'company-transformers 'company//sort-by-tabnine t)
-                      (add-to-list 'company-backends '(company-lsp :with company-tabnine :separate))))
-  (kill-emacs . company-tabnine-kill-process)
-  :config
-  ;; Enable TabNine on default
-  (add-to-list 'company-backends #'company-tabnine)
-
-  ;; Integrate company-tabnine with lsp-mode
-  (defun company//sort-by-tabnine (candidates)
-    (if (or (functionp company-backend)
-            (not (and (listp company-backend) (memq 'company-tabnine company-backend))))
-        candidates
-      (let ((candidates-table (make-hash-table :test #'equal))
-            candidates-lsp
-            candidates-tabnine)
-        (dolist (candidate candidates)
-          (if (eq (get-text-property 0 'company-backend candidate)
-                  'company-tabnine)
-              (unless (gethash candidate candidates-table)
-                (push candidate candidates-tabnine))
-            (push candidate candidates-lsp)
-            (puthash candidate t candidates-table)))
-        (setq candidates-lsp (nreverse candidates-lsp))
-        (setq candidates-tabnine (nreverse candidates-tabnine))
-        (nconc (seq-take candidates-tabnine 3)
-               (seq-take candidates-lsp 6))))))
-;; -CompanyTabNinePac#+END_SRC
-
-(use-package company-go
-  :ensure t
-  :defer t
-  :init
   (with-eval-after-load 'company
-    (add-to-list 'company-backends 'company-go))
+    (push 'company-lsp company-backends))
 )
 
 (use-package lsp-mode
@@ -2322,9 +2275,10 @@ If failed try to complete the common part with `company-complete-common'"
 (use-package ivy-explorer
   :ensure t
   :after ivy
+  :hook
+  (after-init . ivy-explorer-mode)
   :config
   ;; use ivy explorer for all file dialogs
-  (ivy-explorer-mode 1)
 )
 
 (use-package dired-k
@@ -2560,26 +2514,6 @@ If failed try to complete the common part with `company-complete-common'"
 (use-package treemacs-magit
    :after treemacs magit
    :ensure t
-)
-
-(use-package dired-sidebar
-  :ensure t
-  :commands (dired-sidebar-toggle-sidebar)
-  :bind
-  ("<f6>" . dired-sidebar-toggle-sidebar)
-  :init
-  (add-hook 'dired-sidebar-mode-hook
-         (lambda ()
-           (unless (file-remote-p default-directory)
-             (auto-revert-mode))))
-  :config
-  (push 'toggle-window-split dired-sidebar-toggle-hidden-commands)
-  (push 'rotate-windows dired-sidebar-toggle-hidden-commands)
-
-  (setq dired-sidebar-subtree-line-prefix "__")
-  (setq dired-sidebar-theme 'vscode)
-  (setq dired-sidebar-use-term-integration t)
-  (setq dired-sidebar-use-custom-font t)
 )
 
 (use-package ranger
@@ -2960,11 +2894,11 @@ If failed try to complete the common part with `company-complete-common'"
 
 (set-face-attribute 'mode-line nil :height tau/font-size-mode-line)
 (set-face-attribute 'mode-line nil
-                    :background "#007ad3"
-                    :foreground "#ffffff"
-                    :box '(:line-width 4 :color "#007ad3") ;; modeline border
-                    :overline nil
-                    :underline nil)
+                    :background "#fdf6e3"
+                    :foreground "#000000"
+                    :box '(:line-width 4 :color "#eee8d5") ;; modeline border
+                    :overline t
+                    :underline t)
 
 ;; for now the inactive modeline looks the same as the active one
 (set-face-attribute 'mode-line-inactive nil
@@ -3015,6 +2949,7 @@ If failed try to complete the common part with `company-complete-common'"
 
 (use-package mini-modeline
   :ensure t
+  :disabled
   :config
   ;;(setq mini-modeline-l-format) ;; Left part of mini-modeline, same format with mode-line-format.
   ;;(setq mini-modeline-r-format) ;; Right part of mini-modeline, same format with mode-line-format.
@@ -3040,29 +2975,6 @@ If failed try to complete the common part with `company-complete-common'"
           (feebleline-git-branch          :face feebleline-git-face :pre " : ")
           (feebleline-project-name        :align right)))
   (feebleline-mode 1)
-)
-
-(use-package lunar-mode-line
-  :ensure nil
-  :load-path "packages/lunar-mode-line"
-)
-
-(use-package celestial-mode-line
-  :ensure t
-  :disabled
-  :config
-  (setq calendar-longitude 25.5)
-  (setq calendar-latitude 17.5)
-  (setq calendar-location-name "Some place")
-  ;; Icons customization
-  (defvar celestial-mode-line-phase-representation-alist '((0 . "○") (1 . "☽") (2 . "●") (3 . "☾")))
-  (defvar celestial-mode-line-sunrise-sunset-alist '((sunrise . "☀↑") (sunset . "☀↓")))
-  ;; add to end of global-mode-string
-  (if (null global-mode-string)
-      (setq global-mode-string '("" celestial-mode-line-string))
-  (add-to-list 'global-mode-string 'celestial-mode-line-string t))
-  ;; Start the timer, to update every few minutes:
-  (celestial-mode-line-start-timer)
 )
 
 (use-package common-header-mode-line
@@ -3297,36 +3209,6 @@ If failed try to complete the common part with `company-complete-common'"
   :ensure nil
   :config
   (auto-save-visited-mode)
-)
-
-(require 'discover)
-(when (featurep 'discover)
-  (discover-add-context-menu
-    :context-menu '(isearch
-              (description "Isearch, occur and highlighting")
-              (lisp-switches
-               ("-cf" "Case should fold search" case-fold-search t nil))
-              (lisp-arguments
-               ("=l" "context lines to show (occur)"
-                "list-matching-lines-default-context-lines"
-                (lambda (dummy) (interactive) (read-number "Number of context lines to show: "))))
-              (actions
-               ("Isearch"
-                ("_" "isearch forward symbol" isearch-forward-symbol)
-                ("w" "isearch forward word" isearch-forward-word))
-               ("Occur"
-                ("o" "occur" occur))
-               ("More"
-                ("h" "highlighters ..." makey-key-mode-popup-isearch-highlight))))
-    :bind "M-s"
-  )
-
-  (discover-add-context-menu
-    :context-menu '(dired)
-    :bind "?"
-    :mode 'dired-mode
-    :mode-hook 'dired-mode-hook
-  )
 )
 
 (use-package sublimity
@@ -4304,6 +4186,14 @@ If failed try to complete the common part with `company-complete-common'"
   :hook (before-save . gofmt-before-save)
 )
 
+(use-package company-go
+  :ensure t
+  :defer t
+  :init
+  (with-eval-after-load 'company
+    (add-to-list 'company-backends 'company-go))
+)
+
 (use-package web-mode
   :defer t
   :custom-face
@@ -4408,6 +4298,34 @@ If failed try to complete the common part with `company-complete-common'"
   ;;=======================================
 
   )
+
+(use-package eslintd-fix
+  :ensure t
+  :defer t
+  :ensure-system-package
+  (eslint . "npm i -g eslint")
+  :config
+  ;; Grab eslint executable from node_modules instead of global
+  ;; Taken from https://github.com/flycheck/flycheck/issues/1087#issuecomment-246514860
+  ;; Gist: https://github.com/lunaryorn/.emacs.d/blob/master/lisp/lunaryorn-flycheck.el#L62
+  (defun lunaryorn-use-js-executables-from-node-modules ()
+    "Set executables of JS and TS checkers from local node modules."
+    (-when-let* ((file-name (buffer-file-name))
+                 (root (locate-dominating-file file-name "node_modules"))
+                 (module-directory (expand-file-name "node_modules" root)))
+      (pcase-dolist (`(,checker . ,module) '((javascript-jshint . "jshint")
+                                             (javascript-eslint . "eslint")
+                                             (typescript-tslint . "tslint")
+                                             (javascript-jscs   . "jscs")))
+        (let ((package-directory (expand-file-name module module-directory))
+              (executable-var (flycheck-checker-executable-variable checker)))
+          (when (file-directory-p package-directory)
+            (set (make-local-variable executable-var)
+                 (expand-file-name (if (string= module "tslint")
+                                       (concat "bin/" module)
+                                     (concat "bin/" module ".js"))
+                                   package-directory)))))))
+)
 
 (use-package js2-refactor
   :ensure t
@@ -4531,73 +4449,6 @@ If failed try to complete the common part with `company-complete-common'"
 ;;
 )
 
-(use-package format-all
-  :ensure t
-  :defer t
-  :bind ("C-c C-f" . format-all-buffer)
-)
-
-(use-package json-mode
-  :ensure t
-  :mode "\\.js\\(?:on\\|[hl]int\\(rc\\)?\\)\\'"
-  :config
-  (add-hook 'json-mode-hook #'prettier-js-mode)
-  (setq json-reformat:indent-width 2)
-  (setq json-reformat:pretty-string? t)
-  (setq js-indent-level 2)
-)
-
-(use-package eslintd-fix
-  :ensure t
-  :defer t
-  :ensure-system-package
-  (eslint . "npm i -g eslint")
-  :config
-  ;; Grab eslint executable from node_modules instead of global
-  ;; Taken from https://github.com/flycheck/flycheck/issues/1087#issuecomment-246514860
-  ;; Gist: https://github.com/lunaryorn/.emacs.d/blob/master/lisp/lunaryorn-flycheck.el#L62
-  (defun lunaryorn-use-js-executables-from-node-modules ()
-    "Set executables of JS and TS checkers from local node modules."
-    (-when-let* ((file-name (buffer-file-name))
-                 (root (locate-dominating-file file-name "node_modules"))
-                 (module-directory (expand-file-name "node_modules" root)))
-      (pcase-dolist (`(,checker . ,module) '((javascript-jshint . "jshint")
-                                             (javascript-eslint . "eslint")
-                                             (typescript-tslint . "tslint")
-                                             (javascript-jscs   . "jscs")))
-        (let ((package-directory (expand-file-name module module-directory))
-              (executable-var (flycheck-checker-executable-variable checker)))
-          (when (file-directory-p package-directory)
-            (set (make-local-variable executable-var)
-                 (expand-file-name (if (string= module "tslint")
-                                       (concat "bin/" module)
-                                     (concat "bin/" module ".js"))
-                                   package-directory)))))))
-)
-
-(use-package rjsx-mode
-  :ensure t
-  :defer t
-  :after js2-mode
-  :mode
-  ("\\.jsx$" . rjsx-mode)
-  ("components/.+\\.js$" . rjsx-mode)
-  :hook
-  (rjsx-mode . add-node-modules-path)
-  (rjsx-mode . prettier-js-mode)
-  :config
-  ;; auto register for JS files that are inside a `components' folder
-  (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
-
-  ;; for better jsx syntax-highlighting in web-mode
-  ;; - courtesy of Patrick @halbtuerke
-  (defadvice web-mode-highlight-part (around tweak-jsx activate)
-    (if (equal web-mode-content-type "jsx")
-      (let ((web-mode-enable-part-face nil))
-        ad-do-it)
-      ad-do-it))
-)
-
 (use-package typescript-mode
   :ensure t
   :defer t
@@ -4652,6 +4503,45 @@ If failed try to complete the common part with `company-complete-common'"
   ;;(add-hook 'before-save-hook 'tide-format-before-save)
   ;;(add-hook 'typescript-mode-hook #'setup-tide-mode)
   ;;(add-hook 'js2-mode-hook #'setup-tide-mode)
+)
+
+(use-package format-all
+  :ensure t
+  :defer t
+  :bind ("C-c C-f" . format-all-buffer)
+)
+
+(use-package json-mode
+  :ensure t
+  :mode "\\.js\\(?:on\\|[hl]int\\(rc\\)?\\)\\'"
+  :config
+  (add-hook 'json-mode-hook #'prettier-js-mode)
+  (setq json-reformat:indent-width 2)
+  (setq json-reformat:pretty-string? t)
+  (setq js-indent-level 2)
+)
+
+(use-package rjsx-mode
+  :ensure t
+  :defer t
+  :after js2-mode
+  :mode
+  ("\\.jsx$" . rjsx-mode)
+  ("components/.+\\.js$" . rjsx-mode)
+  :hook
+  (rjsx-mode . add-node-modules-path)
+  (rjsx-mode . prettier-js-mode)
+  :config
+  ;; auto register for JS files that are inside a `components' folder
+  (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
+
+  ;; for better jsx syntax-highlighting in web-mode
+  ;; - courtesy of Patrick @halbtuerke
+  (defadvice web-mode-highlight-part (around tweak-jsx activate)
+    (if (equal web-mode-content-type "jsx")
+      (let ((web-mode-enable-part-face nil))
+        ad-do-it)
+      ad-do-it))
 )
 
 (defun ng2--counterpart-name (file)
