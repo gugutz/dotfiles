@@ -1,0 +1,19 @@
+[15:39:28.494] Global cache location '/home/gustavo/.cache/typescript/3.7', safe file path '/home/gustavo/.nvm/versions/node/v10.16.3/lib/node_modules/typescript/lib/typingSafeList.json', types map path /home/gustavo/.nvm/versions/node/v10.16.3/lib/node_modules/typescript/lib/typesMap.json
+[15:39:28.508] Processing cache location '/home/gustavo/.cache/typescript/3.7'
+[15:39:28.508] Trying to find '/home/gustavo/.cache/typescript/3.7/package.json'...
+[15:39:28.593] Loaded content of '/home/gustavo/.cache/typescript/3.7/package.json': {"private":true,"dependencies":{"types-registry":"^0.1.472"}}
+[15:39:28.593] Loaded content of '/home/gustavo/.cache/typescript/3.7/package-lock.json'
+[15:39:28.593] Finished processing cache location '/home/gustavo/.cache/typescript/3.7'
+[15:39:28.594] Process id: 10378
+[15:39:28.594] NPM location: /home/gustavo/.nvm/versions/node/v10.16.3/bin/npm (explicit '--npmLocation' not  provided)
+[15:39:28.594] validateDefaultNpmLocation: false
+[15:39:28.594] Npm config file: /home/gustavo/.cache/typescript/3.7/package.json
+[15:39:28.594] Updating types-registry npm package...
+[15:39:28.594] Exec: /home/gustavo/.nvm/versions/node/v10.16.3/bin/npm install --ignore-scripts types-registry@latest
+[15:39:30.34]     Succeeded. stdout:
+    + types-registry@0.1.472
+    updated 1 package and audited 1 package in 0.926s
+found 0 vulnerabilities
+
+
+[15:39:30.34] Updated types-registry npm package
