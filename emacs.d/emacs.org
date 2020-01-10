@@ -39,6 +39,8 @@ Put here for convenient editing
 (defvar tau/font-size-mode-line    100        "The font size to use for the mode-line.")
 (defvar tau/font-size-small        100        "The font size to use for smaller text.")
 (defvar tau/font-size-title        140        "The font size to use for titles.")
+(defvar tau/indent-js                2        "The font size to use for titles.")
+(defvar tau/indent-html              4        "The font size to use for titles.")
 #+END_SRC
 
 * Observations about this config
@@ -251,8 +253,8 @@ emacs asks 2 annoying confirmations on every startup before actually starting
 (use-package gnus
   :ensure nil
   :config
-  (setq user-mail-address "joshuafwolfe@gmail.com"
-        user-full-name "Josh Wolfe")
+  (setq user-mail-address "gugutz@gmail.com"
+        user-full-name "tau")
 
   (setq gnus-select-method
         '(nnimap "gmail"
@@ -2704,6 +2706,8 @@ If failed try to complete the common part with `company-complete-common'"
                        (eq old-tick (buffer-chars-modified-tick)))
               (company-complete-common))))
       (company-complete-common)))
+  :hook
+  (after-init . global-company-mode)
   :bind
   (:map company-active-map
         ([tab] . smarter-yas-expand-next-field-complete)
@@ -2888,78 +2892,15 @@ If failed try to complete the common part with `company-complete-common'"
 
 ** company-lsp
 
+Company-lsp is auto inserted into company backends
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package company-lsp
   :ensure t
-  :defer t
-  :after company lsp-mode
-  ;;:hook
-  ;;(lsp-mode . (lambda () (push 'company-lsp company-backends)))
   :custom
   (company-lsp-enable-snippet t)
   (company-lsp-async t)
   (company-lsp-cache-candidates 'auto)
   (company-lsp-enable-recompletion t)
-  :config
-  ;; add company-lsp to company backends (made via hooks above)
-  ;; (with-eval-after-load 'company
-  ;;   (push 'company-lsp company-backends))
-)
-#+END_SRC
-
-** Company TabNine
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-;; CompanyTabNinePac
-(use-package company-tabnine
-  :disabled
-  :ensure t
-  :defer 1
-  :custom
-  (company-tabnine-max-num-results 9)
-  :bind
-  (("C-c c o" . company-other-backend)
-   ("C-c c t" . company-tabnine))
-  :hook
-  (lsp-after-open . (lambda ()
-                      (setq company-tabnine-max-num-results 3)
-                      (add-to-list 'company-transformers 'company//sort-by-tabnine t)
-                      (add-to-list 'company-backends '(company-lsp :with company-tabnine :separate))))
-  (kill-emacs . company-tabnine-kill-process)
-  :config
-  ;; Enable TabNine on default
-  (add-to-list 'company-backends #'company-tabnine)
-
-  ;; Integrate company-tabnine with lsp-mode
-  (defun company//sort-by-tabnine (candidates)
-    (if (or (functionp company-backend)
-            (not (and (listp company-backend) (memq 'company-tabnine company-backend))))
-        candidates
-      (let ((candidates-table (make-hash-table :test #'equal))
-            candidates-lsp
-            candidates-tabnine)
-        (dolist (candidate candidates)
-          (if (eq (get-text-property 0 'company-backend candidate)
-                  'company-tabnine)
-              (unless (gethash candidate candidates-table)
-                (push candidate candidates-tabnine))
-            (push candidate candidates-lsp)
-            (puthash candidate t candidates-table)))
-        (setq candidates-lsp (nreverse candidates-lsp))
-        (setq candidates-tabnine (nreverse candidates-tabnine))
-        (nconc (seq-take candidates-tabnine 3)
-               (seq-take candidates-lsp 6))))))
-;; -CompanyTabNinePac#+END_SRC
-#+END_SRC
-
-** company-go
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package company-go
-  :ensure t
-  :defer t
-  :init
-  (with-eval-after-load 'company
-    (add-to-list 'company-backends 'company-go))
 )
 #+END_SRC
 
@@ -3002,85 +2943,88 @@ If failed try to complete the common part with `company-complete-common'"
 #+END_SRC
 ** lsp ui
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package lsp-ui
-  :ensure t
-  :after lsp-mode
-  ;;:hook
-  ;;(lsp-mode . lsp-ui-mode)
-  :custom-face
-  (lsp-ui-doc-background ((t (:background nil))))
-  (lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic)))))
-  :preface
-  (defun tau/toggle-lsp-ui-doc ()
-    (interactive)
-    (if lsp-ui-doc-mode
-      (progn
-        (lsp-ui-doc-mode -1)
-        (lsp-ui-doc--hide-frame))
-    (lsp-ui-doc-mode 1)))
-  :bind
-    (:map lsp-mode-map
-      ("C-c l p f r" . lsp-ui-peek-find-references)
-      ("C-c l p f d" . lsp-ui-peek-find-definitions)
-      ("C-c l p f i" . lsp-ui-peek-find-implementation)
-      ("C-c l g d" . lsp-goto-type-definition)
-      ("C-c l f d" . lsp-find-definition)
-      ("C-c l g i" . lsp-goto-implementation)
-      ("C-c l f i" . lsp-find-implementation)
-      ("C-c l m"   . lsp-ui-imenu)
-      ("C-c l s"   . lsp-ui-sideline-mode)
-      ("C-c l d"   . tau/toggle-lsp-ui-doc))
-    ;; remap native find-definitions and references to use lsp-ui
-    (:map lsp-ui-mode-map
-      ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-      ([remap xref-find-references] . lsp-ui-peek-find-references)
-      ("C-c u" . lsp-ui-imenu))
-  :custom
-  ;; lsp-ui-doc
-  (lsp-ui-doc-enable t)
-  (lsp-ui-doc-header t)
-  (lsp-ui-doc-include-signature t)
-  (lsp-ui-doc-position 'top) ;; top, bottom, or at-point
-  (lsp-ui-doc-border (face-foreground 'default))
-  (lsp-ui-doc-max-width 100)
-  (lsp-ui-doc-max-height 30)
-  (lsp-ui-doc-use-childframe t)
-  ;; lsp-ui-flycheck
-  (lsp-ui-flycheck-enable nil) ;; disable to leave tsling as checker for ts files
-  (lsp-ui-flycheck-list-position 'right)
-  (lsp-ui-flycheck-live-reporting t)
-  ;; lsp-ui-sideline
-  (lsp-ui-sideline-enable nil)
-  (lsp-ui-sideline-ignore-duplicate t)
-  (lsp-ui-sideline-show-symbol t)
-  (lsp-ui-sideline-show-hover t)
-  (lsp-ui-sideline-show-diagnostics nil) ;; show flycheck diagnostics
-  (lsp-ui-sideline-show-code-actions t)
-  (lsp-ui-sideline-code-actions-prefix "")
-  (lsp-ui-sideline-update-mode 'point)
-  ;; lsp-ui-imenu
-  (lsp-ui-imenu-enable t)
-  (lsp-ui-imenu-kind-position 'top)
-  ;; lsp-ui-peek
-  (lsp-ui-peek-enable t)
-  (lsp-ui-peek-peek-height 20)
-  (lsp-ui-peek-list-width 40)
-  (lsp-ui-peek-fontify 'on-demand) ;; never, on-demand, or always
-  :config
-  ;; lsp-ui appearance
-  (set-face-attribute 'lsp-ui-doc-background  nil :background "#f9f2d9")
-  (add-hook 'lsp-ui-doc-frame-hook
-    (lambda (frame _w)
-      (set-face-attribute 'default frame :font "Hack 11")))
+  (use-package lsp-ui
+    :ensure t
+    :after lsp-mode
+    ;;:hook
+    (lsp-mode . lsp-ui-mode)
+    :custom-face
+    (lsp-ui-doc-background ((t (:background nil))))
+    (lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic)))))
+    :preface
+    (defun tau/toggle-lsp-ui-doc ()
+      (interactive)
+      (if lsp-ui-doc-mode
+        (progn
+          (lsp-ui-doc-mode -1)
+          (lsp-ui-doc--hide-frame))
+      (lsp-ui-doc-mode 1)))
+    :bind
+      (:map lsp-mode-map
+        ("C-c l p f r" . lsp-ui-peek-find-references)
+        ("C-c l p f d" . lsp-ui-peek-find-definitions)
+        ("C-c l p f i" . lsp-ui-peek-find-implementation)
+        ("C-c l g d" . lsp-goto-type-definition)
+        ("C-c l f d" . lsp-find-definition)
+        ("C-c l g i" . lsp-goto-implementation)
+        ("C-c l f i" . lsp-find-implementation)
+        ("C-c l m"   . lsp-ui-imenu)
+        ("C-c l s"   . lsp-ui-sideline-mode)
+        ("C-c l d"   . tau/toggle-lsp-ui-doc))
+      ;; remap native find-definitions and references to use lsp-ui
+      (:map lsp-ui-mode-map
+        ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+        ([remap xref-find-references] . lsp-ui-peek-find-references)
+        ("C-c u" . lsp-ui-imenu))
+    :custom
+    ;; lsp-ui-doc
+    (lsp-ui-doc-enable nil)
+    (lsp-ui-doc-header t)
+    (lsp-ui-doc-include-signature t)
+    (lsp-ui-doc-position 'top) ;; top, bottom, or at-point
+    (lsp-ui-doc-border (face-foreground 'default))
+    (lsp-ui-doc-max-width 100)
+    (lsp-ui-doc-max-height 30)
+    (lsp-ui-doc-use-childframe t)
+    ;; lsp-ui-flycheck
+    (lsp-ui-flycheck-enable nil) ;; disable to leave tsling as checker for ts files
+    (lsp-ui-flycheck-list-position 'right)
+    (lsp-ui-flycheck-live-reporting t)
+    ;; lsp-ui-sideline
+    (lsp-ui-sideline-enable nil)
+    (lsp-ui-sideline-ignore-duplicate t)
+    (lsp-ui-sideline-show-symbol t)
+    (lsp-ui-sideline-show-hover t)
+    (lsp-ui-sideline-show-diagnostics nil) ;; show flycheck diagnostics
+    (lsp-ui-sideline-show-code-actions t)
+    (lsp-ui-sideline-code-actions-prefix "")
+    (lsp-ui-sideline-update-mode 'point)
+    ;; lsp-ui-imenu
+    (lsp-ui-imenu-enable t)
+    (lsp-ui-imenu-kind-position 'top)
+    ;; lsp-ui-peek
+    (lsp-ui-peek-enable t)
+    (lsp-ui-peek-peek-height 20)
+    (lsp-ui-peek-list-width 40)
+    (lsp-ui-peek-fontify 'on-demand) ;; never, on-demand, or always
+    :config
+    ;; lsp-ui appearance
+    (set-face-attribute 'lsp-ui-doc-background  nil :background "#f9f2d9")
+    (add-hook 'lsp-ui-doc-frame-hook
+      (lambda (frame _w)
+        (set-face-attribute 'default frame :font "Hack 11")))
 
-  (set-face-attribute 'lsp-ui-sideline-global nil
-                      :inherit 'shadow
-                      :background "#f9f2d9")
-  ;; Use lsp-ui-doc-webkit only in GUI
-  (if (window-system)
-    (setq lsp-ui-doc-use-webkit t))
-)
+    (set-face-attribute 'lsp-ui-sideline-global nil
+                        :inherit 'shadow
+                        :background "#f9f2d9")
+    ;; Use lsp-ui-doc-webkit only in GUI
+    (if (window-system)
+      (setq lsp-ui-doc-use-webkit t))
+  )
 #+END_SRC
+
+
+** lsp flycheck
 
 ** dap - debug adapter protocol
 
@@ -3193,9 +3137,10 @@ If failed try to complete the common part with `company-complete-common'"
 (use-package ivy-explorer
   :ensure t
   :after ivy
+  :hook
+  (after-init . ivy-explorer-mode)
   :config
   ;; use ivy explorer for all file dialogs
-  (ivy-explorer-mode 1)
 )
 #+END_SRC
 
@@ -3212,14 +3157,15 @@ If failed try to complete the common part with `company-complete-common'"
  )
  #+END_SRC
 
- #+BEGIN_SRC emacs-lisp :tangle init.el
+** all the icons dired
+#+BEGIN_SRC emacs-lisp :tangle init.el
  (use-package all-the-icons-dired
   :ensure t
   :defer t
   :hook
   (dired-mode . all-the-icons-dired-mode)
 )
- #+END_SRC
+#+END_SRC
 
 ** Treemacs (neotree like navigation)
 
@@ -3458,30 +3404,6 @@ If failed try to complete the common part with `company-complete-common'"
    :ensure t
 )
 #+END_SRC
-
-** dired-sidebar
-
-   #+BEGIN_SRC emacs-lisp :tangle init.el
- (use-package dired-sidebar
-   :ensure t
-   :commands (dired-sidebar-toggle-sidebar)
-   :bind
-   ("<f6>" . dired-sidebar-toggle-sidebar)
-   :init
-   (add-hook 'dired-sidebar-mode-hook
-          (lambda ()
-            (unless (file-remote-p default-directory)
-              (auto-revert-mode))))
-   :config
-   (push 'toggle-window-split dired-sidebar-toggle-hidden-commands)
-   (push 'rotate-windows dired-sidebar-toggle-hidden-commands)
-
-   (setq dired-sidebar-subtree-line-prefix "__")
-   (setq dired-sidebar-theme 'vscode)
-   (setq dired-sidebar-use-term-integration t)
-   (setq dired-sidebar-use-custom-font t)
- )
-   #+END_SRC
 
 ** ranger
 
@@ -4015,17 +3937,18 @@ Display the value of point in the mode line. It is displayed in brackets, adjace
 Cool background colors
 #fdf6e3
 #eee8d5
+#007ad3 - vscode statusbar blue
 Cool foreground colors
 #93a1a1
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (set-face-attribute 'mode-line nil :height tau/font-size-mode-line)
 (set-face-attribute 'mode-line nil
-                    :background "#007ad3"
-                    :foreground "#ffffff"
-                    :box '(:line-width 4 :color "#007ad3") ;; modeline border
-                    :overline nil
-                    :underline nil)
+                    :background "#fdf6e3"
+                    :foreground "#000000"
+                    :box '(:line-width 4 :color "#eee8d5") ;; modeline border
+                    :overline t
+                    :underline t)
 
 ;; for now the inactive modeline looks the same as the active one
 (set-face-attribute 'mode-line-inactive nil
@@ -4175,6 +4098,7 @@ Display the modeline in the minibuffer
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package mini-modeline
   :ensure t
+  :disabled
   :config
   ;;(setq mini-modeline-l-format) ;; Left part of mini-modeline, same format with mode-line-format.
   ;;(setq mini-modeline-r-format) ;; Right part of mini-modeline, same format with mode-line-format.
@@ -4208,41 +4132,6 @@ put it here to test it to see what is best
           (feebleline-git-branch          :face feebleline-git-face :pre " : ")
           (feebleline-project-name        :align right)))
   (feebleline-mode 1)
-)
-#+END_SRC
-
-** lunar-mode-line
-
-Display lumoon phases in the modeline
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package lunar-mode-line
-  :ensure nil
-  :load-path "packages/lunar-mode-line"
-)
-#+END_SRC
-
-** celestial-mode-line
-
-Displaysunrise and sunset info and moon phase
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package celestial-mode-line
-  :ensure t
-  :disabled
-  :config
-  (setq calendar-longitude 25.5)
-  (setq calendar-latitude 17.5)
-  (setq calendar-location-name "Some place")
-  ;; Icons customization
-  (defvar celestial-mode-line-phase-representation-alist '((0 . "○") (1 . "☽") (2 . "●") (3 . "☾")))
-  (defvar celestial-mode-line-sunrise-sunset-alist '((sunrise . "☀↑") (sunset . "☀↓")))
-  ;; add to end of global-mode-string
-  (if (null global-mode-string)
-      (setq global-mode-string '("" celestial-mode-line-string))
-  (add-to-list 'global-mode-string 'celestial-mode-line-string t))
-  ;; Start the timer, to update every few minutes:
-  (celestial-mode-line-start-timer)
 )
 #+END_SRC
 
@@ -4396,53 +4285,6 @@ Type of parrots available:
    (setq nyan-animate-nyancat t)
    (setq nyan-wavy-trail t)
    (nyan-start-animation))
-#+END_SRC
-
-** COMMENT smart-mode-line
-
-this was commented with C-c ; so it doenst get exported in favor of doom-modeline
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
- (require 'smart-mode-line)
- (if (require 'smart-mode-line nil 'noerror)
-     (progn
-       ;( sml/name-width 20)
-       ;( sml/mode-width 'full)
-       ;( sml/shorten-directory t)
-       ;( sml/shorten-modes t)
-       (require 'smart-mode-line-powerline-theme)
-       ; this must be BEFORE (sml/setup)
-       (sml/apply-theme 'powerline)
-       ;; Alternatives:
-       ;; (sml/apply-theme 'powerline)
-       ;; (sml/apply-theme 'dark)
-       ;; (sml/apply-theme 'light)
-       ;; (sml/apply-theme 'respectful)
-       ;; (sml/apply-theme 'automatic)
-
-
-       (if after-init-time
-           (sml/setup)
-         (add-hook 'after-init-hook 'sml/setup))
-
-
-       (display-time-mode 1)
-
-       (add-to-list 'sml/replacer-regexp-list '("^~/Dropbox/" ":DB:"))
-       (add-to-list 'sml/replacer-regexp-list
-                    '("^~/.*/lib/ruby/gems" ":GEMS" ))
-       (add-to-list 'sml/replacer-regexp-list
-                    '("^~/Projects/" ":CODE:"))))
-   #+END_SRC
-
-#+END_SRC
-
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
- (use-package which-func
-    :config
-    (which-function-mode t)
-)
 #+END_SRC
 
 
@@ -4616,40 +4458,6 @@ auto-save file-visiting buffers after five seconds of idle time
 #+END_SRC
 
 * Interface Enhancement
-
-** discover
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(require 'discover)
-(when (featurep 'discover)
-  (discover-add-context-menu
-    :context-menu '(isearch
-              (description "Isearch, occur and highlighting")
-              (lisp-switches
-               ("-cf" "Case should fold search" case-fold-search t nil))
-              (lisp-arguments
-               ("=l" "context lines to show (occur)"
-                "list-matching-lines-default-context-lines"
-                (lambda (dummy) (interactive) (read-number "Number of context lines to show: "))))
-              (actions
-               ("Isearch"
-                ("_" "isearch forward symbol" isearch-forward-symbol)
-                ("w" "isearch forward word" isearch-forward-word))
-               ("Occur"
-                ("o" "occur" occur))
-               ("More"
-                ("h" "highlighters ..." makey-key-mode-popup-isearch-highlight))))
-    :bind "M-s"
-  )
-
-  (discover-add-context-menu
-    :context-menu '(dired)
-    :bind "?"
-    :mode 'dired-mode
-    :mode-hook 'dired-mode-hook
-  )
-)
-#+END_SRC
 
 ** sublimity
 
@@ -5993,6 +5801,17 @@ Unfortunatelly this package has to be installed manually, as its not available o
 )
 #+END_SRC
 
+** company-go
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package company-go
+  :ensure t
+  :defer t
+  :init
+  (with-eval-after-load 'company
+    (add-to-list 'company-backends 'company-go))
+)
+#+END_SRC
+
 
 * Web-Mode
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -6095,6 +5914,7 @@ Unfortunatelly this package has to be installed manually, as its not available o
 
 * JavaScript JS2-mode
 
+** js2-mode
 js2-mode: enhanced JavaScript editing mode
 https://github.com/mooz/js2-mode
 
@@ -6146,6 +5966,42 @@ https://github.com/mooz/js2-mode
 
   )
 #+END_SRC
+
+** eslint
+
+eslintd-fix: Emacs minor-mode to automatically fix javascript with eslint_d.
+https://github.com/aaronjensen/eslintd-fix/tree/master
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package eslintd-fix
+  :ensure t
+  :defer t
+  :ensure-system-package
+  (eslint . "npm i -g eslint")
+  :config
+  ;; Grab eslint executable from node_modules instead of global
+  ;; Taken from https://github.com/flycheck/flycheck/issues/1087#issuecomment-246514860
+  ;; Gist: https://github.com/lunaryorn/.emacs.d/blob/master/lisp/lunaryorn-flycheck.el#L62
+  (defun lunaryorn-use-js-executables-from-node-modules ()
+    "Set executables of JS and TS checkers from local node modules."
+    (-when-let* ((file-name (buffer-file-name))
+                 (root (locate-dominating-file file-name "node_modules"))
+                 (module-directory (expand-file-name "node_modules" root)))
+      (pcase-dolist (`(,checker . ,module) '((javascript-jshint . "jshint")
+                                             (javascript-eslint . "eslint")
+                                             (typescript-tslint . "tslint")
+                                             (javascript-jscs   . "jscs")))
+        (let ((package-directory (expand-file-name module module-directory))
+              (executable-var (flycheck-checker-executable-variable checker)))
+          (when (file-directory-p package-directory)
+            (set (make-local-variable executable-var)
+                 (expand-file-name (if (string= module "tslint")
+                                       (concat "bin/" module)
+                                     (concat "bin/" module ".js"))
+                                   package-directory)))))))
+)
+#+END_SRC
+
 
 ** js2-refactor
 js2-refactor uses 2 char mnemonic for refactorings.
@@ -6276,7 +6132,7 @@ Keybindings
     (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
 )
 #+END_SRC
-** add-json-modules-path
+** add-node-modules-path
 
 Adds the node_modules/.bin directory to the buffer exec_path. E.g. support project local eslint installations.
 https://github.com/codesuki/add-node-modules-path/tree/master
@@ -6354,97 +6210,6 @@ https://github.com/jakoblind/js-import
 )
 #+END_SRC
 
-* format-all
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package format-all
-  :ensure t
-  :defer t
-  :bind ("C-c C-f" . format-all-buffer)
-)
-#+END_SRC
-
-* JSON Mode
-
-json-mode: Major mode for editing JSON files with emacs
-https://github.com/joshwnj/json-mode
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package json-mode
-  :ensure t
-  :mode "\\.js\\(?:on\\|[hl]int\\(rc\\)?\\)\\'"
-  :config
-  (add-hook 'json-mode-hook #'prettier-js-mode)
-  (setq json-reformat:indent-width 2)
-  (setq json-reformat:pretty-string? t)
-  (setq js-indent-level 2)
-)
-#+END_SRC
-
-* ESLint
-
-eslintd-fix: Emacs minor-mode to automatically fix javascript with eslint_d.
-https://github.com/aaronjensen/eslintd-fix/tree/master
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package eslintd-fix
-  :ensure t
-  :defer t
-  :ensure-system-package
-  (eslint . "npm i -g eslint")
-  :config
-  ;; Grab eslint executable from node_modules instead of global
-  ;; Taken from https://github.com/flycheck/flycheck/issues/1087#issuecomment-246514860
-  ;; Gist: https://github.com/lunaryorn/.emacs.d/blob/master/lisp/lunaryorn-flycheck.el#L62
-  (defun lunaryorn-use-js-executables-from-node-modules ()
-    "Set executables of JS and TS checkers from local node modules."
-    (-when-let* ((file-name (buffer-file-name))
-                 (root (locate-dominating-file file-name "node_modules"))
-                 (module-directory (expand-file-name "node_modules" root)))
-      (pcase-dolist (`(,checker . ,module) '((javascript-jshint . "jshint")
-                                             (javascript-eslint . "eslint")
-                                             (typescript-tslint . "tslint")
-                                             (javascript-jscs   . "jscs")))
-        (let ((package-directory (expand-file-name module module-directory))
-              (executable-var (flycheck-checker-executable-variable checker)))
-          (when (file-directory-p package-directory)
-            (set (make-local-variable executable-var)
-                 (expand-file-name (if (string= module "tslint")
-                                       (concat "bin/" module)
-                                     (concat "bin/" module ".js"))
-                                   package-directory)))))))
-)
-#+END_SRC
-
-* RJSX Mode
-
-https://github.com/felipeochoa/rjsx-mode
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package rjsx-mode
-  :ensure t
-  :defer t
-  :after js2-mode
-  :mode
-  ("\\.jsx$" . rjsx-mode)
-  ("components/.+\\.js$" . rjsx-mode)
-  :hook
-  (rjsx-mode . add-node-modules-path)
-  (rjsx-mode . prettier-js-mode)
-  :config
-  ;; auto register for JS files that are inside a `components' folder
-  (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
-
-  ;; for better jsx syntax-highlighting in web-mode
-  ;; - courtesy of Patrick @halbtuerke
-  (defadvice web-mode-highlight-part (around tweak-jsx activate)
-    (if (equal web-mode-content-type "jsx")
-      (let ((web-mode-enable-part-face nil))
-        ad-do-it)
-      ad-do-it))
-)
-#+END_SRC
-
 * Typescript
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -6507,6 +6272,63 @@ https://github.com/felipeochoa/rjsx-mode
   ;;(add-hook 'js2-mode-hook #'setup-tide-mode)
 )
 
+#+END_SRC
+
+
+* format-all
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package format-all
+  :ensure t
+  :defer t
+  :bind ("C-c C-f" . format-all-buffer)
+)
+#+END_SRC
+
+* JSON Mode
+
+json-mode: Major mode for editing JSON files with emacs
+https://github.com/joshwnj/json-mode
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package json-mode
+  :ensure t
+  :mode "\\.js\\(?:on\\|[hl]int\\(rc\\)?\\)\\'"
+  :config
+  (add-hook 'json-mode-hook #'prettier-js-mode)
+  (setq json-reformat:indent-width 2)
+  (setq json-reformat:pretty-string? t)
+  (setq js-indent-level 2)
+)
+#+END_SRC
+
+* RJSX Mode
+
+https://github.com/felipeochoa/rjsx-mode
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package rjsx-mode
+  :ensure t
+  :defer t
+  :after js2-mode
+  :mode
+  ("\\.jsx$" . rjsx-mode)
+  ("components/.+\\.js$" . rjsx-mode)
+  :hook
+  (rjsx-mode . add-node-modules-path)
+  (rjsx-mode . prettier-js-mode)
+  :config
+  ;; auto register for JS files that are inside a `components' folder
+  (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
+
+  ;; for better jsx syntax-highlighting in web-mode
+  ;; - courtesy of Patrick @halbtuerke
+  (defadvice web-mode-highlight-part (around tweak-jsx activate)
+    (if (equal web-mode-content-type "jsx")
+      (let ((web-mode-enable-part-face nil))
+        ad-do-it)
+      ad-do-it))
+)
 #+END_SRC
 
 * Angular

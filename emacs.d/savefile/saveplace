@@ -1,4 +1,5 @@
 ;;; -*- coding: utf-8 -*-
+<<<<<<< HEAD
 (("/home/gustavo/dotfiles/.gitconfig" . 674)
  ("/home/gustavo/dotfiles/aliases" . 1083)
  ("/home/gustavo/.emacs.d/recentf" . 16398)
@@ -76,3 +77,7 @@
  ("/home/gustavo/code/pep/src/app/_store/_modules/historico/historico.action.ts" . 103)
  ("/home/gustavo/code/pep/src/app/_store/_modules/beneficiario/beneficiario.action.ts" . 3641)
  ("/home/gustavo/code/pep/src/app/_store/_modules/beneficiario/beneficiario.state.ts" . 223))
+=======
+(("/home/tau/.emacs.d/elpa/org-plus-contrib-20191230/org-loaddefs.el" . 136001)
+ ("/home/tau/.emacs.d/recentf" . 1733))
+>>>>>>> 80a80b6a0b625fa3f1586b1c1aa0f5bd1a4a5090
