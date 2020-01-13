@@ -33,6 +33,7 @@ plugins=(
     zsh-syntax-highlighting
     zsh-autosuggestions
     you-should-use
+    k
     )
 
 #########################################

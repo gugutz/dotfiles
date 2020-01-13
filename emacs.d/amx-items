@@ -1,18 +1,18 @@
 
 ;; ----- amx-history -----
 (
+ bug-hunter-init-file
  ag
  counsel-ag
  counsel-rg
  lsp-execute-code-action
  toggle-debug-on-error
  outline-mode
- outshine-menu
 )
 
 ;; ----- amx-data -----
 (
- (bug-hunter-init-file . 5)
+ (bug-hunter-init-file . 8)
  (scss-mode . 12)
  (eslintd-fix-mode . 3)
  (helm-M-x . 1)
