@@ -52,7 +52,6 @@ Keymap:
 : snails-everywhere
 
 
-
 * PDF Tools
 
 ** Install pdf-tools if its not already installed
@@ -77,7 +76,6 @@ Keymap:
     "k" (lambda () (interactive) (pdf-view-previous-line-or-previous-page 5))
     "l" 'pdf-view-next-page-command)
    #+END_SRC
-
 
 
 
@@ -121,7 +119,6 @@ Used in adition with the Edit in Emacs plugin for Chrome
   ("C-." . ace-jump-mode)
 )
 #+END_SRC
-
 
 * flycheck inline
 
@@ -196,7 +193,6 @@ There is another official flycheck-pos-tip extension for displaying errors under
 )
 #+END_SRC
 
-
 * ox-confluence
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -254,7 +250,6 @@ There is another official flycheck-pos-tip extension for displaying errors under
 
 )
 #+END_SRC
-
 
 * paredit
 
@@ -418,7 +413,6 @@ Indium connects to a browser tab or nodejs process and provides many features fo
 #+END_SRC
 
 
-
 * web-beautify
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -522,7 +516,6 @@ Display lumoon phases in the modeline
 )
 #+END_SRC
 
-
 * celestial-mode-line
 
 Displaysunrise and sunset info and moon phase
@@ -546,7 +539,6 @@ Displaysunrise and sunset info and moon phase
   (celestial-mode-line-start-timer)
 )
 #+END_SRC
-
 
 
 * COMMENT smart-mode-line
@@ -595,7 +587,6 @@ this was commented with C-c ; so it doenst get exported in favor of doom-modelin
     (which-function-mode t)
 )
 #+END_SRC
-
 
 * discover
 
@@ -886,7 +877,6 @@ Make sure :ensure nil
   (helm-fuzzier-mode 1)
   )
 
-
 * helm-projectile
 
 (use-package helm-projectile
@@ -896,6 +886,37 @@ Make sure :ensure nil
   :config
   (helm-projectile-on)
 )
+
+* Helm CSS SCSS
+
+
+(use-package helm-css-scss
+  :ensure t
+  :defer t
+  :after helm
+  :bind
+  (:map isearch-mode-map
+        ("s-i" . helm-css-scss-from-isearch))
+  (:map helm-css-scss-map
+        ("s-i" . helm-css-scss-multi-from-helm-css-scss))
+  (:map css-mode-map
+        ("s-i" . helm-css-scss)
+        ("s-S-I" . helm-css-scss-back-to-last-point))
+  (:map scss-mode-map
+        ("s-i" . helm-css-scss)
+        ("s-S-I" . helm-css-scss-back-to-last-point))
+  :config
+  (setq helm-css-scss-insert-close-comment-depth 2
+        helm-css-scss-split-with-multiple-windows t
+        helm-css-scss-split-direction 'split-window-vertically)
+
+  ;; Set local keybind map for css-mode / scss-mode / less-css-mode
+  (dolist ($hook '(css-mode-hook scss-mode-hook less-css-mode-hook))
+    (add-hook
+     $hook (lambda ()
+             (local-set-key (kbd "s-i") 'helm-css-scss)
+             (local-set-key (kbd "s-I") 'helm-css-scss-back-to-last-point))))
+  )
 
 * fun packages
 
@@ -1152,7 +1173,6 @@ display battery percentagem on the modeline
   )
 
 
-
 * ag
 
 (use-package ag
@@ -1170,7 +1190,6 @@ display battery percentagem on the modeline
   (use-package wgrep-ag)
   )
 
-
 * wgrep
 
 
@@ -1182,7 +1201,6 @@ display battery percentagem on the modeline
   (wgrep-auto-save-buffer t)
   (wgrep-change-readonly-file t)
   )
-
 
 * ripgrep
 
@@ -1223,7 +1241,6 @@ tangled, and the tangled file is compiled."
 
 
 (add-hook 'after-save-hook #'/util/tangle-init)
-
 
 * garbage collection stuff
 
@@ -1444,7 +1461,6 @@ tangled, and the tangled file is compiled."
   (recentf-mode +1)
   )
 
-
 * auto-save-visited
 
 ;; auto-save file-visiting buffers after five seconds of idle time
@@ -1455,7 +1471,6 @@ tangled, and the tangled file is compiled."
   :config
   (auto-save-visited-mode)
   )
-
 
 
 * sublimity
@@ -1538,7 +1553,6 @@ tangled, and the tangled file is compiled."
   )
 
 
-
 * hideshowvis
 
 ;; Add clicable markers for foldable regions in the fringe
@@ -1557,7 +1571,6 @@ tangled, and the tangled file is compiled."
   :config
   (hideshowvis-symbols) ; displaying a + symbol in the fringe for folded regions
   )
-
 
 * hi-lock mode
 
@@ -1585,7 +1598,6 @@ tangled, and the tangled file is compiled."
   ;; always highlight patterns found in files without confirmation
   (setq hi-lock-file-patterns-policy #'(lambda (dummy) t))
   )
-
 
 * hl-anything
 
@@ -1646,38 +1658,6 @@ tangled, and the tangled file is compiled."
   (vhl/install-extension 'undo-tree)
   )
 
-* Helm CSS SCSS
-
-
-(use-package helm-css-scss
-  :ensure t
-  :defer t
-  :after helm
-  :bind
-  (:map isearch-mode-map
-        ("s-i" . helm-css-scss-from-isearch))
-  (:map helm-css-scss-map
-        ("s-i" . helm-css-scss-multi-from-helm-css-scss))
-  (:map css-mode-map
-        ("s-i" . helm-css-scss)
-        ("s-S-I" . helm-css-scss-back-to-last-point))
-  (:map scss-mode-map
-        ("s-i" . helm-css-scss)
-        ("s-S-I" . helm-css-scss-back-to-last-point))
-  :config
-  (setq helm-css-scss-insert-close-comment-depth 2
-        helm-css-scss-split-with-multiple-windows t
-        helm-css-scss-split-direction 'split-window-vertically)
-
-  ;; Set local keybind map for css-mode / scss-mode / less-css-mode
-  (dolist ($hook '(css-mode-hook scss-mode-hook less-css-mode-hook))
-    (add-hook
-     $hook (lambda ()
-             (local-set-key (kbd "s-i") 'helm-css-scss)
-             (local-set-key (kbd "s-I") 'helm-css-scss-back-to-last-point))))
-  )
-
-
 * web-mode-edit-element
 
 
@@ -1719,7 +1699,6 @@ tangled, and the tangled file is compiled."
 (use-package web-mode-edit-element
   :ensure t
   )
-
 
 * eslintd-fix
 
@@ -1812,4 +1791,26 @@ tangled, and the tangled file is compiled."
                                               ("infinity" "∞")
                                               ("arrow" "→")
                                               ))
+  )
+* org-kanban
+
+(use-package org-kanban
+  :ensure t
+  :defer t
+  :after org
+  :commands  (org-kanban/initialize)
+  :config
+)
+* git-messenger
+
+(use-package git-messenger
+  :ensure t
+  :bind
+  ("C-c g p" . git-messenger:popup-message)
+  :init
+  (setq git-messenger:show-detail t)
+  (setq git-messenger:use-magit-popup t)
+  :config
+  (progn
+    (define-key git-messenger-map (kbd "RET") 'git-messenger:popup-close))
   )

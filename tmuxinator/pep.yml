@@ -45,8 +45,11 @@ windows:
       panes:
         - ng s --host
         - git status
-  - server:
+  - info:
       layout: even-horizontal
       panes:
         - htop
         - cd ~/dotfiles && git status
+  - system:
+      panes:
+        - gotop

@@ -26,7 +26,7 @@
 
 
 ;; Font sizes
-(defvar tau/erc-nick               nil        "The ERC nick to use.")
+(defvar tau/erc-nick               "tau"        "The ERC nick to use.")
 (defvar tau/erc-password           nil        "The ERC password to use.")
 (defvar tau/erc-port               nil        "The ERC port to use.")
 (defvar tau/erc-server             nil        "The ERC server to use.")
@@ -40,6 +40,9 @@
 ;; Indent sizes
 (defvar tau/indent-js                2        "The font size to use for titles.")
 (defvar tau/indent-html              4        "The font size to use for titles.")
+
+;; Colors
+(defvar color/vscode-status-bar      "#007ad3"        "The font size to use for titles.")
 
 ;; Init time start
 (defvar my-init-el-start-time (current-time) "Time when init.el was started")
@@ -110,34 +113,6 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
             (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
             (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
 ;; -AutoGC
-
-
-;; **************************************************
-
-;; CUSTTOM-SET-VARIABLES
-
-;; moved this part to beggining of the file because if the
-;; custom-safe-themes variable is not set before smart-mode-line (sml) activates
-;; emacs asks 2 annoying confirmations on every startup before actually starting
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   (quote
-    ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "57f95012730e3a03ebddb7f2925861ade87f53d5bbb255398357731a7b1ac0e0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
- '(fci-rule-color "#3E4451")
- '(package-selected-packages
-   (quote
-    (pdf-tools ox-pandoc ox-reveal org-preview-html latex-preview-pane smart-mode-line-powerline-theme base16-theme gruvbox-theme darktooth-theme rainbow-mode smartscan restclient editorconfig prettier-js pandoc rjsx-mode js2-refactor web-mode evil-org multiple-cursors flycheck smart-mode-line ## evil-leader evil-commentary evil-surround htmlize magit neotree evil json-mode web-serverx org))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
 
 ;; **************************************************
 
@@ -783,6 +758,7 @@ Example output:
   (:map prog-mode-map
         ("C-c C-o" . dumb-jump-go-other-window)
         ("C-c C-j" . dumb-jump-go)
+        ("C-c C-b" . dumb-jump-back)
         ("C-c C-i" . dumb-jump-go-prompt))
   :custom
   (dumb-jump-selector 'ivy)
@@ -1286,7 +1262,7 @@ Example output:
     "|" 'split-window-right
     "." 'find-tag
     "t" 'projectile-find-file
-    "b" 'ido-switch-buffer
+    "b" 'ivy-switch-buffer
     "vc" 'evilnc-comment-or-uncomment-lines
     "ag" 'projectile-ag
     "," 'switch-to-previous-buffer
@@ -1421,17 +1397,26 @@ Example output:
   :after evil
   :bind
   (:map evil-visual-state-map
+        ("C-d" . mc/mark-next-like-this)
+        ("C-a" . mc/mark-all-like-this)
+        ("C-a" . mc/mark-all-like-this)
+        )
+  (:map evil-visual-state-map
         ("C-d" . evil-mc-make-and-goto-next-match) ;; Make a cursor at point and go to the next match of the selected region or the symbol under cursor.
         ("C-a" . evil-mc-make-all-cursors) ;; Create cursors for all strings that match the selected region or the symbol under cursor.
         ("C-q" . evil-mc-undo-all-cursors)  ;; Remove all cursors.
         )
   :config
+  (define-key evil-visual-state-map (kbd "mn") 'evil-mc-make-and-goto-next-match)
+  (define-key evil-visual-state-map (kbd "ma") 'mc/mark-all-like-this-dwim)
+  (define-key evil-visual-state-map (kbd "md") 'mc/mark-all-like-this-in-defun)
+  (define-key evil-visual-state-map (kbd "mm") 'ace-mc-add-multiple-cursors)
+  (define-key evil-visual-state-map (kbd "ms") 'ace-mc-add-single-cursor)
   (global-evil-mc-mode  1)
   )
 
 
 ;; ** evil-goggles
-
 
 (use-package evil-goggles
   :ensure t
@@ -1444,17 +1429,17 @@ Example output:
   (evil-goggles-enable-paste nil) ;; to disable the hint when pasting
   (evil-goggles-enable-delete t)
   (evil-goggles-enable-change t)
-  ;;(evil-goggles-enable-indent t)
-  ;;(evil-goggles-enable-yank t)
+  (evil-goggles-enable-indent t)
+  (evil-goggles-enable-yank t)
   ;;(evil-goggles-enable-join t)
   ;;(evil-goggles-enable-fill-and-move t)
   (evil-goggles-enable-paste t)
   ;;(evil-goggles-enable-shift t)
   (evil-goggles-enable-surround t)
-  ;;(evil-goggles-enable-commentary)
+  (evil-goggles-enable-commentary t )
   ;;(evil-goggles-enable-nerd-commenter t)
   ;;(evil-goggles-enable-replace-with-register t)
-  ;;(evil-goggles-enable-set-marker t)
+  (evil-goggles-enable-set-marker t)
   (evil-goggles-enable-undo t)
   (evil-goggles-enable-redo t)
   ;;(evil-goggles-enable-record-macro t)
@@ -1851,17 +1836,8 @@ Example output:
                   ".swp"
                   ".pyc")
                 projectile-globally-ignored-files))
-)
+  )
 
-;; ** org-kanban
-
-(use-package org-kanban
-  :ensure t
-  :defer t
-  :after org
-  :commands  (org-kanban/initialize)
-  :config
-)
 
 ;; **************************************************
 
@@ -1869,6 +1845,7 @@ Example output:
 
 (use-package ivy
   :ensure t
+  :demand t
   :diminish ivy-mode
   :hook
   (after-init . ivy-mode)
@@ -1887,7 +1864,7 @@ Example output:
   (ivy-set-actions  t
                     '(("I" insert "insert")))
   (ivy-set-occur 'ivy-switch-buffer 'ivy-switch-buffer-occur)
-)
+  )
 
 ;; ** counsel
 
@@ -1999,9 +1976,9 @@ Example output:
 
 (use-package counsel-projectile
   :ensure t
-  :after ivy projectile
+  :after ivy counsel projectile
   :config (counsel-projectile-mode 1)
-)
+  )
 
 
 ;; ** ivy-posframe
@@ -2011,29 +1988,29 @@ Example output:
 
 (use-package ivy-posframe
   :ensure t
+  :demand t
+  :after ivy
   :diminish ivy-posframe-mode
   :custom-face
   (ivy-posframe ((t (:background "#333244"))))
   (ivy-posframe-border ((t (:background "#abff00"))))
   (ivy-posframe-cursor ((t (:background "#00ff00"))))
-  :hook
-  (ivy-mode . ivy-posframe-mode)
-  :config
+  :custom
+  ;; define the position of the posframe per function
+  (ivy-posframe-display-functions-alist
+   '((swiper          . ivy-posframe-display-at-window-center)
+     (complete-symbol . ivy-posframe-display-at-point)
+     ;;(counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
+     (counsel-M-x     . ivy-posframe-display-at-frame-center)
+     (t               . ivy-posframe-display-at-frame-center)))
   ;; custom define height of post frame per function
-  (setq ivy-posframe-height-alist '((swiper . 15)
-                                    (find-file . 20)
-                                    (counsel-ag . 15)
-                                    (counsel-projectile-ag . 30)
-                                    (t      . 25)))
-
-  ;; display at `ivy-posframe-style'
-  (setq ivy-posframe-display-functions-alist
-        '((swiper          . ivy-posframe-display-at-window-center)
-          (complete-symbol . ivy-posframe-display-at-point)
-          ;;(counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
-          (counsel-M-x     . ivy-posframe-display-at-frame-center)
-          (t               . ivy-posframe-display-at-frame-center)))
-  (ivy-posframe-mode 1)
+  (ivy-posframe-height-alist '((swiper . 15)
+                               (find-file . 20)
+                               (counsel-ag . 15)
+                               (counsel-projectile-ag . 30)
+                               (t      . 25)))
+  :config
+  (ivy-posframe-mode)
   )
 
 ;; ** ivy-rich
@@ -2202,18 +2179,15 @@ Example output:
 
 (use-package magit
   :ensure t
-  :custom
-  (magit-auto-revert-mode t)
-  ;;:hook
-  ;; this line was giving the `Wrong number of arguments error'
-  ;; (after-save . (lambda () (magit-after-save-refresh-status t)))
   :bind
   ("<tab>" . magit-section-toggle)
   ("M-g s" . magit-status)
+  ("M-g l" . magit-log)
+  ("M-g b" . magit-blame)
   ("C-x g" . magit-status)
   :config
   (add-hook 'after-save-hook 'magit-after-save-refresh-status t)
-)
+  )
 
 ;; ** evil-magit
 
@@ -2258,12 +2232,13 @@ Example output:
   (magit-todos-mode)
   )
 
-;; ** git-messenger
+;; ** vc-msg
 
-(use-package git-messenger
+(use-package vc-msg
   :ensure t
+  :defer t
   :bind
-  ("C-c g p" . git-messenger:popup-message)
+  ("C-c g p" . vc-msg-show)
   :init
   (setq git-messenger:show-detail t)
   (setq git-messenger:use-magit-popup t)
@@ -2271,21 +2246,6 @@ Example output:
   (progn
     (define-key git-messenger-map (kbd "RET") 'git-messenger:popup-close))
   )
-
-;; ** vc-msg
-
-(use-package vc-msg
-  :ensure t
-  :defer t
-  :bind
-  ("C-c g p" . git-messenger:popup-message)
-  :init
-  (setq git-messenger:show-detail t)
-  (setq git-messenger:use-magit-popup t)
-  :config
-  (progn
-    (define-key git-messenger-map (kbd "RET") 'git-messenger:popup-close))
-)
 
 ;; Major modes for git related files
 
@@ -2624,21 +2584,6 @@ If failed try to complete the common part with `company-complete-common'"
 ;; -CompanyBoxPac
 
 
-;; ** company-lsp
-
-;; Company-lsp is auto inserted into company backends
-
-(use-package company-lsp
-  :ensure t
-  :custom
-  (company-lsp-enable-snippet t)
-  (company-lsp-async t)
-  (company-lsp-cache-candidates 'auto)
-  (company-lsp-enable-recompletion t)
-)
-
-;; **************************************************
-
 ;; * LSP
 
 ;; ** LSP (language server protocol implementation for emacs)
@@ -2646,21 +2591,14 @@ If failed try to complete the common part with `company-complete-common'"
 (use-package lsp-mode
   :ensure t
   :commands lsp
+  :hook
+  (prog-mode . lsp)
+  (text-mode . lsp)
   :custom
   ;; general
-  (lsp-inhibit-message nil) ;; was `t`, changed to nil to see what it does
-  (lsp-eldoc-render-all nil)  ;; was `nil`, changed to t to see what it does
-  (lsp-highlight-symbol-at-point t)  ;; was `nil`, changed to nil to see what it does
-  (lsp-auto-guess-root t)
-  (lsp-document-sync-method 'incremental) ;; none, full, incremental, or nil
-  (lsp-response-timeout 10)
-  (lsp-prefer-flymake nil) ;; use flycheck instead of flymake
-  (lsp-enable-symbol-highlighting nil)
-  (lsp-signature-auto-activate nil)
-                                        ;debug
-  (lsp-print-io nil)
-  (lsp-trace nil)
-  (lsp-print-performance nil)
+  (lsp-auto-configure t) ;; auto-configure `lsp-ui' and `company-lsp'
+  (lsp-prefer-flymake :none) ;; t: flymake | nil: lsp-ui | :none -> none of them (flycheck)
+  (lsp-log-io t) ;; log all messages to and from the language server to a *lsp-log* buffer
   :config
   ;; angular language server
   (setq lsp-clients-angular-language-server-command
@@ -2671,29 +2609,20 @@ If failed try to complete the common part with `company-complete-common'"
           "--tsProbeLocations"
           "~/.nvm/versions/node/v10.16.3/lib/node_modules"
           "--stdio"))
-)
+  )
 
 ;; ** lsp ui
 
 (use-package lsp-ui
   :ensure t
+  :commands lsp-ui-mode
   :after lsp-mode
   :hook
   (lsp-mode . lsp-ui-mode)
   :custom-face
   (lsp-ui-doc-background ((nil (:background "#f9f2d9"))))
   (lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic)))))
-
   (lsp-ui-sideline-global ((nil (:inherit 'shadow :background "#f9f2d9"))))
-
-  :preface
-  (defun tau/toggle-lsp-ui-doc ()
-    (interactive)
-    (if lsp-ui-doc-mode
-        (progn
-          (lsp-ui-doc-mode -1)
-          (lsp-ui-doc--hide-frame))
-      (lsp-ui-doc-mode 1)))
   :bind
   (:map lsp-mode-map
         ("C-c l p f r" . lsp-ui-peek-find-references)
@@ -2714,26 +2643,18 @@ If failed try to complete the common part with `company-complete-common'"
   :custom
   ;; lsp-ui-doc
   (lsp-ui-doc-enable nil)
-  (lsp-ui-doc-header t)
-  (lsp-ui-doc-include-signature t)
   (lsp-ui-doc-position 'top) ;; top, bottom, or at-point
   (lsp-ui-doc-border (face-foreground 'default))
   (lsp-ui-doc-max-width 100)
   (lsp-ui-doc-max-height 30)
-  (lsp-ui-doc-use-childframe t)
   ;; lsp-ui-flycheck
-  (lsp-ui-flycheck-enable nil) ;; disable to leave tsling as checker for ts files
+  (lsp-ui-flycheck-enable nil) ;; disable to leave `tslint' as checker for ts files
   (lsp-ui-flycheck-list-position 'right)
   (lsp-ui-flycheck-live-reporting t)
   ;; lsp-ui-sideline
   (lsp-ui-sideline-enable nil)
-  (lsp-ui-sideline-ignore-duplicate t)
-  (lsp-ui-sideline-show-symbol t)
-  (lsp-ui-sideline-show-hover t)
-  (lsp-ui-sideline-show-diagnostics nil) ;; show flycheck diagnostics
-  (lsp-ui-sideline-show-code-actions t)
+  (lsp-ui-sideline-show-diagnostics t) ;; show diagnostics (flyckeck) messages in sideline
   (lsp-ui-sideline-code-actions-prefix "")
-  (lsp-ui-sideline-update-mode 'point)
   ;; lsp-ui-imenu
   (lsp-ui-imenu-enable t)
   (lsp-ui-imenu-kind-position 'top)
@@ -2741,7 +2662,6 @@ If failed try to complete the common part with `company-complete-common'"
   (lsp-ui-peek-enable t)
   (lsp-ui-peek-peek-height 20)
   (lsp-ui-peek-list-width 40)
-  (lsp-ui-peek-fontify 'on-demand) ;; never, on-demand, or always
   :config
   ;; lsp-ui appearance
   (add-hook 'lsp-ui-doc-frame-hook
@@ -2751,6 +2671,22 @@ If failed try to complete the common part with `company-complete-common'"
   (if (display-graphic-p)
       (setq lsp-ui-doc-use-webkit t))
   )
+
+;; ** company-lsp
+
+;; Company-lsp is auto inserted into company backends
+
+(use-package company-lsp
+  :ensure t
+  :commands company-lsp
+  :custom
+  (company-lsp-enable-snippet t)
+  (company-lsp-async t)
+  (company-lsp-cache-candidates 'auto)
+  (company-lsp-enable-recompletion t)
+  )
+
+;; **************************************************
 
 ;; ** dap - debug adapter protocol
 
@@ -2794,9 +2730,10 @@ If failed try to complete the common part with `company-complete-common'"
 (use-package lsp-treemacs
   :ensure t
   :defer t
+  :commands lsp-treemacs-errors-list
   :init
   (setq lsp-treemacs-sync-mode 1)
-)
+  )
 
 ;; ** lsp-ivy
 
@@ -2815,9 +2752,9 @@ If failed try to complete the common part with `company-complete-common'"
 (use-package yasnippet
   :ensure t
   :diminish yas-minor-mode
-  ;;:hook
-  ;;(prog-mode . yas-minor-mode)
-  ;;(text-mode . yas-minor-mode)
+  :hook
+  (prog-mode . yas-minor-mode)
+  (text-mode . yas-minor-mode)
   :bind
   ;; ("<tab>" . yas-maybe-expand)
   ("C-<tab>" . yas-maybe-expand)
@@ -2841,7 +2778,7 @@ If failed try to complete the common part with `company-complete-common'"
   (yas-reload-all) ;; tell yasnippet about updates to yas-snippet-dirs
   ;; disabled global mode in favor or hooks in prog and text modes only
   ;; (yas-global-mode 1)
-)
+  )
 
 ;; Colection of snippets
 (use-package yasnippet-snippets :ensure t)
@@ -2857,11 +2794,11 @@ If failed try to complete the common part with `company-complete-common'"
   :after ivy
   :hook
   (after-init . ivy-explorer-mode)
-  :config
-  ;; use ivy explorer for all file dialogs
-)
+  )
 
 ;; ** Dired
+
+;; Make dired look like k
 
 (use-package dired-k
   :after dired
@@ -2870,7 +2807,7 @@ If failed try to complete the common part with `company-complete-common'"
   (setq dired-k-human-readable t)
   (setq dired-dwin-target t)
   (add-hook 'dired-initial-position-hook #'dired-k)
-)
+  )
 
 ;; ** all the icons dired
 
@@ -2879,7 +2816,7 @@ If failed try to complete the common part with `company-complete-common'"
   :defer t
   :hook
   (dired-mode . all-the-icons-dired-mode)
-)
+  )
 
 ;; **************************************************
 ;; ** Treemacs itself
@@ -2968,110 +2905,110 @@ If failed try to complete the common part with `company-complete-common'"
 
     (let ((face-spec '(:inherit font-lock-doc-face :slant normal)))  ;; taken from doom-treemacs -theme to use all theicons in some parts
       (treemacs-create-theme "vscode"
-                             :icon-directory (f-join treemacs-dir "icons/default")
-                             :config
-                             (progn
-                               ;; directory and other icons
-                               ;; (treemacs-create-icon :file "root.png"        :extensions (root)       :fallback "")
-                               (treemacs-create-icon
-                                :icon (format " %s\t" (all-the-icons-octicon "repo" :height 1.2 :v-adjust -0.1 :face face-spec))
-                                :extensions (root))
-                               (treemacs-create-icon :file "vscode/default_folder.png"  :extensions (dir-closed) :fallback (propertize "+ " 'face 'treemacs-term-node-face))
-                               (treemacs-create-icon :file "vscode/default_folder_opened.png"    :extensions (dir-open)   :fallback (propertize "- " 'face 'treemacs-term-node-face))
-                               (treemacs-create-icon :file "tags-leaf.png"   :extensions (tag-leaf)   :fallback (propertize "• " 'face 'font-lock-constant-face))
-                               (treemacs-create-icon :file "tags-open.png"   :extensions (tag-open)   :fallback (propertize "▸ " 'face 'font-lock-string-face))
-                               (treemacs-create-icon :file "tags-closed.png" :extensions (tag-closed) :fallback (propertize "▾ " 'face 'font-lock-string-face))
-                               (treemacs-create-icon :file "error.png"       :extensions (error)      :fallback (propertize "• " 'face 'font-lock-string-face))
-                               (treemacs-create-icon :file "warning.png"     :extensions (warning)    :fallback (propertize "• " 'face 'font-lock-string-face))
-                               (treemacs-create-icon :file "info.png"        :extensions (info)       :fallback (propertize "• " 'face 'font-lock-string-face))
+        :icon-directory (f-join treemacs-dir "icons/default")
+        :config
+        (progn
+          ;; directory and other icons
+          ;; (treemacs-create-icon :file "root.png"        :extensions (root)       :fallback "")
+          (treemacs-create-icon
+           :icon (format " %s\t" (all-the-icons-octicon "repo" :height 1.2 :v-adjust -0.1 :face face-spec))
+           :extensions (root))
+          (treemacs-create-icon :file "vscode/default_folder.png"  :extensions (dir-closed) :fallback (propertize "+ " 'face 'treemacs-term-node-face))
+          (treemacs-create-icon :file "vscode/default_folder_opened.png"    :extensions (dir-open)   :fallback (propertize "- " 'face 'treemacs-term-node-face))
+          (treemacs-create-icon :file "tags-leaf.png"   :extensions (tag-leaf)   :fallback (propertize "• " 'face 'font-lock-constant-face))
+          (treemacs-create-icon :file "tags-open.png"   :extensions (tag-open)   :fallback (propertize "▸ " 'face 'font-lock-string-face))
+          (treemacs-create-icon :file "tags-closed.png" :extensions (tag-closed) :fallback (propertize "▾ " 'face 'font-lock-string-face))
+          (treemacs-create-icon :file "error.png"       :extensions (error)      :fallback (propertize "• " 'face 'font-lock-string-face))
+          (treemacs-create-icon :file "warning.png"     :extensions (warning)    :fallback (propertize "• " 'face 'font-lock-string-face))
+          (treemacs-create-icon :file "info.png"        :extensions (info)       :fallback (propertize "• " 'face 'font-lock-string-face))
 
-                               ;; common file types icons
-                               (treemacs-create-icon :file "vscode/default_file.png"         :extensions (fallback))
-                               (treemacs-create-icon :file "vscode/image.png"       :extensions ("jpg" "jpeg" "bmp" "svg" "png" "xpm" "gif"))
-                               (treemacs-create-icon :file "vscode/video.png"       :extensions ("webm" "mp4" "avi" "mkv" "flv" "mov" "wmv" "mpg" "mpeg" "mpv"))
-                               (treemacs-create-icon :file "vscode/pdf.png"         :extensions ("pdf"))
-                               (treemacs-create-icon :file "vscode/emacs.png"       :extensions ("el" "elc"))
-                               (treemacs-create-icon :file "ledger.png"      :extensions ("ledger"))
-                               (treemacs-create-icon :file "vscode/config.png"        :extensions ("properties" "conf" "config" "cfg" "ini" "xdefaults" "xresources" "terminalrc" "ledgerrc"))
-                               (treemacs-create-icon :file "vscode/shell.png"       :extensions ("sh" "zsh" "fish"))
-                               (treemacs-create-icon :file "asciidoc.png"    :extensions ("adoc" "asciidoc"))
-                               ;; git
-                               (treemacs-create-icon :file "vscode/git.png"         :extensions ("git" "gitignore" "gitconfig" "gitmodules" "gitattributes"))
-                               ;; dev lib
-                               (treemacs-create-icon :file "vscode/editorconfig.png"         :extensions ("editorconfig"))
-                               ;; frontend universe
-                               (treemacs-create-icon :file "vscode/json.png"        :extensions ("json"))
-                               (treemacs-create-icon :file "vscode/html.png"        :extensions ("html" "htm"))
-                               (treemacs-create-icon :file "vscode/css.png"         :extensions ("css"))
-                               (treemacs-create-icon :file "vscode/scss.png"         :extensions ("scss"))
-                               (treemacs-create-icon :file "vscode/js_official.png"          :extensions ("js" "jsx"))
-                               (treemacs-create-icon :file "vscode/typescript.png"          :extensions ("ts" "tsx"))
-                               (treemacs-create-icon :file "vscode/typescriptdef.png"          :extensions ("spec"))
-                               (treemacs-create-icon :file "vscode/tslint.png"          :extensions ("tslint"))
-                               (treemacs-create-icon :file "vscode/tsconfig.png"          :extensions ("tsconfig"))
-                               (treemacs-create-icon :file "vscode/vue.png"         :extensions ("vue"))
-                               (treemacs-create-icon :file "vscode/elm.png"         :extensions ("elm"))
-                               ;; markupgs
-                               (treemacs-create-icon :file "vscode/org.png"     :extensions ("org"))
-                               (treemacs-create-icon :file "vscode/markdown.png"    :extensions ("md"))
-                               (treemacs-create-icon :file "vscode/tex.png"         :extensions ("tex"))
-                               (treemacs-create-icon :file "vscode/yaml.png"        :extensions ("yml" "yaml"))
-                               (treemacs-create-icon :file "vscode/toml.png"        :extensions ("toml"))
-                               (treemacs-create-icon :file "vscode/dartlang.png"        :extensions ("dart"))
-                               (treemacs-create-icon :file "vscode/julia.png"       :extensions ("jl"))
-                               ;; erlang / elixir
-                               (treemacs-create-icon :file "vscode/erlang2.png"      :extensions ("erl" "hrl"))
-                               (treemacs-create-icon :file "vscode/elixir.png"         :extensions ("ex"))
-                               (treemacs-create-icon :file "elx-light.png"   :extensions ("exs" "eex"))
-                               ;; ruby
-                               (treemacs-create-icon :file "ruby.png"   :extensions ("rb"))
-                               (treemacs-create-icon :file "erb.png"   :extensions ("erb"))
-                               ;; backend languages file types
-                               (treemacs-create-icon :file "vscode/rust.png"        :extensions ("rs"))
-                               (treemacs-create-icon :file "vscode/clojure.png"     :extensions ("clj" "cljs" "cljc"))
-                               (treemacs-create-icon :file "vscode/java.png"        :extensions ("java"))
-                               (treemacs-create-icon :file "vscode/kotlin.png"      :extensions ("kt"))
-                               (treemacs-create-icon :file "vscode/scala.png"       :extensions ("scala"))
-                               (treemacs-create-icon :file "sbt.png"         :extensions ("sbt"))
-                               (treemacs-create-icon :file "vscode/go.png"          :extensions ("go"))
-                               (treemacs-create-icon :file "vscode/php.png"         :extensions ("php"))
-                               (treemacs-create-icon :file "vscode/c.png"           :extensions ("c" "h"))
-                               (treemacs-create-icon :file "vscode/cpp.png"         :extensions ("cpp" "cxx" "hpp" "tpp" "cc" "hh"))
-                               ;; lisp ecosystem
-                               (treemacs-create-icon :file "racket.png"      :extensions ("racket" "rkt" "rktl" "rktd" "scrbl" "scribble" "plt"))
-                               ;; haskell
-                               (treemacs-create-icon :file "vscode/haskell.png"     :extensions ("hs" "lhs"))
-                               (treemacs-create-icon :file "cabal.png"       :extensions ("cabal"))
-                               ;; python
-                               (treemacs-create-icon :file "python.png"      :extensions ("py" "pyc"))
-                               (treemacs-create-icon :file "hy.png"          :extensions ("hy"))
-                               (treemacs-create-icon :file "ocaml.png"       :extensions ("ml" "mli"))
-                               (treemacs-create-icon :file "puppet.png"      :extensions ("pp"))
-                               ;; devops tools
-                               (treemacs-create-icon :file "vscode/docker.png"      :extensions ("dockerfile"))
-                               (treemacs-create-icon :file "vagrant.png"     :extensions ("vagrantfile"))
-                               (treemacs-create-icon :file "jinja2.png"      :extensions ("j2" "jinja2"))
-                               (treemacs-create-icon :file "purescript.png"  :extensions ("purs"))
-                               (treemacs-create-icon :file "nix.png"         :extensions ("nix"))
-                               (treemacs-create-icon :file "scons.png"       :extensions ("sconstruct" "sconstript"))
-                               (treemacs-create-icon :file "vscode/make.png"    :extensions ("makefile"))
-                               (treemacs-create-icon :file "vscode/license.png" :extensions ("license"))
-                               (treemacs-create-icon :file "vscode/zip.png"     :extensions ("zip" "7z" "tar" "gz" "rar"))
-                               (treemacs-create-icon :file "vscode/elm.png"     :extensions ("elm"))
-                               (treemacs-create-icon :file "vscode/xml.png"     :extensions ("xml" "xsl"))
-                               (treemacs-create-icon :file "vscode/binary.png"  :extensions ("exe" "dll" "obj" "so" "o"))
-                               (treemacs-create-icon :file "vscode/ruby.png"    :extensions ("rb"))
-                               (treemacs-create-icon :file "vscode/scss.png"    :extensions ("scss"))
-                               (treemacs-create-icon :file "vscode/lua.png"     :extensions ("lua"))
-                               (treemacs-create-icon :file "vscode/log.png"     :extensions ("log"))
-                               (treemacs-create-icon :file "vscode/lisp.png"    :extensions ("lisp"))
-                               (treemacs-create-icon :file "vscode/sql.png"     :extensions ("sql"))
-                               (treemacs-create-icon :file "vscode/nim.png"     :extensions ("nim"))
-                               (treemacs-create-icon :file "vscode/perl.png"    :extensions ("pl" "pm" "perl"))
-                               (treemacs-create-icon :file "vscode/vim.png"     :extensions ("vimrc" "tridactylrc" "vimperatorrc" "ideavimrc" "vrapperrc"))
-                               (treemacs-create-icon :file "vscode/deps.png"    :extensions ("cask"))
-                               (treemacs-create-icon :file "vscode/r.png"       :extensions ("r"))
-                               (treemacs-create-icon :file "vscode/reason.png"  :extensions ("re" "rei")))))
+          ;; common file types icons
+          (treemacs-create-icon :file "vscode/default_file.png"         :extensions (fallback))
+          (treemacs-create-icon :file "vscode/image.png"       :extensions ("jpg" "jpeg" "bmp" "svg" "png" "xpm" "gif"))
+          (treemacs-create-icon :file "vscode/video.png"       :extensions ("webm" "mp4" "avi" "mkv" "flv" "mov" "wmv" "mpg" "mpeg" "mpv"))
+          (treemacs-create-icon :file "vscode/pdf.png"         :extensions ("pdf"))
+          (treemacs-create-icon :file "vscode/emacs.png"       :extensions ("el" "elc"))
+          (treemacs-create-icon :file "ledger.png"      :extensions ("ledger"))
+          (treemacs-create-icon :file "vscode/config.png"        :extensions ("properties" "conf" "config" "cfg" "ini" "xdefaults" "xresources" "terminalrc" "ledgerrc"))
+          (treemacs-create-icon :file "vscode/shell.png"       :extensions ("sh" "zsh" "fish"))
+          (treemacs-create-icon :file "asciidoc.png"    :extensions ("adoc" "asciidoc"))
+          ;; git
+          (treemacs-create-icon :file "vscode/git.png"         :extensions ("git" "gitignore" "gitconfig" "gitmodules" "gitattributes"))
+          ;; dev lib
+          (treemacs-create-icon :file "vscode/editorconfig.png"         :extensions ("editorconfig"))
+          ;; frontend universe
+          (treemacs-create-icon :file "vscode/json.png"        :extensions ("json"))
+          (treemacs-create-icon :file "vscode/html.png"        :extensions ("html" "htm"))
+          (treemacs-create-icon :file "vscode/css.png"         :extensions ("css"))
+          (treemacs-create-icon :file "vscode/scss.png"         :extensions ("scss"))
+          (treemacs-create-icon :file "vscode/js_official.png"          :extensions ("js" "jsx"))
+          (treemacs-create-icon :file "vscode/typescript.png"          :extensions ("ts" "tsx"))
+          (treemacs-create-icon :file "vscode/typescriptdef.png"          :extensions ("spec"))
+          (treemacs-create-icon :file "vscode/tslint.png"          :extensions ("tslint"))
+          (treemacs-create-icon :file "vscode/tsconfig.png"          :extensions ("tsconfig"))
+          (treemacs-create-icon :file "vscode/vue.png"         :extensions ("vue"))
+          (treemacs-create-icon :file "vscode/elm.png"         :extensions ("elm"))
+          ;; markupgs
+          (treemacs-create-icon :file "vscode/org.png"     :extensions ("org"))
+          (treemacs-create-icon :file "vscode/markdown.png"    :extensions ("md"))
+          (treemacs-create-icon :file "vscode/tex.png"         :extensions ("tex"))
+          (treemacs-create-icon :file "vscode/yaml.png"        :extensions ("yml" "yaml"))
+          (treemacs-create-icon :file "vscode/toml.png"        :extensions ("toml"))
+          (treemacs-create-icon :file "vscode/dartlang.png"        :extensions ("dart"))
+          (treemacs-create-icon :file "vscode/julia.png"       :extensions ("jl"))
+          ;; erlang / elixir
+          (treemacs-create-icon :file "vscode/erlang2.png"      :extensions ("erl" "hrl"))
+          (treemacs-create-icon :file "vscode/elixir.png"         :extensions ("ex"))
+          (treemacs-create-icon :file "elx-light.png"   :extensions ("exs" "eex"))
+          ;; ruby
+          (treemacs-create-icon :file "ruby.png"   :extensions ("rb"))
+          (treemacs-create-icon :file "erb.png"   :extensions ("erb"))
+          ;; backend languages file types
+          (treemacs-create-icon :file "vscode/rust.png"        :extensions ("rs"))
+          (treemacs-create-icon :file "vscode/clojure.png"     :extensions ("clj" "cljs" "cljc"))
+          (treemacs-create-icon :file "vscode/java.png"        :extensions ("java"))
+          (treemacs-create-icon :file "vscode/kotlin.png"      :extensions ("kt"))
+          (treemacs-create-icon :file "vscode/scala.png"       :extensions ("scala"))
+          (treemacs-create-icon :file "sbt.png"         :extensions ("sbt"))
+          (treemacs-create-icon :file "vscode/go.png"          :extensions ("go"))
+          (treemacs-create-icon :file "vscode/php.png"         :extensions ("php"))
+          (treemacs-create-icon :file "vscode/c.png"           :extensions ("c" "h"))
+          (treemacs-create-icon :file "vscode/cpp.png"         :extensions ("cpp" "cxx" "hpp" "tpp" "cc" "hh"))
+          ;; lisp ecosystem
+          (treemacs-create-icon :file "racket.png"      :extensions ("racket" "rkt" "rktl" "rktd" "scrbl" "scribble" "plt"))
+          ;; haskell
+          (treemacs-create-icon :file "vscode/haskell.png"     :extensions ("hs" "lhs"))
+          (treemacs-create-icon :file "cabal.png"       :extensions ("cabal"))
+          ;; python
+          (treemacs-create-icon :file "python.png"      :extensions ("py" "pyc"))
+          (treemacs-create-icon :file "hy.png"          :extensions ("hy"))
+          (treemacs-create-icon :file "ocaml.png"       :extensions ("ml" "mli"))
+          (treemacs-create-icon :file "puppet.png"      :extensions ("pp"))
+          ;; devops tools
+          (treemacs-create-icon :file "vscode/docker.png"      :extensions ("dockerfile"))
+          (treemacs-create-icon :file "vagrant.png"     :extensions ("vagrantfile"))
+          (treemacs-create-icon :file "jinja2.png"      :extensions ("j2" "jinja2"))
+          (treemacs-create-icon :file "purescript.png"  :extensions ("purs"))
+          (treemacs-create-icon :file "nix.png"         :extensions ("nix"))
+          (treemacs-create-icon :file "scons.png"       :extensions ("sconstruct" "sconstript"))
+          (treemacs-create-icon :file "vscode/make.png"    :extensions ("makefile"))
+          (treemacs-create-icon :file "vscode/license.png" :extensions ("license"))
+          (treemacs-create-icon :file "vscode/zip.png"     :extensions ("zip" "7z" "tar" "gz" "rar"))
+          (treemacs-create-icon :file "vscode/elm.png"     :extensions ("elm"))
+          (treemacs-create-icon :file "vscode/xml.png"     :extensions ("xml" "xsl"))
+          (treemacs-create-icon :file "vscode/binary.png"  :extensions ("exe" "dll" "obj" "so" "o"))
+          (treemacs-create-icon :file "vscode/ruby.png"    :extensions ("rb"))
+          (treemacs-create-icon :file "vscode/scss.png"    :extensions ("scss"))
+          (treemacs-create-icon :file "vscode/lua.png"     :extensions ("lua"))
+          (treemacs-create-icon :file "vscode/log.png"     :extensions ("log"))
+          (treemacs-create-icon :file "vscode/lisp.png"    :extensions ("lisp"))
+          (treemacs-create-icon :file "vscode/sql.png"     :extensions ("sql"))
+          (treemacs-create-icon :file "vscode/nim.png"     :extensions ("nim"))
+          (treemacs-create-icon :file "vscode/perl.png"    :extensions ("pl" "pm" "perl"))
+          (treemacs-create-icon :file "vscode/vim.png"     :extensions ("vimrc" "tridactylrc" "vimperatorrc" "ideavimrc" "vrapperrc"))
+          (treemacs-create-icon :file "vscode/deps.png"    :extensions ("cask"))
+          (treemacs-create-icon :file "vscode/r.png"       :extensions ("r"))
+          (treemacs-create-icon :file "vscode/reason.png"  :extensions ("re" "rei")))))
 
     ;; finally apply the custom theme
     (treemacs-load-theme tau-themes-treemacs-theme))
@@ -3272,7 +3209,7 @@ If failed try to complete the common part with `company-complete-common'"
   ;; to switch the backgrounds of the `default` and `solaire-default-face` faces.
   ;; This should be used *after* you load the active theme!
   ;; NOTE: This is necessary for themes in the doom-themes package!
-  ;; (solaire-mode-swap-bg)
+  (solaire-mode-swap-bg)
   )
 
 ;; ** dimmer
@@ -3463,14 +3400,14 @@ If failed try to complete the common part with `company-complete-common'"
   :ensure t
   :bind
   ("C-M-z" . zoom)
-  :init
-  (setq zoom-size '(0.618 . 0.618))
-  (setq zoom-ignored-major-modes '(treemacs dired-mode neotree dired-sidebar))
-  (setq zoom-ignored-buffer-names '("zoom.el" "init.el"))
-  (setq zoom-ignored-buffer-name-regexps '("^*calc"))
+  :custom
+  (zoom-size '(0.618 . 0.618))
+  (zoom-ignored-major-modes '(treemacs dired-mode neotree dired-sidebar))
+  (zoom-ignored-buffer-names '("zoom.el" "init.el"))
+  (zoom-ignored-buffer-name-regexps '("^*calc"))
   :config
   (zoom-mode t)
-)
+  )
 
 ;; **************************************************
 
@@ -3852,12 +3789,12 @@ If failed try to complete the common part with `company-complete-common'"
   (dashboard-navigator-buttons
    (if (featurep 'all-the-icons)
        `(((,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust -0.05)
-           "M-EMACS" "Browse M-EMACS Homepage"
+           "dotfiles @ github" "Browse personal dotfiles"
            (lambda (&rest _) (browse-url "https://github.com/gugutz/dotfiles")))
           (,(all-the-icons-fileicon "elisp" :height 1.0 :v-adjust -0.1)
            "Configuration" "" (lambda (&rest _) (edit-configs)))
           (,(all-the-icons-faicon "cogs" :height 1.0 :v-adjust -0.1)
-           "Update" "" (lambda (&rest _) (auto-package-update-now)))))
+           "Update packages" "" (lambda (&rest _) (auto-package-update-now)))))
      `((("" "M-EMACS" "Browse M-EMACS Homepage"
          (lambda (&rest _) (browse-url "https://github.com/gugutz/dotfiles")))
         ("" "Configuration" "" (lambda (&rest _) (edit-configs)))
@@ -4354,17 +4291,19 @@ If failed try to complete the common part with `company-complete-common'"
 ;; ** memacs scrolling (trying it out)
 
 
-;; SmoothScroll
-;; Vertical Scroll
-(setq scroll-step 1)
+;; General Vertical Scrolling Settings
+(setq scroll-step 1) ;; one line at a time
 (setq scroll-margin 1)
-(setq scroll-conservatively 101)
+(setq scroll-conservatively 101) ;; move minimum when cursor exits view, instead of recentering
 (setq scroll-up-aggressively 0.01)
+(setq scroll-preserve-screen-position t)  ;; centered screen scrolling
 (setq scroll-down-aggressively 0.01)
 (setq auto-window-vscroll nil)
 (setq fast-but-imprecise-scrolling nil)
-(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
-(setq mouse-wheel-progressive-speed nil)
+;; Mouse Scroll
+(setq mouse-wheel-scroll-amount '(3 ((shift) . 1))) ;; shift + mouse scroll moves 1 line at a time, instead of 5 lines
+(setq mouse-wheel-scroll-amount '(3 ((control) . 6))) ;; hold Control for 5 lines at a time
+(setq mouse-wheel-progressive-speed nil) ;; on a long mouse scroll keep scrolling by 1 line,  don't accelerate scrolling
 ;; Horizontal Scroll
 (setq hscroll-step 1)
 (setq hscroll-margin 1)
@@ -4376,8 +4315,6 @@ If failed try to complete the common part with `company-complete-common'"
 (use-package mwheel
   :ensure nil
   :config
-  (setq mouse-wheel-progressive-speed nil)            ;; don't accelerate scrolling
-  (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ;; one line at a time
   (setq mouse-wheel-scroll-amount '(1 ((control) . 5)))
   (setq mouse-wheel-follow-mouse 't)                  ;; scroll window under mouse
   )
@@ -4971,10 +4908,6 @@ If failed try to complete the common part with `company-complete-common'"
   (defun setup-typescript-mode ()
     (interactive)
     (message "Trying to setup typescript-mode for buffer")
-    (lsp)
-    (lsp-ui-mode)
-    ;; (tide-setup)
-    ;; (tide-hl-identifier-mode 1)
     (flycheck-mode 1)
     (eldoc-mode 1)
     (yas-minor-mode 1)
@@ -5039,9 +4972,9 @@ If failed try to complete the common part with `company-complete-common'"
 ;; Taken from ng2-mode
 
 
-(defun ng2--counterpart-name (file)
+(defun angular--counterpart-name (file)
   "Return the file name of FILE's counterpart, or FILE if there is no counterpart."
-  (when (not (ng2--is-component file)) file)
+  (when (not (angular--is-component file)) file)
   (let ((ext (file-name-extension file))
         (base (file-name-sans-extension file)))
     (if (equal ext "ts")
@@ -5050,20 +4983,20 @@ If failed try to complete the common part with `company-complete-common'"
 
 
 
-(defun ng2--is-component (file)
+(defun angular--is-component (file)
   "Return whether FILE is a component file."
   (equal (file-name-extension (file-name-sans-extension file)) "component"))
 
 
 
-(defun ng2-open-counterpart ()
+(defun angular-open-counterpart ()
   "Opens the corresponding template or component file to this one."
   (interactive)
-  (find-file (ng2--counterpart-name (buffer-file-name))))
+  (find-file (angular--counterpart-name (buffer-file-name))))
 
 
 
-(global-set-key (kbd "C-x a o") #'ng2-open-counterpart)
+(global-set-key (kbd "C-x a o") #'angular-open-counterpart)
 
 
 
@@ -5279,19 +5212,53 @@ If failed try to complete the common part with `company-complete-common'"
 ;; ** Duplicate line
 
 
-(defun duplicate-line()
+;; (defun duplicate-line()
+;;   "Duplicate current line."
+;;   (interactive)
+;;   (move-beginning-of-line 1)
+;;   (kill-line)
+;;   (yank)
+;;   (open-line 1)
+;;   (next-line 1)
+;;   (yank))
+
+;; shorter version
+(defun duplicate-line ()
   "Duplicate current line."
   (interactive)
-  (move-beginning-of-line 1)
-  (kill-line)
-  (yank)
-  (open-line 1)
-  (next-line 1)
-  (yank)
-  )
+  (let ((col (current-column)))
+    (move-beginning-of-line 1)
+    (kill-line)
+    (yank)
+    (newline)
+    (yank)
+    (move-to-column col)))
 
 (global-set-key [(meta shift d)] 'duplicate-line)
+(global-set-key [(control shift d)] 'duplicate-line)
 
+;; ** Move Lines Up and Down
+
+(defun move-line-down ()
+  (interactive)
+  (let ((col (current-column)))
+    (save-excursion
+      (forward-line)
+      (transpose-lines 1))
+    (forward-line)
+    (move-to-column col)))
+
+(defun move-line-up ()
+  (interactive)
+  (let ((col (current-column)))
+    (save-excursion
+      (forward-line)
+      (transpose-lines -1))
+    (forward-line -1)
+    (move-to-column col)))
+
+(global-set-key (kbd "C-S-j") 'move-line-down)
+(global-set-key (kbd "C-S-k") 'move-line-up)
 
 
 ;; * End init.el file

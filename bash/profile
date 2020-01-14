@@ -29,6 +29,14 @@ export PAGER=/usr/bin/less
 export QT_QPA_PLATFORMTHEME="qt5ct"
 export GTK2_RC_FILES="$HOME/.gtkrc-2.0"
 
+###########################################
+# Manjaro i3 default .profile settings
+###########################################
+export QT_QPA_PLATFORMTHEME="qt5ct"
+export EDITOR=/usr/bin/vim
+export GTK2_RC_FILES="$HOME/.gtkrc-2.0"
+# fix "xdg-open fork-bomb" export your preferred browser from here
+export BROWSER=/usr/bin/firefox
 
 ###########################################
 # Applications specific settings
@@ -55,4 +63,3 @@ export PATH=$PATH:$GOPATH/bin
 # export PATH="/home/tau/.pyenv/bin:$PATH"
 # eval "$(pyenv init -)"
 # eval "$(pyenv virtualenv-init -)"
-

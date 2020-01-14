@@ -1,13 +1,13 @@
 
 ;; ----- amx-history -----
 (
- bug-hunter-init-file
- ag
- counsel-ag
- counsel-rg
- lsp-execute-code-action
- toggle-debug-on-error
- outline-mode
+ evil-mc-make-all-cursors
+ goto-char
+ ivy-switch-buffer
+ counsel-switch-buffer
+ vc-msg-show
+ diffview-current
+ vc-annotate
 )
 
 ;; ----- amx-data -----
@@ -95,7 +95,7 @@
  (dumb-jump-quick-look . 1)
  (hydra-ivy/body . 1)
  (switch-to-buffer . 2)
- (ivy-switch-buffer . 1)
+ (ivy-switch-buffer . 2)
  (counsel-yank-pop . 1)
  (customize . 1)
  (format-all-buffer . 1)
@@ -110,4 +110,15 @@
  (counsel-rg . 1)
  (counsel-ag . 1)
  (ag . 1)
+ (imenu . 1)
+ (lsp-mode . 1)
+ (speedbar . 1)
+ (evil-goggles-mode . 2)
+ (elisp-format-buffer . 1)
+ (vc-annotate . 1)
+ (diffview-current . 1)
+ (vc-msg-show . 1)
+ (counsel-switch-buffer . 1)
+ (goto-char . 2)
+ (evil-mc-make-all-cursors . 1)
 )

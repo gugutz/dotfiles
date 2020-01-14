@@ -29,8 +29,11 @@ echo "## downloading and installing rightclickpaste patch"
 wget -P ~/downloads/st-0.8.2/ https://st.suckless.org/patches/rightclickpaste/st-rightclickpaste-0.8.2.diff
 patch -Np1 -i st-rightclickpaste-0.8.2.diff
 
+# OH-MY-ZSH FRAMEWORK
 echo "## installing oh-my-zsh framework"
 curl -L https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh | sh
+
+# PLUGINS
 echo "## installing zsh sintax highlighting plugin"
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 echo "## installing zsh autosuggestions plugin"
@@ -39,9 +42,16 @@ echo "## installing you-should-use aliases reminder plugin"
 git clone https://github.com/MichaelAquilina/zsh-you-should-use.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/you-should-use
 echo "## installing fzf command line fuzzy search"
 git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install
+echo "## installing k directory list enhancements"
 git clone https://github.com/supercrabtree/k ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/k
 
+# TMUXINATOR
+echo "## installing Tmuxinator"
+sudo pacman -S --noconfirm tmux
+echo "## install tmuxinator"
+gem install tmuxinator
 
+# LANGUAGES CONFIG
 echo "## install ASDF"
 git clone https://github.com/asdf-vm/asdf.git ~/.asdf
 
@@ -50,10 +60,6 @@ asdf plugin-add ruby
 asdf install ruby 2.6.4
 asdf global ruby 2.6.4
 
-echo "## installing Tmux"
-sudo pacman -S --noconfirm tmux
-echo "## install tmuxinator"
-gem install tmuxinator
 
 echo "## installing NVM"
 curl -o https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
