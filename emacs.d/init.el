@@ -194,8 +194,7 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 (unless (or (daemonp) (server-running-p))
   (server-start))
 
-
-;; ** Add the folder 'config' to emacs load-path so i can require stuff from there
+;; Add the folder 'config' to emacs load-path so i can require stuff from there
 (add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
 ;; (add-to-list 'load-path "~/dotfiles/emacs.d/config")
 
@@ -204,24 +203,14 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 (setq blink-cursor-blinks 0) ;; blink forever
 (setq-default indicate-empty-lines t)
 
-;; ** visual-line-mode (word wrap)
-
-(use-package visual-line-mode
-  :ensure nil
-  :hook
-  (prog-mode . turn-on-visual-line-mode)
-  (text-mode . turn-on-visual-line-mode)
-  )
-
-
-;; ** Prevent emacs to create lockfiles (.#files#). this also stops preventing editing colisions, so watch out
+;; Prevent emacs to create lockfiles (.#files#). this also stops preventing editing colisions, so watch out
 (setq create-lockfiles nil)
-;; ** dont make backup files
+;; dont make backup files
 (setq make-backup-files nil)
 ;; dont ask confirmation to kill processes
 (setq confirm-kill-processes nil)
 
-;; ** Save all tempfiles in $TMPDIR/emacs$UID/
+;; Save all tempfiles in $TMPDIR/emacs$UID/
 (defconst emacs-tmp-dir (expand-file-name (format "emacs%d" (user-uid)) temporary-file-directory))
 (setq backup-directory-alist
     `((".*" . ,emacs-tmp-dir)))
@@ -230,22 +219,108 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 (setq auto-save-list-file-prefix
       emacs-tmp-dir)
 
-;; ** Always follow symbolic links to edit the 'actual' file it points to
+;; Always follow symbolic links to edit the 'actual' file it points to
 (setq vc-follow-symlinks t)
 
-;; ** dont ask confirmation to kill processes
+;; dont ask confirmation to kill processes
 (setq confirm-kill-processes nil)
 
-;; ** Disable the annoying Emacs bell ring (beep)
+;; Disable the annoying Emacs bell ring (beep)
 (setq ring-bell-function 'ignore)
 
-;; ** Create alias to yes-or-no anwsers (y-or-n-p
+;; Create alias to yes-or-no anwsers (y-or-n-p
 (defalias 'yes-or-no-p 'y-or-n-p)
 (fset 'yes-or-no-p 'y-or-n-p)
 
-;; ** dont ask for confirmation for opening large files
+;; dont ask for confirmation for opening large files
 (setq large-file-warning-threshold nil) ;; Don’t warn me about opening large files
 
+;; ** C-n insert newlines if the point is at the end of the buffer.
+(setq next-line-add-newlines t)
+
+;; warn when opening files bigger than 100MB
+(setq large-file-warning-threshold 100000000)
+;; ** C-k kills current buffer without having to select which buffer
+
+;; By default C-x k prompts to select which buffer should be selected.
+;; I almost always want to kill the current buffer, so this snippet helps in that.
+
+;; Kill current buffer; prompt only if
+;; there are unsaved changes.
+(global-set-key (kbd "C-x k")
+                '(lambda () (interactive) (kill-buffer (current-buffer)))
+                )
+
+
+
+;; ** add final newline
+
+
+(setq require-final-newline t)
+
+
+;; ** fill column
+
+;; Sets a 80 character line width
+
+
+(setq-default fill-column 80)
+(setq auto-fill-mode 1)
+
+
+;; ** preffer UTF-8 coding system
+
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+
+
+
+
+;; auto balance windows on opening and closing frames
+(setq window-combination-resize t)
+
+
+;; ** set default line spacing
+;; (setq-default line-spacing 1) ;; A nice line height
+(setq-default line-spacing 3)
+
+
+;; fix wierd color escape system
+(setq system-uses-terminfo nil) ;; Fix weird color escape sequences
+
+
+;; confirm before closing emacs
+;; (setq confirm-kill-emacs 'yes-or-no-p) ;; Ask for confirmation before closing emacs
+
+
+;; select window for help
+(setq help-window-select t)
+
+
+;; delete selection mode
+
+;; Delete Selection mode lets you treat an Emacs region much like a typical text selection outside of Emacs: You can replace the active region just by typing text, and you can delete the selected text just by hitting the Backspace key (‘DEL’).
+
+;; According to the Emacs manual,
+;; If you enable Delete Selection mode, a minor mode, then inserting text while the mark is active causes the selected text to be deleted first. This also deactivates the mark. Many graphical applications follow this convention, but Emacs does not.
+
+
+(delete-selection-mode 1)
+
+
+;; **************************************************
+
+;; * PACKAGES
+
+;; ** visual-line-mode (word wrap)
+(use-package visual-line-mode
+  :ensure nil
+  :hook
+  (prog-mode . turn-on-visual-line-mode)
+  (text-mode . turn-on-visual-line-mode)
+  )
 
 ;; **************************************************
 
@@ -255,7 +330,6 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 (setq x-select-enable-clipboard t)
 
 ;; *** Copy to system clipboard
-
 
 (defun copy-to-clipboard ()
   "Make F8 and F9 Copy and Paste to/from OS Clipboard.  Super usefull."
@@ -272,10 +346,9 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
           (deactivate-mark))
       (message "No region active; can't yank to clipboard!")))
   )
-
+(global-set-key [f9] 'copy-to-clipboard)
 
 ;; *** Paste
-
 
 (defun paste-from-clipboard()
   (if (display-graphic-p)
@@ -285,9 +358,6 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
         )
     (insert (shell-command-to-string "xsel -o -b")) ) )
 
-
-
-(global-set-key [f9] 'copy-to-clipboard)
 (global-set-key [f10] 'paste-from-clipboard)
 
 
@@ -301,10 +371,6 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
   :init
   (setq display-line-numbers-grow-only t)
   (setq display-line-numbers-width-start t)
-  ;; old linum-mode variables, check if they work with new display-line-numbers-mode
-  ;; (setq linum-format 'dynamic)
-  ;; (setq linum-format " %d ") ;; one space separation between the linenumber display and the buffer contents:
-  ;; (setq linum-format "%4d “) ;; 4 character and a space for line numbers
   (setq linum-format "%4d \u2502 ") ; 4 chars and a space with solid line separator
   :config
   ;;(global-display-line-numbers-mode)
@@ -347,8 +413,7 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
   (global-set-key (kbd "<left-margin> <down-mouse-1>") 'md-select-linum)
   (global-set-key (kbd "<left-margin> <mouse-1>") 'mu-select-linum)
   (global-set-key (kbd "<left-margin> <drag-mouse-1>") 'mu-select-linum)
-)
-
+  )
 
 ;; **************************************************
 ;; * GPG Encryption
@@ -362,51 +427,11 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
   (setq epa-file-select-keys 0)
   ;; Cache passphrase for symmetric encryption.
   (setq epa-file-cache-passphrase-for-symmetric-encryption t)
-)
-
-
-;; **************************************************
-
-;; * email
-
-
-(use-package gnus
-  :ensure nil
-  :config
-  (setq user-mail-address "gugutz@gmail.com"
-        user-full-name "tau")
-
-  (setq gnus-select-method
-        '(nnimap "gmail"
-                 (nnimap-address "imap.gmail.com")
-                 (nnimap-server-port 993)
-                 (nnimap-stream ssl)))
-
-  (setq smtpmail-smtp-server "smtp.gmail.com"
-        smtpmail-smtp-service 587
-        gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
-
-  (setq gnus-thread-sort-functions
-        '(gnus-thread-sort-by-most-recent-date
-          (not gnus-thread-sort-by-number)))
-
-  (defun my-gnus-group-list-subscribed-groups ()
-    "List all subscribed groups with or without un-read messages"
-    (interactive)
-    (gnus-group-list-all-groups 5))
-
-  (define-key gnus-group-mode-map
-    ;; list all the subscribed groups even they contain zero un-read messages
-    (kbd "o") 'my-gnus-group-list-subscribed-groups)
-)
-
+  )
 
 ;; **************************************************
-
-
 
 ;; ** Turn on auto-revert mode (auto updates files changed on disk)
-
 
 (use-package autorevert
   :ensure nil
@@ -417,10 +442,10 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
   (setq auto-revert-interval 2)
   (setq auto-revert-check-vc-info t)
   (setq auto-revert-verbose nil)
-)
+  )
 
-;; ** C-n insert newlines if the point is at the end of the buffer.
-(setq next-line-add-newlines t)
+;; refresh buffer with F5
+(global-set-key [f5] '(lambda () (interactive) (revert-buffer nil t nil)))
 
 
 ;; ** Remove the ^M characters from files that contains Unix and DOS line endings
@@ -429,16 +454,16 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
   (interactive)
   (setq buffer-display-table (make-display-table))
   (aset buffer-display-table ?\^M [])
-)
+  )
 
 ;; *** Hook it to text-mode and prog-mode
 (add-hook 'text-mode-hook 'remove-dos-eol)
 (add-hook 'prog-mode-hook 'remove-dos-eol)
 
 
-
 ;; ** expand-region
 
+;; smart selection of text
 
 (use-package expand-region
   :ensure t
@@ -446,94 +471,6 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
   :bind
   ([(control shift iso-lefttab)] . 'er/expand-region)
   )
-
-
-;; ** refresh buffer with F5
-
-(global-set-key [f5] '(lambda () (interactive) (revert-buffer nil t nil)))
-
-;; ** C-k kills current buffer without having to select which buffer
-
-;; By default C-x k prompts to select which buffer should be selected.
-;; I almost always want to kill the current buffer, so this snippet helps in that.
-
-;; Kill current buffer; prompt only if
-;; there are unsaved changes.
-(global-set-key (kbd "C-x k")
-                '(lambda () (interactive) (kill-buffer (current-buffer)))
-                )
-
-
-;; ** warn when opening large files
-
-
-;; warn when opening files bigger than 100MB
-(setq large-file-warning-threshold 100000000)
-
-
-;; ** add final newline
-
-
-(setq require-final-newline t)
-
-
-;; ** fill column
-
-;; Sets a 80 character line width
-
-
-(setq-default fill-column 80)
-(setq auto-fill-mode 1)
-
-
-;; ** preffer UTF-8 coding system
-
-(prefer-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-
-
-;; ** delete selection mode
-
-;; Delete Selection mode lets you treat an Emacs region much like a typical text selection outside of Emacs: You can replace the active region just by typing text, and you can delete the selected text just by hitting the Backspace key (‘DEL’).
-
-;; According to the Emacs manual,
-;; If you enable Delete Selection mode, a minor mode, then inserting text while the mark is active causes the selected text to be deleted first. This also deactivates the mark. Many graphical applications follow this convention, but Emacs does not.
-
-
-(delete-selection-mode 1)
-
-
-;; ** auto balance windows on opening and closing frames
-
-
-(setq window-combination-resize t)
-
-
-;; ** set default line spacing
-
-
-;; (setq-default line-spacing 1) ;; A nice line height
-(setq-default line-spacing 3)
-
-
-;; ** fix wierd color escape system
-
-
-(setq system-uses-terminfo nil) ;; Fix weird color escape sequences
-
-
-;; ** confirm before closing emacs
-
-
-;; (setq confirm-kill-emacs 'yes-or-no-p) ;; Ask for confirmation before closing emacs
-
-
-;; ** select window for help
-
-
-(setq help-window-select t)
 
 
 ;; * Code editing settings
@@ -1044,11 +981,18 @@ Example output:
 
 
 ;; zoom in/out like we do everywhere else.
-(global-set-key (kbd "C-=") 'text-scale-increase)
-(global-set-key (kbd "C--") 'text-scale-decrease)
-(global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
-(global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
 
+;; mouse scrolls are binded differently depending on the system
+(if (eq system-type 'gnu/linux)
+    (global-set-key (kbd "<C-mouse-4>") 'text-scale-increase)
+  (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
+  )
+(if (eq system-type 'windows-nt)
+    (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+  (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
+  )
+(global-set-key [?\C-=] 'text-scale-increase)
+(global-set-key [?\C--] 'text-scale-decrease)
 
 ;; * hippie-expand (native emacs expand function)
 
@@ -1305,52 +1249,45 @@ Example output:
 
 
 (use-package evil-surround
+  :preface
+  (defun evil-surround-prog-mode-hook-setup ()
+    "Documentation string, idk, put something here later."
+    (push '(47 . ("/" . "/")) evil-surround-pairs-alist)
+    (push '(40 . ("(" . ")")) evil-surround-pairs-alist)
+    (push '(41 . ("(" . ")")) evil-surround-pairs-alist)
+    (push '(91 . ("[" . "]")) evil-surround-pairs-alist)
+    (push '(93 . ("[" . "]")) evil-surround-pairs-alist)
+    )
+  (defun evil-surround-js-mode-hook-setup ()
+    "ES6." ;  this is a documentation string, a feature in Lisp
+    ;; I believe this is for auto closing pairs
+    (push '(?1 . ("{`" . "`}")) evil-surround-pairs-alist)
+    (push '(?2 . ("${" . "}")) evil-surround-pairs-alist)
+    (push '(?4 . ("(e) => " . "(e)")) evil-surround-pairs-alist)
+    ;; ReactJS
+    (push '(?3 . ("classNames(" . ")")) evil-surround-pairs-alist)
+    )
+  (defun evil-surround-emacs-lisp-mode-hook-setup ()
+    (push '(?` . ("`" . "'")) evil-surround-pairs-alist)
+    )
+  (defun evil-surround-org-mode-hook-setup ()
+    (push '(91 . ("[" . "]")) evil-surround-pairs-alist)
+    (push '(93 . ("[" . "]")) evil-surround-pairs-alist)
+    (push '(?= . ("=" . "=")) evil-surround-pairs-alist)
+    )
+
   :config
   (global-evil-surround-mode 1)
+  (add-hook 'prog-mode-hook 'evil-surround-prog-mode-hook-setup)
+  (add-hook 'js2-mode-hook 'evil-surround-js-mode-hook-setup)
+  (add-hook 'emacs-lisp-mode-hook 'evil-surround-emacs-lisp-mode-hook-setup)
+  (add-hook 'org-mode-hook 'evil-surround-org-mode-hook-setup)
   )
-
-
-
-(defun evil-surround-prog-mode-hook-setup ()
-  "Documentation string, idk, put something here later."
-  (push '(47 . ("/" . "/")) evil-surround-pairs-alist)
-  (push '(40 . ("(" . ")")) evil-surround-pairs-alist)
-  (push '(41 . ("(" . ")")) evil-surround-pairs-alist)
-  (push '(91 . ("[" . "]")) evil-surround-pairs-alist)
-  (push '(93 . ("[" . "]")) evil-surround-pairs-alist)
-)
-(add-hook 'prog-mode-hook 'evil-surround-prog-mode-hook-setup)
-
-
-
-(defun evil-surround-js-mode-hook-setup ()
-  "ES6." ;  this is a documentation string, a feature in Lisp
-  ;; I believe this is for auto closing pairs
-  (push '(?1 . ("{`" . "`}")) evil-surround-pairs-alist)
-  (push '(?2 . ("${" . "}")) evil-surround-pairs-alist)
-  (push '(?4 . ("(e) => " . "(e)")) evil-surround-pairs-alist)
-  ;; ReactJS
-  (push '(?3 . ("classNames(" . ")")) evil-surround-pairs-alist)
-)
-(add-hook 'js2-mode-hook 'evil-surround-js-mode-hook-setup)
-
-
-
-(defun evil-surround-emacs-lisp-mode-hook-setup ()
-  (push '(?` . ("`" . "'")) evil-surround-pairs-alist)
-)
-(add-hook 'emacs-lisp-mode-hook 'evil-surround-emacs-lisp-mode-hook-setup)
-
-(defun evil-surround-org-mode-hook-setup ()
-  (push '(91 . ("[" . "]")) evil-surround-pairs-alist)
-  (push '(93 . ("[" . "]")) evil-surround-pairs-alist)
-  (push '(?= . ("=" . "=")) evil-surround-pairs-alist)
-)
-(add-hook 'org-mode-hook 'evil-surround-org-mode-hook-setup)
-
 
 ;; ** evil-commentary
 
+;; gcc -> comments a line
+;; gc -> comments the target of a motion (eg: gcap -> comment all paragraph)
 
 (use-package evil-commentary
   :config
@@ -1359,6 +1296,8 @@ Example output:
 
 
 ;; ** Evil-Matchit
+
+;; Press “%” to jump between matched tags in Emacs
 
 (use-package evil-matchit
   :config
@@ -1501,7 +1440,6 @@ Example output:
     (message "Trying to setup org-mode for buffer")
     (color-identifiers-mode)
     (flycheck-mode 1)
-    (turn-on-visual-line-mode)
     (rainbow-mode 1)
     (diff-hl-mode)
     (prettify-symbols-mode 1)
@@ -1854,6 +1792,7 @@ Example output:
    '((t . ivy--regex-plus)))
   :config
   (ivy-mode)
+  (ivy-posframe-mode)
   ;; display an arrow on the selected item in the list
   (setf (cdr (assoc t ivy-format-functions-alist)) #'ivy-format-function-arrow)
 
@@ -1995,22 +1934,22 @@ Example output:
   (ivy-posframe ((t (:background "#333244"))))
   (ivy-posframe-border ((t (:background "#abff00"))))
   (ivy-posframe-cursor ((t (:background "#00ff00"))))
-  :custom
+  :init
+  (setq ivy-posframe-parameters '((internal-border-width . 5)))
+  (setq ivy-posframe-width 130)
   ;; define the position of the posframe per function
-  (ivy-posframe-display-functions-alist
-   '((swiper          . ivy-posframe-display-at-window-center)
-     (complete-symbol . ivy-posframe-display-at-point)
-     ;;(counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
-     (counsel-M-x     . ivy-posframe-display-at-frame-center)
-     (t               . ivy-posframe-display-at-frame-center)))
+  (setq ivy-posframe-display-functions-alist
+        '((swiper          . ivy-posframe-display-at-window-center)
+          (complete-symbol . ivy-posframe-display-at-point)
+          ;;(counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
+          (counsel-M-x     . ivy-posframe-display-at-frame-center)
+          (t               . ivy-posframe-display-at-frame-center)))
   ;; custom define height of post frame per function
-  (ivy-posframe-height-alist '((swiper . 15)
-                               (find-file . 20)
-                               (counsel-ag . 15)
-                               (counsel-projectile-ag . 30)
-                               (t      . 25)))
-  :config
-  (ivy-posframe-mode)
+  (setq ivy-posframe-height-alist '((swiper . 15)
+                                    (find-file . 20)
+                                    (counsel-ag . 15)
+                                    (counsel-projectile-ag . 30)
+                                    (t      . 25)))
   )
 
 ;; ** ivy-rich
@@ -2041,9 +1980,33 @@ Example output:
             (ivy-rich-switch-buffer-project (:width 15 :face success))
             (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
            :predicate
-           (lambda (cand) (get-buffer cand)))))
+           (lambda (cand) (get-buffer cand)))
+          counsel-M-x
+          (:columns
+           ((counsel-M-x-transformer (:width 35))
+            (ivy-rich-counsel-function-docstring (:width 34 :face font-lock-doc-face))))
+          counsel-describe-function
+          (:columns
+           ((counsel-describe-function-transformer (:width 35))
+            (ivy-rich-counsel-function-docstring (:width 34 :face font-lock-doc-face))))
+          counsel-describe-variable
+          (:columns
+           ((counsel-describe-variable-transformer (:width 35))
+            (ivy-rich-counsel-variable-docstring (:width 34 :face font-lock-doc-face))))
+          package-install
+          (:columns
+           ((ivy-rich-candidate (:width 25))
+            (ivy-rich-package-version (:width 12 :face font-lock-comment-face))
+            (ivy-rich-package-archive-summary (:width 7 :face font-lock-builtin-face))
+            (ivy-rich-package-install-summary (:width 23 :face font-lock-doc-face)))))
+        )
   )
 
+(use-package all-the-icons-ivy
+  :ensure t
+  :hook
+  (after-init . all-the-icons-ivy-setup)
+  )
 
 ;; **************************************************
 
@@ -2104,49 +2067,23 @@ Example output:
   :hook
   (flycheck-mode . flycheck-posframe-mode)
   :custom
-  (flycheck-check-syntax-automatically '(save mode-enabled idle-change newline))
+  (flycheck-check-syntax-automatically '(save mode-enabled newline))
   (flycheck-idle-change-delay 1.5)
   (flycheck-display-errors-delay 1)
   (flycheck-indication-mode 'left-fringe)
-  ;; force flycheck to use its own xml parser instead of libxml32 (was giving me errors)
-  (flycheck-xml-parser 'flycheck-parse-xml-region)
   :config
-  ;; customize flycheck temp file prefix
   (setq-default flycheck-temp-prefix ".flycheck")
-  ;;
-  ;;=======================================
-  ;; Flycheck Setup for JavaScript
-  ;;
-  ;; disable jshint since we prefer eslint checking
-  (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))
-  ;; enable eslint as default js flycheck linter
-  (setq flycheck-checkers '(javascript-eslint))
-  ;; add eslint to js and j2 modes
+  (setq flycheck-checkers '(javascript-eslint typescript-tslint))
   (flycheck-add-mode 'javascript-eslint 'js-mode)
   (flycheck-add-mode 'javascript-eslint 'js2-mode)
-  ;; use eslint_d instead of eslint for faster linting
-  (setq flycheck-javascript-eslint-executable "eslint_d")
-  ;;
-  ;;=======================================
-  ;; Flycheck Setup for Typescript
   (flycheck-add-mode 'typescript-tslint 'rjsx-mode)
   (flycheck-add-mode 'typescript-tslint 'typescript-mode)
-  ;;
-  ;;=======================================
-  ;; Flycheck Setup for WebMode
-  ;;
-  (eval-after-load 'flycheck
-    '(flycheck-add-mode 'javascript-eslint 'web-mode))
-  ;; Use tidy to check HTML buffers with web-mode.
-  (eval-after-load 'flycheck
-    '(flycheck-add-mode 'html-tidy 'web-mode))
-  (eval-after-load 'flycheck
-    '(flycheck-add-mode 'typescript-tslint 'web-mode))
+  (flycheck-add-mode 'typescript-tslint 'web-mode)
+  (flycheck-add-mode 'html-tidy 'web-mode)
   )
 
 
 ;; ** flycheck posframe
-
 
 (use-package flycheck-posframe
   :ensure t
@@ -2159,15 +2096,16 @@ Example output:
   (flycheck-posframe-error-face ((nil (:inherit 'error))))
   (flycheck-posframe-background-face ((nil (:background "#FFFFFF" :foreground "#000000"))))
   (flycheck-posframe-border-face ((nil (:background "#af3ec8"))))
+  :custom
+  (flycheck-posframe-position 'point-bottom-left-corner)
+  (flycheck-posframe-prefix "\u27a4 ") ;; default: ➤
+  (flycheck-posframe-warning-prefix "\u26a0 ")
+  (flycheck-posframe-info-prefix "\uf6c8 ")
+  (flycheck-posframe-error-prefix "\u274c ")
+  (flycheck-posframe-border-width 2)
   :config
-  (setq flycheck-posframe-position 'point-bottom-left-corner)
-  (setq flycheck-posframe-prefix "\u27a4 ") ;; default: ➤
-  (setq flycheck-posframe-warning-prefix "\u26a0 ")
-  (setq flycheck-posframe-info-prefix "\uf6c8 ")
-  (setq  flycheck-posframe-error-prefix "\u274c ")
-  (setq flycheck-posframe-border-width 2)
   ;; Calling (flycheck-posframe-configure-pretty-defaults) will configure flycheck-posframe to show warnings and errors with nicer faces (inheriting from warning and error respectively), and set the prefix for each to nicer unicode characters.
-  ;;(flycheck-posframe-configure-pretty-defaults)
+  (flycheck-posframe-configure-pretty-defaults)
   )
 
 
@@ -2357,14 +2295,28 @@ Example output:
 
 (use-package lisp-mode
   :commands emacs-lisp-mode
+  :preface
+  (defun setup-elisp-mode ()
+    (interactive)
+    (message "Trying to setup typescript-mode for buffer")
+    (flycheck-mode 1)
+    (eldoc-mode 1)
+    (yas-minor-mode 1)
+    (add-node-modules-path)
+    (editorconfig-mode 1)
+    (prettier-js-mode 1)
+    (highlight-indent-guides-mode 1)
+    (dumb-jump-mode 1)
+    (hl-todo-mode 1)
+    (smartscan-mode 1)
+    )
+  :hook
+  (emacs-lisp-mode . setup-elisp-mode)
+  (lisp-interaction-mode . eldoc-mode)
   :config
-  (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
-  (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
   (define-key emacs-lisp-mode-map (kbd "C-c C-z") #'bozhidar-visit-ielm)
   (define-key emacs-lisp-mode-map (kbd "C-c C-c") #'eval-defun)
   (define-key emacs-lisp-mode-map (kbd "C-c C-b") #'eval-buffer)
-  (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
-  (add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode)
   (bind-key "RET" 'comment-indent-new-line emacs-lisp-mode-map)
   (bind-key "C-c c" 'compile emacs-lisp-mode-map)
   )
@@ -2450,7 +2402,7 @@ If failed try to complete the common part with `company-complete-common'"
   (global-company-mode)
   (progn
     (bind-key [remap completion-at-point] #'company-complete company-mode-map))
-  ;; Frontends
+  ;; show tooltip even for single candidates
   (setq company-frontends '(company-pseudo-tooltip-frontend
                             company-echo-metadata-frontend))
   )
@@ -2596,19 +2548,18 @@ If failed try to complete the common part with `company-complete-common'"
   (text-mode . lsp)
   :custom
   ;; general
-  (lsp-auto-configure t) ;; auto-configure `lsp-ui' and `company-lsp'
+  ;; (lsp-auto-configure t) ;; auto-configure `lsp-ui' and `company-lsp'
   (lsp-prefer-flymake :none) ;; t: flymake | nil: lsp-ui | :none -> none of them (flycheck)
-  (lsp-log-io t) ;; log all messages to and from the language server to a *lsp-log* buffer
   :config
   ;; angular language server
   (setq lsp-clients-angular-language-server-command
-        '("node"
-          "~/.nvm/versions/node/v10.16.3/lib/node_modules/@angular/language-server"
-          "--ngProbeLocations"
-          "~/.nvm/versions/node/v10.16.3/lib/node_modules"
-          "--tsProbeLocations"
-          "~/.nvm/versions/node/v10.16.3/lib/node_modules"
-          "--stdio"))
+    '("node"
+       "~/.nvm/versions/node/v10.16.3/lib/node_modules/@angular/language-server"
+       "--ngProbeLocations"
+       "~/.nvm/versions/node/v10.16.3/lib/node_modules"
+       "--tsProbeLocations"
+       "~/.nvm/versions/node/v10.16.3/lib/node_modules"
+       "--stdio"))
   )
 
 ;; ** lsp ui
@@ -2625,21 +2576,21 @@ If failed try to complete the common part with `company-complete-common'"
   (lsp-ui-sideline-global ((nil (:inherit 'shadow :background "#f9f2d9"))))
   :bind
   (:map lsp-mode-map
-        ("C-c l p f r" . lsp-ui-peek-find-references)
-        ("C-c l p f d" . lsp-ui-peek-find-definitions)
-        ("C-c l p f i" . lsp-ui-peek-find-implementation)
-        ("C-c l g d" . lsp-goto-type-definition)
-        ("C-c l f d" . lsp-find-definition)
-        ("C-c l g i" . lsp-goto-implementation)
-        ("C-c l f i" . lsp-find-implementation)
-        ("C-c l m"   . lsp-ui-imenu)
-        ("C-c l s"   . lsp-ui-sideline-mode)
-        ("C-c l d"   . tau/toggle-lsp-ui-doc))
+    ("C-c l p f r" . lsp-ui-peek-find-references)
+    ("C-c l p f d" . lsp-ui-peek-find-definitions)
+    ("C-c l p f i" . lsp-ui-peek-find-implementation)
+    ("C-c l g d" . lsp-goto-type-definition)
+    ("C-c l f d" . lsp-find-definition)
+    ("C-c l g i" . lsp-goto-implementation)
+    ("C-c l f i" . lsp-find-implementation)
+    ("C-c l m"   . lsp-ui-imenu)
+    ("C-c l s"   . lsp-ui-sideline-mode)
+    ("C-c l d"   . tau/toggle-lsp-ui-doc))
   ;; remap native find-definitions and references to use lsp-ui
   (:map lsp-ui-mode-map
-        ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-        ([remap xref-find-references] . lsp-ui-peek-find-references)
-        ("C-c u" . lsp-ui-imenu))
+    ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+    ([remap xref-find-references] . lsp-ui-peek-find-references)
+    ("C-c u" . lsp-ui-imenu))
   :custom
   ;; lsp-ui-doc
   (lsp-ui-doc-enable nil)
@@ -2665,11 +2616,11 @@ If failed try to complete the common part with `company-complete-common'"
   :config
   ;; lsp-ui appearance
   (add-hook 'lsp-ui-doc-frame-hook
-            (lambda (frame _w)
-              (set-face-attribute 'default frame :font "Hack 11")))
+    (lambda (frame _w)
+      (set-face-attribute 'default frame :font "Hack 11")))
   ;; Use lsp-ui-doc-webkit only in GUI
   (if (display-graphic-p)
-      (setq lsp-ui-doc-use-webkit t))
+    (setq lsp-ui-doc-use-webkit t))
   )
 
 ;; ** company-lsp
@@ -2678,62 +2629,17 @@ If failed try to complete the common part with `company-complete-common'"
 
 (use-package company-lsp
   :ensure t
+  :defer t
   :commands company-lsp
   :custom
-  (company-lsp-enable-snippet t)
-  (company-lsp-async t)
+  ;; (company-lsp-enable-snippet t)
+  ;; (company-lsp-async t)
   (company-lsp-cache-candidates 'auto)
-  (company-lsp-enable-recompletion t)
+  ;; (company-lsp-enable-recompletion t)
   )
 
 ;; **************************************************
 
-;; ** dap - debug adapter protocol
-
-(use-package dap-mode
-  :ensure t
-  :defer t
-  :diminish
-  :bind
-  (:map dap-mode-map
-        (("<M-f12>" . dap-debug)
-         ("<M-f8>" . dap-continue)
-         ("<M-f9>" . dap-next)
-         ("<M-f11>" . dap-step-in)
-         ("C-M-<f11>" . dap-step-out)
-         ("<M-f7>" . dap-breakpoint-toggle)))
-  :hook ((after-init . dap-mode)
-         (dap-mode . dap-ui-mode)
-         (python-mode . (lambda () (require 'dap-python)))
-         (ruby-mode . (lambda () (require 'dap-ruby)))
-         (go-mode . (lambda () (require 'dap-go)))
-         (java-mode . (lambda () (require 'dap-java)))
-         ((c-mode c++-mode objc-mode swift) . (lambda () (require 'dap-lldb)))
-         (php-mode . (lambda () (require 'dap-php)))
-         (elixir-mode . (lambda () (require 'dap-elixir)))
-         ((js-mode js2-mode typescript-mode) . (lambda () (require 'dap-chrome))))
-  :config
-  ;; (dap-mode 1)
-  ;; (dap-ui-mode 1)
-  ;; enables mouse hover support
-  ;; (dap-tooltip-mode 1)
-  ;; use tooltips for mouse hover
-  ;; if it is not enabled `dap-mode' will use the minibuffer.
-  ;; (tooltip-mode 1)
-  ;; dap-mode also provides a hydra with dap-hydra. You can automatically trigger the hydra when the program hits a breakpoint by using the following code.
-  (add-hook 'dap-stopped-hook
-            (lambda (arg) (call-interactively #'dap-hydra)))
-  )
-
-;; ** lsp treemacs
-
-(use-package lsp-treemacs
-  :ensure t
-  :defer t
-  :commands lsp-treemacs-errors-list
-  :init
-  (setq lsp-treemacs-sync-mode 1)
-  )
 
 ;; ** lsp-ivy
 
@@ -3194,22 +3100,19 @@ If failed try to complete the common part with `company-complete-common'"
 (use-package solaire-mode
   :ensure t
   :hook
-  (after-init . solaire-global-mode)
-  ;; To enable solaire-mode unconditionally for certain modes:
-  (ediff-prepare-buffer . solaire-mode)
-  ;; if you use auto-revert-mode, this prevents solaire-mode from turning itself off every time Emacs reverts the file
-  (after-revert- . turn-on-solaire-mode)
-  ;; highlight the minibuffer when it is activated:
+  (change-major-mode . turn-on-solaire-mode)
+  (after-revert . turn-on-solaire-mode)
+  (ediff-prepare-buffer . turn-on-solaire-mode)
   (minibuffer-setup . solaire-mode-in-minibuffer)
-  (after-change-major-mode . turn-on-solaire-mode)
-  (treemacs-mode . turn-on-solaire-mode)
+  ;; if you use auto-revert-mode, this prevents solaire-mode from turning itself off every time Emacs reverts the file
+  (after-revert . turn-on-solaire-mode)
   :config
-  (solaire-mode)
+  (solaire-global-mode)
   ;; if the bright and dark background colors are the wrong way around, use this
   ;; to switch the backgrounds of the `default` and `solaire-default-face` faces.
   ;; This should be used *after* you load the active theme!
   ;; NOTE: This is necessary for themes in the doom-themes package!
-  (solaire-mode-swap-bg)
+  ;; (solaire-mode-swap-bg)
   )
 
 ;; ** dimmer
@@ -3972,13 +3875,15 @@ If failed try to complete the common part with `company-complete-common'"
   (prog-mode . show-paren-mode)
   :custom-face
   (show-paren-match ((nil (:background "#44475a" :foreground "#f1fa8c")))) ;; :box t
+  (show-paren-mismatch ((nil (:background "red" :foreground "black")))) ;; :box t
+  :custom
+  (show-paren-delay 0)
+  (show-paren-style 'mixed)
+  (show-paren-when-point-inside-paren t)
+  (show-paren-when-point-in-periphery t)
   :config
-  (set-face-background 'show-paren-mismatch "red")
-  (set-face-background 'show-paren-match "#4445e0")
-  (setq show-paren-delay 0)
-  (setq show-paren-style 'mixed)
-  (setq show-paren-when-point-inside-paren t)
-  (setq show-paren-when-point-in-periphery t)
+  ;; (set-face-background 'show-paren-mismatch "red")
+  ;; (set-face-background 'show-paren-match "#4445e0")
   (show-paren-mode +1)
   )
 
@@ -4052,33 +3957,35 @@ If failed try to complete the common part with `company-complete-common'"
 (use-package diff-hl
   :ensure t
   :defer t
-  :custom-face (diff-hl-change ((t (:foreground ,(face-background 'highlight)))))
+  :custom-face
+  ;; Better looking colours for diff indicators
+  (diff-hl-change ((t (:foreground ,(face-background 'highlight)))))
+
+  (diff-hl-change ((t (:background "#3a81c3"))))
+  (diff-hl-insert ((t (:background "#7ccd7c"))))
+  (diff-hl-delete ((t (:background "#ee6363"))))
+
+
   :hook
   (prog-mode . diff-hl-mode)
   (dired-mode . diff-hl-mode)
   (magit-post-refresh . diff-hl-mode)
+  :custom
+  (diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
+  (diff-hl-side 'left)
+  (diff-hl-margin-side 'left)
   :init
   ;; (add-hook 'prog-mode-hook #'diff-hl-mode)
   ;; (add-hook 'org-mode-hook #'diff-hl-mode)
   ;; (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
   ;; (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
 
-  ;; Better looking colours for diff indicators
-  (custom-set-faces
-   '(diff-hl-change ((t (:background "#3a81c3"))))
-   '(diff-hl-insert ((t (:background "#7ccd7c"))))
-   '(diff-hl-delete ((t (:background "#ee6363"))))
-   )
-
   :config
-
-  (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
-  (setq diff-hl-side 'left)
-  (setq diff-hl-margin-side 'left)
+  (global-diff-hl-mode +1)
+  (diff-hl-flydiff-mode +1)
+  (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh t)
   ;; Set fringe style
   (setq-default fringes-outside-margins t)
-
-
   (diff-hl-margin-mode 1) ;; show the indicators in the margin
   (diff-hl-flydiff-mode 1) ;;  ;; On-the-fly diff updates
 
@@ -4097,8 +4004,6 @@ If failed try to complete the common part with `company-complete-common'"
   ;; Integration with magit
   (with-eval-after-load 'magit
     (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
-
-  (global-diff-hl-mode 1) ;; Enable diff-hl globally
   )
 
 
@@ -4300,33 +4205,29 @@ If failed try to complete the common part with `company-complete-common'"
 (setq scroll-down-aggressively 0.01)
 (setq auto-window-vscroll nil)
 (setq fast-but-imprecise-scrolling nil)
+
 ;; Mouse Scroll
 (setq mouse-wheel-scroll-amount '(3 ((shift) . 1))) ;; shift + mouse scroll moves 1 line at a time, instead of 5 lines
 (setq mouse-wheel-scroll-amount '(3 ((control) . 6))) ;; hold Control for 5 lines at a time
+(setq mouse-wheel-follow-mouse 't)                  ;; scroll window under mouse
 (setq mouse-wheel-progressive-speed nil) ;; on a long mouse scroll keep scrolling by 1 line,  don't accelerate scrolling
+
 ;; Horizontal Scroll
 (setq hscroll-step 1)
 (setq hscroll-margin 1)
 ;; -SmoothScroll
 
 
-;; ** native mouse scrolling
 
-(use-package mwheel
-  :ensure nil
-  :config
-  (setq mouse-wheel-scroll-amount '(1 ((control) . 5)))
-  (setq mouse-wheel-follow-mouse 't)                  ;; scroll window under mouse
+
+;; **************************************************
+
+;; * MOUSE SETTINGS
+
+;; on linux, make right button show char info (of current cursor position, not clicked point)
+(when (string-equal system-type "gnu/linux") ; linux
+  (global-set-key (kbd "<mouse-3>") 'describe-char)
   )
-
-
-;; *** Use Shift + MouseWheels for smooth scrolling
-
-
-(global-set-key (kbd "<S-mouse-4>") 'scroll-down-line)
-(global-set-key (kbd "<S-mouse-5>") 'scroll-up-line)
-
-
 
 ;; **************************************************
 
@@ -4459,7 +4360,6 @@ If failed try to complete the common part with `company-complete-common'"
   :mode ("\\.tex" . latex-mode)
   :defer t
   :hook
-  (LaTeX-mode . turn-on-visual-line-mode)
   (LaTeX-mode . rainbow-mode)
   (LaTeX-mode . flyspell-mode)
   (LaTeX-mode . LaTeX-math-mode)
@@ -4626,11 +4526,9 @@ If failed try to complete the common part with `company-complete-common'"
     (interactive)
     (message "Trying to setup css-mode for buffer")
     (flycheck-mode 1)
-    (smartparens-mode 1)
     (prettier-js-mode 1)
     (aggressive-indent-mode 1)
     (editorconfig-mode 1)
-    (turn-on-visual-line-mode)
     )
   :hook
   (css-mode . setup-css-mode)
@@ -4711,7 +4609,6 @@ If failed try to complete the common part with `company-complete-common'"
     (highlight-indent-guides-mode 1)
     (editorconfig-mode 1)
     (smartscan-mode 1)
-    (turn-on-visual-line-mode)
     )
   :hook
   (web-mode . setup-web-mode)
@@ -4734,7 +4631,7 @@ If failed try to complete the common part with `company-complete-common'"
         '(("php"    . "\\.phtml\\'")
           ("blade"  . "\\.blade\\.")))
   ;;---------------------------------------
-)
+  )
 
 
 ;; ** js2-mode
@@ -4750,8 +4647,6 @@ If failed try to complete the common part with `company-complete-common'"
   :hook
   (js2-mode . flycheck-mode)
   (js2-mode . add-node-modules-path)
-  (js2-mode . lsp)
-  (js2-jsx-mode . lsp)
   (js2-mode . rainbow-mode)
   (js2-mode . color-identifiers-mode)
   (js2-mode . prettier-js-mode)
@@ -4787,7 +4682,7 @@ If failed try to complete the common part with `company-complete-common'"
   (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t))
   ;;=======================================
 
-)
+  )
 
 ;; *** js2-refactor
 
@@ -4900,15 +4795,16 @@ If failed try to complete the common part with `company-complete-common'"
 (use-package typescript-mode
   :ensure t
   :defer t
-  :after company
   :mode
   (("\\.ts\\'" . typescript-mode)
-   ("\\.tsx\\'" . typescript-mode))
+    ("\\.tsx\\'" . typescript-mode))
   :preface
   (defun setup-typescript-mode ()
     (interactive)
     (message "Trying to setup typescript-mode for buffer")
     (flycheck-mode 1)
+    (eval-after-load 'flycheck
+      '(flycheck-add-mode 'typescript-tslint 'typescript-mode))
     (eldoc-mode 1)
     (yas-minor-mode 1)
     (add-node-modules-path)
@@ -4918,7 +4814,6 @@ If failed try to complete the common part with `company-complete-common'"
     (dumb-jump-mode 1)
     (hl-todo-mode 1)
     (smartscan-mode 1)
-    (turn-on-visual-line-mode)
     )
   :hook
   (typescript-mode . setup-typescript-mode)

@@ -1,13 +1,13 @@
 
 ;; ----- amx-history -----
 (
- evil-mc-make-all-cursors
- goto-char
- ivy-switch-buffer
- counsel-switch-buffer
- vc-msg-show
- diffview-current
- vc-annotate
+ lsp-execute-code-action
+ js-import
+ prettier-js-mode
+ flycheck-mode
+ web-mode
+ eyebrowse-mode
+ scroll-down
 )
 
 ;; ----- amx-data -----
@@ -46,7 +46,7 @@
  (evil-mode . 2)
  (visual-line-mode . 5)
  (display-line-numbers-mode . 5)
- (flycheck-mode . 2)
+ (flycheck-mode . 4)
  (smooth-scrolling-mode . 2)
  (sublimity-mode . 1)
  (snails-current-project . 1)
@@ -56,7 +56,7 @@
  (snake . 2)
  (c-c-combo-mode . 2)
  (check-parens . 2)
- (eyebrowse-mode . 4)
+ (eyebrowse-mode . 5)
  (js2-mode . 1)
  (conf-unix-mode . 1)
  (dumb-jump-mode . 2)
@@ -69,18 +69,18 @@
  (org-table-create . 1)
  (org-table-create-or-convert-from-region . 5)
  (revert-buffer . 1)
- (prettier-js-mode . 8)
+ (prettier-js-mode . 11)
  (org-mode . 6)
  (which-key-mode . 1)
  (eval-region . 1)
  (org . 1)
  (dashboard-refresh-buffer . 1)
  (delete-trailing-whitespace . 1)
- (web-mode . 9)
+ (web-mode . 11)
  (web-beautify-html . 2)
  (editorconfig-apply . 1)
  (er/expand-region . 2)
- (prettier-js . 13)
+ (prettier-js . 14)
  (highlight-operators-mode . 3)
  (highlight-parentheses-mode . 4)
  (show-paren-mode . 2)
@@ -89,13 +89,13 @@
  (volatile-highlights-mode . 1)
  (hydra-frame-window/body . 3)
  (toggle-debug-on-error . 10)
- (shell-pop . 1)
+ (shell-pop . 2)
  (dumb-jump-go . 2)
  (lsp . 3)
  (dumb-jump-quick-look . 1)
  (hydra-ivy/body . 1)
  (switch-to-buffer . 2)
- (ivy-switch-buffer . 2)
+ (ivy-switch-buffer . 3)
  (counsel-yank-pop . 1)
  (customize . 1)
  (format-all-buffer . 1)
@@ -106,7 +106,7 @@
  (eval-buffer . 1)
  (outshine-menu . 1)
  (outline-mode . 1)
- (lsp-execute-code-action . 1)
+ (lsp-execute-code-action . 4)
  (counsel-rg . 1)
  (counsel-ag . 1)
  (ag . 1)
@@ -121,4 +121,10 @@
  (counsel-switch-buffer . 1)
  (goto-char . 2)
  (evil-mc-make-all-cursors . 1)
+ (ivy-push-view . 1)
+ (counsel-find-file . 1)
+ (ivy-rich-mode . 2)
+ (smartscan-mode . 1)
+ (scroll-down . 1)
+ (js-import . 1)
 )

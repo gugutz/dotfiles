@@ -1814,3 +1814,114 @@ tangled, and the tangled file is compiled."
   (progn
     (define-key git-messenger-map (kbd "RET") 'git-messenger:popup-close))
   )
+
+* gnus
+
+(use-package gnus
+  :ensure nil
+  :config
+  (setq user-mail-address "gugutz@gmail.com"
+        user-full-name "tau")
+
+  (setq gnus-select-method
+        '(nnimap "gmail"
+                 (nnimap-address "imap.gmail.com")
+                 (nnimap-server-port 993)
+                 (nnimap-stream ssl)))
+
+  (setq smtpmail-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-service 587
+        gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
+
+  (setq gnus-thread-sort-functions
+        '(gnus-thread-sort-by-most-recent-date
+          (not gnus-thread-sort-by-number)))
+
+  (defun my-gnus-group-list-subscribed-groups ()
+    "List all subscribed groups with or without un-read messages"
+    (interactive)
+    (gnus-group-list-all-groups 5))
+
+  (define-key gnus-group-mode-map
+    ;; list all the subscribed groups even they contain zero un-read messages
+    (kbd "o") 'my-gnus-group-list-subscribed-groups)
+  )
+* dap - debug adapter protocol
+
+(use-package dap-mode
+  :ensure t
+  :defer t
+  :diminish
+  :bind
+  (:map dap-mode-map
+        (("<M-f12>" . dap-debug)
+         ("<M-f8>" . dap-continue)
+         ("<M-f9>" . dap-next)
+         ("<M-f11>" . dap-step-in)
+         ("C-M-<f11>" . dap-step-out)
+         ("<M-f7>" . dap-breakpoint-toggle)))
+  :hook ((after-init . dap-mode)
+         (dap-mode . dap-ui-mode)
+         (python-mode . (lambda () (require 'dap-python)))
+         (ruby-mode . (lambda () (require 'dap-ruby)))
+         (go-mode . (lambda () (require 'dap-go)))
+         (java-mode . (lambda () (require 'dap-java)))
+         ((c-mode c++-mode objc-mode swift) . (lambda () (require 'dap-lldb)))
+         (php-mode . (lambda () (require 'dap-php)))
+         (elixir-mode . (lambda () (require 'dap-elixir)))
+         ((js-mode js2-mode typescript-mode) . (lambda () (require 'dap-chrome))))
+  :config
+  ;; (dap-mode 1)
+  ;; (dap-ui-mode 1)
+  ;; enables mouse hover support
+  ;; (dap-tooltip-mode 1)
+  ;; use tooltips for mouse hover
+  ;; if it is not enabled `dap-mode' will use the minibuffer.
+  ;; (tooltip-mode 1)
+  ;; dap-mode also provides a hydra with dap-hydra. You can automatically trigger the hydra when the program hits a breakpoint by using the following code.
+  (add-hook 'dap-stopped-hook
+            (lambda (arg) (call-interactively #'dap-hydra)))
+  )
+* lsp treemacs
+
+(use-package lsp-treemacs
+  :ensure t
+  :defer t
+  :commands lsp-treemacs-errors-list
+  :init
+  (setq lsp-treemacs-sync-mode 1)
+  )
+
+* PRESCIENT
+
+;; Filter candidates for several frameworks and packages
+
+(use-package prescient
+  :ensure t
+  :custom
+  (prescient-filter-method '(literal regexp initialism fuzzy))
+  :config
+  (prescient-persist-mode +1)
+  )
+
+(use-package ivy-prescient
+  :ensure t
+  :after (prescient ivy)
+  :custom
+  (ivy-prescient-sort-commands
+    '(:not swiper
+       counsel-grep
+       counsel-rg
+       counsel-projectile-rg
+       ivy-switch-buffer
+       counsel-switch-buffer))
+  (ivy-prescient-retain-classic-highlighting t)
+  :config
+  (ivy-prescient-mode +1)
+  )
+
+(use-package company-prescient
+  :after (prescient company)
+  :config
+  (company-prescient-mode +1)
+  )
