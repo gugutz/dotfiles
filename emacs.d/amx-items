@@ -1,13 +1,13 @@
 
 ;; ----- amx-history -----
 (
- lsp-execute-code-action
- js-import
- prettier-js-mode
+ lsp
+ balance-windows-area
+ eldoc-box-hover-mode
  flycheck-mode
- web-mode
- eyebrowse-mode
- scroll-down
+ ivy-rich-mode
+ ivy-switch-buffer
+ package-install
 )
 
 ;; ----- amx-data -----
@@ -22,7 +22,7 @@
  (counsel-projectile-mode . 2)
  (swiper-avy . 2)
  (align-regexp . 3)
- (package-install . 25)
+ (package-install . 26)
  (package-refresh-contents . 2)
  (package-delete . 11)
  (electric-indent-mode . 1)
@@ -46,7 +46,7 @@
  (evil-mode . 2)
  (visual-line-mode . 5)
  (display-line-numbers-mode . 5)
- (flycheck-mode . 4)
+ (flycheck-mode . 5)
  (smooth-scrolling-mode . 2)
  (sublimity-mode . 1)
  (snails-current-project . 1)
@@ -69,7 +69,7 @@
  (org-table-create . 1)
  (org-table-create-or-convert-from-region . 5)
  (revert-buffer . 1)
- (prettier-js-mode . 11)
+ (prettier-js-mode . 13)
  (org-mode . 6)
  (which-key-mode . 1)
  (eval-region . 1)
@@ -91,11 +91,11 @@
  (toggle-debug-on-error . 10)
  (shell-pop . 2)
  (dumb-jump-go . 2)
- (lsp . 3)
+ (lsp . 4)
  (dumb-jump-quick-look . 1)
  (hydra-ivy/body . 1)
  (switch-to-buffer . 2)
- (ivy-switch-buffer . 3)
+ (ivy-switch-buffer . 5)
  (counsel-yank-pop . 1)
  (customize . 1)
  (format-all-buffer . 1)
@@ -106,7 +106,7 @@
  (eval-buffer . 1)
  (outshine-menu . 1)
  (outline-mode . 1)
- (lsp-execute-code-action . 4)
+ (lsp-execute-code-action . 5)
  (counsel-rg . 1)
  (counsel-ag . 1)
  (ag . 1)
@@ -118,13 +118,20 @@
  (vc-annotate . 1)
  (diffview-current . 1)
  (vc-msg-show . 1)
- (counsel-switch-buffer . 1)
+ (counsel-switch-buffer . 2)
  (goto-char . 2)
  (evil-mc-make-all-cursors . 1)
  (ivy-push-view . 1)
  (counsel-find-file . 1)
- (ivy-rich-mode . 2)
+ (ivy-rich-mode . 8)
  (smartscan-mode . 1)
  (scroll-down . 1)
  (js-import . 1)
+ (lsp-ui-doc-show . 1)
+ (find-file . 1)
+ (counsel-bookmark . 1)
+ (lsp-describe-session . 1)
+ (eldoc-box-hover-mode . 1)
+ (balance-windows-area . 1)
+ (flycheck-buffer . 1)
 )

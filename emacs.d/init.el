@@ -1785,23 +1785,40 @@ Example output:
   :ensure t
   :demand t
   :diminish ivy-mode
+  :preface
+  (defun ivy-format-function-pretty (cands)
+    "Transform CANDS into a string for minibuffer."
+    (ivy--format-function-generic
+      (lambda (str)
+        (concat
+          (all-the-icons-faicon "hand-o-right" :height .85 :v-adjust .05 :face 'font-lock-constant-face)
+          (ivy--add-face (concat str "\n") 'ivy-current-match)))
+
+      (lambda (str)
+        (concat "  " str "\n"))
+      cands
+      "")
+    )
   :hook
   (after-init . ivy-mode)
   :custom
   (ivy-re-builders-alist
-   '((t . ivy--regex-plus)))
+    '((t . ivy--regex-plus)))
+  (ivy-display-style 'fancy)
+  (ivy-use-virtual-buffers t)
+  (enable-recursive-minibuffers t)
+  (ivy-use-selectable-prompt t)
   :config
   (ivy-mode)
-  (ivy-posframe-mode)
   ;; display an arrow on the selected item in the list
-  (setf (cdr (assoc t ivy-format-functions-alist)) #'ivy-format-function-arrow)
+  ;; (setf (cdr (assoc t ivy-format-functions-alist)) #'ivy-format-function-arrow)
+  ;; (setq ivy-format-function #'ivy-format-function-line)
+  ;; NOTE: this variable do not work if defined in :custom
+  ;; (setf (cdr (assoc t ivy-format-functions-alist)) #'ivy-format-function-arrow)
+  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-pretty)
 
-  (setq ivy-display-style 'fancy
-        ivy-use-virtual-buffers t
-        enable-recursive-minibuffers t
-        ivy-use-selectable-prompt t)
   (ivy-set-actions  t
-                    '(("I" insert "insert")))
+    '(("I" insert "insert")))
   (ivy-set-occur 'ivy-switch-buffer 'ivy-switch-buffer-occur)
   )
 
@@ -1817,29 +1834,23 @@ Example output:
   :hook
   (ivy-mode . counsel-mode)
   :custom
-  (counsel-yank-pop-height 15)
   (enable-recursive-minibuffers t)
   (ivy-use-selectable-prompt t)
   (ivy-use-virtual-buffers t)
   (ivy-on-del-error-function nil)
-  (swiper-action-recenter t)
+  (counsel-find-file-ignore-regexp "\\(?:^[#.]\\)\\|\\(?:[#~]$\\)\\|\\(?:^Icon?\\)")
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  ;; Add smart-casing (-S) to default command arguments:
+  (counsel-rg-base-command "rg -S --no-heading --line-number --color never %s .")
+  (counsel-ag-base-command "ag -S --nocolor --nogroup %s")
+  (counsel-pt-base-command "pt -S --nocolor --nogroup -e %s")
   (counsel-grep-base-command "ag -S --noheading --nocolor --nofilename --numbers '%s' %s")
+  (counsel-find-file-at-point t)
+  (counsel-yank-pop-height 15)
+  (swiper-action-recenter t)
   ;; check out this better-jumper mode to see what it does
   ;; (counsel-grep-post-action . better-jumper-set-jump)
-  :preface
-  (defun ivy-format-function-pretty (cands)
-    "Transform CANDS into a string for minibuffer."
-    (ivy--format-function-generic
-     (lambda (str)
-       (concat
-        (all-the-icons-faicon "hand-o-right" :height .85 :v-adjust .05 :face 'font-lock-constant-face)
-        (ivy--add-face str 'ivy-current-match)))
-
-     (lambda (str)
-       (concat "  " str))
-     cands
-     "\n")
-    )
   :bind
   ([remap execute-extended-command] . counsel-M-x)
   ([remap find-file] . counsel-find-file)
@@ -1870,28 +1881,18 @@ Example output:
   ("M-s r" . counsel-recentf)
   ("M-y" . counsel-yank-pop)
   (:map ivy-minibuffer-map
-        ("C-w" . ivy-backward-kill-word)
-        ("C-k" . ivy-kill-line)
-        ("C-j" . ivy-immediate-done)
-        ("RET" . ivy-alt-done)
-        ("C-h" . ivy-backward-delete-char))
+    ("C-w" . ivy-backward-kill-word)
+    ("C-k" . ivy-kill-line)
+    ("C-j" . ivy-immediate-done)
+    ("RET" . ivy-alt-done)
+    ("C-h" . ivy-backward-delete-char))
   (:map minibuffer-local-map
-        ("C-r" . counsel-minibuffer-history))
+    ("C-r" . counsel-minibuffer-history))
   :config
-  ;; NOTE: this variable do not work if defined in :custom
-  (setq ivy-format-function 'ivy-format-function-pretty)
   (setq counsel-yank-pop-separator
-        (propertize "\n────────────────────────────────────────────────────────\n"
-                    'face `(:foreground "#6272a4")))
+    (propertize "\n────────────────────────────────────────────────────────\n"
+      'face `(:foreground "#6272a4")))
 
-  (setq counsel-find-file-ignore-regexp "\\(?:^[#.]\\)\\|\\(?:[#~]$\\)\\|\\(?:^Icon?\\)"
-        counsel-describe-function-function #'helpful-callable
-        counsel-describe-variable-function #'helpful-variable
-        ;; Add smart-casing (-S) to default command arguments:
-        counsel-rg-base-command "rg -S --no-heading --line-number --color never %s ."
-        counsel-ag-base-command "ag -S --nocolor --nogroup %s"
-        counsel-pt-base-command "pt -S --nocolor --nogroup -e %s"
-        counsel-find-file-at-point t)
 
   ;; Integration with `projectile'
   (with-eval-after-load 'projectile
@@ -1935,72 +1936,89 @@ Example output:
   (ivy-posframe-border ((t (:background "#abff00"))))
   (ivy-posframe-cursor ((t (:background "#00ff00"))))
   :init
-  (setq ivy-posframe-parameters '((internal-border-width . 5)))
+  (setq ivy-posframe-parameters '((internal-border-width . 2)))
   (setq ivy-posframe-width 130)
   ;; define the position of the posframe per function
   (setq ivy-posframe-display-functions-alist
-        '((swiper          . ivy-posframe-display-at-window-center)
-          (complete-symbol . ivy-posframe-display-at-point)
-          ;;(counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
-          (counsel-M-x     . ivy-posframe-display-at-frame-center)
-          (t               . ivy-posframe-display-at-frame-center)))
+    '((swiper          . ivy-posframe-display-at-window-center)
+       (complete-symbol . ivy-posframe-display-at-point)
+       ;;(counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
+       (counsel-M-x     . ivy-posframe-display-at-frame-center)
+       (t               . ivy-posframe-display-at-frame-center)))
   ;; custom define height of post frame per function
-  (setq ivy-posframe-height-alist '((swiper . 15)
-                                    (find-file . 20)
-                                    (counsel-ag . 15)
-                                    (counsel-projectile-ag . 30)
-                                    (t      . 25)))
+  (setq ivy-posframe-height-alist '((swiper . 10)
+                                     (find-file . 20)
+                                     (counsel-ag . 15)
+                                     (counsel-projectile-ag . 30)
+                                     (t      . 25)))
+  :config
+  (ivy-posframe-mode)
+
   )
+
 
 ;; ** ivy-rich
 
 (use-package ivy-rich
   :ensure t
-  :config
-  (ivy-rich-mode 1)
-  (setq ivy-format-function #'ivy-format-function-line)
-
+  :preface
   ;; use all-the-icons for `ivy-switch-buffer'
   (defun ivy-rich-switch-buffer-icon (candidate)
     (with-current-buffer
-        (get-buffer candidate)
+      (get-buffer candidate)
       (let ((icon (all-the-icons-icon-for-mode major-mode)))
         (if (symbolp icon)
-            (all-the-icons-icon-for-mode 'fundamental-mode)
+          (all-the-icons-icon-for-mode 'fundamental-mode)
           icon))))
-  ;; add the above function to `ivy-rich--display-transformers-list'
+  :init
+  ;; To abbreviate paths using abbreviate-file-name (e.g. replace “/home/username” with “~”)
+  (setq ivy-rich-path-style 'abbrev)
+
+  ;; customizing functions
   (setq ivy-rich--display-transformers-list
-        '(ivy-switch-buffer
-          (:columns
-           ((ivy-rich-switch-buffer-icon :width 2)
-            (ivy-rich-candidate (:width 30))
-            (ivy-rich-switch-buffer-size (:width 7))
-            (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
-            (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))
-            (ivy-rich-switch-buffer-project (:width 15 :face success))
-            (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
-           :predicate
-           (lambda (cand) (get-buffer cand)))
-          counsel-M-x
-          (:columns
-           ((counsel-M-x-transformer (:width 35))
-            (ivy-rich-counsel-function-docstring (:width 34 :face font-lock-doc-face))))
-          counsel-describe-function
-          (:columns
-           ((counsel-describe-function-transformer (:width 35))
-            (ivy-rich-counsel-function-docstring (:width 34 :face font-lock-doc-face))))
-          counsel-describe-variable
-          (:columns
-           ((counsel-describe-variable-transformer (:width 35))
-            (ivy-rich-counsel-variable-docstring (:width 34 :face font-lock-doc-face))))
-          package-install
-          (:columns
-           ((ivy-rich-candidate (:width 25))
-            (ivy-rich-package-version (:width 12 :face font-lock-comment-face))
-            (ivy-rich-package-archive-summary (:width 7 :face font-lock-builtin-face))
-            (ivy-rich-package-install-summary (:width 23 :face font-lock-doc-face)))))
-        )
+    '(ivy-switch-buffer
+       (:columns
+         ((ivy-rich-switch-buffer-icon (:width 2))
+           (ivy-rich-candidate (:width 30))
+           (ivy-rich-switch-buffer-size (:width 7))
+           (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
+           (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))
+           (ivy-rich-switch-buffer-project (:width 15 :face success))
+           (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
+         :predicate
+         (lambda (cand) (get-buffer cand)))
+       counsel-find-file
+       (:columns
+         ((ivy-read-file-transformer)
+           (ivy-rich-counsel-find-file-truename (:face font-lock-doc-face))))
+       counsel-M-x
+       (:columns
+         ((counsel-M-x-transformer (:width 35))
+           (ivy-rich-counsel-function-docstring (:width 34 :face font-lock-doc-face))))
+       counsel-describe-function
+       (:columns
+         ((counsel-describe-function-transformer (:width 35))
+           (ivy-rich-counsel-function-docstring (:width 34 :face font-lock-doc-face))))
+       counsel-describe-variable
+       (:columns
+         ((counsel-describe-variable-transformer (:width 35))
+           (ivy-rich-counsel-variable-docstring (:width 34 :face font-lock-doc-face))))
+       package-install
+       (:columns
+         ((ivy-rich-candidate (:width 25))
+           (ivy-rich-package-version (:width 12 :face font-lock-comment-face))
+           (ivy-rich-package-archive-summary (:width 7 :face font-lock-builtin-face))
+           (ivy-rich-package-install-summary (:width 23 :face font-lock-doc-face))))
+       )
+    )
+
+  :config
+  ;; ivy-rich-mode needs to be called after `ivy-rich--display-transformers-list' is changed
+  (ivy-rich-mode 1)
+
   )
+
+;; all the icons for ivy
 
 (use-package all-the-icons-ivy
   :ensure t
@@ -2073,11 +2091,11 @@ Example output:
   (flycheck-indication-mode 'left-fringe)
   :config
   (setq-default flycheck-temp-prefix ".flycheck")
-  (setq flycheck-checkers '(javascript-eslint typescript-tslint))
+  ;; (setq flycheck-checkers '(javascript-eslint typescript-tslint))
   (flycheck-add-mode 'javascript-eslint 'js-mode)
   (flycheck-add-mode 'javascript-eslint 'js2-mode)
   (flycheck-add-mode 'typescript-tslint 'rjsx-mode)
-  (flycheck-add-mode 'typescript-tslint 'typescript-mode)
+  ;; (flycheck-add-mode 'typescript-tslint 'typescript-mode)
   (flycheck-add-mode 'typescript-tslint 'web-mode)
   (flycheck-add-mode 'html-tidy 'web-mode)
   )
@@ -2120,11 +2138,27 @@ Example output:
   :bind
   ("<tab>" . magit-section-toggle)
   ("M-g s" . magit-status)
+  ("M-g f" . magit-find-file)
   ("M-g l" . magit-log)
   ("M-g b" . magit-blame)
   ("C-x g" . magit-status)
   :config
   (add-hook 'after-save-hook 'magit-after-save-refresh-status t)
+
+  ;; integrate with vc-msg
+  (eval-after-load 'vc-msg-git
+    '(progn
+       ;; show code of commit
+       (setq vc-msg-git-show-commit-function 'magit-show-commit)
+       ;; open file of certain revision
+       (push '("m"
+                "[m]agit-find-file"
+                (lambda ()
+                  (let* ((info vc-msg-previous-commit-info)
+                          (git-dir (locate-dominating-file default-directory ".git")))
+                    (magit-find-file (plist-get info :id )
+                      (concat git-dir (plist-get info :filename))))))
+         vc-msg-git-extra)))
   )
 
 ;; ** evil-magit
@@ -2298,13 +2332,12 @@ Example output:
   :preface
   (defun setup-elisp-mode ()
     (interactive)
-    (message "Trying to setup typescript-mode for buffer")
+    (message "Trying to setup elisp-mode for buffer")
     (flycheck-mode 1)
     (eldoc-mode 1)
     (yas-minor-mode 1)
     (add-node-modules-path)
     (editorconfig-mode 1)
-    (prettier-js-mode 1)
     (highlight-indent-guides-mode 1)
     (dumb-jump-mode 1)
     (hl-todo-mode 1)
@@ -2320,8 +2353,8 @@ Example output:
   (bind-key "RET" 'comment-indent-new-line emacs-lisp-mode-map)
   (bind-key "C-c c" 'compile emacs-lisp-mode-map)
   )
-;; * elisp-format
 
+;; * elisp-format
 
 (use-package elisp-format
   :ensure t
@@ -2342,36 +2375,36 @@ Example output:
 If failed try to complete the common part with `company-complete-common'"
     (interactive)
     (if yas-minor-mode
-        (let ((old-point (point))
-              (old-tick (buffer-chars-modified-tick)))
-          (yas-expand)
+      (let ((old-point (point))
+             (old-tick (buffer-chars-modified-tick)))
+        (yas-expand)
+        (when (and (eq old-point (point))
+                (eq old-tick (buffer-chars-modified-tick)))
+          (ignore-errors (yas-next-field))
           (when (and (eq old-point (point))
-                     (eq old-tick (buffer-chars-modified-tick)))
-            (ignore-errors (yas-next-field))
-            (when (and (eq old-point (point))
-                       (eq old-tick (buffer-chars-modified-tick)))
-              (company-complete-common))))
+                  (eq old-tick (buffer-chars-modified-tick)))
+            (company-complete-common))))
       (company-complete-common)))
   :hook
   (after-init . global-company-mode)
   :bind
   (:map company-active-map
-        ([tab] . smarter-yas-expand-next-field-complete)
-        ("TAB" . smarter-yas-expand-next-field-complete))
+    ([tab] . smarter-yas-expand-next-field-complete)
+    ("TAB" . smarter-yas-expand-next-field-complete))
   (:map evil-insert-state-map
-        ;; ("<tab>" . company-indent-or-complete-common)
-        ("C-SPC" . company-indent-or-complete-common))
+    ;; ("<tab>" . company-indent-or-complete-common)
+    ("C-SPC" . company-indent-or-complete-common))
   (:map company-active-map
-        ("M-n" . nil)
-        ("M-p" . nil)
-        ("C-n" . company-select-next)
-        ("C-p" . company-select-previous)
-        ("S-<backtab>" . company-select-previous)
-        ("<backtab>" . company-select-previous)
-        ("C-d" . company-show-doc-buffer))
+    ("M-n" . nil)
+    ("M-p" . nil)
+    ("C-n" . company-select-next)
+    ("C-p" . company-select-previous)
+    ("S-<backtab>" . company-select-previous)
+    ("<backtab>" . company-select-previous)
+    ("C-d" . company-show-doc-buffer))
   (:map company-search-map
-        ("C-p" . company-select-previous)
-        ("C-n" . company-select-next))
+    ("C-p" . company-select-previous)
+    ("C-n" . company-select-next))
   :custom-face
   (company-preview-common ((t (:foreground unspecified :background "#111111"))))
   (company-scrollbar-bg ((t (:background "#111111"))))
@@ -2404,7 +2437,7 @@ If failed try to complete the common part with `company-complete-common'"
     (bind-key [remap completion-at-point] #'company-complete company-mode-map))
   ;; show tooltip even for single candidates
   (setq company-frontends '(company-pseudo-tooltip-frontend
-                            company-echo-metadata-frontend))
+                             company-echo-metadata-frontend))
   )
 
 
@@ -2554,11 +2587,11 @@ If failed try to complete the common part with `company-complete-common'"
   ;; angular language server
   (setq lsp-clients-angular-language-server-command
     '("node"
-       "~/.nvm/versions/node/v10.16.3/lib/node_modules/@angular/language-server"
+       "/home/gustavo/.nvm/versions/node/v10.16.3/lib/node_modules/@angular/language-server"
        "--ngProbeLocations"
-       "~/.nvm/versions/node/v10.16.3/lib/node_modules"
+       "/home/gustavo/.nvm/versions/node/v10.16.3/lib/node_modules"
        "--tsProbeLocations"
-       "~/.nvm/versions/node/v10.16.3/lib/node_modules"
+       "/home/gustavo/.nvm/versions/node/v10.16.3/lib/node_modules"
        "--stdio"))
   )
 

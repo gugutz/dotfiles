@@ -18,22 +18,37 @@ yay -S emacs-all-the-icons
 echo "install ag searcher for dumb-jump to work better"
 sudo pacman -S --noconfirm the_silver_searcher
 
+#### LANGUAGE SERVERS
 echo "## install typescript/javascript language server"
 npm install -g typescript-language-server
-
-echo "## install vscode-html-languageserver"
-npm i -g vscode-html-languageserver-bin
-
-echo "## install eslint"
-npm install -g eslint babel-eslint eslint-plugin-react
-echo "## install eslint typescript plugin"
-npm install -g @typescript-eslint/eslint-plugin@latest
 
 echo "## install angular language server"
 npm install -g @angular/language-service@next typescript  @angular/language-server
 
 echo "## install css language server"
 npm install --global vscode-css-languageserver-bin
+
+echo "## install vscode-html-languageserver"
+npm i -g vscode-html-languageserver-bin
+
+echo "## installing yaml language server"
+npm install -g yaml-language-server
+
+echo "## installing bash language server"
+npm i -g bash-language-server
+#################################
+
+echo "## install eslint"
+npm install -g eslint babel-eslint eslint-plugin-react
+
+echo "## install eslint typescript plugin"
+npm install -g @typescript-eslint/eslint-plugin@latest
+
+echo "## install html-tidy"
+sudo pacman -S --noconfirm tidy
+
+echo "## installing bash language server"
+npm i -g bash-language-server
 
 echo "## install pandoc for document generation in org mode"
 sudo pacman -S --noconfirm pandoc
