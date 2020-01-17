@@ -1,7 +1,7 @@
 ;; -*- outshine-startup-folded-p: t; eval: (outshine-mode); -*-
 ;;; package.el
-
-;; **************************************************
+;;; Commentary: personal init.el
+;;; Code:
 
 ;; * Personal information
 
@@ -45,7 +45,7 @@
 (defvar color/vscode-status-bar      "#007ad3"        "The font size to use for titles.")
 
 ;; Init time start
-(defvar my-init-el-start-time (current-time) "Time when init.el was started")
+(defvar my-init-el-start-time (current-time) "Time when init.el was started.")
 (setq my-theme 'vscode-default-dark)
 
 ;; Folder to save session
@@ -2095,9 +2095,9 @@ Example output:
   (flycheck-add-mode 'javascript-eslint 'js-mode)
   (flycheck-add-mode 'javascript-eslint 'js2-mode)
   (flycheck-add-mode 'typescript-tslint 'rjsx-mode)
-  ;; (flycheck-add-mode 'typescript-tslint 'typescript-mode)
-  (flycheck-add-mode 'typescript-tslint 'web-mode)
-  (flycheck-add-mode 'html-tidy 'web-mode)
+  (flycheck-add-mode 'typescript-tslint 'typescript-mode)
+  (flycheck-add-mode 'html-tidy 'sgml-mode)
+  (flycheck-add-mode 'lsp-ui 'web-mode)
   )
 
 
@@ -2582,7 +2582,7 @@ If failed try to complete the common part with `company-complete-common'"
   :custom
   ;; general
   ;; (lsp-auto-configure t) ;; auto-configure `lsp-ui' and `company-lsp'
-  (lsp-prefer-flymake :none) ;; t: flymake | nil: lsp-ui | :none -> none of them (flycheck)
+  (lsp-prefer-flymake nil) ;; t: flymake | nil: lsp-ui | :none -> none of them (flycheck)
   :config
   ;; angular language server
   (setq lsp-clients-angular-language-server-command
@@ -3839,61 +3839,6 @@ If failed try to complete the common part with `company-complete-common'"
 (add-hook 'org-mode-hook 'add-pretty-lambda)
 
 
-;; ** centaur-tabs
-
-
-(use-package centaur-tabs
-  :ensure t
-  :hook
-  (after-init . centaur-tabs-mode)
-  (dashboard-mode . centaur-tabs-local-mode)
-  (term-mode . centaur-tabs-local-mode)
-  (calendar-mode . centaur-tabs-local-mode)
-  (org-agenda-mode . centaur-tabs-local-mode)
-  (helpful-mode . centaur-tabs-local-mode)
-  :custom
-  ;; appearantly these dont work if put in :init
-  (centaur-tabs-style "bar")           ; types available: (alternative, bar, box, chamfer, rounded, slang, wave, zigzag)
-  (centaur-tabs-height 28)
-  (centaur-tabs-set-icons t)           ;; display themed icons from all the icons
-  (centaur-tabs-set-modified-marker t) ;; display a marker indicating that a buffer has been modified (atom-style)
-  (centaur-tabs-modified-marker "*")
-  (centaur-tabs-set-close-button t)
-  (centaur-tabs-close-button "X")
-  (centaur-tabs-set-bar 'over)         ;; in previous config value was 'over
-  (centaur-tabs-gray-out-icons 'buffer)
-  (centaur-tabs-adjust-buffer-order t)
-  (uniquify-separator "/")
-  (uniquify-buffer-name-style 'forward)
-  :custom-face
-  (centaur-tabs-active-bar-face ((t (:background "cyan"))))
-  (centaur-tabs-default ((t (:background "black" :foreground "black"))))
-  (centaur-tabs-unselected ((t (:background "#292929" :foreground "grey50"))))
-  (centaur-tabs-selected ((t (:background "#181818" :foreground "white"))))
-  (centaur-tabs-unselected-modified ((t (:background "#3D3C3D" :foreground "grey50"))))
-  (centaur-tabs-selected-modified ((t (:background "#181818" :foreground "white"))))
-  (centaur-tabs-close-unselected ((t (:inherit centaur-tabs-unselected))))
-  (centaur-tabs-close-selected ((t (:inherit centaur-tabs-selected))))
-  (centaur-tabs-close-mouse-face ((t (:inherit underline))))
-  (centaur-tabs-modified-marker-selected ((t (:inherit centaur-tabs-selected))))
-  (centaur-tabs-modified-marker-unselected ((t (:inherit centaur-tabs-unselected))))
-  :bind
-  ("C-<prior>" . centaur-tabs-backward)
-  ("C-<next>" . centaur-tabs-forward)
-  ("C-c t s" . centaur-tabs-counsel-switch-group)
-  ("C-c t p" . centaur-tabs-group-by-projectile-project)
-  ("C-c t g" . centaur-tabs-group-buffer-groups)
-  (:map evil-normal-state-map
-        ("g t" . centaur-tabs-forward)
-        ("g T" . centaur-tabs-backward))
-  ;;  :init
-  :config
-  ;; functions
-  ;; (centaur-tabs-change-fonts "arial" 160)
-  (centaur-tabs-headline-match)
-  (centaur-tabs-enable-buffer-reordering)
-  (centaur-tabs-mode t)
-  )
 
 ;; * Highlights
 
@@ -3970,20 +3915,19 @@ If failed try to complete the common part with `company-complete-common'"
   :defer t
   :hook
   (prog-mode . hes-mode)
-)
+  )
 
 
 ;; ** Highlighting parentheses
 
-;; This mode highlights (bolds) the current pair in which the point (cursor) is
-
+;; This mode highlights (coloring) the current pair in which the point (cursor) is
 
 (use-package highlight-parentheses
   :ensure t
   :defer t
   :hook
   (prog-mode . highlight-parentheses-mode)
-)
+  )
 
 ;; ** diff-hl (highlights uncommited diffs in bar aside from the line numbers)
 
@@ -3993,12 +3937,9 @@ If failed try to complete the common part with `company-complete-common'"
   :custom-face
   ;; Better looking colours for diff indicators
   (diff-hl-change ((t (:foreground ,(face-background 'highlight)))))
-
   (diff-hl-change ((t (:background "#3a81c3"))))
   (diff-hl-insert ((t (:background "#7ccd7c"))))
   (diff-hl-delete ((t (:background "#ee6363"))))
-
-
   :hook
   (prog-mode . diff-hl-mode)
   (dired-mode . diff-hl-mode)
@@ -4007,12 +3948,6 @@ If failed try to complete the common part with `company-complete-common'"
   (diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
   (diff-hl-side 'left)
   (diff-hl-margin-side 'left)
-  :init
-  ;; (add-hook 'prog-mode-hook #'diff-hl-mode)
-  ;; (add-hook 'org-mode-hook #'diff-hl-mode)
-  ;; (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
-  ;; (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
-
   :config
   (global-diff-hl-mode +1)
   (diff-hl-flydiff-mode +1)
@@ -4022,17 +3957,16 @@ If failed try to complete the common part with `company-complete-common'"
   (diff-hl-margin-mode 1) ;; show the indicators in the margin
   (diff-hl-flydiff-mode 1) ;;  ;; On-the-fly diff updates
 
-
   (unless (display-graphic-p)
     (setq diff-hl-margin-symbols-alist
-          '((insert . " ") (delete . " ") (change . " ")
-            (unknown . " ") (ignored . " ")))
+      '((insert . " ") (delete . " ") (change . " ")
+         (unknown . " ") (ignored . " ")))
     ;; Fall back to the display margin since the fringe is unavailable in tty
     (diff-hl-margin-mode 1)
     ;; Avoid restoring `diff-hl-margin-mode'
     (with-eval-after-load 'desktop
       (add-to-list 'desktop-minor-mode-table
-                   '(diff-hl-margin-mode nil))))
+        '(diff-hl-margin-mode nil))))
 
   ;; Integration with magit
   (with-eval-after-load 'magit
@@ -4062,49 +3996,6 @@ If failed try to complete the common part with `company-complete-common'"
   )
 
 
-;; ** highlight-tail
-
-(use-package highlight-tail
-  :load-path "packages/highlight-tail"
-  :ensure nil
-  :config
-  (setq highlight-tail-colors '(("#9310FF" . 0) ;; closest to cursor
-                                ("#9370DB" . 35)  ;; midle of tail
-                                ("#DDA0DD" . 76)))  ;; end of the tail
-  (setq highlight-tail-steps 17)
-  (setq highlight-tail-timer 0.05)
-  (setq highlight-tail-posterior-type 'const)
-  (highlight-tail-mode)
-  )
-
-
-;; ** beacon - flash light where cursor is
-
-(use-package beacon
-  :ensure t
-  :hook
-  (post-self-insert . beacon-blink)
-  (blink-cursor-mode. beacon-blink)
-  (after-change-functions . beacon-blink)
-  (delete-selection-mode . beacon-blink)
-  (normal-erase-is-backspace . beacon-blink)
-  :init
-  (setq inhibit-modification-hooks nil)
-  (setq beacon-blink-when-point-moves-vertically 1) ; default nil
-  (setq beacon-blink-when-point-moves-horizontally 1) ; default nil
-  (setq beacon-blink-when-buffer-changes t) ; default t
-  (setq beacon-blink-when-window-scrolls t) ; default t
-  (setq beacon-blink-when-window-changes t) ; default t
-  (setq beacon-blink-when-focused nil) ; default nil
-  (setq beacon-blink-duration 0.2) ; default 0.3
-  (setq beacon-blink-delay 0.3) ; default 0.3
-  (setq beacon-size 23) ; default 40
-  (setq beacon-color "#9310FF") ; default 0.5
-  :config
-  (setq inhibit-modification-hooks nil)
-  (add-hook 'after-change-functions #'beacon-blink)
-  (beacon-mode 1)
-  )
 
 ;; ** Rainbow Delimiters
 
@@ -4117,7 +4008,7 @@ If failed try to complete the common part with `company-complete-common'"
   :defer t
   :hook
   (prog-mode . rainbow-delimiters-mode)
-)
+  )
 
 
 ;; ** rainbow mode
@@ -4136,17 +4027,15 @@ If failed try to complete the common part with `company-complete-common'"
 
 ;; : built-in package
 
-
 (use-package hl-line
   :ensure nil
   :defer t
   :config
   (global-hl-line-mode)
-)
+  )
 
 
 ;; ** Highlight columns
-
 
 (use-package col-highlight
   :load-path "packages/col-highlight"
@@ -4156,20 +4045,6 @@ If failed try to complete the common part with `company-complete-common'"
   (col-highlight-toggle-when-idle)
   (col-highlight-set-interval 2)
   )
-
-
-;; ** Highlight crosshair
-
-;; Highlight crosshair (combination of hl-lines and hl-columns
-
-
-(use-package crosshairs
-  :load-path "packages/crosshairs"
-  :ensure nil
-  :defer t
-  :config
-  (crosshairs-mode)
-)
 
 ;; ** highlight indent guides
 
@@ -4183,21 +4058,6 @@ If failed try to complete the common part with `company-complete-common'"
   (highlight-indent-guides-responsive t)
   (highlight-indent-guides-method 'character) ; column
   )
-
-
-;; ** highlight-context-line
-
-;; The line of your Emacs buffer that is at the top of the window before you start to scroll, is considered the context line. It is the last line in the view after scrolling that was visible before scrolling. Similarly the line at the bottom of the window is the context line for scrolling down.
-;; Whenever you scrolled it painted a line across the document that reflected where the previous view ended.
-
-
-(use-package highlight-context-line
-  :ensure t
-  :defer t
-  :config
-  (highlight-context-line-mode 1)
-  )
-
 
 ;; * crux
 
@@ -4220,14 +4080,12 @@ If failed try to complete the common part with `company-complete-common'"
   (global-set-key (kbd "s-r") #'crux-recentf-find-file)
   (global-set-key (kbd "C-<backspace>") #'crux-kill-line-backwards)
   (global-set-key [remap kill-whole-line] #'crux-kill-whole-line)
-)
+  )
 
 
 ;; **************************************************
 
-;; * Scrolling settings
-;; ** memacs scrolling (trying it out)
-
+;; * Scrolling settings (currently trying M-EMACS settings for scrolling)
 
 ;; General Vertical Scrolling Settings
 (setq scroll-step 1) ;; one line at a time
@@ -4248,9 +4106,6 @@ If failed try to complete the common part with `company-complete-common'"
 ;; Horizontal Scroll
 (setq hscroll-step 1)
 (setq hscroll-margin 1)
-;; -SmoothScroll
-
-
 
 
 ;; **************************************************
@@ -4268,7 +4123,6 @@ If failed try to complete the common part with `company-complete-common'"
 
 ;; ** which-key
 
-
 (use-package which-key
   :ensure t
   :defer t
@@ -4283,7 +4137,6 @@ If failed try to complete the common part with `company-complete-common'"
 
 ;; ** key-frequency
 
-
 (use-package keyfreq
   :ensure t
   :defer t
@@ -4292,7 +4145,6 @@ If failed try to complete the common part with `company-complete-common'"
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1)
   )
-
 
 
 ;; * Local minor modes
@@ -4311,9 +4163,7 @@ If failed try to complete the common part with `company-complete-common'"
   (sp-pair "$" "$" :actions '(wrap))
   )
 
-
 ;; *** evil-smartparens helps avoid conflicts between evil and smartparens
-
 
 (use-package evil-smartparens
   :ensure t
@@ -4328,7 +4178,6 @@ If failed try to complete the common part with `company-complete-common'"
 ;; : M-' to replace all symbols in the buffer matching the one under point
 ;; : C-u M-' to replace symbols in your current defun only (as used by narrow-to-defun.)
 
-
 (use-package smartscan
   :ensure t
   :defer t
@@ -4336,7 +4185,6 @@ If failed try to complete the common part with `company-complete-common'"
 
 
 ;; ** editorconfig
-
 
 (use-package editorconfig
   :ensure t
@@ -4346,7 +4194,6 @@ If failed try to complete the common part with `company-complete-common'"
 
 
 ;; * multiple cursors
-
 
 (use-package multiple-cursors
   :after evil
@@ -4359,9 +4206,9 @@ If failed try to complete the common part with `company-complete-common'"
   :bind
   ("M-u" . hydra-multiple-cursors/body)
   (:map evil-visual-state-map
-        ("C-d" . mc/mark-next-like-this)
-        ("C-a" . mc/mark-all-like-this)
-        )
+    ("C-d" . mc/mark-next-like-this)
+    ("C-a" . mc/mark-all-like-this)
+    )
   :config
   (define-key evil-visual-state-map (kbd "mn") 'mc/mark-next-like-this)
   (define-key evil-visual-state-map (kbd "ma") 'mc/mark-all-like-this-dwim)
@@ -4369,7 +4216,6 @@ If failed try to complete the common part with `company-complete-common'"
   (define-key evil-visual-state-map (kbd "mm") 'ace-mc-add-multiple-cursors)
   (define-key evil-visual-state-map (kbd "ms") 'ace-mc-add-single-cursor)
   )
-
 
 
 ;; * quickrun (compile and execute code)
@@ -4509,24 +4355,21 @@ If failed try to complete the common part with `company-complete-common'"
 
 (with-eval-after-load 'org
   '(add-to-list 'org-latex-classes
-                '("abntex2"
-                  "\\documentclass{abntex2}"
-                  ;; ("\\chapter{%s}" . "\\chapter*{%s}")
-                  ("\\section{%s}" . "\\section*{%s}")
-                  ("\\subsection{%s}" . "\\subsection*{%s}")
-                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                  ("\\subsubsubsection{%s}" . "\\subsubsubsection*{%s}")
-                  ("\\paragraph{%s}" . "\\paragraph*{%s}"))))
-
+     '("abntex2"
+        "\\documentclass{abntex2}"
+        ;; ("\\chapter{%s}" . "\\chapter*{%s}")
+        ("\\section{%s}" . "\\section*{%s}")
+        ("\\subsection{%s}" . "\\subsection*{%s}")
+        ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+        ("\\subsubsubsection{%s}" . "\\subsubsubsection*{%s}")
+        ("\\paragraph{%s}" . "\\paragraph*{%s}"))))
 
 
 ;; **************************************************
 
 ;; * WEBDEV
 
-;; * HTML
-
-;; Set HTML indentation to 4 spaces by default (only on html-mode)
+;; ** HTML
 
 (use-package sgml-mode
   :ensure nil
@@ -4545,10 +4388,7 @@ If failed try to complete the common part with `company-complete-common'"
   )
 
 
-
-
 ;; ** CSS
-
 
 (use-package css-mode
   :ensure t
@@ -4557,9 +4397,10 @@ If failed try to complete the common part with `company-complete-common'"
   :preface
   (defun setup-css-mode ()
     (interactive)
-    (message "Trying to setup css-mode for buffer")
+    (message "Trying to setup css-mode for buffer " (buffer-file-name))
     (flycheck-mode 1)
     (prettier-js-mode 1)
+    (emmet-mode 1)
     (aggressive-indent-mode 1)
     (editorconfig-mode 1)
     )
@@ -4594,7 +4435,6 @@ If failed try to complete the common part with `company-complete-common'"
   )
 
 ;; * Emmet
-
 
 (use-package emmet-mode
   :ensure t
@@ -4633,8 +4473,7 @@ If failed try to complete the common part with `company-complete-common'"
   :preface
   (defun setup-web-mode ()
     (interactive)
-    ;;(message "Trying to setup web-mode for buffer %s (file: %s)" buffer-name buffer-file-name)
-    (message "Trying to setup web-mode for buffer")
+    (message "Trying to setup web-mode for buffer " (buffer-file-name))
     (flycheck-mode 1)
     (eldoc-mode 1)
     (emmet-mode 1)
@@ -4656,21 +4495,17 @@ If failed try to complete the common part with `company-complete-common'"
   :config
   ;; TSX
   (add-hook 'web-mode-hook
-            (lambda ()
-              (when (string-equal "tsx" (file-name-extension buffer-file-name))
-                (setup-tide-mode))))
+    (lambda ()
+      (when (string-equal "tsx" (file-name-extension buffer-file-name))
+        (setup-tide-mode))))
   ;; Template
   (setq web-mode-engines-alist
-        '(("php"    . "\\.phtml\\'")
-          ("blade"  . "\\.blade\\.")))
+    '(("php"    . "\\.phtml\\'")
+       ("blade"  . "\\.blade\\.")))
   ;;---------------------------------------
   )
 
-
 ;; ** js2-mode
-;; js2-mode: enhanced JavaScript editing mode
-;; https://github.com/mooz/js2-mode
-
 
 (use-package js2-mode
   :after flycheck company
@@ -4703,22 +4538,13 @@ If failed try to complete the common part with `company-complete-common'"
   (setq flycheck-checkers '(javascript-eslint))
   ;; disable jshint since we prefer eslint checking
   (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))
-  ;; use eslint_d insetad of eslint for faster linting
-  (setq flycheck-javascript-eslint-executable "eslint_d")
   ;; set modes that will use ESLint
   (flycheck-add-mode 'javascript-eslint 'web-mode)
   (flycheck-add-mode 'javascript-eslint 'js2-mode)
   (flycheck-add-mode 'javascript-eslint 'js-mode)
-
-  ;; Workaround for eslint loading slow
-  ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
-  (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t))
-  ;;=======================================
-
   )
 
 ;; *** js2-refactor
-
 
 (use-package js2-refactor
   :ensure t
@@ -4728,8 +4554,8 @@ If failed try to complete the common part with `company-complete-common'"
   (js2-mode . js2-refactor-mode)
   :bind
   (:map js2-mode-map
-        ("C-k" . js2r-kill)
-        ("C-c h r" . js2-refactor-hydra/body))
+    ("C-k" . js2r-kill)
+    ("C-c h r" . js2-refactor-hydra/body))
   :config
   (js2r-add-keybindings-with-prefix "C-c C-r")
   (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
@@ -4777,11 +4603,9 @@ If failed try to complete the common part with `company-complete-common'"
 
 ;; *** xref-js2
 
-
 ;; | M-. | Jump  to definition                         |
 ;; | M-? | Jump to references                          |
 ;; | M-, | Pop back  to where  M-.  was  last  invoked |
-
 
 (use-package xref-js2
   :ensure t
@@ -4795,20 +4619,14 @@ If failed try to complete the common part with `company-complete-common'"
 
   (add-hook 'js2-mode-hook (lambda ()
                              (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
-)
+  )
 
 ;; ** add-node-modules-path
-
-;; Adds the node_modules/.bin directory to the buffer exec_path. E.g. support project local eslint installations.
-;; https://github.com/codesuki/add-node-modules-path/tree/master
-
 
 (use-package add-node-modules-path
   :ensure t
   :defer t
-)
-
-
+  )
 
 ;; ** js-import
 
@@ -4818,12 +4636,11 @@ If failed try to complete the common part with `company-complete-common'"
 (use-package js-import
   :ensure t
   :defer t
-)
+  )
 
 ;; **************************************************
 
 ;; ** Typescript
-
 
 (use-package typescript-mode
   :ensure t
@@ -4853,21 +4670,15 @@ If failed try to complete the common part with `company-complete-common'"
   )
 ;; ** PrettierJS
 
-
-;; prettier-emacs: minor-mode to prettify javascript files on save
-;; https://github.com/prettier/prettier-emacs
 (use-package prettier-js
   :ensure t
   :defer t
   :custom
   (prettier-js-show-errors 'buffer) ;; options: 'buffer, 'echo or nil
   :config
-)
+  )
 
 ;; * RJSX Mode
-
-;; https://github.com/felipeochoa/rjsx-mode
-
 
 (use-package rjsx-mode
   :ensure t
@@ -4887,51 +4698,41 @@ If failed try to complete the common part with `company-complete-common'"
   ;; - courtesy of Patrick @halbtuerke
   (defadvice web-mode-highlight-part (around tweak-jsx activate)
     (if (equal web-mode-content-type "jsx")
-        (let ((web-mode-enable-part-face nil))
-          ad-do-it)
+      (let ((web-mode-enable-part-face nil))
+        ad-do-it)
       ad-do-it))
   )
 
 
 ;; * Angular
 
-;; ** Angular Open Counterpart
-
-;; Taken from ng2-mode
+;; ** Angular Open Counterpart (taken from ng2-mode)
 
 
 (defun angular--counterpart-name (file)
   "Return the file name of FILE's counterpart, or FILE if there is no counterpart."
   (when (not (angular--is-component file)) file)
   (let ((ext (file-name-extension file))
-        (base (file-name-sans-extension file)))
+         (base (file-name-sans-extension file)))
     (if (equal ext "ts")
-        (concat base ".html")
+      (concat base ".html")
       (concat base ".ts"))))
-
-
 
 (defun angular--is-component (file)
   "Return whether FILE is a component file."
   (equal (file-name-extension (file-name-sans-extension file)) "component"))
-
-
 
 (defun angular-open-counterpart ()
   "Opens the corresponding template or component file to this one."
   (interactive)
   (find-file (angular--counterpart-name (buffer-file-name))))
 
-
-
 (global-set-key (kbd "C-x a o") #'angular-open-counterpart)
-
 
 
 ;; **************************************************
 
 ;; * Ruby
-
 
 (use-package ruby-mode
   :defer t
@@ -4939,9 +4740,9 @@ If failed try to complete the common part with `company-complete-common'"
   :interpreter "ruby"
   :ensure-system-package
   ((rubocop     . "gem install rubocop")
-   (ruby-lint   . "gem install ruby-lint")
-   (ripper-tags . "gem install ripper-tags")
-   (pry         . "gem install pry"))
+    (ruby-lint   . "gem install ruby-lint")
+    (ripper-tags . "gem install ripper-tags")
+    (pry         . "gem install pry"))
   :functions inf-ruby-keys
   :hook
   (ruby-mode . subword-mode)
@@ -4957,9 +4758,9 @@ If failed try to complete the common part with `company-complete-common'"
   (add-hook 'after-init-hook 'inf-ruby-switch-setup)
 
   (add-hook 'ruby-mode-hook
-            (lambda ()
-              (hs-minor-mode 1) ;; Enables folding
-              (modify-syntax-entry ?: "."))) ;; Adds ":" to the word definition
+    (lambda ()
+      (hs-minor-mode 1) ;; Enables folding
+      (modify-syntax-entry ?: "."))) ;; Adds ":" to the word definition
   )
 
 
@@ -5168,6 +4969,7 @@ If failed try to complete the common part with `company-complete-common'"
 ;; ** Move Lines Up and Down
 
 (defun move-line-down ()
+  "Move line down."
   (interactive)
   (let ((col (current-column)))
     (save-excursion
@@ -5177,6 +4979,7 @@ If failed try to complete the common part with `company-complete-common'"
     (move-to-column col)))
 
 (defun move-line-up ()
+  "Move line up."
   (interactive)
   (let ((col (current-column)))
     (save-excursion
@@ -5189,13 +4992,11 @@ If failed try to complete the common part with `company-complete-common'"
 (global-set-key (kbd "C-S-k") 'move-line-up)
 
 
-;; * End init.el file
 
 ;; Local Variables:
 ;; coding: utf-8
 ;; no-byte-compile: t
 ;; End:
 
-
 (provide 'init)
-;;; .emacs ends here
+;;; init.el ends here

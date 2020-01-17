@@ -1925,3 +1925,127 @@ tangled, and the tangled file is compiled."
   :config
   (company-prescient-mode +1)
   )
+
+* highlight-tail (either this or beacon was giving the ivy-posframe bug of not working on first try, only the second. text would go to minibuffer instead of the posframe)
+
+(use-package highlight-tail
+  :load-path "packages/highlight-tail"
+  :ensure nil
+  :config
+  (setq highlight-tail-colors '(("#9310FF" . 0) ;; closest to cursor
+                                ("#9370DB" . 35)  ;; midle of tail
+                                ("#DDA0DD" . 76)))  ;; end of the tail
+  (setq highlight-tail-steps 17)
+  (setq highlight-tail-timer 0.05)
+  (setq highlight-tail-posterior-type 'const)
+  (highlight-tail-mode)
+  )
+
+
+* beacon - flash light where cursor is (either this or highlight-tail was giving the ivy-posframe bug of not working on first try, only the second. text would go to minibuffer instead of the posframe)
+
+(use-package beacon
+  :ensure t
+  :hook
+  (post-self-insert . beacon-blink)
+  (blink-cursor-mode. beacon-blink)
+  (after-change-functions . beacon-blink)
+  (delete-selection-mode . beacon-blink)
+  (normal-erase-is-backspace . beacon-blink)
+  :init
+  (setq inhibit-modification-hooks nil)
+  (setq beacon-blink-when-point-moves-vertically 1) ; default nil
+  (setq beacon-blink-when-point-moves-horizontally 1) ; default nil
+  (setq beacon-blink-when-buffer-changes t) ; default t
+  (setq beacon-blink-when-window-scrolls t) ; default t
+  (setq beacon-blink-when-window-changes t) ; default t
+  (setq beacon-blink-when-focused nil) ; default nil
+  (setq beacon-blink-duration 0.2) ; default 0.3
+  (setq beacon-blink-delay 0.3) ; default 0.3
+  (setq beacon-size 23) ; default 40
+  (setq beacon-color "#9310FF") ; default 0.5
+  :config
+  (setq inhibit-modification-hooks nil)
+  (add-hook 'after-change-functions #'beacon-blink)
+  (beacon-mode 1)
+  )
+
+* highlight-context-line
+
+;; The line of your Emacs buffer that is at the top of the window before you start to scroll, is considered the context line. It is the last line in the view after scrolling that was visible before scrolling. Similarly the line at the bottom of the window is the context line for scrolling down.
+;; Whenever you scrolled it painted a line across the document that reflected where the previous view ended.
+
+
+(use-package highlight-context-line
+  :ensure t
+  :defer t
+  :config
+  (highlight-context-line-mode 1)
+  )
+
+* Highlight crosshair
+
+;; Highlight crosshair (combination of hl-lines and hl-columns
+
+(use-package crosshairs
+  :load-path "packages/crosshairs"
+  :ensure nil
+  :defer t
+  :config
+  (crosshairs-mode)
+  )
+
+* centaur-tabs
+
+(use-package centaur-tabs
+  :ensure t
+  :hook
+  (after-init . centaur-tabs-mode)
+  (dashboard-mode . centaur-tabs-local-mode)
+  (term-mode . centaur-tabs-local-mode)
+  (calendar-mode . centaur-tabs-local-mode)
+  (org-agenda-mode . centaur-tabs-local-mode)
+  (helpful-mode . centaur-tabs-local-mode)
+  :custom
+  ;; appearantly these dont work if put in :init
+  (centaur-tabs-style "bar")           ; types available: (alternative, bar, box, chamfer, rounded, slang, wave, zigzag)
+  (centaur-tabs-height 28)
+  (centaur-tabs-set-icons t)           ;; display themed icons from all the icons
+  (centaur-tabs-set-modified-marker t) ;; display a marker indicating that a buffer has been modified (atom-style)
+  (centaur-tabs-modified-marker "*")
+  (centaur-tabs-set-close-button t)
+  (centaur-tabs-close-button "X")
+  (centaur-tabs-set-bar 'over)         ;; in previous config value was 'over
+  (centaur-tabs-gray-out-icons 'buffer)
+  (centaur-tabs-adjust-buffer-order t)
+  (uniquify-separator "/")
+  (uniquify-buffer-name-style 'forward)
+  :custom-face
+  (centaur-tabs-active-bar-face ((t (:background "cyan"))))
+  (centaur-tabs-default ((t (:background "black" :foreground "black"))))
+  (centaur-tabs-unselected ((t (:background "#292929" :foreground "grey50"))))
+  (centaur-tabs-selected ((t (:background "#181818" :foreground "white"))))
+  (centaur-tabs-unselected-modified ((t (:background "#3D3C3D" :foreground "grey50"))))
+  (centaur-tabs-selected-modified ((t (:background "#181818" :foreground "white"))))
+  (centaur-tabs-close-unselected ((t (:inherit centaur-tabs-unselected))))
+  (centaur-tabs-close-selected ((t (:inherit centaur-tabs-selected))))
+  (centaur-tabs-close-mouse-face ((t (:inherit underline))))
+  (centaur-tabs-modified-marker-selected ((t (:inherit centaur-tabs-selected))))
+  (centaur-tabs-modified-marker-unselected ((t (:inherit centaur-tabs-unselected))))
+  :bind
+  ("C-<prior>" . centaur-tabs-backward)
+  ("C-<next>" . centaur-tabs-forward)
+  ("C-c t s" . centaur-tabs-counsel-switch-group)
+  ("C-c t p" . centaur-tabs-group-by-projectile-project)
+  ("C-c t g" . centaur-tabs-group-buffer-groups)
+  (:map evil-normal-state-map
+    ("g t" . centaur-tabs-forward)
+    ("g T" . centaur-tabs-backward))
+  ;;  :init
+  :config
+  ;; functions
+  ;; (centaur-tabs-change-fonts "arial" 160)
+  (centaur-tabs-headline-match)
+  (centaur-tabs-enable-buffer-reordering)
+  (centaur-tabs-mode t)
+  )
