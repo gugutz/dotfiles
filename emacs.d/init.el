@@ -2097,7 +2097,6 @@ Example output:
   (flycheck-add-mode 'typescript-tslint 'rjsx-mode)
   (flycheck-add-mode 'typescript-tslint 'typescript-mode)
   (flycheck-add-mode 'html-tidy 'sgml-mode)
-  (flycheck-add-mode 'lsp-ui 'web-mode)
   )
 
 
@@ -4052,7 +4051,7 @@ If failed try to complete the common part with `company-complete-common'"
   :ensure t
   :defer t
   :hook
-  ((prog-mode yaml-mode) . highlight-indent-guides-mode)
+  ((prog-mode yaml-mode toml-mode) . highlight-indent-guides-mode)
   :custom
   (highlight-indent-guides-auto-enabled t)
   (highlight-indent-guides-responsive t)
@@ -4434,22 +4433,6 @@ If failed try to complete the common part with `company-complete-common'"
   (add-to-list 'auto-mode-alist '("\\.scss$\\'" . scss-mode))
   )
 
-;; * Emmet
-
-(use-package emmet-mode
-  :ensure t
-  :defer t
-  :commands emmet-mode
-  :init
-  (setq emmet-indentation 2)
-  (setq emmet-move-cursor-between-quotes t)
-  :config
-  (unbind-key "<C-return>" emmet-mode-keymap)
-  (unbind-key "C-M-<left>" emmet-mode-keymap)
-  (unbind-key "C-M-<right>" emmet-mode-keymap)
-  (setq emmet-expand-jsx-className? nil) ;; use emmet with JSX markup
-  )
-
 
 ;; ** Web-Mode
 
@@ -4495,13 +4478,13 @@ If failed try to complete the common part with `company-complete-common'"
   :config
   ;; TSX
   (add-hook 'web-mode-hook
-    (lambda ()
-      (when (string-equal "tsx" (file-name-extension buffer-file-name))
-        (setup-tide-mode))))
+            (lambda ()
+              (when (string-equal "tsx" (file-name-extension buffer-file-name))
+                (setup-tide-mode))))
   ;; Template
   (setq web-mode-engines-alist
-    '(("php"    . "\\.phtml\\'")
-       ("blade"  . "\\.blade\\.")))
+        '(("php"    . "\\.phtml\\'")
+          ("blade"  . "\\.blade\\.")))
   ;;---------------------------------------
   )
 
@@ -4544,7 +4527,7 @@ If failed try to complete the common part with `company-complete-common'"
   (flycheck-add-mode 'javascript-eslint 'js-mode)
   )
 
-;; *** js2-refactor
+;; ** js2-refactor
 
 (use-package js2-refactor
   :ensure t
@@ -4554,8 +4537,8 @@ If failed try to complete the common part with `company-complete-common'"
   (js2-mode . js2-refactor-mode)
   :bind
   (:map js2-mode-map
-    ("C-k" . js2r-kill)
-    ("C-c h r" . js2-refactor-hydra/body))
+        ("C-k" . js2r-kill)
+        ("C-c h r" . js2-refactor-hydra/body))
   :config
   (js2r-add-keybindings-with-prefix "C-c C-r")
   (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
@@ -4600,8 +4583,34 @@ If failed try to complete the common part with `company-complete-common'"
     ("q" nil))
   )
 
+;; ** PrettierJS
 
-;; *** xref-js2
+(use-package prettier-js
+  :ensure t
+  :defer t
+  :custom
+  (prettier-js-show-errors 'buffer) ;; options: 'buffer, 'echo or nil
+  :config
+  )
+
+;; ** Emmet
+
+(use-package emmet-mode
+  :ensure t
+  :defer t
+  :commands emmet-mode
+  :init
+  (setq emmet-indentation 2)
+  (setq emmet-move-cursor-between-quotes t)
+  :config
+  (unbind-key "<C-return>" emmet-mode-keymap)
+  (unbind-key "C-M-<left>" emmet-mode-keymap)
+  (unbind-key "C-M-<right>" emmet-mode-keymap)
+  (setq emmet-expand-jsx-className? nil) ;; use emmet with JSX markup
+  )
+
+
+;; ** xref-js2
 
 ;; | M-. | Jump  to definition                         |
 ;; | M-? | Jump to references                          |
@@ -4630,9 +4639,6 @@ If failed try to complete the common part with `company-complete-common'"
 
 ;; ** js-import
 
-;; https://github.com/jakoblind/js-import
-
-
 (use-package js-import
   :ensure t
   :defer t
@@ -4647,7 +4653,7 @@ If failed try to complete the common part with `company-complete-common'"
   :defer t
   :mode
   (("\\.ts\\'" . typescript-mode)
-    ("\\.tsx\\'" . typescript-mode))
+   ("\\.tsx\\'" . typescript-mode))
   :preface
   (defun setup-typescript-mode ()
     (interactive)
@@ -4668,17 +4674,8 @@ If failed try to complete the common part with `company-complete-common'"
   :hook
   (typescript-mode . setup-typescript-mode)
   )
-;; ** PrettierJS
 
-(use-package prettier-js
-  :ensure t
-  :defer t
-  :custom
-  (prettier-js-show-errors 'buffer) ;; options: 'buffer, 'echo or nil
-  :config
-  )
-
-;; * RJSX Mode
+;; ** RJSX Mode
 
 (use-package rjsx-mode
   :ensure t
@@ -4698,24 +4695,24 @@ If failed try to complete the common part with `company-complete-common'"
   ;; - courtesy of Patrick @halbtuerke
   (defadvice web-mode-highlight-part (around tweak-jsx activate)
     (if (equal web-mode-content-type "jsx")
-      (let ((web-mode-enable-part-face nil))
-        ad-do-it)
+        (let ((web-mode-enable-part-face nil))
+          ad-do-it)
       ad-do-it))
   )
 
 
-;; * Angular
+;; ** Angular
 
-;; ** Angular Open Counterpart (taken from ng2-mode)
+;; *** Angular Open Counterpart (taken from ng2-mode)
 
 
 (defun angular--counterpart-name (file)
   "Return the file name of FILE's counterpart, or FILE if there is no counterpart."
   (when (not (angular--is-component file)) file)
   (let ((ext (file-name-extension file))
-         (base (file-name-sans-extension file)))
+        (base (file-name-sans-extension file)))
     (if (equal ext "ts")
-      (concat base ".html")
+        (concat base ".html")
       (concat base ".ts"))))
 
 (defun angular--is-component (file)
