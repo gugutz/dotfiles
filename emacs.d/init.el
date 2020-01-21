@@ -4783,17 +4783,6 @@ If failed try to complete the common part with `company-complete-common'"
   )
 
 
-;; ** ruby additional
-
-;; Ruby rdoc helpers mostly
-
-
-(use-package ruby-additional
-  :ensure t
-  :defer t
-  )
-
-
 ;; ** ruby-tools
 
 
