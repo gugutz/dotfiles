@@ -1,13 +1,13 @@
 
 ;; ----- amx-history -----
 (
+ occur-mode
  package-install
  package-refresh-contents
  lsp
  balance-windows-area
  eldoc-box-hover-mode
- flycheck-mode
- ivy-rich-mode
+ rainbow-mode
 )
 
 ;; ----- amx-data -----
@@ -106,7 +106,7 @@
  (eval-buffer . 1)
  (outshine-menu . 1)
  (outline-mode . 1)
- (lsp-execute-code-action . 5)
+ (lsp-execute-code-action . 6)
  (counsel-rg . 1)
  (counsel-ag . 1)
  (ag . 1)
@@ -134,4 +134,5 @@
  (eldoc-box-hover-mode . 1)
  (balance-windows-area . 1)
  (flycheck-buffer . 1)
+ (occur-mode . 1)
 )

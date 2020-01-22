@@ -3,6 +3,25 @@
 ;;; Commentary: personal init.el
 ;;; Code:
 
+;; * Emacs Startup
+
+;; taken from `doom-emacs'
+;;
+;; A big contributor to startup times is garbage collection. We up the gc
+;; threshold to temporarily prevent it from running, then reset it later by
+;; enabling `gcmh-mode'. Not resetting it will cause stuttering/freezes.
+(setq gc-cons-threshold most-positive-fixnum)
+
+;; In noninteractive sessions, prioritize non-byte-compiled source files to
+;; prevent the use of stale byte-code. Otherwise, it saves us a little IO time
+;; to skip the mtime checks on every *.elc file.
+(setq load-prefer-newer noninteractive)
+
+;; reset GC by loading gcmh
+(add-to-list 'load-path "packages/gcmh.el")
+(require 'gcmh)
+(gcmh-mode 1)
+
 ;; * Personal information
 
 (setq user-full-name "Gustavo P Borges")
@@ -44,8 +63,16 @@
 ;; Colors
 (defvar color/vscode-status-bar      "#007ad3"        "The font size to use for titles.")
 
+;; Modeline
+(defvar color/modeline-active-bg      "#007af0"        "The font size to use for titles.")
+(defvar color/modeline-active-fg      "#ffffff"        "The font size to use for titles.")
+(defvar color/modeline-inactive-bg      "#007ad3"        "The font size to use for titles.")
+(defvar color/modeline-inactive-fg      "#eeeeee"        "The font size to use for titles.")
+
 ;; Init time start
 (defvar my-init-el-start-time (current-time) "Time when init.el was started.")
+
+;; Set the used theme
 (setq my-theme 'vscode-default-dark)
 
 ;; Folder to save session
@@ -179,10 +206,24 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 ;; ** outshine mode
 
-;;;; To enable the keybindings, you must set the variable outline-minor-mode-prefix (note the variable name carefully) before loading Outshine, e.g.:
 
-(defvar outline-minor-mode-prefix "\M-#")
-(add-hook 'emacs-lisp-mode-hook 'outshine-mode)
+(use-package outshine
+  :ensure t
+  :diminish
+  :init
+  ;; To enable the keybindings, you must set the variable outline-minor-mode-prefix (note the variable name carefully) before loading Outshine, e.g.:
+  (defvar outline-minor-mode-prefix "\M-#")
+  :hook
+  (emacs-lisp-mode . outshine-mode)
+  )
+
+;; ** outline mode
+;; this is only here so i can diminish it
+(use-package outline
+  :ensure nil
+  :diminish
+  )
+
 ;; **************************************************
 ;; * General editor settings
 
@@ -317,6 +358,7 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 ;; ** visual-line-mode (word wrap)
 (use-package visual-line-mode
   :ensure nil
+  :diminish
   :hook
   (prog-mode . turn-on-visual-line-mode)
   (text-mode . turn-on-visual-line-mode)
@@ -550,6 +592,7 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (use-package eldoc
   :ensure nil
+  :diminish
   :hook
   (prog-mode . eldoc-mode)
   ;;(prog-mode       . turn-on-eldoc-mode)
@@ -575,14 +618,13 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
   :config
   ;;(setq eldoc-box-max-pixel-width)
   ;;(setq eldoc-box-max-pixel-height)
-  ;;(setq eldoc-box-only-multi-line)   ;;  Set this to non-nil and eldoc-box only display multi-line message in childframe. One line messages are left in minibuffer.
+  (setq eldoc-box-only-multi-line nil)   ;;  Set this to non-nil and eldoc-box only display multi-line message in childframe. One line messages are left in minibuffer.
   ;; (eldoc-box-hover-mode)
   (eldoc-box-hover-at-point-mode)
   )
 
 
 ;; ** aggressive-indent-mode
-
 
 (use-package aggressive-indent
   :ensure t
@@ -607,7 +649,7 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 ;; | C-c +   | ialign-increment-spacing |
 ;; | C-c -   | ialign-decrement-spacing |
 ;; | C-c [   | ialign-decrement-group   |
-;;             | C-c ]   | ialign-increment-group   |
+;; | C-c ]   | ialign-increment-group   |
 ;; | C-c C-f | ialign-set-group         |
 ;; | C-c C-s | ialign-set-spacing       |
 ;; | C-c RET | ialign-commit            |
@@ -1057,18 +1099,18 @@ Example output:
   (evil-operator-state-cursor '("red" hollow))
   :bind
   (:map evil-normal-state-map
-        (", w" . evil-window-vsplit)
-        ("C-r" . undo-tree-redo))
+    (", w" . evil-window-vsplit)
+    ("C-r" . undo-tree-redo))
   (:map evil-insert-state-map
-        ;; this is also defined globally above in the config
-        ("C-S-<backtab>" . er/expand-region))
+    ;; this is also defined globally above in the config
+    ("C-S-<backtab>" . er/expand-region))
   (:map evil-visual-state-map
-        ;; this is also defined globally above in the config
-        ("<tab>" . indent-region)
-        ("C-/" . comment-line)
-        ("C-S-/" . comment-region)
-        ("C-S-M-/" . comment-box)
-        ("M-=" . #'align-values))
+    ;; this is also defined globally above in the config
+    ("<tab>" . indent-region)
+    ("C-/" . comment-line)
+    ("C-S-/" . comment-region)
+    ("C-S-M-/" . comment-box)
+    ("M-=" . #'align-values))
 
   ;; check if global-set-key also maps to evil insert mode; if yes delete bellow snippets
   :config
@@ -1077,13 +1119,6 @@ Example output:
   (define-key evil-insert-state-map (kbd "<tab>") nil)
   (define-key evil-normal-state-map (kbd "<tab>") nil)
   (define-key evil-visual-state-map (kbd "<tab>") nil)
-  ;; unset change to emacs state and rebind it
-  ;; (define-key evil-insert-state-map (kbd "C-z") nil)
-  ;; (define-key evil-normal-state-map (kbd "C-z") nil)
-  ;; (define-key evil-visual-state-map (kbd "C-z") nil)
-  ;; (define-key evil-insert-state-map (kbd "C-z e") evil-emacs-state)
-  ;; (define-key evil-normal-state-map (kbd "C-z e") evil-emacs-state)
-  ;; (define-key evil-visual-state-map (kbd "C-z e") evil-emacs-state)
   ;; use esc while in emacs state to return to normal evil mode
   (define-key evil-emacs-state-map [escape] 'evil-normal-state)
   ;; vim-like navigation with C-w hjkl
@@ -1102,7 +1137,7 @@ Example output:
   then it takes a second \\[keyboard-quit] to abort the minibuffer."
     (interactive)
     (if (and delete-selection-mode transient-mark-mode mark-active)
-        (setq deactivate-mark  t)
+      (setq deactivate-mark  t)
       (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
       (abort-recursive-edit)))
   (define-key evil-normal-state-map [escape] 'keyboard-quit)
@@ -1290,6 +1325,8 @@ Example output:
 ;; gc -> comments the target of a motion (eg: gcap -> comment all paragraph)
 
 (use-package evil-commentary
+  :ensure t
+  :diminish
   :config
   (evil-commentary-mode)
   )
@@ -2337,7 +2374,6 @@ Example output:
     (yas-minor-mode 1)
     (add-node-modules-path)
     (editorconfig-mode 1)
-    (highlight-indent-guides-mode 1)
     (dumb-jump-mode 1)
     (hl-todo-mode 1)
     (smartscan-mode 1)
@@ -2367,7 +2403,7 @@ Example output:
 
 (use-package company
   :ensure t
-  ;; :diminish company-mode
+  :diminish company-mode
   :preface
   (defun smarter-yas-expand-next-field-complete ()
     "Try to `yas-expand' and `yas-next-field' at current cursor position.
@@ -2729,6 +2765,7 @@ If failed try to complete the common part with `company-complete-common'"
 
 (use-package ivy-explorer
   :ensure t
+  :diminish
   :after ivy
   :hook
   (after-init . ivy-explorer-mode)
@@ -3425,98 +3462,118 @@ If failed try to complete the common part with `company-complete-common'"
 ;; Modeline colors
 (set-face-attribute 'mode-line nil :height tau/font-size-mode-line)
 (set-face-attribute 'mode-line nil
-                    :background "#007af0"
-                    :foreground "#ffffff"
-                    :box '(:line-width 3 :color "#007af0") ;; modeline border
-                    :overline nil
-                    :underline nil)
+  :background color/modeline-active-bg
+  :foreground color/modeline-active-fg
+  :box '(:line-width 3 :color "#007af0") ;; modeline border
+  :overline nil
+  :underline nil)
 
 ;; for now the inactive modeline looks the same as the active one
 (set-face-attribute 'mode-line-inactive nil
-                    :background "#007ad3"
-                    :foreground "#ffffff"
-                    :box '(:line-width 3 :color "#007ad3") ;; modeline border
-                    :overline nil
-                    :underline nil)
+  :background color/modeline-inactive-bg
+  :foreground color/modeline-inactive-fg
+  :box '(:line-width 3 :color "#007ad3") ;; modeline border
+  :overline nil
+  :underline nil)
 
 ;; ** My personal modeline
 
 ;; use setq-default to set it for /all/ modes
 (setq-default mode-line-format
-              (list
-               evil-mode-line-tag
-               mode-line-front-space
-               mode-line-mule-info
-               mode-line-modified
-               mode-line-frame-identification
-               mode-line-buffer-identification
-               " "
-               mode-line-position
-               mode-line-modes
-               ;; value of `mode-name'
-               "%m: "
-               ;; value of current buffer name
-               "buffer %b, "
-               ;; value of current line number
-               "line %l "
-               "-- user: "
-               ;; value of user
-               (getenv "USER")
-               ;; the buffer name; the file name as a tool tip
-               '(:eval (propertize "%b " 'face 'font-lock-keyword-face
-                                   'help-echo (buffer-file-name)))
+  (list
+    ;; ------------------------------
+    "state: "
+    evil-mode-line-tag
+    ;; ------------------------------
+    "| "
+    "modeline-front-space: "
+    mode-line-front-space
+    ;; ------------------------------
+    "| "
+    "modeline-mule-info: "
+    mode-line-mule-info
+    ;; ------------------------------
+    "| "
+    "modeline-modified: "
+    mode-line-modified
+    ;; ------------------------------
+    ;; This variable identifies the current frame. Its default value displays " " if you are using a window system which can show multiple frames, or "-%F " on an ordinary terminal which shows only one frame at a time.
+    "| "
 
-               ;; line and column
-               "(" ;; '%02' to set to 2 chars at least; prevents flickering
-               (propertize "%02l" 'face 'font-lock-type-face) ","
-               (propertize "%02c" 'face 'font-lock-type-face)
-               ") "
+    "modeline-frameid: "
+    mode-line-frame-identification
+    "| "
+    mode-line-buffer-identification
+    "teste aqui"
+    mode-line-position
+    mode-line-modes
+    ;; value of `mode-name'
+    "%m: "
+    ;; value of current buffer name
+    "| "
+    "buffer %b, "
+    ;; value of current line number
+    "| "
+    "line %l "
+    "| "
+    ;; current user
+    "user: "
+    (getenv "USER")
+    ;; the buffer name; the file name as a tool tip
+    '(:eval (propertize "%b " 'face 'font-lock-keyword-face
+              'help-echo (buffer-file-name)))
 
-               ;; relative position, size of file
-               "["
-               (propertize "%p" 'face 'font-lock-constant-face) ;; % above top
-               "/"
-               (propertize "%I" 'face 'font-lock-constant-face) ;; size
-               "] "
+    ;; line and column
+    "(" ;; '%02' to set to 2 chars at least; prevents flickering
+    (propertize "%02l" 'face 'font-lock-type-face) ","
+    (propertize "%02c" 'face 'font-lock-type-face)
+    ") "
 
-               ;; the current major mode for the buffer.
-               "["
+    ;; relative position, size of file
+    "["
+    (propertize "%p" 'face 'font-lock-constant-face) ;; % above top
+    "/"
+    (propertize "%I" 'face 'font-lock-constant-face) ;; size
+    "] "
 
-               '(:eval (propertize "%m" 'face 'font-lock-string-face
-                                   'help-echo buffer-file-coding-system))
-               "] "
+    ;; the current major mode for the buffer.
+    "["
+
+    '(:eval (propertize "%m" 'face 'font-lock-string-face
+              'help-echo buffer-file-coding-system))
+    "] "
 
 
-               "[" ;; insert vs overwrite mode, input-method in a tooltip
-               '(:eval (propertize (if overwrite-mode "Ovr" "Ins")
-                                   'face 'font-lock-preprocessor-face
-                                   'help-echo (concat "Buffer is in "
-                                                      (if overwrite-mode "overwrite" "insert") " mode")))
+    "[" ;; insert vs overwrite mode, input-method in a tooltip
+    '(:eval (propertize (if overwrite-mode "Ovr" "Ins")
+              'face 'font-lock-preprocessor-face
+              'help-echo (concat "Buffer is in "
+                           (if overwrite-mode "overwrite" "insert") " mode")))
 
-               ;; was this buffer modified since the last save?
-               '(:eval (when (buffer-modified-p)
-                         (concat ","  (propertize "Mod"
-                                                  'face 'font-lock-warning-face
-                                                  'help-echo "Buffer has been modified"))))
+    ;; was this buffer modified since the last save?
+    '(:eval (when (buffer-modified-p)
+              (concat ","  (propertize "Mod"
+                             'face 'font-lock-warning-face
+                             'help-echo "Buffer has been modified"))))
 
-               ;; is this buffer read-only?
-               '(:eval (when buffer-read-only
-                         (concat ","  (propertize "RO"
-                                                  'face 'font-lock-type-face
-                                                  'help-echo "Buffer is read-only"))))
-               "] "
+    ;; is this buffer read-only?
+    '(:eval (when buffer-read-only
+              (concat ","  (propertize "RO"
+                             'face 'font-lock-type-face
+                             'help-echo "Buffer is read-only"))))
+    "] "
 
-               ;; add the time, with the date and the emacs uptime in the tooltip
-               '(:eval (propertize (format-time-string "%H:%M")
-                                   'help-echo
-                                   (concat (format-time-string "%c; ")
-                                           (emacs-uptime "Uptime:%hh"))))
-               " --"
-               ;; i don't want to see minor-modes; but if you want, uncomment this:
-               ;; minor-mode-alist  ;; list of minor modes
-               "%-" ;; fill with '-'
-               )
-              )
+    ;; add the time, with the date and the emacs uptime in the tooltip
+    '(:eval (propertize (format-time-string "%H:%M")
+              'help-echo
+              (concat (format-time-string "%c; ")
+                (emacs-uptime "Uptime:%hh"))))
+    " --"
+    ;; i don't want to see minor-modes; but if you want, uncomment this:
+    ;; minor-mode-alist  ;; list of minor modes
+    "%-" ;; fill with '-'
+    )
+  )
 
 ;; Diplay line number on the modeline
 (line-number-mode t)
@@ -3924,6 +3981,7 @@ If failed try to complete the common part with `company-complete-common'"
 (use-package highlight-parentheses
   :ensure t
   :defer t
+  :diminish
   :hook
   (prog-mode . highlight-parentheses-mode)
   )
@@ -4017,8 +4075,9 @@ If failed try to complete the common part with `company-complete-common'"
 (use-package rainbow-mode
   :ensure t
   :defer t
+  :diminish
   :hook
-  (emacs-lisp-mode . rainbow-mode)
+  ((prog-mode css-mode web-mode) . rainbow-mode)
   )
 
 
@@ -4050,6 +4109,7 @@ If failed try to complete the common part with `company-complete-common'"
 (use-package highlight-indent-guides
   :ensure t
   :defer t
+  :diminish
   :hook
   ((prog-mode yaml-mode toml-mode) . highlight-indent-guides-mode)
   :custom
@@ -4124,6 +4184,7 @@ If failed try to complete the common part with `company-complete-common'"
 
 (use-package which-key
   :ensure t
+  :diminish
   :defer t
   :hook (after-init . which-key-mode)
   :config
@@ -4152,6 +4213,7 @@ If failed try to complete the common part with `company-complete-common'"
 (use-package smartparens
   :ensure t
   :defer t
+  :diminish
   :hook
   (prog-mode . smartparens-mode)
   :config
@@ -4166,6 +4228,7 @@ If failed try to complete the common part with `company-complete-common'"
 
 (use-package evil-smartparens
   :ensure t
+  :diminish
   :hook
   (smartparens-enabled . evil-smartparens-mode)
   )
@@ -4461,7 +4524,6 @@ If failed try to complete the common part with `company-complete-common'"
     (eldoc-mode 1)
     (emmet-mode 1)
     (prettier-js-mode 1)
-    (highlight-indent-guides-mode 1)
     (editorconfig-mode 1)
     (smartscan-mode 1)
     )
@@ -4478,13 +4540,13 @@ If failed try to complete the common part with `company-complete-common'"
   :config
   ;; TSX
   (add-hook 'web-mode-hook
-            (lambda ()
-              (when (string-equal "tsx" (file-name-extension buffer-file-name))
-                (setup-tide-mode))))
+    (lambda ()
+      (when (string-equal "tsx" (file-name-extension buffer-file-name))
+        (setup-tide-mode))))
   ;; Template
   (setq web-mode-engines-alist
-        '(("php"    . "\\.phtml\\'")
-          ("blade"  . "\\.blade\\.")))
+    '(("php"    . "\\.phtml\\'")
+       ("blade"  . "\\.blade\\.")))
   ;;---------------------------------------
   )
 
@@ -4653,7 +4715,7 @@ If failed try to complete the common part with `company-complete-common'"
   :defer t
   :mode
   (("\\.ts\\'" . typescript-mode)
-   ("\\.tsx\\'" . typescript-mode))
+    ("\\.tsx\\'" . typescript-mode))
   :preface
   (defun setup-typescript-mode ()
     (interactive)
@@ -4666,7 +4728,6 @@ If failed try to complete the common part with `company-complete-common'"
     (add-node-modules-path)
     (editorconfig-mode 1)
     (prettier-js-mode 1)
-    (highlight-indent-guides-mode 1)
     (dumb-jump-mode 1)
     (hl-todo-mode 1)
     (smartscan-mode 1)
