@@ -1190,17 +1190,6 @@ display battery percentagem on the modeline
   (use-package wgrep-ag)
   )
 
-* wgrep
-
-
-(use-package wgrep
-  :ensure t
-  :defer t
-  :custom
-  (wgrep-enable-key "e")
-  (wgrep-auto-save-buffer t)
-  (wgrep-change-readonly-file t)
-  )
 
 * ripgrep
 

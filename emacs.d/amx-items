@@ -1,13 +1,13 @@
 
 ;; ----- amx-history -----
 (
+ lsp-execute-code-action
  occur-mode
  package-install
  package-refresh-contents
  lsp
  balance-windows-area
  eldoc-box-hover-mode
- rainbow-mode
 )
 
 ;; ----- amx-data -----
@@ -106,7 +106,7 @@
  (eval-buffer . 1)
  (outshine-menu . 1)
  (outline-mode . 1)
- (lsp-execute-code-action . 6)
+ (lsp-execute-code-action . 9)
  (counsel-rg . 1)
  (counsel-ag . 1)
  (ag . 1)

@@ -17,8 +17,8 @@
 ;; to skip the mtime checks on every *.elc file.
 (setq load-prefer-newer noninteractive)
 
-;; reset GC by loading gcmh
-(add-to-list 'load-path "packages/gcmh.el")
+
+(add-to-list 'load-path "~/.emacs.d/packages/gcmh")
 (require 'gcmh)
 (gcmh-mode 1)
 
@@ -110,7 +110,7 @@
 ;; BetterGC
 (defvar better-gc-cons-threshold 67108864 ; 64mb
   "The default value to use for `gc-cons-threshold'.
-If you experience freezing, decrease this.  If you experience stuttering, increase this.")
+  If you experience freezing, decrease this.  If you experience stuttering, increase this.")
 
 (add-hook 'emacs-startup-hook
           (lambda ()
@@ -123,27 +123,27 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 ;; AutoGC
 (add-hook 'emacs-startup-hook
-          (lambda ()
-            (if (boundp 'after-focus-change-function)
-                (add-function :after after-focus-change-function
-                              (lambda ()
-                                (unless (frame-focus-state)
-                                  (garbage-collect))))
-              (add-hook 'after-focus-change-function 'garbage-collect))
-            (defun gc-minibuffer-setup-hook ()
-              (setq gc-cons-threshold (* better-gc-cons-threshold 2)))
+  (lambda ()
+    (if (boundp 'after-focus-change-function)
+      (add-function :after after-focus-change-function
+        (lambda ()
+          (unless (frame-focus-state)
+            (garbage-collect))))
+      (add-hook 'after-focus-change-function 'garbage-collect))
+    (defun gc-minibuffer-setup-hook ()
+      (setq gc-cons-threshold (* better-gc-cons-threshold 2)))
 
-            (defun gc-minibuffer-exit-hook ()
-              (garbage-collect)
-              (setq gc-cons-threshold better-gc-cons-threshold))
+    (defun gc-minibuffer-exit-hook ()
+      (garbage-collect)
+      (setq gc-cons-threshold better-gc-cons-threshold))
 
-            (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
-            (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
+    (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
+    (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
 ;; -AutoGC
 
 ;; **************************************************
 
-;; ** package repositories
+;; * PACKAGE MANAGEMENT
 
 
 (require 'package)
@@ -151,13 +151,13 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
 (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t) ; Org-mode's repository
+
 ;; ** initialize packages
 (package-initialize)
 
+;; ** use-package
 
-;; use-package
-
-;; nstall use-package if not already installed
+;; install use-package if not already installed
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -170,7 +170,7 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
   (require 'use-package))
 
 
-;; *** Enable use-package extension `ensure-system-package`
+;; Enable use-package extension `ensure-system-package`
 
 (use-package use-package-ensure-system-package
   :ensure t
@@ -180,7 +180,7 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
   )
 
 
-;; *** Set `:ensure t` globally for all packages using use-package
+;; Set `:ensure t` globally for all packages using use-package
 
 ;; this is disabled for now as i preffer to specify for each package
 
@@ -198,31 +198,12 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
   (auto-package-update-maybe)
   )
 
-;; ** install diminish
+;; ** diminish
 
 (use-package diminish
   :ensure t
   )
 
-;; ** outshine mode
-
-
-(use-package outshine
-  :ensure t
-  :diminish
-  :init
-  ;; To enable the keybindings, you must set the variable outline-minor-mode-prefix (note the variable name carefully) before loading Outshine, e.g.:
-  (defvar outline-minor-mode-prefix "\M-#")
-  :hook
-  (emacs-lisp-mode . outshine-mode)
-  )
-
-;; ** outline mode
-;; this is only here so i can diminish it
-(use-package outline
-  :ensure nil
-  :diminish
-  )
 
 ;; **************************************************
 ;; * General editor settings
@@ -325,7 +306,7 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 ;; ** set default line spacing
 ;; (setq-default line-spacing 1) ;; A nice line height
-(setq-default line-spacing 3)
+(setq-default line-spacing 2)
 
 
 ;; fix wierd color escape system
@@ -355,6 +336,26 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 ;; * PACKAGES
 
+;; ** outshine mode
+
+
+(use-package outshine
+  :ensure t
+  :commands outshine-mode
+  :diminish
+  :init
+  ;; To enable the keybindings, you must set the variable outline-minor-mode-prefix (note the variable name carefully) before loading Outshine, e.g.:
+  (defvar outline-minor-mode-prefix "\M-#")
+  :hook
+  (emacs-lisp-mode . outshine-mode)
+  )
+
+;; ** outline mode
+;; this is only here so i can diminish it
+(use-package outline
+  :ensure nil
+  :diminish
+  )
 ;; ** visual-line-mode (word wrap)
 (use-package visual-line-mode
   :ensure nil
@@ -366,7 +367,7 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 ;; **************************************************
 
-;; ** COPYING AND PASTING
+;; * TEXT MANIPULATION
 
 ;; *** Use the system clipboard
 (setq x-select-enable-clipboard t)
@@ -1211,15 +1212,23 @@ Example output:
   :after evil
   :bind
   (:map evil-normal-state-map
-        ("C-c C-+" . evil-numbers/inc-at-pt)
-        ("C-c C--" . evil-numbers/dec-at-pt)
-        ("<kp-add>" . evil-numbers/inc-at-pt)
-        ("<kp-subtract>" . evil-numbers/dec-at-pt))
+    ("C-c C-+" . evil-numbers/inc-at-pt)
+    ("C-c C--" . evil-numbers/dec-at-pt)
+    ("<kp-add>" . evil-numbers/inc-at-pt)
+    ("<kp-subtract>" . evil-numbers/dec-at-pt))
   :config
   (global-set-key (kbd "C-c C-+") 'evil-numbers/inc-at-pt)
   (global-set-key (kbd "C-c C--") 'evil-numbers/dec-at-pt)
   )
 
+;; ** evil-visualstar
+
+;; Allows `#' and `*' searches on visual-mode
+
+(use-package evil-visualstar
+  :ensure t
+  :config
+  (global-evil-visualstar-mode))
 
 ;; ** evil-leader
 
@@ -1451,11 +1460,11 @@ Example output:
   :ensure t
   :bind
   (:map evil-normal-state-map
-        ("g l " . evil-lion-left)
-        ("g L " . evil-lion-right)
-        :map evil-visual-state-map
-        ("g l " . evil-lion-left)
-        ("g L " . evil-lion-right))
+    ("g l " . evil-lion-left)
+    ("g L " . evil-lion-right)
+    :map evil-visual-state-map
+    ("g l " . evil-lion-left)
+    ("g L " . evil-lion-right))
   :config
   (setq evil-lion-squeeze-spaces t) ;; default t
   (evil-lion-mode)
@@ -1463,6 +1472,25 @@ Example output:
 
 ;; **************************************************
 
+;; ** evil-easymotion
+
+(use-package evil-easymotion
+  :ensure t
+  :config
+  (evilem-default-keybindings "SPC")
+  )
+
+;; ** evil-escape
+
+(use-package evil-escape
+  :ensure t
+  :config
+  (evil-escape-mode)
+  (setq-default evil-escape-key-sequence "jk")
+  (setq-default evil-escape-delay 0.2)
+  ;; (global-set-key (kbd "C-c C-g") 'evil-escape)
+  (global-set-key [escape] 'evil-escape)
+  )
 ;; * ORG-MODE
 
 ;; ** org-mode setup
@@ -1486,17 +1514,17 @@ Example output:
   (org-mode . setup-org-mode)
   :bind
   (:map org-mode-map
-        ("C-c o l" . org-store-link)
-        ("C-c o l" . org-store-link)
-        ("C-c o a" . org-agenda)
-        ("C-c o c" . org-capture)
-        ("C-c o b" . org-switch))
+    ("C-c o l" . org-store-link)
+    ("C-c o l" . org-store-link)
+    ("C-c o a" . org-agenda)
+    ("C-c o c" . org-capture)
+    ("C-c o b" . org-switch))
 
   ;; this map is to delete de bellow commented lambda that does the same thing
   ;; Resolve issue with Tab not working with ORG only in Normal VI Mode in terminal
   ;; (something with TAB on terminals being related to C-i...)
   (:map evil-normal-state-map
-        ("<tab>" . org-cycle))
+    ("<tab>" . org-cycle))
   :init
   ;; general org config variables
   (setq org-log-done 'time)
@@ -1515,7 +1543,7 @@ Example output:
 
   (setq org-confirm-babel-evaluate 'nil)
   (setq org-todo-keywords
-        '((sequence "TODO" "IN-PROGRESS" "REVIEW" "|" "DONE")))
+    '((sequence "TODO" "IN-PROGRESS" "REVIEW" "|" "DONE")))
   (setq org-agenda-window-setup 'other-window)
   (setq org-log-done 'time) ;; Show CLOSED tag line in closed TODO items
   (setq org-log-done 'note) ;; Prompt to leave a note when closing an item
@@ -1541,8 +1569,8 @@ Example output:
     "Setup variables to turn on syntax highlighting when calling `org-latex-export-to-pdf'"
     (interactive)
     (setq org-latex-listings 'minted
-          org-latex-packages-alist '(("" "minted"))
-          org-latex-pdf-process '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f")))
+      org-latex-packages-alist '(("" "minted"))
+      org-latex-pdf-process '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f")))
 
   ;; compile with pdf-latex
   ;; (setq org-latex-pdf-process
@@ -1550,29 +1578,29 @@ Example output:
 
   ;; compile with xelatex to use the Arial font
   (setq org-latex-pdf-process
-        '("xelatex -interaction nonstopmode %f"
-          "xelatex -interaction nonstopmode %f")) ;; for multiple passes
+    '("xelatex -interaction nonstopmode %f"
+       "xelatex -interaction nonstopmode %f")) ;; for multiple passes
 
   (setq org-emphasis-alist '(("*" bold)
-                             ("/" italic)
-                             ("_" underline)
-                             ("=" org-verbatim verbatim)
-                             ("~" org-code verbatim)))
+                              ("/" italic)
+                              ("_" underline)
+                              ("=" org-verbatim verbatim)
+                              ("~" org-code verbatim)))
 
 
   (require 'org-habit)
   '(org-emphasis-alist
-    (quote
-     (
-      ("!" org-habit-overdue-face)
-      ("%" org-habit-alert-face)
-      ("*" bold)
-      ("/" italic)
-      ("_" underline)
-      ("=" org-verbatim verbatim)
-      ("~" org-code verbatim)
-      ("+" (:strike-through t))
-      )))
+     (quote
+       (
+         ("!" org-habit-overdue-face)
+         ("%" org-habit-alert-face)
+         ("*" bold)
+         ("/" italic)
+         ("_" underline)
+         ("=" org-verbatim verbatim)
+         ("~" org-code verbatim)
+         ("+" (:strike-through t))
+         )))
   )
 
 
@@ -1940,7 +1968,19 @@ Example output:
     (setq magit-completing-read-function 'ivy-completing-read))
   )
 
-;; *** Enhance M-x
+;; ** wgrep
+
+
+(use-package wgrep
+  :ensure t
+  :defer t
+  :custom
+  (wgrep-enable-key "e")
+  (wgrep-auto-save-buffer t)
+  (wgrep-change-readonly-file t)
+  )
+
+;; ** Enhance M-x
 
 ;; Enhancement for `execute-extended-command'. Auto detects and uses ivy or ido, if installed
 (use-package amx
@@ -1949,7 +1989,7 @@ Example output:
   (after-init . amx-mode)
   )
 
-;; *** Ivy integration for Projectile
+;; ** Ivy integration for Projectile
 
 (use-package counsel-projectile
   :ensure t
@@ -1990,7 +2030,6 @@ Example output:
                                      (t      . 25)))
   :config
   (ivy-posframe-mode)
-
   )
 
 
@@ -2053,6 +2092,13 @@ Example output:
   ;; ivy-rich-mode needs to be called after `ivy-rich--display-transformers-list' is changed
   (ivy-rich-mode 1)
 
+  )
+
+;; ** ivy-prescient
+(use-package ivy-prescient
+  :ensure t
+  :config
+  (ivy-prescient-mode)
   )
 
 ;; all the icons for ivy
@@ -2475,8 +2521,15 @@ If failed try to complete the common part with `company-complete-common'"
                              company-echo-metadata-frontend))
   )
 
+;; ** company prescient
 
-;; ** Company-QuickHelp
+(use-package company-prescient
+  :ensure t
+  :config
+  (company-prescient-mode)
+  )
+
+;; ** company quickHelp
 
 (use-package company-quickhelp          ; Documentation popups for Company
   :ensure t
@@ -2485,8 +2538,8 @@ If failed try to complete the common part with `company-complete-common'"
   (global-company-mode . company-quickhelp-mode)
   :bind
   (:map company-active-map
-        ("M-h" . company-quickhelp-manual-begin)
-        )
+    ("M-h" . company-quickhelp-manual-begin)
+    )
   :config
   (setq company-quickhelp-delay 0.7)
   (company-quickhelp-mode)
@@ -3073,6 +3126,16 @@ If failed try to complete the common part with `company-complete-common'"
 (load-theme my-theme t)
 
 
+;; ** vi tilde fringe
+
+;; Displays tildes in the fringe on empty lines a la Vi.
+
+(use-package vi-tilde-fringe
+  :ensure t
+  :config
+  (global-vi-tilde-fringe-mode)
+  )
+
 ;; Highlight trailing whitespace
 (setq-default show-trailing-whitespace t)
 ;; Set the whitespace highlight color
@@ -3601,11 +3664,10 @@ If failed try to complete the common part with `company-complete-common'"
   :ensure t
   :bind
   (:map isearch-mode-map
-        ([remap isearch-query-replace] . anzu-isearch-query-replace)
-        ([remap isearch-query-replace-regexp] . anzu-isearch-query-replace-regexp))
+    ([remap isearch-query-replace] . anzu-isearch-query-replace)
+    ([remap isearch-query-replace-regexp] . anzu-isearch-query-replace-regexp))
   :custom-face
   (anzu-mode-line ((nil (:foreground "yellow" :weight 'bold))))
-
   :custom
   (anzu-mode-lighter "")
   (anzu-deactivate-region t)
@@ -3618,6 +3680,12 @@ If failed try to complete the common part with `company-complete-common'"
   (define-key isearch-mode-map [remap isearch-query-replace-regexp] #'anzu-isearch-query-replace-regexp)
   )
 
+;; ** evil-anzu
+
+(use-package evil-anzu
+  :ensure t
+  :after evil
+  )
 ;; ** hide mode line mode
 
 (use-package hide-mode-line
@@ -3626,7 +3694,7 @@ If failed try to complete the common part with `company-complete-common'"
   (completion-list-mode . hide-mode-line-mode)
   (neotree-mode . hide-mode-line-mode)
   (treemacs-mode . hide-mode-line-mode)
-)
+  )
 
 ;; ** mini-modeline
 
@@ -3832,6 +3900,14 @@ If failed try to complete the common part with `company-complete-common'"
 
 (global-set-key (kbd "M-<f12> t") 'tau/toggle-window-transparency)
 
+;; ** nav-flash
+
+(use-package nav-flash
+  :ensure t
+  :config
+  (nav-flash-show)
+  )
+
 ;; ** pulse
 
 
@@ -3847,7 +3923,7 @@ If failed try to complete the common part with `company-complete-common'"
   (defun my-pulse-momentary (&rest _)
     "Pulse the current line."
     (if (fboundp 'xref-pulse-momentarily)
-        (xref-pulse-momentarily)
+      (xref-pulse-momentarily)
       (my-pulse-momentary-line)))
 
   (defun my-recenter-and-pulse(&rest _)
@@ -3860,19 +3936,19 @@ If failed try to complete the common part with `company-complete-common'"
     (recenter)
     (my-pulse-momentary-line))
   :hook (((dumb-jump-after-jump
-           imenu-after-jump) . my-recenter-and-pulse)
-         ((bookmark-after-jump
-           magit-diff-visit-file
-           next-error) . my-recenter-and-pulse-line))
+            imenu-after-jump) . my-recenter-and-pulse)
+          ((bookmark-after-jump
+             magit-diff-visit-file
+             next-error) . my-recenter-and-pulse-line))
   :init
   (dolist (cmd '(recenter-top-bottom
-                 other-window ace-window windmove-do-window-select
-                 pager-page-down pager-page-up
-                 symbol-overlay-basic-jump))
+                  other-window ace-window windmove-do-window-select
+                  pager-page-down pager-page-up
+                  symbol-overlay-basic-jump))
     (advice-add cmd :after #'my-pulse-momentary-line))
   (dolist (cmd '(pop-to-mark-command
-                 pop-global-mark
-                 goto-last-change))
+                  pop-global-mark
+                  goto-last-change))
     (advice-add cmd :after #'my-recenter-and-pulse))
   )
 
@@ -3882,14 +3958,14 @@ If failed try to complete the common part with `company-complete-common'"
 (defun add-pretty-lambda ()
   "Make some word or string show as pretty Unicode symbols. See https://unicodelookup.com for more."
   (setq prettify-symbols-alist
-        '(
-          ("lambda" . 955)
-          ("delta" . 120517)
-          ("epsilon" . 120518)
-          ("->" . 8594)
-          ("<=" . 8804)
-          (">=" . 8805)
-          )))
+    '(
+       ("lambda" . 955)
+       ("delta" . 120517)
+       ("epsilon" . 120518)
+       ("->" . 8594)
+       ("<=" . 8804)
+       (">=" . 8805)
+       )))
 ;;(global-prettify-symbols-mode 1)
 (add-hook 'prog-mode-hook 'add-pretty-lambda)
 (add-hook 'org-mode-hook 'add-pretty-lambda)
