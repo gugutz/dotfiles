@@ -1,13 +1,13 @@
 
 ;; ----- amx-history -----
 (
- lsp-execute-code-action
  occur-mode
  package-install
  package-refresh-contents
  lsp
  balance-windows-area
  eldoc-box-hover-mode
+ rainbow-mode
 )
 
 ;; ----- amx-data -----

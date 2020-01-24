@@ -3,62 +3,87 @@
 ;;; Commentary: personal init.el
 ;;; Code:
 
-;; * Emacs Startup
+;; **************************************************
+;; if emacs version is bellow 26.1, throw an error
+(when (version< emacs-version "26.1")
+  (error "Detected Emacs %s.  Doom only supports Emacs 26.1 and higher"
+    emacs-version))
 
-;; taken from `doom-emacs'
+;; **************************************************
 ;;
+;;; * Garbage Collection
+
 ;; A big contributor to startup times is garbage collection. We up the gc
 ;; threshold to temporarily prevent it from running, then reset it later by
 ;; enabling `gcmh-mode'. Not resetting it will cause stuttering/freezes.
+
 (setq gc-cons-threshold most-positive-fixnum)
 
-;; In noninteractive sessions, prioritize non-byte-compiled source files to
-;; prevent the use of stale byte-code. Otherwise, it saves us a little IO time
-;; to skip the mtime checks on every *.elc file.
-(setq load-prefer-newer noninteractive)
+;; **************************************************
+;;
+;;; * CONSTANTS AND VARIABLES
 
+(defvar interactive-mode (not noninteractive)
+  "If non-nil, Emacs is in interactive mode.")
 
-(add-to-list 'load-path "~/.emacs.d/packages/gcmh")
-(require 'gcmh)
-(gcmh-mode 1)
+(defvar debug-mode (or (getenv "DEBUG") init-file-debug)
+  "If non-nil, Doom will log more.")
 
-;; * Personal information
+;; Systems
+(defconst EMACS27+   (> emacs-major-version 26))
+(defconst IS-MAC     (eq system-type 'darwin))
+(defconst IS-LINUX   (eq system-type 'gnu/linux))
+(defconst IS-WINDOWS (memq system-type '(cygwin windows-nt ms-dos)))
+(defconst IS-BSD     (or IS-MAC (eq system-type 'berkeley-unix)))
 
-(setq user-full-name "Gustavo P Borges")
-(setq user-mail-address "gugutz@gmail.com")
-(setq work-mail-address "gugutz@stairs.studio")
-(setq gmail-address "gugutz@gmail.com")
-(setq nickname "gugutz")
+;;; Directories/files
+(defconst emacs-dir
+  (eval-when-compile (file-truename user-emacs-directory))
+  "The path to the currently loaded .emacs.d directory.  Must end with a slash.")
 
-;; my secrets
-(let ((secret.el (expand-file-name ".secret.el" user-emacs-directory)))
-  (when (file-exists-p secret.el)
-    (load secret.el)))
-;; (load-library "~/dotfiles/emacs.d/secrets.el.gpg")
+(defconst config-dir
+  (eval-when-compile (concat emacs-dir "config/"))
+  "The path to the currently loaded .emacs.d directory.  Must end with a slash.")
+
+(defconst packages-config-dir (concat config-dir "packages/")
+  "Directory for package settings.")
+
+(defconst cache-dir (concat emacs-dir "cache/")
+  "Directory for volatile local storage.
+Use this for files that change often, like cache files.  Must end with a slash.")
+
+(defconst env-file (concat config-dir "env")
+  "The location of the envvar file.")
+
+(defconst secrets-dir (concat config-dir "secrets/")
+  "The location of secrets.")
+
+;; Folder to save session
+(defconst tau-savefile-dir (expand-file-name "savefile" user-emacs-directory))
 
 ;; **************************************************
-
 ;; * Configuration variables
 
 ;; These are values that are used throuhgout this configuration
 ;; Put here for convenient editing
 
 
-;; Font sizes
 (defvar tau/erc-nick               "tau"        "The ERC nick to use.")
 (defvar tau/erc-password           nil        "The ERC password to use.")
 (defvar tau/erc-port               nil        "The ERC port to use.")
 (defvar tau/erc-server             nil        "The ERC server to use.")
-(defvar tau/font-family            "Courier"  "The font to use.")
-(defvar tau/font-size-default      110        "The font size to use for default text.")
-(defvar tau/font-size-header-line  80        "The font size to use for the header-line.")
-(defvar tau/font-size-mode-line    100        "The font size to use for the mode-line.")
-(defvar tau/font-size-small        100        "The font size to use for smaller text.")
-(defvar tau/font-size-title        140        "The font size to use for titles.")
+;; Font sizes
+(defvar font/default            "Courier"  "The font to use.")
+(defvar font/hack            "Hack"  "The font to use.")
+(defvar font-size/default      110        "The font size to use for default text.")
+(defvar font-size/header-line  80        "The font size to use for the header-line.")
+(defvar font-size/mode-line    100        "The font size to use for the mode-line.")
+(defvar font-size/small        100        "The font size to use for smaller text.")
+(defvar font-size/title        140        "The font size to use for titles.")
 
 ;; Indent sizes
-(defvar tau/indent-js                2        "The font size to use for titles.")
-(defvar tau/indent-html              4        "The font size to use for titles.")
+(defvar indent/js                2        "The font size to use for titles.")
+(defvar indent/html              4        "The font size to use for titles.")
 
 ;; Colors
 (defvar color/vscode-status-bar      "#007ad3"        "The font size to use for titles.")
@@ -75,119 +100,43 @@
 ;; Set the used theme
 (setq my-theme 'vscode-default-dark)
 
-;; Folder to save session
-(defconst tau-savefile-dir (expand-file-name "savefile" user-emacs-directory))
 
 ;; **************************************************
+;;
+;;; * PACKAGE MANAGEMENT
 
-;; * Check version (taken from memacs)
-;; this uses emacs 26.1 feature 'early-init' to set a few things before init.el is loaded
-
-;; CheckVer
-(cond ((version< emacs-version "26.1")
-       (warn "Emacs version bellow 26.1. Some features might not work well."))
-      ((let* ((early-init-f (expand-file-name "early-init.el" user-emacs-directory))
-              (early-init-do-not-edit-d (expand-file-name "early-init-do-not-edit/" user-emacs-directory))
-              (early-init-do-not-edit-f (expand-file-name "early-init.el" early-init-do-not-edit-d)))
-         (and (version< emacs-version "27")
-              (or (not (file-exists-p early-init-do-not-edit-f))
-                  (file-newer-than-file-p early-init-f early-init-do-not-edit-f)))
-         (make-directory early-init-do-not-edit-d t)
-         (copy-file early-init-f early-init-do-not-edit-f t t t t)
-         (add-to-list 'load-path early-init-do-not-edit-d)
-         (require 'early-init))))
-;; -CheckVer
-
-
-;; **************************************************
-
-;; * Garbage Collection
-
-;; This part was taken from MEMACS
-;; Source: https://github.com/MatthewZMD/.emacs.d/blob/master/init.el
-
-
-;; BetterGC
-(defvar better-gc-cons-threshold 67108864 ; 64mb
-  "The default value to use for `gc-cons-threshold'.
-  If you experience freezing, decrease this.  If you experience stuttering, increase this.")
-
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (setq gc-cons-threshold better-gc-cons-threshold)
-            (setq file-name-handler-alist file-name-handler-alist-original)
-            (makunbound 'file-name-handler-alist-original)))
-;; -BetterGC
-
-
-
-;; AutoGC
-(add-hook 'emacs-startup-hook
-  (lambda ()
-    (if (boundp 'after-focus-change-function)
-      (add-function :after after-focus-change-function
-        (lambda ()
-          (unless (frame-focus-state)
-            (garbage-collect))))
-      (add-hook 'after-focus-change-function 'garbage-collect))
-    (defun gc-minibuffer-setup-hook ()
-      (setq gc-cons-threshold (* better-gc-cons-threshold 2)))
-
-    (defun gc-minibuffer-exit-hook ()
-      (garbage-collect)
-      (setq gc-cons-threshold better-gc-cons-threshold))
-
-    (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
-    (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
-;; -AutoGC
-
-;; **************************************************
-
-;; * PACKAGE MANAGEMENT
-
+;;
+;;; ** package.el
 
 (require 'package)
-;; add melpa stable emacs package repository
+(setq package-user-dir (concat user-emacs-directory "elpa/"))
+(setq package-gnupghome-dir (expand-file-name "gpg" package-user-dir))
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
 (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t) ; Org-mode's repository
-
-;; ** initialize packages
 (package-initialize)
 
-;; ** use-package
+;;
+;;; ** use-package
 
 ;; install use-package if not already installed
-
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package)
   )
 
 ;; load use-package
-
 (eval-when-compile
   (require 'use-package))
 
-
-;; Enable use-package extension `ensure-system-package`
-
-(use-package use-package-ensure-system-package
-  :ensure t
-  :init
-  ;; use sudo when needed
-  (setq system-packages-use-sudo t)
-  )
-
-
 ;; Set `:ensure t` globally for all packages using use-package
 
-;; this is disabled for now as i preffer to specify for each package
+(use-package use-package-ensure
+  :config
+  (setq use-package-always-ensure nil)
+  )
 
-(require 'use-package-ensure)
-;; (setq use-package-always-ensure t)
-
-;; *** Auto update packages
+;; Auto update packages
 
 (use-package auto-package-update
   :config
@@ -198,54 +147,358 @@
   (auto-package-update-maybe)
   )
 
-;; ** diminish
+;; **************************************************
+;;
+;;; * Personal information
 
-(use-package diminish
-  :ensure t
-  )
+(setq user-full-name "Gustavo P Borges")
+(setq user-mail-address "gugutz@gmail.com")
+(setq work-mail-address "gugutz@stairs.studio")
+(setq gmail-address "gugutz@gmail.com")
+(setq nickname "gugutz")
+
+;; my secrets
+(let ((secret.el (expand-file-name ".secret.el" user-emacs-directory)))
+  (when (file-exists-p secret.el)
+    (load secret.el)))
+;; (load-library "~/dotfiles/emacs.d/secrets.el.gpg")
 
 
 ;; **************************************************
+;;
+;;; * Emacs Startup
+
+;; taken from `doom-emacs'
+;;
+;; A big contributor to startup times is garbage collection. We up the gc
+;; threshold to temporarily prevent it from running, then reset it later by
+;; enabling `gcmh-mode'. Not resetting it will cause stuttering/freezes.
+(setq gc-cons-threshold most-positive-fixnum)
+
+;; In noninteractive sessions, prioritize non-byte-compiled source files to
+;; prevent the use of stale byte-code. Otherwise, it saves us a little IO time
+;; to skip the mtime checks on every *.elc file.
+(setq load-prefer-newer noninteractive)
+
+
+(add-to-list 'load-path "~/.emacs.d/packages/gcmh")
+(use-package gcmh
+  :diminish
+  :config
+  (gcmh-mode 1)
+  )
+
+;; **************************************************
+
+;; * Check version (taken from memacs)
+;; this uses emacs 26.1 feature 'early-init' to set a few things before init.el is loaded
+
+;; CheckVer
+(cond ((version< emacs-version "26.1")
+        (warn "Emacs version bellow 26.1. Some features might not work well."))
+  ((let* ((early-init-f (expand-file-name "early-init.el" user-emacs-directory))
+           (early-init-do-not-edit-d (expand-file-name "early-init-do-not-edit/" user-emacs-directory))
+           (early-init-do-not-edit-f (expand-file-name "early-init.el" early-init-do-not-edit-d)))
+     (and (version< emacs-version "27")
+       (or (not (file-exists-p early-init-do-not-edit-f))
+         (file-newer-than-file-p early-init-f early-init-do-not-edit-f)))
+     (make-directory early-init-do-not-edit-d t)
+     (copy-file early-init-f early-init-do-not-edit-f t t t t)
+     (add-to-list 'load-path early-init-do-not-edit-d)
+     (require 'early-init))))
+;; -CheckVer
+
+
+;; **************************************************
+;;
+;; * CORE SETTINGS
+
+;; UTF-8 as the default coding system
+(when (fboundp 'set-charset-priority)
+  (set-charset-priority 'unicode))       ; pretty
+(prefer-coding-system 'utf-8)            ; pretty
+(setq locale-coding-system 'utf-8)       ; please
+;; Except for the clipboard on Windows, where its contents could be in an
+;; encoding that's wider than utf-8, so we let Emacs/the OS decide what encoding
+;; to use.
+(unless IS-WINDOWS
+  (setq selection-coding-system 'utf-8)) ; with sugar on top
+
+;; Disable warnings from legacy advice system. They aren't useful, and we can't
+;; often do anything about them besides changing packages upstream
+(setq ad-redefinition-action 'accept)
+
+;; Make apropos omnipotent. It's more useful this way.
+(setq apropos-do-all t)
+
+;; Don't make a second case-insensitive pass over `auto-mode-alist'. If it has
+;; to, it's our (the user's) failure. One case for all!
+(setq auto-mode-case-fold nil)
+
+;; Display the bare minimum at startup. We don't need all that noise. The
+;; dashboard/empty scratch buffer is good enough.
+(setq inhibit-startup-message t
+  inhibit-startup-echo-area-message user-login-name
+  inhibit-default-init t
+  initial-major-mode 'fundamental-mode
+  initial-scratch-message nil)
+(fset #'display-startup-echo-area-message #'ignore)
+
+;; Emacs "updates" its ui more often than it needs to, so we slow it down
+;; slightly, from 0.5s:
+(setq idle-update-delay 1)
+
+;; Emacs is a huge security vulnerability, what with all the dependencies it
+;; pulls in from all corners of the globe. Let's at least try to be more
+;; discerning.
+(setq gnutls-verify-error (getenv "INSECURE")
+  tls-checktrust gnutls-verify-error
+  tls-program '("gnutls-cli --x509cafile %t -p %p %h"
+                 ;; compatibility fallbacks
+                 "gnutls-cli -p %p %h"
+                 "openssl s_client -connect %h:%p -no_ssl2 -no_ssl3 -ign_eof"))
+
+;; Emacs stores authinfo in HOME and in plaintext. Let's not do that, mkay? This
+;; file usually stores usernames, passwords, and other such treasures for the
+;; aspiring malicious third party.
+(setq auth-sources (list (expand-file-name "authinfo.gpg" secrets-dir)
+                     "~/.authinfo.gpg"))
+
+;; Emacs on Windows frequently confuses HOME (C:\Users\<NAME>) and APPDATA,
+;; causing `abbreviate-home-dir' to produce incorrect paths.
+(when IS-WINDOWS
+  (setq abbreviated-home-dir "\\`'"))
+
+;; Don't litter `doom-emacs-dir'. We don't use `no-littering' because it's a
+;; mote too opinionated for our needs.
+(setq abbrev-file-name             (concat packages-config-dir "abbrev.el")
+  async-byte-compile-log-file  (concat packages-config-dir "async-bytecomp.log")
+  bookmark-default-file        (concat packages-config-dir "bookmarks")
+  custom-file                  (concat config-dir "custom.el")
+  custom-theme-directory       (concat emacs-dir "themes/")
+  desktop-dirname              (concat packages-config-dir "desktop")
+  desktop-base-file-name       "autosave"
+  desktop-base-lock-name       "autosave-lock"
+  pcache-directory             (concat cache-dir "pcache/")
+  request-storage-directory    (concat cache-dir "request")
+  server-auth-dir              (concat cache-dir "server/")
+  shared-game-score-directory  (concat config-dir "shared-game-score/")
+  tramp-auto-save-directory    (concat cache-dir "tramp-auto-save/")
+  tramp-backup-directory-alist backup-directory-alist
+  tramp-persistency-file-name  (concat cache-dir "tramp-persistency.el")
+  url-cache-directory          (concat cache-dir "url/")
+  url-configuration-directory  (concat packages-config-dir "url/")
+  gamegrid-user-score-file-directory (concat packages-config-dir "games/"))
+
+;; HACK Stop sessions from littering the user directory
+;; (defadvice doom--use-cache-dir-a (session-id)
+;;   :override #'emacs-session-filename
+;;   (concat cache-dir "emacs-session." session-id))
+
+
+;; **************************************************
+;;
+;;; * Optimizations
+
+;; Disable bidirectional text rendering for a modest performance boost. Of
+;; course, this renders Emacs unable to detect/display right-to-left languages
+;; (sorry!), but for us left-to-right language speakers/writers, it's a boon.
+(setq-default bidi-display-reordering 'left-to-right
+  bidi-paragraph-direction 'left-to-right)
+
+;; Reduce rendering/line scan work for Emacs by not rendering cursors or regions
+;; in non-focused windows.
+(setq-default cursor-in-non-selected-windows nil)
+(setq highlight-nonselected-windows nil)
+
+;; More performant rapid scrolling over unfontified regions. May cause brief
+;; spells of inaccurate fontification immediately after scrolling.
+(setq fast-but-imprecise-scrolling t)
+
+;; Resizing the Emacs frame can be a terribly expensive part of changing the
+;; font. By inhibiting this, we halve startup times, particularly when we use
+;; fonts that are larger than the system default (which would resize the frame).
+(setq frame-inhibit-implied-resize t)
+
+;; Don't ping things that look like domain names.
+(setq ffap-machine-p-known 'reject)
+
+;; Performance on Windows is considerably worse than elsewhere, especially if
+;; WSL is involved. We'll need everything we can get.
+(when IS-WINDOWS
+  ;; Reduce the workload when doing file IO
+  (setq w32-get-true-file-attributes nil)
+
+  ;; Font compacting can be terribly expensive, especially for rendering icon
+  ;; fonts on Windows. Whether it has a noteable affect on Linux and Mac hasn't
+  ;; been determined.
+  (setq inhibit-compacting-font-caches t))
+
+;; Remove command line options that aren't relevant to our current OS; means
+;; slightly less to process at startup.
+(unless IS-MAC   (setq command-line-ns-option-alist nil))
+(unless IS-LINUX (setq command-line-x-option-alist nil))
+
+;; Delete files to trash on macOS, as an extra layer of precaution against
+;; accidentally deleting wanted files.
+(setq delete-by-moving-to-trash IS-MAC)
+
+;; Adopt a sneaky garbage collection strategy of waiting until idle time to
+;; collect; staving off the collector while the user is working.
+(when interactive-mode
+  (add-hook 'pre-command-hook (gcmh-mode +1))
+  (with-eval-after-load 'gcmh
+    (setq gcmh-idle-delay 10
+      gcmh-verbose debug-mode)
+    (add-hook 'focus-out-hook #'gcmh-idle-garbage-collect)))
+
+;; HACK `tty-run-terminal-initialization' is *tremendously* slow for some
+;;      reason. Disabling it completely could have many side-effects, so we
+;;      defer it until later.
+(unless (display-graphic-p)
+  (advice-add #'tty-run-terminal-initialization :override #'ignore)
+  (add-hook 'window-setup-hook
+    (defun doom-init-tty-h ()
+      (advice-remove #'tty-run-terminal-initialization #'ignore)
+      (tty-run-terminal-initialization (selected-frame) nil t))))
+
+
+;;
+;;; MODE-local-vars-hook
+
+;; File+dir local variables are initialized after the major mode and its hooks
+;; have run. If you want hook functions to be aware of these customizations, add
+;; them to MODE-local-vars-hook instead.
+(defun doom-run-local-var-hooks-h ()
+  "Run MODE-local-vars-hook after local variables are initialized."
+  (run-hook-wrapped (intern-soft (format "%s-local-vars-hook" major-mode))
+    #'doom-try-run-hook))
+(add-hook 'hack-local-variables-hook #'doom-run-local-var-hooks-h)
+
+;; If the user has disabled `enable-local-variables', then
+;; `hack-local-variables-hook' is never triggered, so we trigger it at the end
+;; of `after-change-major-mode-hook':
+(defun doom-run-local-var-hooks-if-necessary-h ()
+  "Run `doom-run-local-var-hooks-h' if `enable-local-variables' is disabled."
+  (unless enable-local-variables
+    (doom-run-local-var-hooks-h)))
+(add-hook 'after-change-major-mode-hook
+  #'doom-run-local-var-hooks-if-necessary-h
+  'append)
+
+;; **************************************************
+;;
 ;; * General editor settings
 
 ;; set frame title
 (setq frame-title-format '("Emacs"))
 
 ;; Allow access from emacsclient
-(require 'server)
-(unless (or (daemonp) (server-running-p))
-  (server-start))
+(use-package server
+  :when (display-graphic-p)
+  :defer 1
+  :config
+  (unless (or (daemonp) (server-running-p))
+    (server-start))
+  )
 
 ;; Add the folder 'config' to emacs load-path so i can require stuff from there
 (add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
 ;; (add-to-list 'load-path "~/dotfiles/emacs.d/config")
 
-;; mouse cursor
-(blink-cursor-mode t)
-(setq blink-cursor-blinks 0) ;; blink forever
+;; indicate empty lines in the fringe with --
 (setq-default indicate-empty-lines t)
 
-;; Prevent emacs to create lockfiles (.#files#). this also stops preventing editing colisions, so watch out
-(setq create-lockfiles nil)
-;; dont make backup files
-(setq make-backup-files nil)
-;; dont ask confirmation to kill processes
-(setq confirm-kill-processes nil)
+;; always avoid GUI
+(setq use-dialog-box nil)
+;; Don't display floating tooltips; display their contents in the echo-area,
+;; because native tooltips are ugly.
+(when (bound-and-true-p tooltip-mode)
+  (tooltip-mode -1))
+;; ...especially on linux
+(when (eq system-type 'gnu/linux)
+  (setq x-gtk-use-system-tooltips nil))
+
+;; Favor vertical splits over horizontal ones. Screens are usually wide.
+(setq split-width-threshold 160
+  split-height-threshold nil)
+
+;; **************************************************
+;;
+;;; Minibuffer
+
+;; Allow for minibuffer-ception. Sometimes we need another minibuffer command
+;; while we're in the minibuffer.
+(setq enable-recursive-minibuffers t)
+
+;; Show current key-sequence in minibuffer, like vim does. Any feedback after
+;; typing is better UX than no feedback at all.
+(setq echo-keystrokes 0.02)
+
+;; Expand the minibuffer to fit multi-line text displayed in the echo-area. This
+;; doesn't look too great with direnv, however...
+(setq resize-mini-windows 'grow-only
+  ;; But don't let the minibuffer grow beyond this size
+  max-mini-window-height 0.15)
+
+;; Typing yes/no is obnoxious when y/n will do
+(fset #'yes-or-no-p #'y-or-n-p)
+
+;; Try really hard to keep the cursor from getting stuck in the read-only prompt
+;; portion of the minibuffer.
+(setq minibuffer-prompt-properties '(read-only t intangible t cursor-intangible t face minibuffer-prompt))
+(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+;; **************************************************
+;;
+;;; cursor
+
+;; dont blink the cursor
+(blink-cursor-mode 0)
+(setq blink-cursor-blinks 0) ;; blink forever
+
+;; Don't blink the paren matching the one at point, it's too distracting.
+(setq blink-matching-paren nil)
+
+(setq visible-cursor nil)
+
+;; Don't stretch the cursor to fit wide characters, it is disorienting,
+;; especially for tabs.
+(setq x-stretch-cursor nil)
+
+(setq create-lockfiles nil) ;; Prevent emacs to create lockfiles (.#files#). this also stops preventing editing colisions, so watch out
+
+(setq make-backup-files nil) ;; dont make backup files
+
+(setq confirm-kill-processes nil) ;; dont ask confirmation to kill processes
 
 ;; Save all tempfiles in $TMPDIR/emacs$UID/
 (defconst emacs-tmp-dir (expand-file-name (format "emacs%d" (user-uid)) temporary-file-directory))
 (setq backup-directory-alist
-    `((".*" . ,emacs-tmp-dir)))
+  `((".*" . ,emacs-tmp-dir)))
 (setq auto-save-file-name-transforms
-    `((".*" ,emacs-tmp-dir t)))
+  `((".*" ,emacs-tmp-dir t)))
 (setq auto-save-list-file-prefix
-      emacs-tmp-dir)
+  emacs-tmp-dir)
 
-;; Always follow symbolic links to edit the 'actual' file it points to
-(setq vc-follow-symlinks t)
 
-;; dont ask confirmation to kill processes
-(setq confirm-kill-processes nil)
+;; **************************************************
+;;
+  ;;; File Handling
+
+;; Resolve symlinks when opening files, so that any operations are conducted
+;; from the file's true directory (like `find-file').
+(setq find-file-visit-truename t
+  vc-follow-symlinks t)
+
+;; Disable the warning "X and Y are the same file". It's fine to ignore this
+;; warning as it will redirect you to the existing buffer anyway.
+(setq find-file-suppress-same-file-warnings t)
+
+(setq vc-follow-symlinks t) ;; Always follow symbolic links to edit the 'actual' file it points to
+
+
+(setq confirm-kill-processes nil) ;; dont ask confirmation to kill processes
 
 ;; Disable the annoying Emacs bell ring (beep)
 (setq ring-bell-function 'ignore)
@@ -254,42 +507,81 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 (fset 'yes-or-no-p 'y-or-n-p)
 
-;; dont ask for confirmation for opening large files
+
 (setq large-file-warning-threshold nil) ;; Don’t warn me about opening large files
+(setq next-line-add-newlines t) ;; C-n insert newlines if the point is at the end of the buffer.
+(setq large-file-warning-threshold 100000000) ;; warn when opening files bigger than 100MB
 
-;; ** C-n insert newlines if the point is at the end of the buffer.
-(setq next-line-add-newlines t)
 
-;; warn when opening files bigger than 100MB
-(setq large-file-warning-threshold 100000000)
 ;; ** C-k kills current buffer without having to select which buffer
-
 ;; By default C-x k prompts to select which buffer should be selected.
 ;; I almost always want to kill the current buffer, so this snippet helps in that.
 
 ;; Kill current buffer; prompt only if
 ;; there are unsaved changes.
 (global-set-key (kbd "C-x k")
-                '(lambda () (interactive) (kill-buffer (current-buffer)))
-                )
+  '(lambda () (interactive) (kill-buffer (current-buffer)))
+  )
+
+(setq require-final-newline t)  ;; add final newline to files
 
 
+;; **************************************************
+;;
+;;; Formatting
 
-;; ** add final newline
-
-
-(setq require-final-newline t)
-
-
-;; ** fill column
-
-;; Sets a 80 character line width
-
-
-(setq-default fill-column 80)
-(setq auto-fill-mode 1)
+;; Indentation
+(setq-default tab-width 4
+  tab-always-indent t
+  indent-tabs-mode nil
+  fill-column 80) ;; Sets a 80 character line width
 
 
+;; Word wrapping
+(setq-default word-wrap t
+  truncate-lines t
+  truncate-partial-width-windows nil)
+
+(setq sentence-end-double-space nil
+  delete-trailing-lines nil
+  require-final-newline t
+  tabify-regexp "^\t* [ \t]+")  ; for :retab
+
+;; Favor hard-wrapping in text modes
+(add-hook 'text-mode-hook #'auto-fill-mode)
+
+;; **************************************************
+;;
+;;; Clipboard / kill-ring
+
+;; Eliminate duplicates in the kill ring. That is, if you kill the same thing
+;; twice, you won't have to use M-y twice to get past it to older entries in the
+;; kill ring.
+(setq kill-do-not-save-duplicates t)
+
+;;
+(setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
+
+;; Fixes the clipboard in tty Emacs by piping clipboard I/O through xclip, xsel,
+;; pb{copy,paste}, wl-copy, termux-clipboard-get, or getclip (cygwin).
+(unless (eq system-type 'windows-nt)
+  (add-hook 'tty-setup-hook
+    (defun doom-init-clipboard-in-tty-emacs-h ()
+      (and (not (getenv "SSH_CONNECTION"))
+        (require 'xclip nil t)
+        (xclip-mode +1)))))
+
+
+;; **************************************************
+;;
+;;; Extra file extensions to support
+
+(push '("/LICENSE\\'" . text-mode) auto-mode-alist)
+(push '("\\.log\\'" . text-mode) auto-mode-alist)
+(push '("\\.env\\'" . sh-mode) auto-mode-alist)
+
+;; **************************************************
+;;
 ;; ** preffer UTF-8 coding system
 
 (prefer-coding-system 'utf-8)
@@ -303,23 +595,18 @@
 ;; auto balance windows on opening and closing frames
 (setq window-combination-resize t)
 
-
 ;; ** set default line spacing
 ;; (setq-default line-spacing 1) ;; A nice line height
 (setq-default line-spacing 2)
 
-
 ;; fix wierd color escape system
 (setq system-uses-terminfo nil) ;; Fix weird color escape sequences
-
 
 ;; confirm before closing emacs
 ;; (setq confirm-kill-emacs 'yes-or-no-p) ;; Ask for confirmation before closing emacs
 
-
 ;; select window for help
 (setq help-window-select t)
-
 
 ;; delete selection mode
 
@@ -335,6 +622,18 @@
 ;; **************************************************
 
 ;; * PACKAGES
+
+;;;###package image
+(setq image-animate-loop t)
+
+;;;###pos tip
+(setq pos-tip-internal-border-width 6
+  pos-tip-border-width 1)
+;; ** diminish
+
+(use-package diminish
+  :ensure t
+  )
 
 ;; ** outshine mode
 
@@ -356,6 +655,7 @@
   :ensure nil
   :diminish
   )
+
 ;; ** visual-line-mode (word wrap)
 (use-package visual-line-mode
   :ensure nil
@@ -378,15 +678,15 @@
   "Make F8 and F9 Copy and Paste to/from OS Clipboard.  Super usefull."
   (interactive)
   (if (display-graphic-p)
-      (progn
-        (message "Yanked region to x-clipboard!")
-        (call-interactively 'clipboard-kill-ring-save)
-        )
+    (progn
+      (message "Yanked region to x-clipboard!")
+      (call-interactively 'clipboard-kill-ring-save)
+      )
     (if (region-active-p)
-        (progn
-          (shell-command-on-region (region-beginning) (region-end) "xsel -i -b")
-          (message "Yanked region to clipboard!")
-          (deactivate-mark))
+      (progn
+        (shell-command-on-region (region-beginning) (region-end) "xsel -i -b")
+        (message "Yanked region to clipboard!")
+        (deactivate-mark))
       (message "No region active; can't yank to clipboard!")))
   )
 (global-set-key [f9] 'copy-to-clipboard)
@@ -394,11 +694,12 @@
 ;; *** Paste
 
 (defun paste-from-clipboard()
+  "Allow to paste from system clipboard."
   (if (display-graphic-p)
-      (progn
-        (clipboard-yank)
-        (message "graphics active")
-        )
+    (progn
+      (clipboard-yank)
+      (message "graphics active")
+      )
     (insert (shell-command-to-string "xsel -o -b")) ) )
 
 (global-set-key [f10] 'paste-from-clipboard)
@@ -411,22 +712,30 @@
 (use-package display-line-numbers
   :if (version<= "26.0.50" emacs-version)
   :ensure nil
-  :init
+  :config
   (setq display-line-numbers-grow-only t)
   (setq display-line-numbers-width-start t)
   (setq linum-format "%4d \u2502 ") ; 4 chars and a space with solid line separator
-  :config
-  ;;(global-display-line-numbers-mode)
-  ;; for some reason the hooks for diplay line numbers wont work if i put them in use-package `:hook'. it has to be after `:config'
+  ;; Explicitly define a width to reduce computation
+  (setq-default display-line-numbers-width 3)
+
+  ;; Show absolute line numbers for narrowed regions makes it easier to tell the
+  ;; buffer is narrowed, and where you are, exactly.
+  (setq-default display-line-numbers-widen t)
+
+  ;; Enable line numbers in most text-editing modes. We avoid
+  ;; `global-display-line-numbers-mode' because there are many special and
+  ;; temporary modes where we don't need/want them.
   (add-hook 'prog-mode-hook #'display-line-numbers-mode)
   (add-hook 'text-mode-hook #'display-line-numbers-mode)
+  (add-hook 'conf-mode-hook #'display-line-numbers-mode)
 
   ;; Select lines by click-dragging on the margin. Tested with GNU Emacs 23.3
   (defvar *linum-mdown-line* nil)
   (defun line-at-click ()
     (save-excursion
       (let ((click-y (cdr (cdr (mouse-position))))
-            (line-move-visual-store line-move-visual))
+             (line-move-visual-store line-move-visual))
         (setq line-move-visual t)
         (goto-char (window-start))
         (next-line (1- click-y))
@@ -439,7 +748,7 @@
     (goto-line (line-at-click))
     (set-mark (point))
     (setq *linum-mdown-line*
-          (line-number-at-pos)))
+      (line-number-at-pos)))
 
   (defun mu-select-linum ()
     (interactive)
@@ -451,7 +760,7 @@
         (set-mark (line-end-position))
         (goto-line (min *linum-mdown-line* mu-line))
         (setq *linum-mdown*
-              nil))))
+          nil))))
 
   (global-set-key (kbd "<left-margin> <down-mouse-1>") 'md-select-linum)
   (global-set-key (kbd "<left-margin> <mouse-1>") 'mu-select-linum)
@@ -479,12 +788,21 @@
 (use-package autorevert
   :ensure nil
   :hook
-  (after-init . global-auto-revert-mode)
+  ;; revert buffers when their files/state have changed
+  (focus-in . revert-buffer)
+  (after-save . revert-buffer)
+  (switch-buffer . revert-buffer)
+  (switch-window . revert-buffer)
+  :preface
   :config
-  (setq auto-revert-interval 0.5)
-  (setq auto-revert-interval 2)
+  (setq auto-revert-verbose t) ; let us know when it happens
+  (setq auto-revert-use-notify nil)
+  (setq auto-revert-stop-on-user-input nil)
+  ;; Only prompts for confirmation when buffer is unsaved.
+  (setq revert-without-query (list "."))
+  (setq auto-revert-interval 1) ;; rever every 1 second
   (setq auto-revert-check-vc-info t)
-  (setq auto-revert-verbose nil)
+
   )
 
 ;; refresh buffer with F5
@@ -558,151 +876,179 @@
 
 ;; ** Use unix-conf-mode for .*rc files
 
-(use-package conf-mode
-  :mode
-  (;; systemd
-   ("\\.service\\'"     . conf-unix-mode)
-   ("\\.timer\\'"      . conf-unix-mode)
-   ("\\.target\\'"     . conf-unix-mode)
-   ("\\.mount\\'"      . conf-unix-mode)
-   ("\\.automount\\'"  . conf-unix-mode)
-   ("\\.slice\\'"      . conf-unix-mode)
-   ("\\.socket\\'"     . conf-unix-mode)
-   ("\\.path\\'"       . conf-unix-mode)
+  (use-package conf-mode
+    :mode
+    (;; systemd
+      ("\\.service\\'"     . conf-unix-mode)
+      ("\\.timer\\'"      . conf-unix-mode)
+      ("\\.target\\'"     . conf-unix-mode)
+      ("\\.mount\\'"      . conf-unix-mode)
+      ("\\.automount\\'"  . conf-unix-mode)
+      ("\\.slice\\'"      . conf-unix-mode)
+      ("\\.socket\\'"     . conf-unix-mode)
+      ("\\.path\\'"       . conf-unix-mode)
 
-   ;; general
-   ("conf\\(ig\\)?$"   . conf-mode)
-   ("rc$"              . conf-mode))
-  )
-;; (add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode))
-
-
-;; ** iedit
-
-(use-package iedit
-  :config
-  (set-face-background 'iedit-occurrence "Magenta")
-  :bind
-  ("C-;" . iedit-mode)
-  )
+      ;; general
+      ("conf\\(ig\\)?$"   . conf-mode)
+      ("rc$"              . conf-mode))
+    )
+  ;; (add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode))
 
 
-;; ** eldoc
-;; Enable documentation for programming languages
+  ;; ** iedit
+
+  (use-package iedit
+    :config
+    (set-face-background 'iedit-occurrence "Magenta")
+    :bind
+    ("C-;" . iedit-mode)
+    )
 
 
-(use-package eldoc
-  :ensure nil
-  :diminish
-  :hook
-  (prog-mode . eldoc-mode)
-  ;;(prog-mode       . turn-on-eldoc-mode)
-  ;; (cider-repl-mode . turn-on-eldoc-mode)
-  :config
-  ;; (global-eldoc-mode -1)
-  ;; (add-hook 'prog-mode-hook 'eldoc-mode)
-  (setq eldoc-idle-delay 0.4)
-  )
+  ;; ** eldoc
+  ;; Enable documentation for programming languages
 
 
-;; *** eldoc-box
-
-;; Show eldoc info in a childframe
-
-
-(use-package eldoc-box
-  :ensure t
-  :after eldoc
-  :custom-face
-  ;;(eldoc-box-border (t (:background "#202020"))))
-  ;;(eldoc-box-body (t (:background "#202020"))))
-  :config
-  ;;(setq eldoc-box-max-pixel-width)
-  ;;(setq eldoc-box-max-pixel-height)
-  (setq eldoc-box-only-multi-line nil)   ;;  Set this to non-nil and eldoc-box only display multi-line message in childframe. One line messages are left in minibuffer.
-  ;; (eldoc-box-hover-mode)
-  (eldoc-box-hover-at-point-mode)
-  )
+  (use-package eldoc
+    :ensure nil
+    :diminish
+    :hook
+    (prog-mode . eldoc-mode)
+    ;;(prog-mode       . turn-on-eldoc-mode)
+    ;; (cider-repl-mode . turn-on-eldoc-mode)
+    :config
+    ;; (global-eldoc-mode -1)
+    ;; (add-hook 'prog-mode-hook 'eldoc-mode)
+    (setq eldoc-idle-delay 0.4)
+    )
 
 
-;; ** aggressive-indent-mode
+  ;; *** eldoc-box
 
-(use-package aggressive-indent
-  :ensure t
-  :defer t
-  :custom
-  (aggressive-indent-comments-too t)
-  :hook
-  (emacs-lisp-mode . aggressive-indent-mode)
-  :config
-  )
+  ;; Show eldoc info in a childframe
 
 
-;; ** interactive-align
-
-;; Keymap used in the minibuffer when ialign command is executed.
-;; |---------+--------------------------|
-;; | Key     | Command                  |
-;; |---------+--------------------------|
-;; | C-c C-r | ialign-toggle-repeat     |
-;; | C-c C-t | ialign-toggle-tabs       |
-;; | C-c M-c | ialign-toggle-case-fold  |
-;; | C-c +   | ialign-increment-spacing |
-;; | C-c -   | ialign-decrement-spacing |
-;; | C-c [   | ialign-decrement-group   |
-;; | C-c ]   | ialign-increment-group   |
-;; | C-c C-f | ialign-set-group         |
-;; | C-c C-s | ialign-set-spacing       |
-;; | C-c RET | ialign-commit            |
-;; | C-c C-c | ialign-update            |
-;; | C-c ?   | ialign-show-help         |
-;; |---------+--------------------------|
+  (use-package eldoc-box
+    :ensure t
+    :after eldoc
+    :custom-face
+    ;;(eldoc-box-border (t (:background "#202020"))))
+    ;;(eldoc-box-body (t (:background "#202020"))))
+    :config
+    ;;(setq eldoc-box-max-pixel-width)
+    ;;(setq eldoc-box-max-pixel-height)
+    (setq eldoc-box-only-multi-line nil)   ;;  Set this to non-nil and eldoc-box only display multi-line message in childframe. One line messages are left in minibuffer.
+    ;; (eldoc-box-hover-mode)
+    (eldoc-box-hover-at-point-mode)
+    )
 
 
-(use-package ialign
-  :ensure t
-  :bind
-  ("C-x l" . ialign)
-  :config
-  ;;(setq ialign-default-spacing 32)
-  (setq ialign-align-with-tabs nil) ;; default nil
-  (setq ialign-auto-update t) ;; default t
-  )
+  ;; ** aggressive-indent-mode
+
+  (use-package aggressive-indent
+    :ensure t
+    :defer t
+    :custom
+    (aggressive-indent-comments-too t)
+    :hook
+    (emacs-lisp-mode . aggressive-indent-mode)
+    :config
+    )
 
 
-;; ** align.el
+  ;; ** interactive-align
 
-;; align text to a specific column, by regexp
+  ;; Keymap used in the minibuffer when ialign command is executed.
+  ;; |---------+--------------------------|
+  ;; | Key     | Command                  |
+  ;; |---------+--------------------------|
+  ;; | C-c C-r | ialign-toggle-repeat     |
+  ;; | C-c C-t | ialign-toggle-tabs       |
+  ;; | C-c M-c | ialign-toggle-case-fold  |
+  ;; | C-c +   | ialign-increment-spacing |
+  ;; | C-c -   | ialign-decrement-spacing |
+  ;; | C-c [   | ialign-decrement-group   |
+  ;; | C-c ]   | ialign-increment-group   |
+  ;; | C-c C-f | ialign-set-group         |
+  ;; | C-c C-s | ialign-set-spacing       |
+  ;; | C-c RET | ialign-commit            |
+  ;; | C-c C-c | ialign-update            |
+  ;; | C-c ?   | ialign-show-help         |
+  ;; |---------+--------------------------|
 
-;; This mode allows you to align regions in a context-sensitive fashion.
-;; The classic use is to align assignments:
 
-;; int a = 1;
-;; short foo = 2;
-;; double blah = 4;
-
-;; becomes
-
-;; int    a    = 1;
-;; short  foo  = 2;
-;; double blah = 4;
+  (use-package ialign
+    :ensure t
+    :bind
+    ("C-x l" . ialign)
+    :config
+    ;;(setq ialign-default-spacing 32)
+    (setq ialign-align-with-tabs nil) ;; default nil
+    (setq ialign-auto-update t) ;; default t
+    )
 
 
-(defun align-values (start end)
-  "Vertically aligns region based on lengths of the first value of each line.
+  ;; ** align.el
+
+  ;; align text to a specific column, by regexp
+
+  ;; This mode allows you to align regions in a context-sensitive fashion.
+  ;; The classic use is to align assignments:
+
+  ;; int a = 1;
+  ;; short foo = 2;
+  ;; double blah = 4;
+
+  ;; becomes
+
+  ;; int    a    = 1;
+  ;; short  foo  = 2;
+  ;; double blah = 4;
+
+
+  (defun align-values (start end)
+    "Vertically aligns region based on lengths of the first value of each line.
 Example output:
 
 	foo        bar
 	foofoo     bar
 	foofoofoo  bar"
-  (interactive "r")
-  (align-regexp start end
-                "\\S-+\\(\\s-+\\)"
-                1 1 nil))
+    (interactive "r")
+    (align-regexp start end
+      "\\S-+\\(\\s-+\\)"
+      1 1 nil))
 
 
+;; ** better-jumper
+(use-package better-jumper
+  :preface
+  ;; REVIEW Suppress byte-compiler warning spawning a *Compile-Log* buffer at
+  ;; startup. This can be removed once gilbertw1/better-jumper#2 is merged.
+  (defvar better-jumper-local-mode nil)
+  :init
+  (global-set-key [remap evil-jump-forward]  #'better-jumper-jump-forward)
+  (global-set-key [remap evil-jump-backward] #'better-jumper-jump-backward)
+  (global-set-key [remap xref-pop-marker-stack] #'better-jumper-jump-backward)
+  :config
+  (better-jumper-mode +1)
+  (add-hook 'better-jumper-post-jump-hook #'recenter)
+  )
 
+;; ** dtrt
 
+(use-package dtrt-indent
+  ;; Automatic detection of indent settings
+  :defer t
+  :config
+  ;; Enable dtrt-indent even in smie modes so that it can update `tab-width',
+  ;; `standard-indent' and `evil-shift-width' there as well.
+  (setq dtrt-indent-run-after-smie t)
+  ;; Reduced from the default of 5000 for slightly faster analysis
+  (setq dtrt-indent-max-lines 2000)
+
+  ;; always keep tab-width up-to-date
+  (push '(t tab-width) dtrt-indent-hook-generic-mapping-list)
+  )
 ;; ** align-regexp
 
 
@@ -736,10 +1082,10 @@ Example output:
   ;;("M-g z" . dumb-jump-go-prefer-external-other-window)
   ;;("M-S-h d" . dumb-jump-hydra/body)
   (:map prog-mode-map
-        ("C-c C-o" . dumb-jump-go-other-window)
-        ("C-c C-j" . dumb-jump-go)
-        ("C-c C-b" . dumb-jump-back)
-        ("C-c C-i" . dumb-jump-go-prompt))
+    ("C-c C-o" . dumb-jump-go-other-window)
+    ("C-c C-j" . dumb-jump-go)
+    ("C-c C-b" . dumb-jump-back)
+    ("C-c C-i" . dumb-jump-go-prompt))
   :custom
   (dumb-jump-selector 'ivy)
   :config
@@ -752,8 +1098,12 @@ Example output:
 
 ;; Delete trailing whitespace on save
 
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
-
+;; (add-hook 'before-save-hook 'delete-trailing-whitespace)
+(use-package ws-butler
+  ;; a less intrusive `delete-trailing-whitespaces' on save
+  :config
+  (ws-butler-global-mode +1)
+  )
 
 ;; * Native Command Remappings
 
@@ -803,14 +1153,14 @@ Example output:
 (defun downcase-backward-word (arg)
   (interactive "p")
   (downcase-word (- arg))
-)
+  )
 
 
 
 (defun capitalize-backward-word (arg)
   (interactive "p")
   (capitalize-word (- arg))
-)
+  )
 
 
 
@@ -850,11 +1200,11 @@ Example output:
   )
 
 (defun cycle-ispell-languages ()
-   (interactive)
-   (let ((lang (ring-ref lang-ring -1)))
-     (ring-insert lang-ring lang)
-     (ispell-change-dictionary lang))
-)
+  (interactive)
+  (let ((lang (ring-ref lang-ring -1)))
+    (ring-insert lang-ring lang)
+    (ispell-change-dictionary lang))
+  )
 
 (global-set-key (kbd "<f12>")   'cycle-ispell-languages)
 
@@ -923,7 +1273,7 @@ Example output:
   ;; :init (add-hook 'text-mode-hook #'guess-language-mode)
   :config
   (setq guess-language-langcodes '((en . ("en_US" "English"))
-                                   (pt . ("pt_BR" "Portuguese Brazilian"))))
+                                    (pt . ("pt_BR" "Portuguese Brazilian"))))
   (setq guess-language-languages '(en pt))
   (setq guess-language-min-paragraph-length 45)
   )
@@ -1011,12 +1361,12 @@ Example output:
 
   ;; customize the right-click-context-menu
   (let ((right-click-context-local-menu-tree
-         (append right-click-context-global-menu-tree
-                 '(("Insert"
-                    ("Go to definition" :call (lsp-goto-type-definition)
-                     ("FooBar" :call (insert "FooBar"))
-                     )))))
-        (right-click-context-menu)))
+          (append right-click-context-global-menu-tree
+            '(("Insert"
+                ("Go to definition" :call (lsp-goto-type-definition)
+                  ("FooBar" :call (insert "FooBar"))
+                  )))))
+         (right-click-context-menu)))
   )
 
 
@@ -1027,11 +1377,11 @@ Example output:
 
 ;; mouse scrolls are binded differently depending on the system
 (if (eq system-type 'gnu/linux)
-    (global-set-key (kbd "<C-mouse-4>") 'text-scale-increase)
+  (global-set-key (kbd "<C-mouse-4>") 'text-scale-increase)
   (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
   )
 (if (eq system-type 'windows-nt)
-    (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+  (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
   (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
   )
 (global-set-key [?\C-=] 'text-scale-increase)
@@ -1048,16 +1398,16 @@ Example output:
   ("<C-return>" . hippie-expand)
   ("C-M-SPC" . hippie-expand)
   (:map evil-insert-state-map
-        ("<tab>" . hippie-expand)
-        )
+    ("<tab>" . hippie-expand)
+    )
   :config
   (setq-default hippie-expand-try-functions-list
-                '(yas-hippie-try-expand
-                  company-indent-or-complete-common
-                  emmet-expand-yas
-                  emmet-expand-line
-                  indent-according-to-mode
-                  ))
+    '(yas-hippie-try-expand
+       company-indent-or-complete-common
+       emmet-expand-yas
+       emmet-expand-line
+       indent-according-to-mode
+       ))
   )
 
 
@@ -1382,15 +1732,15 @@ Example output:
   :after evil
   :bind
   (:map evil-visual-state-map
-        ("C-d" . mc/mark-next-like-this)
-        ("C-a" . mc/mark-all-like-this)
-        ("C-a" . mc/mark-all-like-this)
-        )
+    ("C-d" . mc/mark-next-like-this)
+    ("C-a" . mc/mark-all-like-this)
+    ("C-a" . mc/mark-all-like-this)
+    )
   (:map evil-visual-state-map
-        ("C-d" . evil-mc-make-and-goto-next-match) ;; Make a cursor at point and go to the next match of the selected region or the symbol under cursor.
-        ("C-a" . evil-mc-make-all-cursors) ;; Create cursors for all strings that match the selected region or the symbol under cursor.
-        ("C-q" . evil-mc-undo-all-cursors)  ;; Remove all cursors.
-        )
+    ("C-d" . evil-mc-make-and-goto-next-match) ;; Make a cursor at point and go to the next match of the selected region or the symbol under cursor.
+    ("C-a" . evil-mc-make-all-cursors) ;; Create cursors for all strings that match the selected region or the symbol under cursor.
+    ("C-q" . evil-mc-undo-all-cursors)  ;; Remove all cursors.
+    )
   :config
   (define-key evil-visual-state-map (kbd "mn") 'evil-mc-make-and-goto-next-match)
   (define-key evil-visual-state-map (kbd "ma") 'mc/mark-all-like-this-dwim)
@@ -1484,12 +1834,14 @@ Example output:
 
 (use-package evil-escape
   :ensure t
+  :diminish
   :config
   (evil-escape-mode)
   (setq-default evil-escape-key-sequence "jk")
   (setq-default evil-escape-delay 0.2)
   ;; (global-set-key (kbd "C-c C-g") 'evil-escape)
   (global-set-key [escape] 'evil-escape)
+  (global-set-key [remap keyboard-quit] 'evil-escape)
   )
 ;; * ORG-MODE
 
@@ -1627,7 +1979,7 @@ Example output:
   :after org
   :bind
   ("C-c o <f8>" . org-sidebar-tree-toggle)
-)
+  )
 
 ;; ** org-ql (required by org-sidebar)
 
@@ -1635,7 +1987,7 @@ Example output:
   :ensure t
   :defer t
   :after org
-)
+  )
 
 ;; ** ox-extra (org-plus-contrib)
 ;; add suport for the ignore tag (ignores a headline without ignoring its content)
@@ -1646,7 +1998,7 @@ Example output:
   :config
   (ox-extras-activate '(ignore-headlines))
   (ox-extras-activate '(latex-header-blocks ignore-headlines))
-)
+  )
 
 ;; ** ox-latex
 
@@ -1727,7 +2079,7 @@ Example output:
   :ensure nil
   :defer t
   :after org
-)
+  )
 
 
 ;; ** ox-gfm (github-flavored markdown)
@@ -1736,7 +2088,7 @@ Example output:
   :ensure t
   :defer t
   :after org
-)
+  )
 
 
 ;; **************************************************
@@ -1770,10 +2122,10 @@ Example output:
   "Opens up a new shell in the directory associated with the current buffer's file."
   (interactive)
   (let* ((parent (if (buffer-file-name)
-                     (file-name-directory (buffer-file-name))
+                   (file-name-directory (buffer-file-name))
                    default-directory))
-         (height (/ (window-total-height) 3))
-         (name   (car (last (split-string parent "/" t)))))
+          (height (/ (window-total-height) 3))
+          (name   (car (last (split-string parent "/" t)))))
     (split-window-vertically (- height))
     (other-window 1)
     (shell "new")
@@ -1782,7 +2134,7 @@ Example output:
     )
   )
 
-; Pull system shell in a new bottom window
+                                        ; Pull system shell in a new bottom window
 (define-key evil-normal-state-map (kbd "\"") #'/shell/new-window)
 (define-key evil-visual-state-map (kbd "\"") #'/shell/new-window)
 (define-key evil-motion-state-map (kbd "\"") #'/shell/new-window)
@@ -1794,10 +2146,10 @@ Example output:
   "Opens up a new eshell in the directory associated with the current buffer's file.  The eshell is renamed to match that directory to make multiple eshell windows easier."
   (interactive)
   (let* ((parent (if (buffer-file-name)
-                     (file-name-directory (buffer-file-name))
+                   (file-name-directory (buffer-file-name))
                    default-directory))
-         (height (/ (window-total-height) 3))
-         (name   (car (last (split-string parent "/" t)))))
+          (height (/ (window-total-height) 3))
+          (name   (car (last (split-string parent "/" t)))))
     (split-window-vertically (- height))
     (other-window 1)
     (eshell "new")
@@ -1823,10 +2175,10 @@ Example output:
   :diminish projectile-mode
   :bind
   (:map projectile-mode-map
-        ("s-p" . projectile-command-map)
-        ("C-c p" . projectile-command-map)
-        ("M-S-O p" . counsel-projectile-switch-project)
-        )
+    ("s-p" . projectile-command-map)
+    ("C-c p" . projectile-command-map)
+    ("M-S-O p" . counsel-projectile-switch-project)
+    )
   :custom
   (projectile-completion-system 'ivy)
   :init
@@ -1835,10 +2187,10 @@ Example output:
   :config
   (projectile-mode +1)
   (setq projectile-globally-ignored-files
-        (append '("~"
-                  ".swp"
-                  ".pyc")
-                projectile-globally-ignored-files))
+    (append '("~"
+               ".swp"
+               ".pyc")
+      projectile-globally-ignored-files))
   )
 
 
@@ -2133,8 +2485,8 @@ Example output:
   :load-path "packages/hydra-posframe"
   :custom
   (hydra-posframe-parameters
-   '((left-fringe . 5)
-     (right-fringe . 5)))
+    '((left-fringe . 5)
+       (right-fringe . 5)))
   :custom-face
   (hydra-posframe-border-face ((t (:background "#6272a4"))))
   :hook
@@ -2154,7 +2506,7 @@ Example output:
     (kbd "C-d")     'evil-scroll-down
     (kbd "C-u")     'evil-scroll-up
     (kbd "C-w C-w") 'other-window)
-)
+  )
 
 
 ;; **************************************************
@@ -2272,7 +2624,7 @@ Example output:
 (use-package diffview
   :ensure t
   :defer t
-)
+  )
 
 ;; ** magit-todo
 
@@ -2317,15 +2669,15 @@ Example output:
   :ensure t
   :bind
   ("C-c g t" . git-timemachine-toggle)
-)
+  )
 
 (use-package forge
   :ensure t
   :after magit
   :config
   (setq forge-topic-list-limit '(30 . 5)
-        forge-pull-notifications t)
-)
+    forge-pull-notifications t)
+  )
 
 ;; **************************************************
 
@@ -2340,10 +2692,10 @@ Example output:
   (progn
     ;; Add hook to override C-c C-c in this mode to stay in window
     (add-hook 'restclient-mode-hook
-              '(lambda ()
-                 (local-set-key
-                  (kbd "C-c C-c")
-                  'restclient-http-send-current-stay-in-window))))
+      '(lambda ()
+         (local-set-key
+           (kbd "C-c C-c")
+           'restclient-http-send-current-stay-in-window))))
   )
 
 
@@ -2358,8 +2710,8 @@ Example output:
   :config
   ;; add restclient to org-babel languages
   (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((restclient . t)))
+    'org-babel-load-languages
+    '((restclient . t)))
   )
 
 
@@ -2369,10 +2721,48 @@ Example output:
 
 (use-package undo-tree
   :ensure t
-  :diminish undo-tree-mode
-  :init
-  (global-undo-tree-mode)
-  ;;  (undo-tree-mode)
+  :diminish
+  :config
+  (setq undo-tree-visualizer-diff t
+    undo-tree-auto-save-history t
+    undo-tree-enable-undo-in-region t
+    ;; Increase undo-limits by a factor of ten to avoid emacs prematurely
+    ;; truncating the undo history and corrupting the tree. See
+    ;; https://github.com/syl20bnr/spacemacs/issues/12110
+    undo-limit 800000
+    undo-strong-limit 12000000
+    undo-outer-limit 120000000
+    undo-tree-history-directory-alist
+    `(("." . ,(concat cache-dir "undo-tree-hist/"))))
+
+  ;; ;; Compress undo-tree history files with zstd, if available. File size isn't
+  ;; ;; the (only) concern here: the file IO barrier is slow for Emacs to cross;
+  ;; ;; reading a tiny file and piping it in-memory through zstd is *slightly*
+  ;; ;; faster than Emacs reading the entire undo-tree file from the get go (on
+  ;; ;; SSDs). Whether or not that's true in practice, we still enjoy zstd's ~80%
+  ;; ;; file savings (these files add up over time and zstd is so incredibly fast).
+  ;; (when (executable-find "zstd")
+  ;;   (defadvice doom--undo-tree-make-history-save-file-name-a (file)
+  ;;     :filter-return #'undo-tree-make-history-save-file-name
+  ;;     (concat file ".zst")))
+
+  ;; ;; Strip text properties from undo-tree data to stave off bloat. File size
+  ;; ;; isn't the concern here; undo cache files bloat easily, which can cause
+  ;; ;; freezing, crashes, GC-induced stuttering or delays when opening files.
+  ;; (defadvice doom--undo-tree-strip-text-properties-a (&rest _)
+  ;;   :before #'undo-list-transfer-to-tree
+  ;;   (dolist (item buffer-undo-list)
+  ;;     (and (consp item)
+  ;;       (stringp (car item))
+  ;;       (setcar item (substring-no-properties (car item))))))
+
+  ;; ;; Undo-tree is too chatty about saving its history files. This doesn't
+  ;; ;; totally suppress it logging to *Messages*, it only stops it from appearing
+  ;; ;; in the echo-area.
+  ;; (advice-add #'undo-tree-save-history :around #'doom-shut-up-a)
+
+  (global-undo-tree-mode +1)
+
   )
 
 
@@ -2387,7 +2777,11 @@ Example output:
   (global-set-key (kbd "C-h f") #'helpful-callable)
   (global-set-key (kbd "C-h v") #'helpful-variable)
   (global-set-key (kbd "C-h k") #'helpful-key)
-
+  (global-set-key [remap describe-function] #'helpful-callable)
+  (global-set-key [remap describe-command]  #'helpful-command)
+  (global-set-key [remap describe-variable] #'helpful-variable)
+  (global-set-key [remap describe-key]      #'helpful-key)
+  (global-set-key [remap describe-symbol]   #'helpful-symbol)
   ;; Lookup the current symbol at point. C-c C-d is a common keybinding
   ;; for this in lisp modes.
   (global-set-key (kbd "C-c C-d") #'helpful-at-point)
@@ -2567,13 +2961,13 @@ If failed try to complete the common part with `company-complete-common'"
   :ensure t
   :diminish
   :functions (my-company-box--make-line
-              my-company-box-icons--elisp)
+               my-company-box-icons--elisp)
   :commands (company-box--get-color
-             company-box--resolve-colors
-             company-box--add-icon
-             company-box--apply-color
-             company-box--make-line
-             company-box-icons--elisp)
+              company-box--resolve-colors
+              company-box--add-icon
+              company-box--apply-color
+              company-box--make-line
+              company-box-icons--elisp)
   :hook ((global-company-mode company-mode) . company-box-mode)
   :custom
   (company-box-backends-colors nil)
@@ -2584,27 +2978,27 @@ If failed try to complete the common part with `company-complete-common'"
   ;; Support `company-common'
   (defun my-company-box--make-line (candidate)
     (-let* (((candidate annotation len-c len-a backend) candidate)
-            (color (company-box--get-color backend))
-            ((c-color a-color i-color s-color) (company-box--resolve-colors color))
-            (icon-string (and company-box--with-icons-p (company-box--add-icon candidate)))
-            (candidate-string (concat (propertize (or company-common "") 'face 'company-tooltip-common)
-                                      (substring (propertize candidate 'face 'company-box-candidate) (length company-common) nil)))
-            (align-string (when annotation
-                            (concat " " (and company-tooltip-align-annotations
-                                             (propertize " " 'display `(space :align-to (- right-fringe ,(or len-a 0) 1)))))))
-            (space company-box--space)
-            (icon-p company-box-enable-icon)
-            (annotation-string (and annotation (propertize annotation 'face 'company-box-annotation)))
-            (line (concat (unless (or (and (= space 2) icon-p) (= space 0))
-                            (propertize " " 'display `(space :width ,(if (or (= space 1) (not icon-p)) 1 0.75))))
-                          (company-box--apply-color icon-string i-color)
-                          (company-box--apply-color candidate-string c-color)
-                          align-string
-                          (company-box--apply-color annotation-string a-color)))
-            (len (length line)))
+             (color (company-box--get-color backend))
+             ((c-color a-color i-color s-color) (company-box--resolve-colors color))
+             (icon-string (and company-box--with-icons-p (company-box--add-icon candidate)))
+             (candidate-string (concat (propertize (or company-common "") 'face 'company-tooltip-common)
+                                 (substring (propertize candidate 'face 'company-box-candidate) (length company-common) nil)))
+             (align-string (when annotation
+                             (concat " " (and company-tooltip-align-annotations
+                                           (propertize " " 'display `(space :align-to (- right-fringe ,(or len-a 0) 1)))))))
+             (space company-box--space)
+             (icon-p company-box-enable-icon)
+             (annotation-string (and annotation (propertize annotation 'face 'company-box-annotation)))
+             (line (concat (unless (or (and (= space 2) icon-p) (= space 0))
+                             (propertize " " 'display `(space :width ,(if (or (= space 1) (not icon-p)) 1 0.75))))
+                     (company-box--apply-color icon-string i-color)
+                     (company-box--apply-color candidate-string c-color)
+                     align-string
+                     (company-box--apply-color annotation-string a-color)))
+             (len (length line)))
       (add-text-properties 0 len (list 'company-box--len (+ len-c len-a)
-                                       'company-box--color s-color)
-                           line)
+                                   'company-box--color s-color)
+        line)
       line))
   (advice-add #'company-box--make-line :override #'my-company-box--make-line)
 
@@ -2613,47 +3007,47 @@ If failed try to complete the common part with `company-complete-common'"
     (when (derived-mode-p 'emacs-lisp-mode)
       (let ((sym (intern candidate)))
         (cond ((fboundp sym) 'Function)
-              ((featurep sym) 'Module)
-              ((facep sym) 'Color)
-              ((boundp sym) 'Variable)
-              ((symbolp sym) 'Text)
-              (t . nil)))))
+          ((featurep sym) 'Module)
+          ((facep sym) 'Color)
+          ((boundp sym) 'Variable)
+          ((symbolp sym) 'Text)
+          (t . nil)))))
   (advice-add #'company-box-icons--elisp :override #'my-company-box-icons--elisp)
 
   (when (and (window-system)
-             (require 'all-the-icons nil t))
+          (require 'all-the-icons nil t))
     (declare-function all-the-icons-faicon 'all-the-icons)
     (declare-function all-the-icons-material 'all-the-icons)
     (declare-function all-the-icons-octicon 'all-the-icons)
     (setq company-box-icons-all-the-icons
-          `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.85 :v-adjust -0.2))
-            (Text . ,(all-the-icons-faicon "text-width" :height 0.8 :v-adjust -0.05))
-            (Method . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
-            (Function . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
-            (Constructor . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
-            (Field . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
-            (Variable . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
-            (Class . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
-            (Interface . ,(all-the-icons-material "share" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
-            (Module . ,(all-the-icons-material "view_module" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
-            (Property . ,(all-the-icons-faicon "wrench" :height 0.8 :v-adjust -0.05))
-            (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.85 :v-adjust -0.2))
-            (Value . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
-            (Enum . ,(all-the-icons-material "storage" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
-            (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.85 :v-adjust -0.2))
-            (Snippet . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2))
-            (Color . ,(all-the-icons-material "palette" :height 0.85 :v-adjust -0.2))
-            (File . ,(all-the-icons-faicon "file-o" :height 0.85 :v-adjust -0.05))
-            (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.85 :v-adjust -0.2))
-            (Folder . ,(all-the-icons-faicon "folder-open" :height 0.85 :v-adjust -0.05))
-            (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
-            (Constant . ,(all-the-icons-faicon "square-o" :height 0.85 :v-adjust -0.05))
-            (Struct . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
-            (Event . ,(all-the-icons-faicon "bolt" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-orange))
-            (Operator . ,(all-the-icons-material "control_point" :height 0.85 :v-adjust -0.2))
-            (TypeParameter . ,(all-the-icons-faicon "arrows" :height 0.8 :v-adjust -0.05))
-            (Template . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2)))
-          company-box-icons-alist 'company-box-icons-all-the-icons)))
+      `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.85 :v-adjust -0.2))
+         (Text . ,(all-the-icons-faicon "text-width" :height 0.8 :v-adjust -0.05))
+         (Method . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+         (Function . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+         (Constructor . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+         (Field . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
+         (Variable . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
+         (Class . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+         (Interface . ,(all-the-icons-material "share" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+         (Module . ,(all-the-icons-material "view_module" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+         (Property . ,(all-the-icons-faicon "wrench" :height 0.8 :v-adjust -0.05))
+         (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.85 :v-adjust -0.2))
+         (Value . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+         (Enum . ,(all-the-icons-material "storage" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+         (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.85 :v-adjust -0.2))
+         (Snippet . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2))
+         (Color . ,(all-the-icons-material "palette" :height 0.85 :v-adjust -0.2))
+         (File . ,(all-the-icons-faicon "file-o" :height 0.85 :v-adjust -0.05))
+         (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.85 :v-adjust -0.2))
+         (Folder . ,(all-the-icons-faicon "folder-open" :height 0.85 :v-adjust -0.05))
+         (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+         (Constant . ,(all-the-icons-faicon "square-o" :height 0.85 :v-adjust -0.05))
+         (Struct . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+         (Event . ,(all-the-icons-faicon "bolt" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-orange))
+         (Operator . ,(all-the-icons-material "control_point" :height 0.85 :v-adjust -0.2))
+         (TypeParameter . ,(all-the-icons-faicon "arrows" :height 0.8 :v-adjust -0.05))
+         (Template . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2)))
+      company-box-icons-alist 'company-box-icons-all-the-icons)))
 ;; -CompanyBoxPac
 
 
@@ -2786,20 +3180,20 @@ If failed try to complete the common part with `company-complete-common'"
   ;; ("<tab>" . yas-maybe-expand)
   ("C-<tab>" . yas-maybe-expand)
   (:map yas-minor-mode-map
-        ;; yas-maybe-expand only expands if there are candidates.
-        ;; if not, acts like binding is unbound and run whatever command is bound to that key normally
-        ;; ("<tab>" . yas-maybe-expand)
-        ;; Bind `C-c y' to `yas-expand' ONLY.
-        ("C-c y" . yas-expand)
-        ("C-SPC" . yas-expand)
-        )
+    ;; yas-maybe-expand only expands if there are candidates.
+    ;; if not, acts like binding is unbound and run whatever command is bound to that key normally
+    ;; ("<tab>" . yas-maybe-expand)
+    ;; Bind `C-c y' to `yas-expand' ONLY.
+    ("C-c y" . yas-expand)
+    ("C-SPC" . yas-expand)
+    )
   :config
   ;; set snippets directory
   ;;  (setq yas-snippet-dirs '(yasnippet-snippets-dir))
   ;; add angular snippets folder
   (with-eval-after-load 'yasnippets-snippets
     (setq yas-snippet-dirs (append yas-snippet-dirs
-                                   '("~/dotfiles/emacs.d/snippets/angular/"))))
+                             '("~/dotfiles/emacs.d/snippets/angular/"))))
   (setq yas-verbosity 1)                      ; No need to be so verbose
   (setq yas-wrap-around-region t)
   (yas-reload-all) ;; tell yasnippet about updates to yas-snippet-dirs
@@ -2856,13 +3250,13 @@ If failed try to complete the common part with `company-complete-common'"
   (after-init . treemacs)
   :bind
   (:map global-map
-        ("<f8>"       . treemacs)
-        ("M-0"       . treemacs-select-window)
-        ("C-x t 1"   . treemacs-delete-other-windows)
-        ("C-x t t"   . treemacs)
-        ("C-x t B"   . treemacs-bookmark)
-        ("C-x t C-t" . treemacs-find-file)
-        ("C-x t M-t" . treemacs-find-tag))
+    ("<f8>"       . treemacs)
+    ("M-0"       . treemacs-select-window)
+    ("C-x t 1"   . treemacs-delete-other-windows)
+    ("C-x t t"   . treemacs)
+    ("C-x t B"   . treemacs-bookmark)
+    ("C-x t C-t" . treemacs-find-file)
+    ("C-x t M-t" . treemacs-find-tag))
   :custom
   ;; general variables
   (treemacs-no-png-images nil)
@@ -2912,18 +3306,18 @@ If failed try to complete the common part with `company-complete-common'"
   (treemacs-filewatch-mode t)
   (treemacs-fringe-indicator-mode t)
   (pcase (cons (not (null (executable-find "git")))
-               (not (null treemacs-python-executable)))
+           (not (null treemacs-python-executable)))
     (`(t . t)
-     (treemacs-git-mode 'deferred))
+      (treemacs-git-mode 'deferred))
     (`(t . _)
-     (treemacs-git-mode 'simple)))
+      (treemacs-git-mode 'simple)))
 
   ;; my vscode icon theme, using vscode-icons
   ;; i just placed the vscode-icons folder inside the treemacs icons vfolder and changed paths
   (defcustom tau-themes-treemacs-theme "vscode"
     "Default treemacs theme."
     :type '(radio (const :doc "A minimalistic atom-inspired icon theme" "doom-atom")
-                  (const :doc "A colorful icon theme leveraging all-the-icons" "doom-colors"))
+             (const :doc "A colorful icon theme leveraging all-the-icons" "doom-colors"))
     :group 'tau-themes-treemacs)
 
   ;; warn if all-the-icons isnt sinstalled
@@ -2939,8 +3333,8 @@ If failed try to complete the common part with `company-complete-common'"
           ;; directory and other icons
           ;; (treemacs-create-icon :file "root.png"        :extensions (root)       :fallback "")
           (treemacs-create-icon
-           :icon (format " %s\t" (all-the-icons-octicon "repo" :height 1.2 :v-adjust -0.1 :face face-spec))
-           :extensions (root))
+            :icon (format " %s\t" (all-the-icons-octicon "repo" :height 1.2 :v-adjust -0.1 :face face-spec))
+            :extensions (root))
           (treemacs-create-icon :file "vscode/default_folder.png"  :extensions (dir-closed) :fallback (propertize "+ " 'face 'treemacs-term-node-face))
           (treemacs-create-icon :file "vscode/default_folder_opened.png"    :extensions (dir-open)   :fallback (propertize "- " 'face 'treemacs-term-node-face))
           (treemacs-create-icon :file "tags-leaf.png"   :extensions (tag-leaf)   :fallback (propertize "• " 'face 'font-lock-constant-face))
@@ -3053,7 +3447,7 @@ If failed try to complete the common part with `company-complete-common'"
 (use-package treemacs-evil
   :after treemacs evil
   :ensure t
-)
+  )
 
 
 ;; *** Treemacs Projectile
@@ -3100,18 +3494,21 @@ If failed try to complete the common part with `company-complete-common'"
 
 ;; * Appearance / UI
 
-;; ** scroll bars from frames
+;; Underline looks a bit better when drawn lower
+(setq x-underline-at-descent-line t)
+
+;; scroll bars from frames
 (scroll-bar-mode -1)
 
-;; ** Remove menu bar and tool bar
+;; Remove menu bar and tool bar
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 
-;; ** set background and foreground color
+;; set background and foreground color
 (set-background-color "#111111")
 (set-foreground-color "#dddddd")
 
-;; ** Applying my theme
+;; Applying my theme
 (add-to-list 'custom-theme-load-path "~/dotfiles/emacs.d/themes/")
                                         ; theme options:
                                         ; atom-one-dark (doenst work well with emacsclient, ugly blue bg)
@@ -3132,6 +3529,7 @@ If failed try to complete the common part with `company-complete-common'"
 
 (use-package vi-tilde-fringe
   :ensure t
+  :diminish
   :config
   (global-vi-tilde-fringe-mode)
   )
@@ -3156,10 +3554,10 @@ If failed try to complete the common part with `company-complete-common'"
 ;; define list of fonts to be used in the above function
 ;; the first one found will be used
 (set-face-attribute 'default nil :font (font-candidate '"Hack-10:weight=normal"
-                                                       "Consolas-10:weight=normal"
-                                                       "Droid Sans Mono-10:weight=normal"
-                                                       "DejaVu Sans Mono-10:weight=normal"
-                                                       "Ubuntu Mono-12:weight=normal"))
+                                         "Consolas-10:weight=normal"
+                                         "Droid Sans Mono-10:weight=normal"
+                                         "DejaVu Sans Mono-10:weight=normal"
+                                         "Ubuntu Mono-12:weight=normal"))
 
 ;; ** Increase, decrease and adjust font size
 (global-set-key (kbd "C-S-+") #'text-scale-increase)
@@ -3170,7 +3568,17 @@ If failed try to complete the common part with `company-complete-common'"
 
 ;; ** All The Icons - Icon package
 
-(use-package all-the-icons :if window-system :ensure t)
+(use-package all-the-icons
+  :if window-system
+  :ensure t
+  :commands
+  (all-the-icons-octicon
+    all-the-icons-faicon
+    all-the-icons-fileicon
+    all-the-icons-wicon
+    all-the-icons-material
+    all-the-icons-alltheicon)
+  )
 
 
 ;; ** vscode-icons
@@ -3178,7 +3586,7 @@ If failed try to complete the common part with `company-complete-common'"
 (use-package vscode-icon
   :ensure t
   :commands (vscode-icon-for-file)
-)
+  )
 
 ;; ** Add some information about buffer boundaries in the left fringe.
 
@@ -3256,7 +3664,7 @@ If failed try to complete the common part with `company-complete-common'"
   :disabled
   :ensure t
   :config (dimmer-mode)
-)
+  )
 
 ;; **************************************************
 
@@ -3285,12 +3693,12 @@ If failed try to complete the common part with `company-complete-common'"
   (after-init . eyebrowse-mode)
   :bind
   (:map eyebrowse-mode-map
-        ("M-1" . eyebrowse-switch-to-window-config-1)
-        ("M-2" . eyebrowse-switch-to-window-config-2)
-        ("M-3" . eyebrowse-switch-to-window-config-3)
-        ("M-4" . eyebrowse-switch-to-window-config-4)
-        ("H-<right>" . eyebrowse-next-window-config)
-        ("H-<left>" . eyebrowse-prev-window-config))
+    ("M-1" . eyebrowse-switch-to-window-config-1)
+    ("M-2" . eyebrowse-switch-to-window-config-2)
+    ("M-3" . eyebrowse-switch-to-window-config-3)
+    ("M-4" . eyebrowse-switch-to-window-config-4)
+    ("H-<right>" . eyebrowse-next-window-config)
+    ("H-<left>" . eyebrowse-prev-window-config))
   :config
   ;;(define-key eyebrowse-mode-map (kbd "M-1") 'eyebrowse-switch-to-window-config-1)
   ;;(define-key eyebrowse-mode-map (kbd "M-2") 'eyebrowse-switch-to-window-config-2)
@@ -3337,10 +3745,10 @@ If failed try to complete the common part with `company-complete-common'"
     (interactive)
     (progn
       (if is-window-maximized
-          (balance-windows)
+        (balance-windows)
         (maximize-window))
       (setq is-window-maximized
-            (not is-window-maximized))))
+        (not is-window-maximized))))
   (defun hydra-title(title) (propertize title 'face `(:inherit font-lock-warning-face :weight bold)))
   (defun command-name(title) (propertize title 'face `(:foreground "#f8f8f2")))
   (defun spacer() (propertize "." 'face `(:foreground "#282a36")))
@@ -3348,7 +3756,7 @@ If failed try to complete the common part with `company-complete-common'"
   (with-eval-after-load 'hydra
     (defhydra hydra-frame-window (:color blue :hint nil)
       (format
-       (format "%s" (propertize "                                                                       ╔════════╗
+        (format "%s" (propertize "                                                                       ╔════════╗
   ((%s))^^^^^^^^   ((%s))^^^^  ((%s))^^  ((%s))^^  ((%s))^^^^^^  ((%s))^   ║ Window ║
 ^^^^^^ ──────────────────────────────────────────────────────────────────────╨────────╜
       ^_k_^        %s_+_         _-_       %s     _,_ ← %s → _._^  %s
@@ -3358,29 +3766,29 @@ If failed try to complete the common part with `company-complete-common'"
       ^_j_^        %s_=_         _/_       %s
 ^^^^^^ ┌──────────────────────────────────────────────────────────────────────────────┘
                          [_q_]: %s, [_<SPC>_]: %s" 'face `(:inherit font-lock-doc-face)))
-       (hydra-title "Size")
-       (hydra-title "Zoom")
-       (hydra-title "Split")
-       (hydra-title "Window")
-       (hydra-title "Buffer")
-       (hydra-title "Misc")
-       (all-the-icons-material "zoom_in" :height .85 :face 'font-lock-doc-face)
-       (command-name "_o_ther")
-       (command-name "page")
-       (command-name "_r_centf")
-       (command-name "_s_wap")
-       (all-the-icons-faicon "slideshare" :height .85 :face 'font-lock-doc-face)
-       (command-name "_p_mode")
-       (command-name "w_i_ndow")
-       (command-name "_m_aximize")
-       (command-name "_s_witch")
-       (command-name "_d_elete")
-       (command-name "_D_elete")
-       (all-the-icons-material "zoom_out" :height .85 :face 'font-lock-doc-face)
-       (command-name "del_O_thers")
-       (command-name "quit")
-       (command-name "rotate")
-       )
+        (hydra-title "Size")
+        (hydra-title "Zoom")
+        (hydra-title "Split")
+        (hydra-title "Window")
+        (hydra-title "Buffer")
+        (hydra-title "Misc")
+        (all-the-icons-material "zoom_in" :height .85 :face 'font-lock-doc-face)
+        (command-name "_o_ther")
+        (command-name "page")
+        (command-name "_r_centf")
+        (command-name "_s_wap")
+        (all-the-icons-faicon "slideshare" :height .85 :face 'font-lock-doc-face)
+        (command-name "_p_mode")
+        (command-name "w_i_ndow")
+        (command-name "_m_aximize")
+        (command-name "_s_witch")
+        (command-name "_d_elete")
+        (command-name "_D_elete")
+        (all-the-icons-material "zoom_out" :height .85 :face 'font-lock-doc-face)
+        (command-name "del_O_thers")
+        (command-name "quit")
+        (command-name "rotate")
+        )
 
       ("K" kill-current-buffer :exit t)
       ("D" kill-buffer-and-window :exit t)
@@ -3457,16 +3865,16 @@ If failed try to complete the common part with `company-complete-common'"
   :ensure t
   :bind
   (("C-s" . swiper-isearch)
-   :map swiper-map
-   ("M-q" . swiper-query-replace)
-   ("C-l". swiper-recenter-top-bottom)
-   ("C-'" . swiper-avy))
+    :map swiper-map
+    ("M-q" . swiper-query-replace)
+    ("C-l". swiper-recenter-top-bottom)
+    ("C-'" . swiper-avy))
   :custom
   (counsel-grep-swiper-limit 20000)
   (counsel-rg-base-command
-   "rg -i -M 120 --no-heading --line-number --color never %s .")
+    "rg -i -M 120 --no-heading --line-number --color never %s .")
   (counsel-grep-base-command
-   "rg -i -M 120 --no-heading --line-number --color never '%s' %s")
+    "rg -i -M 120 --no-heading --line-number --color never '%s' %s")
   )
 
 ;; ** avy
@@ -3485,11 +3893,11 @@ If failed try to complete the common part with `company-complete-common'"
   ("M-g w" . avy-goto-word-1)
   ("M-g e" . avy-goto-word-0)
   (:map isearch-mode-map
-        ("C-'" . avy-search))
+    ("C-'" . avy-search))
   (:map evil-normal-state-map
-        ("SPC" . avy-goto-char))
+    ("SPC" . avy-goto-char))
   (:map evil-visual-state-map
-        ("SPC" . avy-goto-char))
+    ("SPC" . avy-goto-char))
   :config
   (global-set-key [remap goto-char] 'avy-goto-char)
   (setq avy-background nil) ;; default nil ;; gray background will be added during the selection.
@@ -3507,7 +3915,7 @@ If failed try to complete the common part with `company-complete-common'"
   :ensure t
   :config
   (global-set-key [remap goto-line] 'goto-line-preview)
-)
+  )
 
 ;; * miniwindow and minibuffer
 
@@ -3523,7 +3931,7 @@ If failed try to complete the common part with `company-complete-common'"
 ;; * MODELINE AND HEADERLINE
 
 ;; Modeline colors
-(set-face-attribute 'mode-line nil :height tau/font-size-mode-line)
+(set-face-attribute 'mode-line nil :height font-size/mode-line)
 (set-face-attribute 'mode-line nil
   :background color/modeline-active-bg
   :foreground color/modeline-active-fg
@@ -3549,22 +3957,16 @@ If failed try to complete the common part with `company-complete-common'"
     evil-mode-line-tag
     ;; ------------------------------
     "| "
-    "modeline-front-space: "
+    "front-space: "
     mode-line-front-space
     ;; ------------------------------
     "| "
-    "modeline-mule-info: "
+    "mule-info: "
     mode-line-mule-info
     ;; ------------------------------
     "| "
-    "modeline-modified: "
+    "buffer status: "
     mode-line-modified
-    ;; ------------------------------
-    ;; This variable identifies the current frame. Its default value displays " " if you are using a window system which can show multiple frames, or "-%F " on an ordinary terminal which shows only one frame at a time.
-    "| "
-
-    "modeline-frameid: "
-    mode-line-frame-identification
     "| "
     mode-line-buffer-identification
     "teste aqui"
@@ -3682,10 +4084,11 @@ If failed try to complete the common part with `company-complete-common'"
 
 ;; ** evil-anzu
 
-(use-package evil-anzu
-  :ensure t
-  :after evil
-  )
+;; (use-package evil-anzu
+;;   :ensure t
+;;   :after evil
+;;   )
+
 ;; ** hide mode line mode
 
 (use-package hide-mode-line
@@ -3712,7 +4115,7 @@ If failed try to complete the common part with `company-complete-common'"
   (setq mini-modeline-frame nil) ;; default nil ; Frame to display mini-modeline on. nil means current selected frame.
   (setq mini-modeline-truncate-p nil) ;; Truncates the mini-modeline to fit in one line.
   ;;(mini-modeline-mode t)
-)
+  )
 
 ;; ** minions
 
@@ -3740,7 +4143,7 @@ If failed try to complete the common part with `company-complete-common'"
   (define-key evil-normal-state-map (kbd "[r") 'parrot-rotate-prev-word-at-point)
   (define-key evil-normal-state-map (kbd "]r") 'parrot-rotate-next-word-at-point)
   (add-hook 'mu4e-index-updated-hook #'parrot-start-animation)
-)
+  )
 
 
 ;; ** nyan-mode
@@ -3793,14 +4196,14 @@ If failed try to complete the common part with `company-complete-common'"
   :config
   (setq savehist-save-minibuffer-history t)
   (setq savehist-additional-variables
-        '(kill-ring
-          search-ring
-          regexp-search-ring
-          last-kbd-macro
-          kmacro-ring
-          shell-command-history))
+    '(kill-ring
+       search-ring
+       regexp-search-ring
+       last-kbd-macro
+       kmacro-ring
+       shell-command-history))
   (savehist-mode)
-)
+  )
 
 
 ;; **************************************************
@@ -3818,13 +4221,13 @@ If failed try to complete the common part with `company-complete-common'"
   (dashboard-startup-banner 'logo) ;; values: ('oficial, 'logo, 1, 2, 3, or "path/to/image.png")
   ;; Set the title
   (dashboard-banner-logo-title
-   (format "Emacs ready in %.2f seconds with %d garbage collections."
-           (float-time
-            (time-subtract after-init-time before-init-time)) gcs-done))
+    (format "Emacs ready in %.2f seconds with %d garbage collections."
+      (float-time
+        (time-subtract after-init-time before-init-time)) gcs-done))
   ;; Set dashboard itens
   (dashboard-items '((recents  . 7)
-                     (bookmarks . 7)
-                     (agenda . 5)))
+                      (bookmarks . 7)
+                      (agenda . 5)))
   ;; Set dashboard as the inicial buffer on startup
   (initial-buffer-choice (lambda () (get-buffer dashboard-buffer-name)))
   ;; Content is not centered by default. To center, set
@@ -3837,41 +4240,41 @@ If failed try to complete the common part with `company-complete-common'"
   (dashboard-set-file-icons t)
   ;; set widgets to show
   (setq dashboard-items '((recents  . 5)
-                          (bookmarks . 5)
-                          (projects . 5)
-                          (agenda . 5)
-                          (registers . 5)))
+                           (bookmarks . 5)
+                           (projects . 5)
+                           (agenda . 5)
+                           (registers . 5)))
   ;; To show navigator below the banner
   (dashboard-set-navigator t)
   ;;To show info about the packages loaded and the init time:
   (dashboard-set-init-info t)
   ;; Set the navigator buttons
   (dashboard-navigator-buttons
-   (if (featurep 'all-the-icons)
-       `(((,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust -0.05)
+    (if (featurep 'all-the-icons)
+      `(((,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust -0.05)
            "dotfiles @ github" "Browse personal dotfiles"
            (lambda (&rest _) (browse-url "https://github.com/gugutz/dotfiles")))
           (,(all-the-icons-fileicon "elisp" :height 1.0 :v-adjust -0.1)
-           "Configuration" "" (lambda (&rest _) (edit-configs)))
+            "Configuration" "" (lambda (&rest _) (edit-configs)))
           (,(all-the-icons-faicon "cogs" :height 1.0 :v-adjust -0.1)
-           "Update packages" "" (lambda (&rest _) (auto-package-update-now)))))
-     `((("" "M-EMACS" "Browse M-EMACS Homepage"
-         (lambda (&rest _) (browse-url "https://github.com/gugutz/dotfiles")))
-        ("" "Configuration" "" (lambda (&rest _) (edit-configs)))
-        ("" "Update" "" (lambda (&rest _) (auto-package-update-now)))))))
+            "Update packages" "" (lambda (&rest _) (auto-package-update-now)))))
+      `((("" "M-EMACS" "Browse M-EMACS Homepage"
+           (lambda (&rest _) (browse-url "https://github.com/gugutz/dotfiles")))
+          ("" "Configuration" "" (lambda (&rest _) (edit-configs)))
+          ("" "Update" "" (lambda (&rest _) (auto-package-update-now)))))))
   :custom-face
   (dashboard-banner-logo-title ((t (:family "Love LetterTW" :height 123))))
   (dashboard-heading ((t (:foreground "#f1fa8c" :weight bold))))
   :config
   (dashboard-modify-heading-icons '((recents . "file-text")
-                                    (bookmarks . "book")))
+                                     (bookmarks . "book")))
   (dashboard-setup-startup-hook)
   ;; Open Dashboard function
   (defun open-dashboard ()
     "Open the *dashboard* buffer and jump to the first widget."
     (interactive)
     (if (get-buffer dashboard-buffer-name)
-        (kill-buffer dashboard-buffer-name))
+      (kill-buffer dashboard-buffer-name))
     (dashboard-insert-startupify-lists)
     (switch-to-buffer dashboard-buffer-name)
     (goto-char (point-min))
@@ -3892,10 +4295,10 @@ If failed try to complete the common part with `company-complete-common'"
   "Cycle the frame transparency from default to transparent."
   (interactive)
   (let ((transparency 85)
-        (opacity 100))
+         (opacity 100))
     (if (and (not (eq (frame-parameter nil 'alpha) nil))
-             (< (frame-parameter nil 'alpha) opacity))
-        (set-frame-parameter nil 'alpha opacity)
+          (< (frame-parameter nil 'alpha) opacity))
+      (set-frame-parameter nil 'alpha opacity)
       (set-frame-parameter nil 'alpha transparency))))
 
 (global-set-key (kbd "M-<f12> t") 'tau/toggle-window-transparency)
@@ -3987,13 +4390,12 @@ If failed try to complete the common part with `company-complete-common'"
   (show-paren-match ((nil (:background "#44475a" :foreground "#f1fa8c")))) ;; :box t
   (show-paren-mismatch ((nil (:background "red" :foreground "black")))) ;; :box t
   :custom
-  (show-paren-delay 0)
+  (show-paren-delay 0.1)
   (show-paren-style 'mixed)
+  (show-paren-highlight-openparen t)
   (show-paren-when-point-inside-paren t)
   (show-paren-when-point-in-periphery t)
   :config
-  ;; (set-face-background 'show-paren-mismatch "red")
-  ;; (set-face-background 'show-paren-match "#4445e0")
   (show-paren-mode +1)
   )
 
@@ -4017,7 +4419,7 @@ If failed try to complete the common part with `company-complete-common'"
   ;;     (face-remap-add-relative 'font-lock-string-face '((:slant italic)))
   ;;     (face-remap-add-relative 'font-lock-constant-face '((:weight bold))))
   ;;   (add-hook 'color-identifiers-mode-hook 'myfunc-color-identifiers-mode-hook)
-)
+  )
 
 
 ;; ** Highlighting numbers
@@ -4028,7 +4430,7 @@ If failed try to complete the common part with `company-complete-common'"
   :defer t
   :hook
   (prog-mode . highlight-numbers-mode)
-)
+  )
 
 ;; ** Highlighting operators
 
@@ -4141,6 +4543,8 @@ If failed try to complete the common part with `company-complete-common'"
   :defer t
   :hook
   (prog-mode . rainbow-delimiters-mode)
+  :config
+  (setq rainbow-delimiters-max-face-count 3)
   )
 
 
@@ -4219,28 +4623,58 @@ If failed try to complete the common part with `company-complete-common'"
 
 
 ;; **************************************************
+;;
+;;; * Scrolling settings
 
-;; * Scrolling settings (currently trying M-EMACS settings for scrolling)
+;;; DOOM-EMACS SCROLLING SETTING
+(setq hscroll-margin 2
+  hscroll-step 1
+  ;; Emacs spends too much effort recentering the screen if you scroll the
+  ;; cursor more than N lines past window edges (where N is the settings of
+  ;; `scroll-conservatively'). This is especially slow in larger files
+  ;; during large-scale scrolling commands. If kept over 100, the window is
+  ;; never automatically recentered.
+  scroll-conservatively 101
+  scroll-margin 0
+  scroll-preserve-screen-position t
+  ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll'
+  ;; for tall lines.
+  auto-window-vscroll nil
+  ;; mouse
+  mouse-wheel-scroll-amount '(5 ((shift) . 2))
+  mouse-wheel-progressive-speed nil)  ; don't accelerate scrolling
 
-;; General Vertical Scrolling Settings
-(setq scroll-step 1) ;; one line at a time
-(setq scroll-margin 1)
-(setq scroll-conservatively 101) ;; move minimum when cursor exits view, instead of recentering
-(setq scroll-up-aggressively 0.01)
-(setq scroll-preserve-screen-position t)  ;; centered screen scrolling
-(setq scroll-down-aggressively 0.01)
-(setq auto-window-vscroll nil)
-(setq fast-but-imprecise-scrolling nil)
+;; Remove hscroll-margin in shells, otherwise it causes jumpiness
+(add-hook 'term-mode-hook (lambda () (hscroll-margin 0)))
+(add-hook 'eshell-mode-hook (lambda () (hscroll-margin 0)))
 
-;; Mouse Scroll
-(setq mouse-wheel-scroll-amount '(3 ((shift) . 1))) ;; shift + mouse scroll moves 1 line at a time, instead of 5 lines
-(setq mouse-wheel-scroll-amount '(3 ((control) . 6))) ;; hold Control for 5 lines at a time
-(setq mouse-wheel-follow-mouse 't)                  ;; scroll window under mouse
-(setq mouse-wheel-progressive-speed nil) ;; on a long mouse scroll keep scrolling by 1 line,  don't accelerate scrolling
+(when IS-MAC
+  ;; sane trackpad/mouse scroll settings
+  (setq mac-redisplay-dont-reset-vscroll t
+    mac-mouse-wheel-smooth-scroll nil))
 
-;; Horizontal Scroll
-(setq hscroll-step 1)
-(setq hscroll-margin 1)
+
+;;; M-EMACS SCROLLING SETTING
+
+;; ;; General Vertical Scrolling Settings
+;; (setq scroll-step 1) ;; one line at a time
+;; (setq scroll-margin 1)
+;; (setq scroll-conservatively 101) ;; move minimum when cursor exits view, instead of recentering
+;; (setq scroll-up-aggressively 0.01)
+;; (setq scroll-preserve-screen-position t)  ;; centered screen scrolling
+;; (setq scroll-down-aggressively 0.01)
+;; (setq auto-window-vscroll nil)
+;; (setq fast-but-imprecise-scrolling nil)
+
+;; ;; Mouse Scroll
+;; (setq mouse-wheel-scroll-amount '(3 ((shift) . 1))) ;; shift + mouse scroll moves 1 line at a time, instead of 5 lines
+;; (setq mouse-wheel-scroll-amount '(3 ((control) . 6))) ;; hold Control for 5 lines at a time
+;; (setq mouse-wheel-follow-mouse 't)                  ;; scroll window under mouse
+;; (setq mouse-wheel-progressive-speed nil) ;; on a long mouse scroll keep scrolling by 1 line,  don't accelerate scrolling
+
+;; ;; Horizontal Scroll
+;; (setq hscroll-step 1)
+;; (setq hscroll-margin 1)
 
 
 ;; **************************************************
@@ -4256,22 +4690,36 @@ If failed try to complete the common part with `company-complete-common'"
 
 ;; * Global minor modes
 
-;; ** which-key
+;; **************************************************
+;;
+  ;;; ** which-key
 
 (use-package which-key
   :ensure t
   :diminish
   :defer t
   :hook (after-init . which-key-mode)
-  :config
-  (setq which-key-idle-delay 0.2)
-  (setq which-key-min-display-lines 3)
+  :init
+  (setq which-key-sort-order #'which-key-prefix-then-key-order)
+  (setq  which-key-sort-uppercase-first nil)
+  (setq which-key-add-column-padding 1)
+  (setq which-key-max-display-columns nil)
+  (setq which-key-min-display-lines 6)
+  (setq which-key-side-window-slot -10)
   (setq which-key-max-description-length 20)
-  (setq which-key-max-display-columns 6)
+  (setq which-key-idle-delay 0.2)
+  ;; (setq which-key-max-display-columns 6)
+  :config
+  ;; general improvements to which-key readability
+  (set-face-attribute 'which-key-local-map-description-face nil :weight 'bold)
+  (which-key-setup-side-window-bottom)
+  (add-hook 'which-key-init-buffer-hook (lambda () (line-spacing 3)))
   )
 
 
-;; ** key-frequency
+;; **************************************************
+;;
+  ;;; ** key-frequency
 
 (use-package keyfreq
   :ensure t
@@ -4293,12 +4741,69 @@ If failed try to complete the common part with `company-complete-common'"
   :hook
   (prog-mode . smartparens-mode)
   :config
+  ;; Load default smartparens rules for various languages
   (require 'smartparens-config)
   (sp-pair "=" "=" :actions '(wrap))
   (sp-pair "+" "+" :actions '(wrap))
   (sp-pair "<" ">" :actions '(wrap))
   (sp-pair "$" "$" :actions '(wrap))
+  ;; Overlays are too distracting and not terribly helpful. show-parens does
+  ;; this for us already (and is faster), so...
+  (setq sp-highlight-pair-overlay nil
+    sp-highlight-wrap-overlay nil
+    sp-highlight-wrap-tag-overlay nil)
+  (with-eval-after-load 'evil
+    ;; But if someone does want overlays enabled, evil users will be stricken
+    ;; with an off-by-one issue where smartparens assumes you're outside the
+    ;; pair when you're really at the last character in insert mode. We must
+    ;; correct this vile injustice.
+    (setq sp-show-pair-from-inside t)
+    ;; ...and stay highlighted until we've truly escaped the pair!
+    (setq sp-cancel-autoskip-on-backward-movement nil))
+
+  ;; The default is 100, because smartparen's scans are relatively expensive
+  ;; (especially with large pair lists for some modes), we reduce it, as a
+  ;; better compromise between performance and accuracy.
+  (setq sp-max-prefix-length 25)
+  ;; No pair has any business being longer than 4 characters; if they must, set
+  ;; it buffer-locally. It's less work for smartparens.
+  (setq sp-max-pair-length 4)
+  ;; This isn't always smart enough to determine when we're in a string or not.
+  ;; See https://github.com/Fuco1/smartparens/issues/783.
+  (setq sp-escape-quotes-after-insert nil)
+
+  ;; Silence some harmless but annoying echo-area spam
+  (dolist (key '(:unmatched-expression :no-matching-tag))
+    (setf (alist-get key sp-message-alist) nil))
+
+  (add-hook 'minibuffer-setup-hook
+    (defun doom-init-smartparens-in-minibuffer-maybe-h ()
+      "Enable `smartparens-mode' in the minibuffer, during `eval-expression',
+`pp-eval-expression' or `evil-ex'."
+      (when (memq this-command '(eval-expression pp-eval-expression evil-ex))
+        (smartparens-mode))))
+
+  ;; You're likely writing lisp in the minibuffer, therefore, disable these
+  ;; quote pairs, which lisps doesn't use for strings:
+  (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
+  (sp-local-pair 'minibuffer-inactive-mode "`" nil :actions nil)
+
+  ;; Smartparens breaks evil-mode's replace state
+  (defvar doom-buffer-smartparens-mode nil)
+  (add-hook 'evil-replace-state-exit-hook
+    (defun doom-enable-smartparens-mode-maybe-h ()
+      (when doom-buffer-smartparens-mode
+        (turn-on-smartparens-mode)
+        (kill-local-variable 'doom-buffer-smartparens-mode))))
+  (add-hook 'evil-replace-state-entry-hook
+    (defun doom-disable-smartparens-mode-maybe-h ()
+      (when smartparens-mode
+        (setq-local doom-buffer-smartparens-mode t)
+        (turn-off-smartparens-mode))))
+
+  (smartparens-global-mode +1)
   )
+
 
 ;; *** evil-smartparens helps avoid conflicts between evil and smartparens
 
@@ -4327,7 +4832,7 @@ If failed try to complete the common part with `company-complete-common'"
 (use-package editorconfig
   :ensure t
   :defer t
-  :diminish editorconfig-mode
+  :diminish
   )
 
 
@@ -4386,7 +4891,7 @@ If failed try to complete the common part with `company-complete-common'"
   (TeX-master nil)
   ;; to use pdfview with auctex
   (TeX-view-program-selection '((output-pdf "pdf-tools"))
-                              TeX-source-correlate-start-server t)
+    TeX-source-correlate-start-server t)
   (TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view")))
   (TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
   :config
@@ -4394,13 +4899,13 @@ If failed try to complete the common part with `company-complete-common'"
   (setq org-export-with-smart-quotes t) ;; convert quotes to LaTeX smartquotes on export
 
   (add-hook 'LaTeX-mode-hook
-            (lambda ()
-              (turn-on-reftex)
-              (setq reftex-plug-into-AUCTeX t)
-              (reftex-isearch-minor-mode)
-              (setq TeX-PDF-mode t)
-              (setq TeX-source-correlate-method 'synctex)
-              (setq TeX-source-correlate-start-server t)))
+    (lambda ()
+      (turn-on-reftex)
+      (setq reftex-plug-into-AUCTeX t)
+      (reftex-isearch-minor-mode)
+      (setq TeX-PDF-mode t)
+      (setq TeX-source-correlate-method 'synctex)
+      (setq TeX-source-correlate-start-server t)))
   )
 
 
@@ -4430,11 +4935,11 @@ If failed try to complete the common part with `company-complete-common'"
 
 (with-eval-after-load 'org
   '(add-to-list 'org-latex-classes
-                '("beamer"
-                  "\\documentclass\[presentation\]\{beamer\}"
-                  ("\\section\{%s\}" . "\\section*\{%s\}")
-                  ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
-                  ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}"))))
+     '("beamer"
+        "\\documentclass\[presentation\]\{beamer\}"
+        ("\\section\{%s\}" . "\\section*\{%s\}")
+        ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
+        ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}"))))
 
 
 
@@ -4675,8 +5180,8 @@ If failed try to complete the common part with `company-complete-common'"
   (js2-mode . js2-refactor-mode)
   :bind
   (:map js2-mode-map
-        ("C-k" . js2r-kill)
-        ("C-c h r" . js2-refactor-hydra/body))
+    ("C-k" . js2r-kill)
+    ("C-c h r" . js2-refactor-hydra/body))
   :config
   (js2r-add-keybindings-with-prefix "C-c C-r")
   (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
@@ -4693,33 +5198,33 @@ If failed try to complete the common part with `company-complete-common'"
 [_tf_] Toggle fun exp and decl [_ag_] Add var to globals
 [_ta_] Toggle fun expr and =>  [_ti_] Ternary to if
 [_q_]  quit"
-    ("ee" js2r-expand-node-at-point)
-    ("cc" js2r-contract-node-at-point)
-    ("ef" js2r-extract-function)
-    ("em" js2r-extract-method)
-    ("tf" js2r-toggle-function-expression-and-declaration)
-    ("ta" js2r-toggle-arrow-function-and-expression)
-    ("ip" js2r-introduce-parameter)
-    ("lp" js2r-localize-parameter)
-    ("wi" js2r-wrap-buffer-in-iife)
-    ("ig" js2r-inject-global-in-iife)
-    ("ag" js2r-add-to-globals-annotation)
-    ("ev" js2r-extract-var)
-    ("iv" js2r-inline-var)
-    ("rv" js2r-rename-var)
-    ("vt" js2r-var-to-this)
-    ("ao" js2r-arguments-to-object)
-    ("ti" js2r-ternary-to-if)
-    ("sv" js2r-split-var-declaration)
-    ("ss" js2r-split-string)
-    ("uw" js2r-unwrap)
-    ("lt" js2r-log-this)
-    ("dt" js2r-debug-this)
-    ("sl" js2r-forward-slurp)
-    ("ba" js2r-forward-barf)
-    ("k" js2r-kill)
-    ("q" nil))
-  )
+      ("ee" js2r-expand-node-at-point)
+      ("cc" js2r-contract-node-at-point)
+      ("ef" js2r-extract-function)
+      ("em" js2r-extract-method)
+      ("tf" js2r-toggle-function-expression-and-declaration)
+      ("ta" js2r-toggle-arrow-function-and-expression)
+      ("ip" js2r-introduce-parameter)
+      ("lp" js2r-localize-parameter)
+      ("wi" js2r-wrap-buffer-in-iife)
+      ("ig" js2r-inject-global-in-iife)
+      ("ag" js2r-add-to-globals-annotation)
+      ("ev" js2r-extract-var)
+      ("iv" js2r-inline-var)
+      ("rv" js2r-rename-var)
+      ("vt" js2r-var-to-this)
+      ("ao" js2r-arguments-to-object)
+      ("ti" js2r-ternary-to-if)
+      ("sv" js2r-split-var-declaration)
+      ("ss" js2r-split-string)
+      ("uw" js2r-unwrap)
+      ("lt" js2r-log-this)
+      ("dt" js2r-debug-this)
+      ("sl" js2r-forward-slurp)
+      ("ba" js2r-forward-barf)
+      ("k" js2r-kill)
+      ("q" nil))
+    )
 
 ;; ** PrettierJS
 
