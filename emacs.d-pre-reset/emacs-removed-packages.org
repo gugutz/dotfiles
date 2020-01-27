@@ -1,0 +1,2210 @@
+* snails
+
+Keymap:
+| Key         | Description               |
+| C-n         | Select next candidate     |
+| C-p         | Select previous candidate |
+| M-n         | Select next candidate     |
+| M-p         | Select previous candidate |
+| C-v         | Select next backend       |
+| M-v         | Select previous backend   |
+| M-j         | Select next backend       |
+| M-k         | Select previous backend   |
+| C-m         | Confirm candiate          |
+| RET         | Confirm candiate          |
+| M-w         | Copy candidate            |
+| C-g         | Quit snails               |
+| ESC ESC ESC | Quit snails               |
+| M-h         | Quit snails               |
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (use-package snails
+  :ensure nil
+  :load-path "packages/snails"
+  :if window-system
+  :bind
+  ("M-s s" . snails)
+  ("M-s g" . snails-current-project)
+  ("M-s b" . snails-active-recent-buffers)
+  ("M-s e" . snails-everywhere)
+  :custom-face
+  (snails-content-buffer-face ((t (:background "#111" :height 110))))
+  (snails-input-buffer-face ((t (:background "#222" :foreground "gold" :height 110))))
+  (snails-header-line-face ((t (:inherit font-lock-function-name-face :underline t :height 1.1))))
+  :config
+  (use-package exec-path-from-shell
+    :if (featurep 'cocoa) :defer t)
+
+  ;; Functions for specific backends
+  (defun snails-current-project ()
+    (interactive)
+    (snails '(snails-backend-projectile snails-backend-rg snails-backend-fd)))
+  (defun snails-active-recent-buffers ()
+    (interactive)
+    (snails '(snails-backend-buffer snails-backend-recentf)))
+  (defun snails-everywhere ()
+    (interactive)
+    (snails '(snails-backend-everything snails-backend-mdfind)))
+)
+#+END_SRC
+
+#+RESULTS:
+: snails-everywhere
+
+
+* PDF Tools
+
+** Install pdf-tools if its not already installed
+   #+BEGIN_SRC emacs-lisp :tangle init.el
+  ;; (pdf-tools-install)
+  ;; the docs say if i care about startup time, i should use pdf-loader-install instead of pdf-tools-install, but doenst say why
+  ;; (pdf-loader-install)
+   #+END_SRC
+
+** Make buffer refresh every 1 second to PDF-tools updates the changed pdf
+   #+BEGIN_SRC emacs-lisp :tangle init.el
+  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+  ;; (add-hook 'pdf-view-mode-hook 'auto-revert-mode)
+  ;; (add-hook 'doc-view-mode-hook 'auto-revert-mode)
+   #+END_SRC
+
+** PDF tools evil keybindings
+   #+BEGIN_SRC emacs-lisp :tangle init.el
+  (evil-define-key 'normal pdf-view-mode-map
+    "h" 'pdf-view-previous-page-command
+    "j" (lambda () (interactive) (pdf-view-next-line-or-next-page 5))
+    "k" (lambda () (interactive) (pdf-view-previous-line-or-previous-page 5))
+    "l" 'pdf-view-next-page-command)
+   #+END_SRC
+
+
+
+* Browsers integrations
+
+** edit-server
+
+Edit stuff in browsers with emacs
+Used in adition with the Edit in Emacs plugin for Chrome
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package edit-server
+  :if (and window-system
+           (not alternate-emacs))
+  ;; :if window-system
+  :ensure t
+  :defer 5
+  :disabled
+  :config
+  (edit-server-start)
+)
+#+END_SRC
+
+** atomic-chrome
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package atomic-chrome
+  :ensure t
+  :disabled
+  :config
+  (atomic-chrome-start-server)
+)
+#+END_SRC
+
+* ace jump mode
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package ace-jump-mode
+  :disabled
+  :ensure t
+  :bind
+  ("C-." . ace-jump-mode)
+)
+#+END_SRC
+
+* flycheck inline
+
+: Quick peek is an extension that embelishes flycheck inline messages
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package quick-peek
+  :ensure t
+  :disabled
+)
+#+END_SRC
+
+   #+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package flycheck-inline
+  :ensure t
+  :disabled
+  :hook
+  (flycheck-mode . flycheck-inline-mode)
+  :config
+  ;; Set fringe style
+  (setq flycheck-indication-mode 'right-fringe)
+
+  (setq flycheck-mode-line-prefix "Syntax")
+
+  ;; (global-flycheck-inline-mode)
+  (setq flycheck-inline-display-function
+        (lambda (msg pos)
+          (let* ((ov (quick-peek-overlay-ensure-at pos))
+                 (contents (quick-peek-overlay-contents ov)))
+            (setf (quick-peek-overlay-contents ov)
+                  (concat contents (when contents "\n") msg))
+            (quick-peek-update ov)))
+        flycheck-inline-clear-function #'quick-peek-hide))
+#+END_SRC
+
+* flycheck-pos-tip (show flycheck messages in tooltip)
+
+;;; Show Flycheck errors in tooltip
+
+: appearently depends on cask
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package flycheck-pos-tip
+  :ensure t
+  :disabled
+  :defines flycheck-pos-tip-timeout
+  :after flycheck
+  :hook
+  (global-flycheck-mode . flycheck-pos-tip-mode)
+  :config
+  (setq flycheck-pos-tip-timeout 30)
+  (flycheck-pos-tip-mode)
+)
+#+END_SRC
+
+* flycheck-popup-tip (show flycheck messages in tooltip)
+
+There is another official flycheck-pos-tip extension for displaying errors under point. However, it does not display popup if you run Emacs under TTY. It displays message on echo area and that is often used for ELDoc. Also, popups made by pos-tip library does not always look good, especially on macOS and Windows.
+: appearently depends on cask
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;;; Show Flycheck errors in tooltip
+(use-package flycheck-popup-tip
+  :ensure t
+  :disabled
+  :after flycheck
+  :hook
+  (flycheck-mode . flycheck-popup-tip-mode)
+  :config
+  (setq flycheck-popup-tip-error-prefix "\u27a4") ;;  display arrow like this: `➤'
+  ;; (setq flycheck-popup-tip-error-prefix "* ")
+)
+#+END_SRC
+
+* ox-confluence
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package ox-confluence
+  :defer 3
+  :ensure nil
+  :after org
+)
+#+END_SRC
+
+* corral - intelligent surround text with auto-guess suggestions
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package corral
+  :ensure t
+  :bind
+  ("M-9" . corral-parentheses-backward)
+  :config
+  (setq corral-preserve-point t)
+  ;;(global-set-key (kbd "M-9") 'corral-parentheses-backward)
+  (global-set-key (kbd "M-0") 'corral-parentheses-forward)
+  (global-set-key (kbd "M-[") 'corral-brackets-backward)
+  (global-set-key (kbd "M-]") 'corral-brackets-forward)
+  (global-set-key (kbd "M-{") 'corral-braces-backward)
+  (global-set-key (kbd "M-}") 'corral-braces-forward)
+  (global-set-key (kbd "M-\"") 'corral-double-quotes-backward)
+)
+#+END_SRC
+
+* parinfer-mode
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package parinfer
+  :ensure t
+  :bind
+  ("C-," . parinfer-toggle-mode)
+  :init
+  (progn
+    (setq parinfer-extensions
+          '(defaults       ; should be included.
+            pretty-parens  ; different paren styles for different modes.
+            evil           ; If you use Evil.
+            ;lispy          ; If you use Lispy. With this extension, you should install Lispy and do not enable lispy-mode directly.
+            paredit        ; Introduce some paredit commands.
+            smart-tab      ; C-b & C-f jump positions and smart shift with tab & S-tab.
+            smart-yank))   ; Yank behavior depend on mode.
+    (add-hook 'clojure-mode-hook #'parinfer-mode)
+    (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)
+    (add-hook 'common-lisp-mode-hook #'parinfer-mode)
+    (add-hook 'scheme-mode-hook #'parinfer-mode)
+    (add-hook 'lisp-mode-hook #'parinfer-mode))
+    :config
+    ;; auto switch to Indent Mode whenever parens are balance in Paren Mode
+    (setq parinfer-auto-switch-indent-mode nil)  ;; default is nil
+    (setq parinfer-lighters '(" Parinfer:Indent" . "Parinfer:Paren"))
+
+)
+#+END_SRC
+
+* paredit
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package paredit
+  :ensure t
+  :config
+  (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+  (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+  (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+  (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+#+END_SRC
+
+* Disable <RET> for autocomplete and leave on TAB
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;; (define-key ac-completing-map [return] nil)
+;; (define-key ac-completing-map "\r" nil)
+#+END_SRC
+
+* pretty icons for company box
+  ;; (use-package company-box
+  ;;   :ensure t
+  ;;   :diminish company-box-mode
+  ;;   :functions (my-company-box--make-line
+  ;;               my-company-box-icons--elisp)
+  ;;   :init (setq company-box-icons-alist 'company-box-icons-all-the-icons)
+  ;;   :commands (company-box--get-color
+  ;;              company-box--resolve-colors
+  ;;              company-box--add-icon
+  ;;              company-box--apply-color
+  ;;              company-box--make-line
+  ;;              company-box-icons--elisp)
+  ;;   :hook (company-mode . company-box-mode)
+  ;;   :custom
+  ;;   (company-box-backends-colors nil)
+  ;;   (company-box-show-single-candidate t)
+  ;;   (company-box-max-candidates 50)
+  ;;   (company-box-doc-delay 0.3)
+  ;;   :config
+  ;;   ;; Support `company-common'
+  ;;   (defun my-company-box--make-line (candidate)
+  ;;     (-let* (((candidate annotation len-c len-a backend) candidate)
+  ;;             (color (company-box--get-color backend))
+  ;;             ((c-color a-color i-color s-color) (company-box--resolve-colors color))
+  ;;             (icon-string (and company-box--with-icons-p (company-box--add-icon candidate)))
+  ;;             (candidate-string (concat (propertize (or company-common "") 'face 'company-tooltip-common)
+  ;;                                       (substring (propertize candidate 'face 'company-box-candidate) (length company-common) nil)))
+  ;;             (align-string (when annotation
+  ;;                             (concat " " (and company-tooltip-align-annotations
+  ;;                                              (propertize " " 'display `(space :align-to (- right-fringe ,(or len-a 0) 1)))))))
+  ;;             (space company-box--space)
+  ;;             (icon-p company-box-enable-icon)
+  ;;             (annotation-string (and annotation (propertize annotation 'face 'company-box-annotation)))
+  ;;             (line (concat (unless (or (and (= space 2) icon-p) (= space 0))
+  ;;                             (propertize " " 'display `(space :width ,(if (or (= space 1) (not icon-p)) 1 0.75))))
+  ;;                           (company-box--apply-color icon-string i-color)
+  ;;                           (company-box--apply-color candidate-string c-color)
+  ;;                           align-string
+  ;;                           (company-box--apply-color annotation-string a-color)))
+  ;;             (len (length line)))
+  ;;       (add-text-properties 0 len (list 'company-box--len (+ len-c len-a)
+  ;;                                        'company-box--color s-color)
+  ;;                            line)
+  ;;       line))
+  ;;   (advice-add #'company-box--make-line :override #'my-company-box--make-line)
+
+  ;;   ;; Prettify icons
+  ;;   (defun my-company-box-icons--elisp (candidate)
+  ;;     (when (derived-mode-p 'emacs-lisp-mode)
+  ;;       (let ((sym (intern candidate)))
+  ;;         (cond ((fboundp sym) 'Function)
+  ;;               ((featurep sym) 'Module)
+  ;;               ((facep sym) 'Color)
+  ;;               ((boundp sym) 'Variable)
+  ;;               ((symbolp sym) 'Text)
+  ;;               (t . nil)))))
+  ;;   (advice-add #'company-box-icons--elisp :override #'my-company-box-icons--elisp)
+
+  ;;   (when (and (display-graphic-p)
+  ;;              (require 'all-the-icons nil t))
+  ;;     (declare-function all-the-icons-faicon 'all-the-icons)
+  ;;     (declare-function all-the-icons-material 'all-the-icons)
+  ;;     (declare-function all-the-icons-octicon 'all-the-icons)
+  ;;     (setq company-box-icons-all-the-icons
+  ;;           `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.85 :v-adjust -0.2))
+  ;;             (Text . ,(all-the-icons-faicon "text-width" :height 0.8 :v-adjust -0.05))
+  ;;             (Method . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+  ;;             (Function . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+  ;;             (Constructor . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+  ;;             (Field . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
+  ;;             (Variable . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
+  ;;             (Class . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+  ;;             (Interface . ,(all-the-icons-material "share" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+  ;;             (Module . ,(all-the-icons-material "view_module" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+  ;;             (Property . ,(all-the-icons-faicon "wrench" :height 0.8 :v-adjust -0.05))
+  ;;             (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.85 :v-adjust -0.2))
+  ;;             (Value . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+  ;;             (Enum . ,(all-the-icons-material "storage" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+  ;;             (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.85 :v-adjust -0.2))
+  ;;             (Snippet . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2))
+  ;;             (Color . ,(all-the-icons-material "palette" :height 0.85 :v-adjust -0.2))
+  ;;             (File . ,(all-the-icons-faicon "file-o" :height 0.85 :v-adjust -0.05))
+  ;;             (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.85 :v-adjust -0.2))
+  ;;             (Folder . ,(all-the-icons-faicon "folder-open" :height 0.85 :v-adjust -0.05))
+  ;;             (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+  ;;             (Constant . ,(all-the-icons-faicon "square-o" :height 0.85 :v-adjust -0.05))
+  ;;             (Struct . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+  ;;             (Event . ,(all-the-icons-faicon "bolt" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-orange))
+  ;;             (Operator . ,(all-the-icons-material "control_point" :height 0.85 :v-adjust -0.2))
+  ;;             (TypeParameter . ,(all-the-icons-faicon "arrows" :height 0.8 :v-adjust -0.05))
+  ;;             (Template . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2)))
+  ;;           company-box-icons-alist 'company-box-icons-all-the-icons))
+  ;; )
+
+* Indium
+
+A JavaScript development environment for Emacs.
+
+Indium connects to a browser tab or nodejs process and provides many features for JavaScript development, including:
+
++ a REPL (with auto completion) & object inspection;
++ an inspector, with history and navigation;
++ a scratch buffer (M-x indium-scratch);
++ JavaScript evaluation in JS buffers with indium-interaction-mode;
++ a stepping Debugger, similar to edebug, or cider.
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package indium
+  :ensure t
+  :defer t
+  :ensure-system-package
+  (indium . "npm i -g indium")
+  :after js2-mode typescript-mode
+  :bind
+  (:map js2-mode-map
+  ("C-c C-l" . indium-eval-buffer))
+  (:map typescript-mode-map
+  ("C-c C-l" . indium-eval-buffer))
+  :config
+  (setq indium-update-script-on-save t)
+)
+#+END_SRC
+
+* Company emoji suport
+
+  : use `:` to use emojis
+  #+BEGIN_SRC emacs-lisp :tangle init.el
+    (use-package company-emoji
+      :disabled
+      :ensure t
+      :config
+      (add-to-list 'company-backends 'company-emoji)
+      )
+#+END_SRC
+
+
+* web-beautify
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package web-beautify
+  :ensure t
+  :defer t
+  :ensure-system-package
+  (js-beautify . "npm i -g js-beautify")
+  :commands (web-beautify-css
+             web-beautify-css-buffer
+             web-beautify-html
+             web-beautify-html-buffer
+             web-beautify-js
+             web-beautify-js-buffer)
+)
+#+END_SRC
+
+* ng2-mode
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package ng2-mode
+  :defer t
+  :disabled
+  :mode
+  ("\\.component.ts$\\'" "\\.component.html$\\'")
+  :hook
+  (ng2-mode . rainbow-mode)
+  (ng2-mode . flycheck-mode)
+  (ng2-mode . company-mode)
+  (ng2-mode . editorconfig-mode)
+  (ng2-mode . color-identifiers-mode)
+  (ng2-mode . lsp-mode)
+  (ng2-mode . prettier-js-mode)
+  (ng2-mode . eldoc-mode)
+)
+#+END_SRC
+
+* emojify
+
+display emojis inside emacs
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package emojify
+  :ensure t
+  :config
+  (add-hook 'after-init-hook #'global-emojify-mode)
+)
+#+END_SRC
+
+* Company TabNine
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;; CompanyTabNinePac
+(use-package company-tabnine
+  :disabled
+  :ensure t
+  :defer 1
+  :custom
+  (company-tabnine-max-num-results 9)
+  :bind
+  (("C-c c o" . company-other-backend)
+   ("C-c c t" . company-tabnine))
+  :hook
+  (lsp-after-open . (lambda ()
+                      (setq company-tabnine-max-num-results 3)
+                      (add-to-list 'company-transformers 'company//sort-by-tabnine t)
+                      (add-to-list 'company-backends '(company-lsp :with company-tabnine :separate))))
+  (kill-emacs . company-tabnine-kill-process)
+  :config
+  ;; Enable TabNine on default
+  (add-to-list 'company-backends #'company-tabnine)
+
+  ;; Integrate company-tabnine with lsp-mode
+  (defun company//sort-by-tabnine (candidates)
+    (if (or (functionp company-backend)
+            (not (and (listp company-backend) (memq 'company-tabnine company-backend))))
+        candidates
+      (let ((candidates-table (make-hash-table :test #'equal))
+            candidates-lsp
+            candidates-tabnine)
+        (dolist (candidate candidates)
+          (if (eq (get-text-property 0 'company-backend candidate)
+                  'company-tabnine)
+              (unless (gethash candidate candidates-table)
+                (push candidate candidates-tabnine))
+            (push candidate candidates-lsp)
+            (puthash candidate t candidates-table)))
+        (setq candidates-lsp (nreverse candidates-lsp))
+        (setq candidates-tabnine (nreverse candidates-tabnine))
+        (nconc (seq-take candidates-tabnine 3)
+               (seq-take candidates-lsp 6))))))
+;; -CompanyTabNinePac#+END_SRC
+#+END_SRC
+* lunar-mode-line
+
+Display lumoon phases in the modeline
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package lunar-mode-line
+  :ensure nil
+  :load-path "packages/lunar-mode-line"
+)
+#+END_SRC
+
+* celestial-mode-line
+
+Displaysunrise and sunset info and moon phase
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package celestial-mode-line
+  :ensure t
+  :disabled
+  :config
+  (setq calendar-longitude 25.5)
+  (setq calendar-latitude 17.5)
+  (setq calendar-location-name "Some place")
+  ;; Icons customization
+  (defvar celestial-mode-line-phase-representation-alist '((0 . "○") (1 . "☽") (2 . "●") (3 . "☾")))
+  (defvar celestial-mode-line-sunrise-sunset-alist '((sunrise . "☀↑") (sunset . "☀↓")))
+  ;; add to end of global-mode-string
+  (if (null global-mode-string)
+      (setq global-mode-string '("" celestial-mode-line-string))
+  (add-to-list 'global-mode-string 'celestial-mode-line-string t))
+  ;; Start the timer, to update every few minutes:
+  (celestial-mode-line-start-timer)
+)
+#+END_SRC
+
+
+* COMMENT smart-mode-line
+
+this was commented with C-c ; so it doenst get exported in favor of doom-modeline
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+ (require 'smart-mode-line)
+ (if (require 'smart-mode-line nil 'noerror)
+     (progn
+       ;( sml/name-width 20)
+       ;( sml/mode-width 'full)
+       ;( sml/shorten-directory t)
+       ;( sml/shorten-modes t)
+       (require 'smart-mode-line-powerline-theme)
+       ; this must be BEFORE (sml/setup)
+       (sml/apply-theme 'powerline)
+       ;; Alternatives:
+       ;; (sml/apply-theme 'powerline)
+       ;; (sml/apply-theme 'dark)
+       ;; (sml/apply-theme 'light)
+       ;; (sml/apply-theme 'respectful)
+       ;; (sml/apply-theme 'automatic)
+
+
+       (if after-init-time
+           (sml/setup)
+         (add-hook 'after-init-hook 'sml/setup))
+
+
+       (display-time-mode 1)
+
+       (add-to-list 'sml/replacer-regexp-list '("^~/Dropbox/" ":DB:"))
+       (add-to-list 'sml/replacer-regexp-list
+                    '("^~/.*/lib/ruby/gems" ":GEMS" ))
+       (add-to-list 'sml/replacer-regexp-list
+                    '("^~/Projects/" ":CODE:"))))
+   #+END_SRC
+
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+ (use-package which-func
+    :config
+    (which-function-mode t)
+)
+#+END_SRC
+
+* discover
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(require 'discover)
+(when (featurep 'discover)
+  (discover-add-context-menu
+    :context-menu '(isearch
+              (description "Isearch, occur and highlighting")
+              (lisp-switches
+               ("-cf" "Case should fold search" case-fold-search t nil))
+              (lisp-arguments
+               ("=l" "context lines to show (occur)"
+                "list-matching-lines-default-context-lines"
+                (lambda (dummy) (interactive) (read-number "Number of context lines to show: "))))
+              (actions
+               ("Isearch"
+                ("_" "isearch forward symbol" isearch-forward-symbol)
+                ("w" "isearch forward word" isearch-forward-word))
+               ("Occur"
+                ("o" "occur" occur))
+               ("More"
+                ("h" "highlighters ..." makey-key-mode-popup-isearch-highlight))))
+    :bind "M-s"
+  )
+
+  (discover-add-context-menu
+    :context-menu '(dired)
+    :bind "?"
+    :mode 'dired-mode
+    :mode-hook 'dired-mode-hook
+  )
+)
+#+END_SRC
+
+* dired-sidebar
+
+  #+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package dired-sidebar
+  :ensure t
+  :commands (dired-sidebar-toggle-sidebar)
+  :bind
+  ("<f6>" . dired-sidebar-toggle-sidebar)
+  :init
+  (add-hook 'dired-sidebar-mode-hook
+         (lambda ()
+           (unless (file-remote-p default-directory)
+             (auto-revert-mode))))
+  :config
+  (push 'toggle-window-split dired-sidebar-toggle-hidden-commands)
+  (push 'rotate-windows dired-sidebar-toggle-hidden-commands)
+
+  (setq dired-sidebar-subtree-line-prefix "__")
+  (setq dired-sidebar-theme 'vscode)
+  (setq dired-sidebar-use-term-integration t)
+  (setq dired-sidebar-use-custom-font t)
+)
+  #+END_SRC
+
+* dashboard (replaced by MEMACS dashboard section)
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package dashboard
+  :ensure t
+  :bind ("C-S-D" . open-dashboard)
+  :hook
+  (after-init . dashboard-setup-startup-hook)
+  :preface
+  (defun tau/dashboard-banner ()
+    "Sets a dashboard banner including information on package initialization
+     time and garbage collections."
+    (setq dashboard-banner-logo-title
+          (format "Emacs ready in %.2f seconds with %d garbage collections."
+                  (float-time
+                   (time-subtract after-init-time before-init-time)) gcs-done)))
+  :custom-face
+  (dashboard-heading ((t (:foreground "#f1fa8c" :weight bold))))
+  :init
+
+  ;; set widgets to show
+  (setq dashboard-items '((recents  . 5)
+                         (bookmarks . 5)
+                         (projects . 5)
+                         (agenda . 5)
+                         (registers . 5))
+  )
+
+
+  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))) ;; sets dashboard as emacs initial buffer on startup
+
+  ;; Set the title
+  (setq dashboard-banner-logo-title "Hi 😊 ")
+  (setq dashboard-banner-logo-title
+          (message " ★ Emacs initialized in %.2fs ★ "
+                   (float-time (time-subtract (current-time) my-init-el-start-time))))
+
+
+  (setq dashboard-startup-banner 'logo) ;; Set the banner ;; values: ('oficial, 'logo, 1, 2, 3, or "path/to/image.png")
+  (setq dashboard-center-content t) ;; Content is not centered by default. To center, set
+  (setq dashboard-show-shortcuts t) ;; To disable shortcut "jump" indicators for each section, set
+
+  ;; To add icons to the widget headings and their items:
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+
+  (setq dashboard-set-navigator t) ;; To show navigator below the banner
+  (setq dashboard-set-init-info t) ;;To show info about the packages loaded and the init time:
+
+  ;; A randomly selected footnote will be displayed. To disable it:
+  ;;(setq dashboard-set-footer nil)
+
+  :config
+  ;; Org mode’s agenda
+  ;; To display today’s agenda items on the dashboard, add agenda to dashboard-items:
+  (add-to-list 'dashboard-items '(agenda) t)
+  ;; To show agenda for the upcoming seven days set the variable show-week-agenda-p to t.
+  (setq show-week-agenda-p t)
+  ;; Note that setting list-size for the agenda list is intentionally ignored; all agenda items for the current day will be displayed.
+  ;; To customize which categories from the agenda items should be visible in the dashboard set the dashboard-org-agenda-categories to the list of categories you need.
+  (setq dashboard-org-agenda-categories '("Tasks" "Appointments"))
+
+  ;; adds fireplace as a widget
+;;  (defun dashboard-insert-custom (list-size)
+;;    (fireplace))
+;;  (add-to-list 'dashboard-item-generators  '(fireplace . dashboard-insert-custom))
+;;  (add-to-list 'dashboard-items '(fireplace) t)
+
+
+)
+#+END_SRC
+
+* scrolling options
+** native keyboard scrolling
+
+Several combinations can be made of this
+Bellow are some resources on how to combine them:
+
+Centered Scrolling: https://two-wrongs.com/centered-cursor-mode-in-vanilla-emacs
+Simulate Vim-Scrolof: https://wolfecub.github.io/dotfiles/#orgff34878
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;;(setq redisplay-dont-pause t)
+(setq scroll-preserve-screen-position 1)  ;; centered screen scrolling
+  ;; (setq scroll-margin 10
+  ;; (setq maximum-scroll-margin 0.5)
+  ;; (setq scroll-step 1)
+  ;; (setq scroll-conservatively 10000) ;; scroll one line at a time when you move the cursor past the top or bottom of the window
+  ;; (setq scroll-step 1) ;; keyboard scroll one line at a time
+#+END_SRC
+
+** sublimity-scroll
+This is part of the sublimity package.
+Therefore, sublimity needs to be required for this to work
+Make sure :ensure nil
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package sublimity-scroll
+  :ensure nil
+  :config
+  (setq sublimity-scroll-weight 10)  ;; default 10
+  (setq sublimity-scroll-drift-length 5)  ;; default 5
+  (setq sublimity-scroll-hide-cursor t) ;; default t
+)
+#+END_SRC
+** scrollkeeper
+
+: i think this highlights scrolling stopping points? not sure though
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (use-package scrollkeeper
+  :disabled
+  :ensure t
+  :bind
+  ([remap scroll-up-command] . scrollkeeper-contents-up)
+  ([remap scroll-down-command] . scrollkeeper-contents-down)
+  )
+#+END_SRC
+
+** fast-scroll
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (use-package fast-scroll
+  :disabled
+  :ensure t
+  ;; If you would like to turn on/off other modes, like flycheck, add
+  ;; your own hooks.
+  :init
+  (setq fast-scroll-throttle 0.5)
+  :config
+  (add-hook 'fast-scroll-start-hook (lambda () (flycheck-mode -1)))
+  (add-hook 'fast-scroll-end-hook (lambda () (flycheck-mode 1)))
+  (fast-scroll-config)
+  (fast-scroll-mode 1)
+  )
+#+END_SRC
+
+
+
+** centered-cursor-mode
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(use-package centered-cursor-mode
+  :ensure t
+  :disabled
+  :config
+  (global-centered-cursor-mode)
+)
+#+END_SRC
+* helm
+(use-package helm
+  :ensure t
+  :defer t
+  :diminish helm-mode
+  :bind
+  ;; ("M-x" . helm-M-x)
+  ("C-c h" . helm-command-prefix)
+  ("C-x b" . helm-buffers-list)
+  ("C-x C-b" . helm-mini)
+  ("C-x C-f" . helm-find-files)
+  ("C-x r b" . helm-bookmarks)
+  ("M-y" . helm-show-kill-ring)
+  ("M-:" . helm-eval-expression-with-eldoc)
+  (:map helm-map
+        ("C-z" . helm-select-action)
+        ("C-h a" . helm-apropos)
+        ("C-c h" . helm-execute-persistent-action)
+        ("<tab>" . helm-execute-persistent-action)
+        )
+  :init
+  (setq helm-autoresize-mode t)
+  (setq helm-buffer-max-length 40)
+  (setq helm-bookmark-show-location t)
+  (setq helm-buffer-max-length 40)
+  (setq helm-split-window-inside-p t)
+
+  ;; turn on helm fuzzy matching
+  (setq helm-M-x-fuzzy-match t)
+  (setq helm-mode-fuzzy-match t)
+
+  (setq helm-ff-file-name-history-use-recentf t)
+  (setq helm-ff-skip-boring-files t)
+  (setq helm-follow-mode-persistent t)
+  ;; take between 10-30% of screen space
+  (setq helm-autoresize-min-height 10)
+  (setq helm-autoresize-max-height 30)
+  :config
+  (require 'helm-config)
+  (helm-mode 1)
+  ;; Make helm replace the default Find-File and M-x
+  ;;(global-set-key [remap execute-extended-command] #'helm-M-x)
+  ;; (global-set-key [remap find-file] #'helm-find-files)
+  ;; helm bindings
+  (global-unset-key (kbd "C-x c"))
+  )
+
+
+** helm-ag
+
+
+(use-package helm-ag
+  :ensure helm-ag
+  :bind ("M-p" . helm-projectile-ag)
+  :commands (helm-ag helm-projectile-ag)
+  :init
+  (setq helm-ag-insert-at-point 'symbol)
+  (setq  helm-ag-command-option "--path-to-ignore ~/.agignore")
+  )
+
+
+** helm-rg
+
+
+(use-package helm-rg
+  :ensure t
+  :defer t
+  )
+
+
+** helm-fuzzier
+: supposed better fuzzy matching for helm
+: for instance, plp, plpa, paclp, should all match package-list-packages
+
+
+
+(use-package helm-fuzzier
+  :disabled nil
+  :ensure t
+  :after helm
+  :config
+  (helm-fuzzier-mode 1)
+  )
+
+* helm-projectile
+
+(use-package helm-projectile
+  :ensure t
+                                        ;  :after projectile
+                                        ;  :demand t
+  :config
+  (helm-projectile-on)
+)
+
+* Helm CSS SCSS
+
+
+(use-package helm-css-scss
+  :ensure t
+  :defer t
+  :after helm
+  :bind
+  (:map isearch-mode-map
+        ("s-i" . helm-css-scss-from-isearch))
+  (:map helm-css-scss-map
+        ("s-i" . helm-css-scss-multi-from-helm-css-scss))
+  (:map css-mode-map
+        ("s-i" . helm-css-scss)
+        ("s-S-I" . helm-css-scss-back-to-last-point))
+  (:map scss-mode-map
+        ("s-i" . helm-css-scss)
+        ("s-S-I" . helm-css-scss-back-to-last-point))
+  :config
+  (setq helm-css-scss-insert-close-comment-depth 2
+        helm-css-scss-split-with-multiple-windows t
+        helm-css-scss-split-direction 'split-window-vertically)
+
+  ;; Set local keybind map for css-mode / scss-mode / less-css-mode
+  (dolist ($hook '(css-mode-hook scss-mode-hook less-css-mode-hook))
+    (add-hook
+     $hook (lambda ()
+             (local-set-key (kbd "s-i") 'helm-css-scss)
+             (local-set-key (kbd "s-I") 'helm-css-scss-back-to-last-point))))
+  )
+
+* fun packages
+
+** activate-power-mode
+;; inspired from the function with same name from Atom Editor
+;; Source;
+
+
+(defun animated-self-insert ()
+  (let* ((undo-entry (car buffer-undo-list))
+         (beginning (and (consp undo-entry) (car undo-entry)))
+         (end (and (consp undo-entry) (cdr undo-entry)))
+         (str (when (and (numberp beginning)
+                         (numberp end))
+                (buffer-substring-no-properties beginning end)))
+         (animate-n-steps 3))
+    (when str
+      (delete-region beginning end)
+      (animate-string str (1- (line-number-at-pos)) (current-column)))))
+
+;; to disable simply comment this hook
+;;; (add-hook 'post-self-insert-hook 'animated-self-insert)
+
+
+** c-c-combo
+
+;; This package lets you have some kind of encouragement if you are typing fast, it has some unreal tournament sounds, and after 15 seconds of mantaining your WPM, an animation for each insertion will appear. Then it will enable selectric-mode, and highlight trail (WIP) package randomly.
+
+
+(use-package c-c-combo
+  :ensure t
+  :defer t
+  )
+
+
+** xkcd
+
+
+(use-package xkcd
+  :ensure t
+  :defer t
+  )
+
+
+** fireplaces
+
+
+(use-package fireplace
+  :ensure t
+  :defer t
+  :init (defvar fireplace-mode-map)
+  :bind (:map fireplace-mode-map
+              ("d" . fireplace-down)
+              ("s" . fireplace-toggle-smoke)
+              ("u" . fireplace-up))
+  :config
+  (setq fireplace-toggle-smoke t)
+  ;; (fireplace)
+  )
+
+
+** selectric mode
+
+;; make emacs sound like a typewritter
+
+
+(use-package selectric-mode
+  :ensure t
+  :defer t
+  )
+
+
+** tetris
+
+
+(defvar tetris-mode-map
+  (make-sparse-keymap 'tetris-mode-map))
+(define-key tetris-mode-map (kbd "C-p") 'tetris-rotate-prev)
+(define-key tetris-mode-map (kbd "C-n") 'tetris-move-down)
+(define-key tetris-mode-map (kbd "C-b") 'tetris-move-left)
+(define-key tetris-mode-map (kbd "C-f") 'tetris-move-right)
+(define-key tetris-mode-map (kbd "C-SPC") 'tetris-move-bottom)
+(defadvice tetris-end-game (around zap-scores activate)
+  (save-window-excursion ad-do-it))
+
+
+** pacmacs
+
+
+(use-package pacmacs
+  :ensure t
+  :defer t
+  )
+
+
+** epaint
+
+(use-package epaint
+  :defer t
+  :if window-system
+  :commands (epaint)
+  :init
+  (with-eval-after-load (quote epaint-context)
+    (unless (boundp (quote cl-struct-epaint-drawable))
+      (defvar cl-struct-epaint-drawable (quote epaint-drawable)))
+    (unless (boundp (quote cl-struct-epaint-gc))
+      (defvar cl-struct-epaint-gc (quote epaint-gc))))
+  )
+
+
+** Speed type, a game to practice touch/speed typing in Emacs.
+
+
+(use-package speed-type
+  :defer t
+  )
+
+
+** 2048 Game, an implementation of 2048 in Emacs.
+
+(use-package 2048-game
+  :defer t
+  )
+
+
+** Zone
+
+(use-package zone
+  :ensure nil
+  :defer 5
+  :config
+  ;; (zone-when-idle 600) ; in seconds
+  (defun zone-choose (pgm)
+    "Choose a PGM to run for `zone'."
+    (interactive
+     (list
+      (completing-read
+       "Program: "
+       (mapcar 'symbol-name zone-programs))))
+    (let ((zone-programs (list (intern pgm))))
+      (zone))))
+
+
+** meme
+
+
+(use-package meme
+  :ensure nil
+  :defer t
+  :commands (meme meme-file)
+  )
+
+
+** zone-nyan
+
+
+(use-package zone-nyan
+  :ensure t
+  :defer t
+  )
+
+
+** zone-rainbow
+
+(use-package zone-nyan
+  :ensure t
+  :defer t
+  )
+
+* saveplace
+(use-package saveplace
+  :disabled
+  :ensure t
+  :hook
+  (after-init . save-place-mode)
+  :init
+  (setq-default save-place t)
+  (setq save-place-file (expand-file-name ".places" user-emacs-directory))
+  )
+
+* saveplace (appearantly it was doubled in the config)
+
+;; Save the place you were in file when you last edited it
+
+
+(use-package saveplace
+  :ensure nil
+  :config
+  (defconst savefile-dir (expand-file-name "savefile" user-emacs-directory))
+
+  ;; create the savefile dir if it doesn't exist
+  (unless (file-exists-p savefile-dir)
+    (make-directory savefile-dir))
+
+  (setq save-place-file (expand-file-name "saveplace" savefile-dir))
+  ;; activate it for all buffers
+  (setq-default save-place t)
+  (save-place-mode t)
+  )
+
+* files (suposed to be emacs native file lib)
+  Not sure this works. Instead using just the variables now
+(use-package files
+  :ensure nil
+  :config
+  (setq make-backup-files nil)
+  ;; dont ask confirmation to kill processes
+  ;;(setq confirm-kill-processes nil)
+  )
+
+* doom themes
+
+
+(use-package doom-themes
+  :ensure t
+  :disabled
+  :init (load-theme 'doom-tomorrow-night t)
+  :config
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config)
+
+  ;; Enable custom treemacs theme (all-the-icons must be installed!)
+  (doom-themes-treemacs-config)
+  )
+
+* add more custom emacs emphasis characters
+
+(require 'org-habit nil t)
+
+(defun org-add-my-extra-fonts ()
+  "Add alert and overdue fonts."
+  (add-to-list 'org-font-lock-extra-keywords '("\\(!\\)\\([^\n\r\t]+\\)\\(!\\)" (1 '(face org-habit-alert-face invisible t)) (2 'org-habit-alert-face) (3 '(face org-habit-alert-face invisible t))))
+  (add-to-list 'org-font-lock-extra-keywords '("\\(%\\)\\([^\n\r\t]+\\)\\(%\\)" (1 '(face org-habit-overdue-face invisible t)) (2 'org-habit-overdue-face) (3 '(face org-habit-overdue-face invisible t)))))
+
+(add-hook 'org-font-lock-set-keywords-hook #'org-add-my-extra-fonts)
+
+* Enhance fuzzy matching (only works with ido, not helm and ivy)
+
+(use-package flx
+  :ensure t
+  )
+
+* fancy-battery-mode
+
+display battery percentagem on the modeline
+
+(use-package fancy-battery
+  :ensure t
+  :config
+  (add-hook 'after-init-hook #'fancy-battery-mode)
+  )
+
+
+* ag
+
+(use-package ag
+  :ensure t
+  :defer t
+  :ensure-system-package
+  (ag . the_silver_searcher)
+  :custom
+  (ag-highligh-search t)
+  (ag-reuse-buffers t)
+  (ag-reuse-window t)
+  :bind
+  ("M-s a" . ag-project)
+  :config
+  (use-package wgrep-ag)
+  )
+
+
+* ripgrep
+
+
+(use-package rg
+  :ensure t
+  :defer t
+  :ensure-system-package
+  (rg . ripgrep)
+  :config
+  ;; choose between default keybindings or magit like menu interface.
+  ;; both options are mutually exclusive
+  (rg-enable-default-bindings)
+  ;;(rg-enable-menu)
+
+  )
+
+
+#  **************************************************
+* Recompile init.el everytime emacs.org is changed and saved
+
+                                        ;: Moved this to beggining of the file to avoid it not being parsed when theres an error in the middle of the file
+                                        ;: It was being recompiled without this function so i had to manually re-copy first-init.el to make it compile first time again and again
+
+
+
+(defun /util/tangle-init ()
+  (interactive)
+  "If the current buffer is init.org' the code-blocks are
+tangled, and the tangled file is compiled."
+  (when (equal (buffer-file-name)
+               (expand-file-name (concat user-emacs-directory "emacs.org")))
+    ;; Avoid running hooks when tangling.
+    (let ((prog-mode-hook nil))
+      (org-babel-tangle)
+      (byte-compile-file (concat user-emacs-directory "init.el")))))
+
+
+
+(add-hook 'after-save-hook #'/util/tangle-init)
+
+* garbage collection stuff
+
+;; First save the current value of gc-cons-threshold to restore it after the init file is loaded at the very bottom of this file
+;;(setq gc-threshold-original gc-cons-threshold)
+
+;; reduce the frequency of garbage collection by making it happen on
+;; each 50MB of allocated data (the default is on every 0.76MB)
+;;(setq gc-cons-threshold 50000000) ;; 50mb
+
+;; GC only with 500mb of data allocated
+;; (setq gc-cons-percentage 0.5)
+
+;; GC after 5s idle time
+;; (run-with-idle-timer 5 t #'garbage-collect)
+;;
+;;(setq garbage-collection-messages t)
+;;(setq inhibit-compacting-font-caches t)      ;; Don’t compact font caches during GC (garbage collection).
+
+;; Restore original gc value after init
+;; (add-hook 'after-init-hook (lambda () (setq gc-cons-threshold gc-threshold-original)))
+
+* feebleline
+
+;; Same as mini-modeline, different package
+;; put it here to test it to see what is best
+
+
+(use-package feebleline
+  :ensure t
+  :disabled
+  :config
+  (setq feebleline-msg-functions
+        '((feebleline-line-number         :post "" :fmt "%5s")
+          (feebleline-column-number       :pre ":" :fmt "%-2s")
+          (feebleline-file-directory      :face feebleline-dir-face :post "")
+          (feebleline-file-or-buffer-name :face font-lock-keyword-face :post "")
+          (feebleline-file-modified-star  :face font-lock-warning-face :post "")
+          (feebleline-git-branch          :face feebleline-git-face :pre " : ")
+          (feebleline-project-name        :align right)))
+  (feebleline-mode 1)
+  )
+
+* common-header-mode-line
+
+;; This package is not available on melpa
+
+;; Source: https://github.com/Bad-ptr/common-header-mode-line.el
+
+;; : update: this didnt work :(
+;; : try again in the future
+
+(use-package common-header-mode-line
+  :load-path "packages/common-header-mode-line"
+  :disabled
+  :ensure nil
+  ;;:hook
+  ;; (after-init . (lambda () (common-header-line-mode 1)))
+  ;; (after-init . (lambda () (common-mode-line-mode 1)))
+  :config
+  ;;(with-eval-after-load "common-header-mode-line-autoloads"
+  ;;  (common-mode-line-mode 1)
+  ;;  (common-header-line-mode 1))
+  )
+
+* doom-modeline
+
+;; Require and enable the doom-modeline
+
+(use-package doom-modeline
+  :ensure t
+  :disabled
+  :init
+  :config
+  (doom-modeline-mode 1)
+  (setq doom-modeline-height 20)                  ;; modeline height. only respected in GUI
+  (setq doom-modeline-bar-width 3)                ;; How wide the mode-line bar should be. It's only respected in GUI.
+  (setq doom-modeline-icon t)                     ;; display icons in the modeline
+  (setq doom-modeline-major-mode-icon t)          ;; display the icon for the major mode. it respects `doom-modeline-icon'
+  (setq doom-modeline-major-mode-color-icon t)    ;; display color icons for `major-mode'. It respects `doom-modeline-icon' and `all-the-icons-color-icons'.
+  (setq doom-modeline-buffer-state-icon t)        ;; Whether display icons for buffer states. It respects `doom-modeline-icon'.
+  (setq doom-modeline-buffer-modification-icon t) ;; Whether display buffer modification icon. It respects `doom-modeline-icon' and `doom-modeline-buffer-state-icon'.
+  (setq doom-modeline-minor-modes nil)            ;; Whether display minor modes in mode-line or not.
+  (setq doom-modeline-enable-word-count nil)      ;; If non-nil, a word count will be added to the selection-info modeline segment.
+  (setq doom-modeline-buffer-encoding t)          ;; Whether display buffer encoding.
+  (setq doom-modeline-indent-info nil)            ;; Whether display indentation information.
+  (setq doom-modeline-checker-simple-format t)    ;; If non-nil, only display one number for checker information if applicable.
+  (setq doom-modeline-vcs-max-length 12)          ;; The maximum displayed length of the branch name of version control.
+  (setq doom-modeline-persp-name t)               ;; Whether display perspective name or not. Non-nil to display in mode-line.
+  (setq doom-modeline-persp-name-icon nil)        ;; Whether display icon for persp name. Nil to display a # sign. It respects `doom-modeline-icon'
+  (setq doom-modeline-lsp t)                      ;; Whether display `lsp' state or not. Non-nil to display in mode-line.
+  (setq doom-modeline-github nil)                 ;; Whether display github notifications or not. Requires `ghub` package.
+  (setq doom-modeline-github-interval (* 30 60))  ;; The interval of checking github.
+  (setq doom-modeline-mu4e t)                     ;; Whether display mu4e notifications or not. Requires `mu4e-alert' package.
+  (setq doom-modeline-irc t)                      ;; Whether display irc notifications or not. Requires `circe' package.
+  (setq doom-modeline-irc-stylize 'identity)      ;; Function to stylize the irc buffer names.
+
+  ;; Determines the style used by `doom-modeline-buffer-file-name'.
+  ;;
+  ;; Given ~/Projects/FOSS/emacs/lisp/comint.el
+  ;;   truncate-upto-project = ~/P/F/emacs/lisp/comint.el
+  ;;   truncate-from-project = ~/Projects/FOSS/emacs/l/comint.el
+  ;;   truncate-with-project = emacs/l/comint.el
+  ;;   truncate-except-project = ~/P/F/emacs/l/comint.el
+  ;;   truncate-upto-root = ~/P/F/e/lisp/comint.el
+  ;;   truncate-all = ~/P/F/e/l/comint.el
+  ;;   relative-from-project = emacs/lisp/comint.el
+  ;;   relative-to-project = lisp/comint.el
+  ;;   file-name = comint.el
+  ;;   buffer-name = comint.el<2> (uniquify buffer name)
+  ;;
+  ;; If you are expereicing the laggy issue, especially while editing remote files
+  ;; with tramp, please try `file-name' style.
+  ;; Please refer to https://github.com/bbatsov/projectile/issues/657.
+  (setq doom-modeline-buffer-file-name-style 'truncate-upto-project)
+
+  ;; Whether display environment version or not
+  (setq doom-modeline-env-version t)
+  ;; Or for individual languages
+  ;; (setq doom-modeline-env-enable-python t)
+  ;; (setq doom-modeline-env-enable-ruby t)
+  ;; (setq doom-modeline-env-enable-perl t)
+  ;; (setq doom-modeline-env-enable-go t)
+  ;; (setq doom-modeline-env-enable-elixir t)
+  ;; (setq doom-modeline-env-enable-rust t)
+
+  ;; Change the executables to use for the language version string
+  (setq doom-modeline-env-python-executable "python")
+  (setq doom-modeline-env-ruby-executable "ruby")
+  (setq doom-modeline-env-perl-executable "perl")
+  (setq doom-modeline-env-go-executable "go")
+  (setq doom-modeline-env-elixir-executable "iex")
+  (setq doom-modeline-env-rust-executable "rustc")
+  )
+
+* Save emacs sessions
+
+
+
+(use-package desktop
+  :ensure nil
+  :bind
+  ("C-c s" . desktop-save-in-desktop-dir)
+  :init
+  ;; use only one desktop
+  (setq desktop-path '("~/.emacs.d/"))
+  (setq desktop-dirname "~/.emacs.d/")
+  (setq desktop-base-file-name "emacs-desktop")
+
+  (setq desktop-restore-eager 5) ;; restore 5 buffers immediately. the others restore lazily
+  (setq desktop-load-locked-desktop t)
+  (setq desktop-files-not-to-save "^$")
+  (setq desktop-save t)
+  (setq desktop-buffers-not-to-save
+        (concat "\\("
+                "^nn\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
+                "\\|\\.emacs.*\\|\\.diary\\|\\.newsrc-dribble\\|\\.bbdb"
+                "\\)$"))
+  :config
+  (desktop-save-mode t)
+  (add-to-list 'desktop-modes-not-to-save 'dired-mode)
+  (add-to-list 'desktop-modes-not-to-save 'Info-mode)
+  (add-to-list 'desktop-modes-not-to-save 'info-lookup-mode)
+  (add-to-list 'desktop-modes-not-to-save 'fundamental-mode)
+  (add-to-list 'desktop-modes-not-to-save 'completion-list-mode)
+
+  ;; remove desktop after it's been read
+  (add-hook 'desktop-after-read-hook
+            '(lambda ()
+               ;; desktop-remove clears desktop-dirname
+               (setq desktop-dirname-tmp desktop-dirname)
+               (desktop-remove)
+               (setq desktop-dirname desktop-dirname-tmp)))
+
+  (defun saved-session ()
+    (file-exists-p (concat desktop-dirname "/" desktop-base-file-name)))
+
+  ;; use session-restore to restore the desktop manually
+  (defun session-restore ()
+    "Restore a saved emacs session."
+    (interactive)
+    (if (saved-session)
+        (desktop-read)
+      (message "No desktop found.")))
+
+  ;; use session-save to save the desktop manually
+  (defun session-save ()
+    "Save an emacs session."
+    (interactive)
+    (if (saved-session)
+        (if (y-or-n-p "Overwrite existing desktop? ")
+            (desktop-save-in-desktop-dir)
+          (message "Session not saved."))
+      (desktop-save-in-desktop-dir)))
+
+  ;; ask user whether to restore desktop at start-up
+  (add-hook 'after-init-hook
+            '(lambda ()
+               (if (saved-session)
+                   (if (y-or-n-p "Restore desktop? ")
+                       (session-restore)))))
+)
+
+* recentf
+
+;; Save list of recently opened files across emacs sessions
+
+
+(use-package recentf
+  :ensure t
+  :config
+  (setq recentf-save-file (expand-file-name "recentf" user-emacs-directory)
+        recentf-max-saved-items 500
+        recentf-max-menu-items 15
+        ;; disable recentf-cleanup on Emacs start, because it can cause
+        ;; problems with remote files
+        recentf-auto-cleanup 'never)
+  (recentf-mode +1)
+  )
+
+* auto-save-visited
+
+;; auto-save file-visiting buffers after five seconds of idle time
+
+
+(use-package auto-save-visited-mode
+  :ensure nil
+  :config
+  (auto-save-visited-mode)
+  )
+
+
+* sublimity
+
+
+(use-package sublimity
+  :ensure t
+  :disabled
+  :config
+  (sublimity-mode 1)
+  )
+
+
+
+
+** sublimity-map (experimental)
+
+;; This package ruins the scrolling from either sublimity-scroll or the smooth-scrolling package
+
+
+(use-package sublimity-map
+  :disabled
+  :ensure nil
+  :config
+  (setq sublimity-map-size 14)  ;; minimap width
+  (setq sublimity-map-fraction 0.3)
+  (setq sublimity-map-text-scale -5)
+  (sublimity-map-set-delay nil) ;; minimap is displayed after 5 seconds of idle time
+
+  ;; document this snippet better, not sure what it does, but it defines the font-family
+  ;;  (add-hook 'sublimity-map-setup-hook
+  ;;          (lambda ()
+  ;;            (setq buffer-face-mode-face '(:family "Monospace"))
+  ;;            (buffer-face-mode)))
+
+  )
+
+
+** sublimity-attractive
+
+(use-package sublimity-attractive
+  :disabled
+  :ensure nil
+  :config
+  (setq sublimity-attractive-centering-width 110)
+
+  ;; these are functions (NOT variables) to configure some UI parts
+  ;; (sublimity-attractive-hide-bars)
+  ;; (sublimity-attractive-hide-vertical-border)
+  ;; (sublimity-attractive-hide-fringes)
+  ;; (sublimity-attractive-hide-modelines)
+  )
+
+* minimap
+
+(use-package minimap
+  :ensure t
+  :disabled t
+  :commands
+  (minimap-bufname minimap-create minimap-kill)
+  :custom
+  (minimap-major-modes '(prog-mode))
+  (minimap-window-location 'right)
+  (minimap-update-delay 0.2)
+  (minimap-minimum-width 20)
+  :bind
+  ("M-<f12> m" . tau/toggle-minimap)
+  :preface
+  (defun tau/toggle-minimap ()
+    "Toggle minimap for current buffer."
+    (interactive)
+    (if (null minimap-bufname)
+        (minimap-create)
+      (minimap-kill)))
+  :config
+  (custom-set-faces
+   '(minimap-active-region-background
+     ((((background dark)) (:background "#555555555555"))
+      (t (:background "#C847D8FEFFFF"))) :group 'minimap))
+  )
+
+
+* hideshowvis
+
+;; Add clicable markers for foldable regions in the fringe
+;; This package is not on elpa, it has to be downloaded and installed locally
+
+;; Source:           https://emacs.stackexchange.com/questions/112/actionable-code-folding-in-emacs-fringe
+;; Package Download: https://github.com/emacsmirror/hideshowvis/blob/master/hideshowvis.el
+
+
+(use-package hideshowvis
+  :ensure nil
+  :defer t
+  :load-path "packages/hideshowvis"
+  :hook
+  (display-line-numbers-mode . hideshowvis-enable)
+  :config
+  (hideshowvis-symbols) ; displaying a + symbol in the fringe for folded regions
+  )
+
+* hi-lock mode
+
+;; Highlight regexp
+
+;; From Mastering Emacs:
+;; There is a mechanism for storing and restoring the Hi-Locks you’ve created. If you create highlights interactively you can tell Emacs to insert those patterns into the active buffer by running M-s h w. Emacs will wrap the elisp patterns in the comment format used by the buffer (if one is defined) or ask if you no comment format is defined.
+
+;; The patterns should be added to the top of the file, as Emacs will only search the first 10,000 characters (customize hi-lock-file-patterns-range to change that amount) for the patterns before giving up.
+
+;; Emacs will not highlight patterns found in a file automatically. You must explicitly tell it to do so by manually invoking M-x hi-lock-mode or globally with global-hi-lock-mode.
+
+
+(use-package hi-lock
+  :init
+  (global-hi-lock-mode 1)
+  :defer t
+  :config
+  (add-hook 'hi-lock-mode-hook
+            (lambda nil
+              (highlight-regexp "FIXME" 'hi-red-b)
+              (highlight-regexp "NOTE" 'hi-red-b)
+              (highlight-regexp "TODO" 'hi-red-b))
+            )
+  ;; always highlight patterns found in files without confirmation
+  (setq hi-lock-file-patterns-policy #'(lambda (dummy) t))
+  )
+
+* hl-anything
+
+;; Highlight portions of text
+
+
+(use-package hl-anything
+  :ensure t
+  :defer t
+  :after evil
+  ;;  :hook
+  ;;  (kill-emacs . hl-save-highlights)
+  :bind
+  ("C-<f8> h" . hl-highlight-thingatpt-local)
+  ("C-<f8> S-h" . hl-highlight-thingatpt-global)
+  ("C-<f8> u l" . hl-unhighlight-all-local)
+  ("C-<f8> u g" . hl-unhighlight-all-global)
+  ("C-<f8> n" . hl-find-next-thing)
+  ("C-<f8> p" . hl-find-prev-thing)
+  ("C-<f8> s" . hl-save-highlights)
+  ("C-<f8> r" . hl-restore-highlights)
+  :config
+  (hl-highlight-mode 1)
+
+  ;; evil leader key bindings for hl-anything
+  (evil-leader/set-key
+    "hul"  'hl-unhighlight-all-local
+    "hug" 'hl-unhighlight-all-global
+    "htg" 'hl-highlight-thingatpt-global
+    "htl"  'hl-highlight-thingatpt-local
+    "hn"  'hl-find-next-thing
+    "hp"  'hl-find-prev-thing
+    "hr"  'hl-restore-highlights
+    "hs"  'hl-save-highlights)
+  )
+
+* volatile highlights
+
+
+(use-package volatile-highlights
+  :ensure t
+  :defer t
+  ;;:hook
+  ;;(after-init . volatile-highlights-mode)
+  :custom-face
+  (vhl/default-face ((nil (:foreground "#FF3333" :background "#FFCDCD"))))
+  :config
+  ;;-----------------------------------------------------------------------------
+  ;; Supporting evil-mode.
+  ;;-----------------------------------------------------------------------------
+  (vhl/define-extension 'evil 'evil-paste-after 'evil-paste-before
+                        'evil-paste-pop 'evil-move)
+  (vhl/install-extension 'evil)
+  ;;-----------------------------------------------------------------------------
+  ;; Supporting undo-tree.
+  ;;-----------------------------------------------------------------------------
+  (vhl/define-extension 'undo-tree 'undo-tree-yank 'undo-tree-move)
+  (vhl/install-extension 'undo-tree)
+  )
+
+* web-mode-edit-element
+
+
+;; **** General Keymaps
+;;| C-(           | web-mode-element-wrap                                 |
+;;| M-(           | web-mode-element-rename                               |
+;;| C-M-SPC       | web-mode-element-content-select                       |
+;;
+;;**** Elements Keymaps
+;;| C-<left>      | web-mode-element-previous                             |
+;;| C-<right>     | web-mode-element-next                                 |
+;;| M-<left>      | web-mode-edit-element-elements-contract-over-border   |
+;;| M-<right>     | web-mode-edit-element-elements-expand-over-border     |
+;;| C-M-<left>    | web-mode-edit-element-elements-transpose-backward     |
+;;| C-M-<right>   | web-mode-element-transpose                            |
+;;| C-<up>        | web-mode-element-beginning                            |
+;;| C-<down>      | web-mode-tag-match                                    |
+;;| C-S-<up>      | web-mode-element-parent                               |
+;;| C-S-<down>    | web-mode-element-next                                 |
+;;| M-<up>        | web-mode-edit-element-elements-dissolve               |
+;;| M-<down>      | web-mode-edit-element-elements-raise                  |
+;;| C-M-<up>      | web-mode-element-vanish                               |
+;;| C-M-<down>    | web-mode-edit-element-elements-sibling-next-or-parent |
+;;| C-k           | web-mode-element-kill                                 |
+;;| C-S-k         | web-mode-edit-element-elements-kill-siblings          |
+;;| M-k           | web-mode-edit-element-elements-kill-siblings-previous |
+;;| M-K           | web-mode-edit-element-elements-kill-siblings-next     |
+
+;; **** Attributes Keymaps
+;; | C-S-<left>    | web-mode-attribute-previous                           |
+;; | C-S-<right>   | web-mode-attribute-next                               |
+;; | C-M-S-<left>  | web-mode-edit-element-attributes-transpose-backward   |
+;; | C-M-S-<right> | web-mode-attribute-transpose                          |
+;; | C-M-S-<up>    | web-mode-attribute-beginning                          |
+;; | C-M-S-<down>  | web-mode-edit-element-attributes-end-inside           |
+;; | C-M-K         | web-mode-attribute-kill                               |
+
+
+(use-package web-mode-edit-element
+  :ensure t
+  )
+
+* eslintd-fix
+
+;; eslintd-fix: Emacs minor-mode to automatically fix javascript with eslint_d.
+;; https://github.com/aaronjensen/eslintd-fix/tree/master
+
+(use-package eslintd-fix
+  :ensure t
+  :defer t
+  :config
+  ;; Grab eslint executable from node_modules instead of global
+  ;; Taken from https://github.com/flycheck/flycheck/issues/1087#issuecomment-246514860
+  ;; Gist: https://github.com/lunaryorn/.emacs.d/blob/master/lisp/lunaryorn-flycheck.el#L62
+  (defun lunaryorn-use-js-executables-from-node-modules ()
+    "Set executables of JS and TS checkers from local node modules."
+    (-when-let* ((file-name (buffer-file-name))
+                 (root (locate-dominating-file file-name "node_modules"))
+                 (module-directory (expand-file-name "node_modules" root)))
+      (pcase-dolist (`(,checker . ,module) '((javascript-jshint . "jshint")
+                                             (javascript-eslint . "eslint")
+                                             (typescript-tslint . "tslint")
+                                             (javascript-jscs   . "jscs")))
+        (let ((package-directory (expand-file-name module module-directory))
+              (executable-var (flycheck-checker-executable-variable checker)))
+          (when (file-directory-p package-directory)
+            (set (make-local-variable executable-var)
+                 (expand-file-name (if (string= module "tslint")
+                                       (concat "bin/" module)
+                                     (concat "bin/" module ".js"))
+                                   package-directory)))))))
+  )
+
+
+* json-snatcher
+
+;; json-snatcher: get the path of any JSON element easily
+;; https://github.com/Sterlingg/json-snatcher
+
+
+(use-package json-snatcher
+  :ensure t
+  :defer t
+  :hook
+  (json-mode . js-mode-bindings)
+  :config
+  (defun js-mode-bindings ()
+    "Sets a hotkey for using the json-snatcher plugin"
+    (when (string-match  "\\.json$" (buffer-name))
+      (local-set-key (kbd "C-c C-g") 'jsons-print-path)))
+  )
+
+
+* Tide
+
+(use-package tide
+  :ensure t
+  :defer t
+  :after (typescript-mode company flycheck)
+  :preface
+  (defun setup-tide-mode ()
+    (interactive)
+    (tide-setup)
+    (flycheck-mode +1)
+    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+    (eldoc-mode +1)
+    (tide-hl-identifier-mode +1)
+    (company-mode +1)
+    )
+  ;;:hook
+  ;;(tide-mode . setup-tide-mode)
+  ;;(before-save . tide-format-before-save)
+  :init
+  (setq tide-always-show-documentation t)
+  :config
+  ;;(add-hook 'before-save-hook 'tide-format-before-save)
+  ;;(add-hook 'typescript-mode-hook #'setup-tide-mode)
+  ;;(add-hook 'js2-mode-hook #'setup-tide-mode)
+  )
+
+* abbrev
+;; **************************************************
+
+;; * abbrev
+
+(use-package abbrev
+  :ensure nil
+  :config
+  (define-abbrev-table 'global-abbrev-table '(
+                                              ("alpha" "α")
+                                              ("infinity" "∞")
+                                              ("arrow" "→")
+                                              ))
+  )
+* org-kanban
+
+(use-package org-kanban
+  :ensure t
+  :defer t
+  :after org
+  :commands  (org-kanban/initialize)
+  :config
+)
+* git-messenger
+
+(use-package git-messenger
+  :ensure t
+  :bind
+  ("C-c g p" . git-messenger:popup-message)
+  :init
+  (setq git-messenger:show-detail t)
+  (setq git-messenger:use-magit-popup t)
+  :config
+  (progn
+    (define-key git-messenger-map (kbd "RET") 'git-messenger:popup-close))
+  )
+
+* gnus
+
+(use-package gnus
+  :ensure nil
+  :config
+  (setq user-mail-address "gugutz@gmail.com"
+        user-full-name "tau")
+
+  (setq gnus-select-method
+        '(nnimap "gmail"
+                 (nnimap-address "imap.gmail.com")
+                 (nnimap-server-port 993)
+                 (nnimap-stream ssl)))
+
+  (setq smtpmail-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-service 587
+        gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
+
+  (setq gnus-thread-sort-functions
+        '(gnus-thread-sort-by-most-recent-date
+          (not gnus-thread-sort-by-number)))
+
+  (defun my-gnus-group-list-subscribed-groups ()
+    "List all subscribed groups with or without un-read messages"
+    (interactive)
+    (gnus-group-list-all-groups 5))
+
+  (define-key gnus-group-mode-map
+    ;; list all the subscribed groups even they contain zero un-read messages
+    (kbd "o") 'my-gnus-group-list-subscribed-groups)
+  )
+* dap - debug adapter protocol
+
+(use-package dap-mode
+  :ensure t
+  :defer t
+  :diminish
+  :bind
+  (:map dap-mode-map
+        (("<M-f12>" . dap-debug)
+         ("<M-f8>" . dap-continue)
+         ("<M-f9>" . dap-next)
+         ("<M-f11>" . dap-step-in)
+         ("C-M-<f11>" . dap-step-out)
+         ("<M-f7>" . dap-breakpoint-toggle)))
+  :hook ((after-init . dap-mode)
+         (dap-mode . dap-ui-mode)
+         (python-mode . (lambda () (require 'dap-python)))
+         (ruby-mode . (lambda () (require 'dap-ruby)))
+         (go-mode . (lambda () (require 'dap-go)))
+         (java-mode . (lambda () (require 'dap-java)))
+         ((c-mode c++-mode objc-mode swift) . (lambda () (require 'dap-lldb)))
+         (php-mode . (lambda () (require 'dap-php)))
+         (elixir-mode . (lambda () (require 'dap-elixir)))
+         ((js-mode js2-mode typescript-mode) . (lambda () (require 'dap-chrome))))
+  :config
+  ;; (dap-mode 1)
+  ;; (dap-ui-mode 1)
+  ;; enables mouse hover support
+  ;; (dap-tooltip-mode 1)
+  ;; use tooltips for mouse hover
+  ;; if it is not enabled `dap-mode' will use the minibuffer.
+  ;; (tooltip-mode 1)
+  ;; dap-mode also provides a hydra with dap-hydra. You can automatically trigger the hydra when the program hits a breakpoint by using the following code.
+  (add-hook 'dap-stopped-hook
+            (lambda (arg) (call-interactively #'dap-hydra)))
+  )
+* lsp treemacs
+
+(use-package lsp-treemacs
+  :ensure t
+  :defer t
+  :commands lsp-treemacs-errors-list
+  :init
+  (setq lsp-treemacs-sync-mode 1)
+  )
+
+* PRESCIENT
+
+;; Filter candidates for several frameworks and packages
+
+(use-package prescient
+  :ensure t
+  :custom
+  (prescient-filter-method '(literal regexp initialism fuzzy))
+  :config
+  (prescient-persist-mode +1)
+  )
+
+(use-package ivy-prescient
+  :ensure t
+  :after (prescient ivy)
+  :custom
+  (ivy-prescient-sort-commands
+    '(:not swiper
+       counsel-grep
+       counsel-rg
+       counsel-projectile-rg
+       ivy-switch-buffer
+       counsel-switch-buffer))
+  (ivy-prescient-retain-classic-highlighting t)
+  :config
+  (ivy-prescient-mode +1)
+  )
+
+(use-package company-prescient
+  :after (prescient company)
+  :config
+  (company-prescient-mode +1)
+  )
+
+* highlight-tail (either this or beacon was giving the ivy-posframe bug of not working on first try, only the second. text would go to minibuffer instead of the posframe)
+
+(use-package highlight-tail
+  :load-path "packages/highlight-tail"
+  :ensure nil
+  :config
+  (setq highlight-tail-colors '(("#9310FF" . 0) ;; closest to cursor
+                                ("#9370DB" . 35)  ;; midle of tail
+                                ("#DDA0DD" . 76)))  ;; end of the tail
+  (setq highlight-tail-steps 17)
+  (setq highlight-tail-timer 0.05)
+  (setq highlight-tail-posterior-type 'const)
+  (highlight-tail-mode)
+  )
+
+
+* beacon - flash light where cursor is (either this or highlight-tail was giving the ivy-posframe bug of not working on first try, only the second. text would go to minibuffer instead of the posframe)
+
+(use-package beacon
+  :ensure t
+  :hook
+  (post-self-insert . beacon-blink)
+  (blink-cursor-mode. beacon-blink)
+  (after-change-functions . beacon-blink)
+  (delete-selection-mode . beacon-blink)
+  (normal-erase-is-backspace . beacon-blink)
+  :init
+  (setq inhibit-modification-hooks nil)
+  (setq beacon-blink-when-point-moves-vertically 1) ; default nil
+  (setq beacon-blink-when-point-moves-horizontally 1) ; default nil
+  (setq beacon-blink-when-buffer-changes t) ; default t
+  (setq beacon-blink-when-window-scrolls t) ; default t
+  (setq beacon-blink-when-window-changes t) ; default t
+  (setq beacon-blink-when-focused nil) ; default nil
+  (setq beacon-blink-duration 0.2) ; default 0.3
+  (setq beacon-blink-delay 0.3) ; default 0.3
+  (setq beacon-size 23) ; default 40
+  (setq beacon-color "#9310FF") ; default 0.5
+  :config
+  (setq inhibit-modification-hooks nil)
+  (add-hook 'after-change-functions #'beacon-blink)
+  (beacon-mode 1)
+  )
+
+* highlight-context-line
+
+;; The line of your Emacs buffer that is at the top of the window before you start to scroll, is considered the context line. It is the last line in the view after scrolling that was visible before scrolling. Similarly the line at the bottom of the window is the context line for scrolling down.
+;; Whenever you scrolled it painted a line across the document that reflected where the previous view ended.
+
+
+(use-package highlight-context-line
+  :ensure t
+  :defer t
+  :config
+  (highlight-context-line-mode 1)
+  )
+
+* Highlight crosshair
+
+;; Highlight crosshair (combination of hl-lines and hl-columns
+
+(use-package crosshairs
+  :load-path "packages/crosshairs"
+  :ensure nil
+  :defer t
+  :config
+  (crosshairs-mode)
+  )
+
+* centaur-tabs
+
+(use-package centaur-tabs
+  :ensure t
+  :hook
+  (after-init . centaur-tabs-mode)
+  (dashboard-mode . centaur-tabs-local-mode)
+  (term-mode . centaur-tabs-local-mode)
+  (calendar-mode . centaur-tabs-local-mode)
+  (org-agenda-mode . centaur-tabs-local-mode)
+  (helpful-mode . centaur-tabs-local-mode)
+  :custom
+  ;; appearantly these dont work if put in :init
+  (centaur-tabs-style "bar")           ; types available: (alternative, bar, box, chamfer, rounded, slang, wave, zigzag)
+  (centaur-tabs-height 28)
+  (centaur-tabs-set-icons t)           ;; display themed icons from all the icons
+  (centaur-tabs-set-modified-marker t) ;; display a marker indicating that a buffer has been modified (atom-style)
+  (centaur-tabs-modified-marker "*")
+  (centaur-tabs-set-close-button t)
+  (centaur-tabs-close-button "X")
+  (centaur-tabs-set-bar 'over)         ;; in previous config value was 'over
+  (centaur-tabs-gray-out-icons 'buffer)
+  (centaur-tabs-adjust-buffer-order t)
+  (uniquify-separator "/")
+  (uniquify-buffer-name-style 'forward)
+  :custom-face
+  (centaur-tabs-active-bar-face ((t (:background "cyan"))))
+  (centaur-tabs-default ((t (:background "black" :foreground "black"))))
+  (centaur-tabs-unselected ((t (:background "#292929" :foreground "grey50"))))
+  (centaur-tabs-selected ((t (:background "#181818" :foreground "white"))))
+  (centaur-tabs-unselected-modified ((t (:background "#3D3C3D" :foreground "grey50"))))
+  (centaur-tabs-selected-modified ((t (:background "#181818" :foreground "white"))))
+  (centaur-tabs-close-unselected ((t (:inherit centaur-tabs-unselected))))
+  (centaur-tabs-close-selected ((t (:inherit centaur-tabs-selected))))
+  (centaur-tabs-close-mouse-face ((t (:inherit underline))))
+  (centaur-tabs-modified-marker-selected ((t (:inherit centaur-tabs-selected))))
+  (centaur-tabs-modified-marker-unselected ((t (:inherit centaur-tabs-unselected))))
+  :bind
+  ("C-<prior>" . centaur-tabs-backward)
+  ("C-<next>" . centaur-tabs-forward)
+  ("C-c t s" . centaur-tabs-counsel-switch-group)
+  ("C-c t p" . centaur-tabs-group-by-projectile-project)
+  ("C-c t g" . centaur-tabs-group-buffer-groups)
+  (:map evil-normal-state-map
+    ("g t" . centaur-tabs-forward)
+    ("g T" . centaur-tabs-backward))
+  ;;  :init
+  :config
+  ;; functions
+  ;; (centaur-tabs-change-fonts "arial" 160)
+  (centaur-tabs-headline-match)
+  (centaur-tabs-enable-buffer-reordering)
+  (centaur-tabs-mode t)
+  )
+
+* company
+(use-package company
+  :ensure t
+  :diminish company-mode
+  :preface
+  (defun smarter-yas-expand-next-field-complete ()
+    "Try to `yas-expand' and `yas-next-field' at current cursor position.
+If failed try to complete the common part with `company-complete-common'"
+    (interactive)
+    (if yas-minor-mode
+      (let ((old-point (point))
+             (old-tick (buffer-chars-modified-tick)))
+        (yas-expand)
+        (when (and (eq old-point (point))
+                (eq old-tick (buffer-chars-modified-tick)))
+          (ignore-errors (yas-next-field))
+          (when (and (eq old-point (point))
+                  (eq old-tick (buffer-chars-modified-tick)))
+            (company-complete-common))))
+      (company-complete-common)))
+  :hook
+  (after-init . global-company-mode)
+  :bind
+  (:map company-active-map
+    ([tab] . smarter-yas-expand-next-field-complete)
+    ("TAB" . smarter-yas-expand-next-field-complete))
+  (:map evil-insert-state-map
+    ;; ("<tab>" . company-indent-or-complete-common)
+    ("C-SPC" . company-indent-or-complete-common))
+  (:map company-active-map
+    ("M-n" . nil)
+    ("M-p" . nil)
+    ("C-n" . company-select-next)
+    ("C-p" . company-select-previous)
+    ("S-<backtab>" . company-select-previous)
+    ("<backtab>" . company-select-previous)
+    ("C-d" . company-show-doc-buffer))
+  (:map company-search-map
+    ("C-p" . company-select-previous)
+    ("C-n" . company-select-next))
+  :custom-face
+  (company-preview-common ((t (:foreground unspecified :background "#111111"))))
+  (company-scrollbar-bg ((t (:background "#111111"))))
+  (company-scrollbar-fg ((t (:background "#555555"))))
+  (company-tooltip ((t (:inherit default :background "#202029"))))
+  (company-tooltip-common ((t (:inherit font-lock-constant-face))))
+  (company-tooltip-selection ((t (:inherit company-tooltip-common :background "#2a2a2a" ))))
+  :custom
+  (company-minimum-prefix-length 1)                      ; start completing after 1st char typed
+  (company-tooltip-align-annotations t)
+  (company-tooltip-limit 20)                             ; bigger popup window
+  (company-begin-commands '(self-insert-command))        ; start autocompletion only after typing
+  (company-idle-delay 0.1)                               ; decrease delay before autocompletion popup shows
+  (company-echo-delay 0)                                 ; remove annoying blinking
+  (company-selection-wrap-around t)                      ; continue from top when reaching bottom
+  (company-auto-complete 'company-explicit-action-p)
+  (company-require-match nil)
+  (company-complete-number t)                            ;; Allow (lengthy) numbers to be eligible for completion.
+  (company-show-numbers t)                               ;; Number the candidates (use M-1, M-2 etc to select completions).
+  (company-transformers '(company-sort-by-occurrence))   ; weight by frequency
+  ;; company-dabbrev
+  (company-dabbrev-downcase nil)                         ;; Do not downcase completions by default.
+  (company-dabbrev-ignore-case t)                        ;; Even if I write something with the ‘wrong’ case, provide the ‘correct’ casing.
+  (company-dabbrev-code-everywhere t)
+  (company-dabbrev-other-buffers t)
+  (company-dabbrev-code-other-buffers t)
+  :config
+  (global-company-mode)
+  (progn
+    (bind-key [remap completion-at-point] #'company-complete company-mode-map))
+  ;; show tooltip even for single candidates
+  (setq company-frontends '(company-pseudo-tooltip-frontend
+                             company-echo-metadata-frontend))
+  )
+* Company Box (icons in suggestions)
+
+;; CompanyBoxPac
+(use-package company-box
+  :ensure t
+  :diminish
+  :functions (my-company-box--make-line
+               my-company-box-icons--elisp)
+  :commands (company-box--get-color
+              company-box--resolve-colors
+              company-box--add-icon
+              company-box--apply-color
+              company-box--make-line
+              company-box-icons--elisp)
+  :hook ((global-company-mode company-mode) . company-box-mode)
+  :custom
+  (company-box-backends-colors nil)
+  (company-box-show-single-candidate t)
+  (company-box-max-candidates 50)
+  (company-box-doc-delay 0.3)
+  :config
+  ;; Support `company-common'
+  (defun my-company-box--make-line (candidate)
+    (-let* (((candidate annotation len-c len-a backend) candidate)
+             (color (company-box--get-color backend))
+             ((c-color a-color i-color s-color) (company-box--resolve-colors color))
+             (icon-string (and company-box--with-icons-p (company-box--add-icon candidate)))
+             (candidate-string (concat (propertize (or company-common "") 'face 'company-tooltip-common)
+                                 (substring (propertize candidate 'face 'company-box-candidate) (length company-common) nil)))
+             (align-string (when annotation
+                             (concat " " (and company-tooltip-align-annotations
+                                           (propertize " " 'display `(space :align-to (- right-fringe ,(or len-a 0) 1)))))))
+             (space company-box--space)
+             (icon-p company-box-enable-icon)
+             (annotation-string (and annotation (propertize annotation 'face 'company-box-annotation)))
+             (line (concat (unless (or (and (= space 2) icon-p) (= space 0))
+                             (propertize " " 'display `(space :width ,(if (or (= space 1) (not icon-p)) 1 0.75))))
+                     (company-box--apply-color icon-string i-color)
+                     (company-box--apply-color candidate-string c-color)
+                     align-string
+                     (company-box--apply-color annotation-string a-color)))
+             (len (length line)))
+      (add-text-properties 0 len (list 'company-box--len (+ len-c len-a)
+                                   'company-box--color s-color)
+        line)
+      line))
+  (advice-add #'company-box--make-line :override #'my-company-box--make-line)
+
+  ;; Prettify icons
+  (defun my-company-box-icons--elisp (candidate)
+    (when (derived-mode-p 'emacs-lisp-mode)
+      (let ((sym (intern candidate)))
+        (cond ((fboundp sym) 'Function)
+          ((featurep sym) 'Module)
+          ((facep sym) 'Color)
+          ((boundp sym) 'Variable)
+          ((symbolp sym) 'Text)
+          (t . nil)))))
+  (advice-add #'company-box-icons--elisp :override #'my-company-box-icons--elisp)
+
+  (when (and (window-system)
+          (require 'all-the-icons nil t))
+    (declare-function all-the-icons-faicon 'all-the-icons)
+    (declare-function all-the-icons-material 'all-the-icons)
+    (declare-function all-the-icons-octicon 'all-the-icons)
+    (setq company-box-icons-all-the-icons
+      `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.85 :v-adjust -0.2))
+         (Text . ,(all-the-icons-faicon "text-width" :height 0.8 :v-adjust -0.05))
+         (Method . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+         (Function . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+         (Constructor . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+         (Field . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
+         (Variable . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
+         (Class . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+         (Interface . ,(all-the-icons-material "share" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+         (Module . ,(all-the-icons-material "view_module" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+         (Property . ,(all-the-icons-faicon "wrench" :height 0.8 :v-adjust -0.05))
+         (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.85 :v-adjust -0.2))
+         (Value . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+         (Enum . ,(all-the-icons-material "storage" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+         (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.85 :v-adjust -0.2))
+         (Snippet . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2))
+         (Color . ,(all-the-icons-material "palette" :height 0.85 :v-adjust -0.2))
+         (File . ,(all-the-icons-faicon "file-o" :height 0.85 :v-adjust -0.05))
+         (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.85 :v-adjust -0.2))
+         (Folder . ,(all-the-icons-faicon "folder-open" :height 0.85 :v-adjust -0.05))
+         (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+         (Constant . ,(all-the-icons-faicon "square-o" :height 0.85 :v-adjust -0.05))
+         (Struct . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+         (Event . ,(all-the-icons-faicon "bolt" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-orange))
+         (Operator . ,(all-the-icons-material "control_point" :height 0.85 :v-adjust -0.2))
+         (TypeParameter . ,(all-the-icons-faicon "arrows" :height 0.8 :v-adjust -0.05))
+         (Template . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2)))
+      company-box-icons-alist 'company-box-icons-all-the-icons)))
+;; -CompanyBoxPac

@@ -1,0 +1,18 @@
+;;; -*- coding: utf-8 -*-
+(("/home/tau/.emacs.d/"
+  (dired-filename . "/home/tau/.emacs.d/init.el"))
+ ("/home/tau/dotfiles/"
+  (dired-filename . "/home/tau/dotfiles/emacs.d-pre-reset"))
+ ("/home/tau/dotfiles/emacs.d-pre-reset/"
+  (dired-filename . "/home/tau/dotfiles/emacs.d-pre-reset/init2.el"))
+ ("/home/tau/dotfiles/emacs.d-pre-reset/emacs-removed-packages.org" . 65887)
+ ("/srv/tau/code/freelas/wego/src/app/app.module.ts" . 394)
+ ("/srv/tau/code/freelas/wego/src/"
+  (dired-filename . "/srv/tau/code/freelas/wego/src/.."))
+ ("/home/tau/dotfiles/emacs.d-pre-reset/init2.el" . 124908)
+ ("/home/tau/dotfiles/emacs.d/init.el" . 47052)
+ ("/home/tau/.emacs.d/elpa/web-mode-20191104.1859/web-mode-autoloads.el" . 498)
+ ("/home/tau/.emacs.d/elpa/editorconfig-20200116.902/editorconfig-autoloads.el" . 5144)
+ ("/home/tau/.emacs.d/elpa/flycheck-posframe-20191214.1109/flycheck-posframe-autoloads.el" . 767)
+ ("/home/tau/.emacs.d/elpa/flycheck-20191126.2142/flycheck-autoloads.el" . 9059)
+ ("/home/tau/.emacs.d/elpa/expand-region-20200106.2058/expand-region-autoloads.el" . 10432))

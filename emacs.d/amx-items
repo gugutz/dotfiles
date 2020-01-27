@@ -1,13 +1,13 @@
 
 ;; ----- amx-history -----
 (
- occur-mode
- package-install
- package-refresh-contents
- lsp
- balance-windows-area
- eldoc-box-hover-mode
- rainbow-mode
+ eval-buffer
+ eval-defun
+ parrot-mode
+ format-all-mode
+ text-scale-decrease
+ yas-minor-mode
+ which-key-mode
 )
 
 ;; ----- amx-data -----
@@ -22,7 +22,7 @@
  (counsel-projectile-mode . 2)
  (swiper-avy . 2)
  (align-regexp . 3)
- (package-install . 28)
+ (package-install . 29)
  (package-refresh-contents . 3)
  (package-delete . 11)
  (electric-indent-mode . 1)
@@ -40,10 +40,10 @@
  (org-bullets-mode . 4)
  (avy-goto-char . 2)
  (avy-goto-char-2 . 1)
- (rainbow-mode . 13)
+ (rainbow-mode . 14)
  (profiler-start . 1)
  (profiler-report . 1)
- (evil-mode . 2)
+ (evil-mode . 15)
  (visual-line-mode . 5)
  (display-line-numbers-mode . 5)
  (flycheck-mode . 5)
@@ -56,7 +56,7 @@
  (snake . 2)
  (c-c-combo-mode . 2)
  (check-parens . 2)
- (eyebrowse-mode . 5)
+ (eyebrowse-mode . 12)
  (js2-mode . 1)
  (conf-unix-mode . 1)
  (dumb-jump-mode . 2)
@@ -71,7 +71,7 @@
  (revert-buffer . 1)
  (prettier-js-mode . 13)
  (org-mode . 6)
- (which-key-mode . 1)
+ (which-key-mode . 5)
  (eval-region . 1)
  (org . 1)
  (dashboard-refresh-buffer . 1)
@@ -83,12 +83,12 @@
  (prettier-js . 14)
  (highlight-operators-mode . 3)
  (highlight-parentheses-mode . 4)
- (show-paren-mode . 2)
+ (show-paren-mode . 4)
  (rainbow-delimiters-mode . 2)
  (hl-line-mode . 4)
  (volatile-highlights-mode . 1)
  (hydra-frame-window/body . 3)
- (toggle-debug-on-error . 10)
+ (toggle-debug-on-error . 11)
  (shell-pop . 2)
  (dumb-jump-go . 2)
  (lsp . 4)
@@ -102,8 +102,8 @@
  (dap-chrome-setup . 1)
  (company-tabnine-install-binary . 1)
  (describe-face . 1)
- (yas-minor-mode . 4)
- (eval-buffer . 1)
+ (yas-minor-mode . 6)
+ (eval-buffer . 87)
  (outshine-menu . 1)
  (outline-mode . 1)
  (lsp-execute-code-action . 9)
@@ -135,4 +135,15 @@
  (balance-windows-area . 1)
  (flycheck-buffer . 1)
  (occur-mode . 1)
+ (amx-mode . 1)
+ (turn-on-evil-mode . 5)
+ (ivy-explorer-mode . 1)
+ (eval-defun . 3)
+ (color-identifiers-mode . 1)
+ (color-identifiers:refresh . 1)
+ (drag-stuff-mode . 1)
+ (highlight-indent-guides-mode . 2)
+ (text-scale-decrease . 4)
+ (format-all-mode . 2)
+ (parrot-mode . 2)
 )
