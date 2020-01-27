@@ -1,18 +1,18 @@
 
 ;; ----- amx-history -----
 (
- eval-buffer
- eval-defun
+ bug-hunter-init-file
+ execute-extended-command
+ revert-buffer
  parrot-mode
- format-all-mode
- text-scale-decrease
- yas-minor-mode
- which-key-mode
+ eval-defun
+ nyan-mode
+ package-install
 )
 
 ;; ----- amx-data -----
 (
- (bug-hunter-init-file . 8)
+ (bug-hunter-init-file . 10)
  (scss-mode . 12)
  (eslintd-fix-mode . 3)
  (helm-M-x . 1)
@@ -22,11 +22,11 @@
  (counsel-projectile-mode . 2)
  (swiper-avy . 2)
  (align-regexp . 3)
- (package-install . 29)
+ (package-install . 32)
  (package-refresh-contents . 3)
  (package-delete . 11)
  (electric-indent-mode . 1)
- (aggressive-indent-mode . 1)
+ (aggressive-indent-mode . 2)
  (customize-variable . 1)
  (exit-recursive-edit . 2)
  (ivy-mode . 9)
@@ -68,7 +68,7 @@
  (org-table-paste-rectangle . 1)
  (org-table-create . 1)
  (org-table-create-or-convert-from-region . 5)
- (revert-buffer . 1)
+ (revert-buffer . 2)
  (prettier-js-mode . 13)
  (org-mode . 6)
  (which-key-mode . 5)
@@ -103,7 +103,7 @@
  (company-tabnine-install-binary . 1)
  (describe-face . 1)
  (yas-minor-mode . 6)
- (eval-buffer . 87)
+ (eval-buffer . 97)
  (outshine-menu . 1)
  (outline-mode . 1)
  (lsp-execute-code-action . 9)
@@ -138,12 +138,17 @@
  (amx-mode . 1)
  (turn-on-evil-mode . 5)
  (ivy-explorer-mode . 1)
- (eval-defun . 3)
+ (eval-defun . 5)
  (color-identifiers-mode . 1)
  (color-identifiers:refresh . 1)
  (drag-stuff-mode . 1)
  (highlight-indent-guides-mode . 2)
  (text-scale-decrease . 4)
  (format-all-mode . 2)
- (parrot-mode . 2)
+ (parrot-mode . 12)
+ (nyan-mode . 6)
+ (elisp-byte-code-mode . 1)
+ (timeclock-mode-line-display . 1)
+ (parrot-start-animation . 1)
+ (execute-extended-command . 1)
 )
