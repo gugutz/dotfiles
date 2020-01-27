@@ -6,3 +6,4 @@ Host bitbucket.org
     Hostname bitbucket.org
     IdentityFile ~/.ssh/id_rsa_stairs_bitbucket
     IdentitiesOnly yes
+AddKeysToAgent yes

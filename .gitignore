@@ -25,8 +25,9 @@ tramp
 
 # elpa packages
 /elpa/
+elpa/
 
-# elpa packages
+# qelpa packages
 /quelpa/
 
 # cache files
