@@ -1,5 +1,5 @@
 ;;; -*- coding: utf-8 -*-
-(("/home/tau/dotfiles/emacs.d/init.el" . 50903)
+(("/home/tau/dotfiles/emacs.d/init.el" . 52495)
  ("/home/tau/dotfiles/emacs.d/elpa/evil-20200126.906/evil-vars.el" . 44202)
  ("/home/tau/.emacs.d/"
   (dired-filename . "/home/tau/.emacs.d/init.el"))
