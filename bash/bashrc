@@ -5,8 +5,6 @@
 # Enable history appending instead of overwriting.  #139609
 shopt -s histappend
 
-## resume wget downloads by default
-alias wget='wget -c'
 
 set -o vi
 [[ $- != *i* ]] && return
@@ -24,14 +22,12 @@ esac
 
 #################################################
 # my shell aliases
-#################################################
 
 [[ -f $HOME/.aliases ]] && . $HOME/.aliases
 
 
 #################################################
 # appearance
-#################################################
 
 colors() {
 	local fgc bgc vals seq0
@@ -61,18 +57,8 @@ colors() {
 }
 
 
-# add powerline to bash
-powerline-daemon -q
-POWERLINE_BASH_CONTINUATION=1
-POWERLINE_BASH_SELECT=1
-
-# source powerline only if exists
-[[ -f /usr/lib/python3.6/site-packages/powerline/bindings/bash/powerline.sh ]] && \
-    . /usr/lib/python3.6/site-packages/powerline/bindings/bash/powerline.sh
-
 #################################################
 # extensions and complements to bash
-#################################################
 
 # Use bash-completion, if available
 [[ $PS1 && -f /usr/share/bash-completion/bash_completion ]] && \
@@ -142,10 +128,6 @@ shopt -s checkwinsize
 
 shopt -s expand_aliases
 
-# export QT_SELECT=4
-
-
-
 
 #################################################
 # helper functions
@@ -175,22 +157,95 @@ ex ()
   fi
 }
 
+#################################################
+# LOAD APPS
+
 ################################################
+# tmux
+
+# the conditional bellow checks if tmux exists, if we're in a non-interactive shell, and if we're not already inside tmux
+if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
+  exec tmux
+fi
+################################################
+# asdf
+
 # source asdf and enable its completions, it available
 [[ -f $HOME/asdf/asdf.sh ]] && . $HOME/asdf/asdf.sh
 [[ -f $HOME/asdf/completions/asdf.bash ]] && . $HOME/.asdf/completions/asdf.bash
-# . $HOME/.asdf/asdf.sh
-# . $HOME/.asdf/completions/asdf.bash
 
 
+################################################
+# nvm
 
-export NVM_DIR="$HOME/.nvm"
+# the NVM_DIR env var used bellow is exported in .profile
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# tmuxinator
-source $HOME/.bin/tmuxinator.bash
+# Calling nvm use automatically in a directory with a .nvmrc file
+# place this after nvm initialization!
+#
+# source: https://github.com/nvm-sh/nvm#bash
 
+find-up () {
+    path=$(pwd)
+    while [[ "$path" != "" && ! -e "$path/$1" ]]; do
+        path=${path%/*}
+    done
+    echo "$path"
+}
 
-export YVM_DIR=/home/tau/.yvm
+cdnvm(){
+    cd "$@";
+    nvm_path=$(find-up .nvmrc | tr -d '[:space:]')
+
+    # If there are no .nvmrc file, use the default nvm version
+    if [[ ! $nvm_path = *[^[:space:]]* ]]; then
+
+        declare default_version;
+        default_version=$(nvm version default);
+
+        # If there is no default version, set it to `node`
+        # This will use the latest version on your machine
+        if [[ $default_version == "N/A" ]]; then
+            nvm alias default node;
+            default_version=$(nvm version default);
+        fi
+
+        # If the current version is not the default version, set it to use the default version
+        if [[ $(nvm current) != "$default_version" ]]; then
+            nvm use default;
+        fi
+
+        elif [[ -s $nvm_path/.nvmrc && -r $nvm_path/.nvmrc ]]; then
+        declare nvm_version
+        nvm_version=$(<"$nvm_path"/.nvmrc)
+
+        declare locally_resolved_nvm_version
+        # `nvm ls` will check all locally-available versions
+        # If there are multiple matching versions, take the latest one
+        # Remove the `->` and `*` characters and spaces
+        # `locally_resolved_nvm_version` will be `N/A` if no local versions are found
+        locally_resolved_nvm_version=$(nvm ls --no-colors "$nvm_version" | tail -1 | tr -d '\->*' | tr -d '[:space:]')
+
+        # If it is not already installed, install it
+        # `nvm install` will implicitly use the newly-installed version
+        if [[ "$locally_resolved_nvm_version" == "N/A" ]]; then
+            nvm install "$nvm_version";
+        elif [[ $(nvm current) != "$locally_resolved_nvm_version" ]]; then
+            nvm use "$nvm_version";
+        fi
+    fi
+}
+# alias the cd command to use the above function
+alias cd='cdnvm'
+
+################################################
+# yarn version manager
+
+# first the YVM_DIR env var is loaded with .profile
 [ -r $YVM_DIR/yvm.sh ] && . $YVM_DIR/yvm.sh
+
+################################################
+# tmuxinator
+[ -s "$HOME/.bin/tmuxinator.bash" ] && . $HOME/.bin/tmuxinator.bash

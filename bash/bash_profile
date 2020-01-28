@@ -2,6 +2,6 @@
 # ~/.bash_profile
 #
 
-# source .profile and .bashrc, if exists
-if [ -r ~/.profile ]; then . ~/.profile; fi
-case "$-" in *i*) if [ -r ~/.bashrc ]; then . ~/.bashrc; fi;
+# source .profile and .bashrc (in that order), if exists
+if [ -r ~/.profile ]; then . ~/.profile; fi;
+if [ -r ~/.bashrc ]; then . ~/.bashrc; fi;

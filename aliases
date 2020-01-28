@@ -10,12 +10,14 @@ alias more=less
 alias reboot='sudo reboot now'         # reboot / halt / poweroff
 alias shutdown='sudo shutdown now'
 alias suspend='systemctl suspend'
-# create parent directories on demand with mkdir
-alias mkdir='mkdir -pv'
+
+alias mkdir='mkdir -pv' # create parent directories on demand with mkdir
 alias ll='ls -lAbhc'
 alias l='ls -lBohc'
 #History search (use: hs sometext)
 alias hs='history | grep $1'
+
+alias wget='wget -c' # resume wget downloads by default
 
 #Sudo vim
 alias svim='sudo vim'
@@ -38,7 +40,7 @@ alias cd..='cd ..'
 alias ls='ls --color=auto'
 
 ## Use a long listing format ##
-alias ll='ls -la'
+alias ll='ls -la --color=auto'
 
 ## Show hidden files ##
 alias l.='ls -d .* --color=auto'
@@ -48,4 +50,3 @@ alias path='echo -e ${PATH//:/\\n}'
 alias nowtime='date +"%T"'
 # alias nowtime=now
 alias nowdate='date +"%d-%m-%Y"'
-

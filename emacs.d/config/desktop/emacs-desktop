@@ -1,0 +1,43 @@
+;; -*- mode: emacs-lisp; coding: emacs-mule; -*-
+;; --------------------------------------------------------------------------
+;; Desktop File for Emacs
+;; --------------------------------------------------------------------------
+;; Created Tue Jan 28 17:53:58 2020
+;; Desktop file format version 208
+;; Emacs version 26.3
+
+;; Global section:
+(setq desktop-saved-frameset [frameset 1 (24112 40806 688486 666000) (desktop . "208") "gustavo@gustavo-pc" nil nil ((((minibuffer . t) (undecorated) (override-redirect) (font-backend xft x) (font . "-ADBO-Source Code Pro-normal-normal-normal-*-13-*-*-*-m-0-iso10646-1") (font-parameter . "Source Code Pro 10") (border-width . 0) (internal-border-width . 0) (right-divider-width . 0) (bottom-divider-width . 0) (vertical-scroll-bars) (horizontal-scroll-bars) (foreground-color . "#d4d4d4") (background-color . "#252526") (mouse-color . "black") (border-color . "black") (screen-gamma) (line-spacing) (left-fringe . 8) (right-fringe . 8) (no-special-glyphs) (scroll-bar-foreground . "#d8d8d8") (scroll-bar-background . "#d8d8d8") (menu-bar-lines . 0) (tool-bar-lines . 0) (title) (wait-for-wm . t) (tool-bar-position . top) (inhibit-double-buffering) (icon-type . t) (auto-raise) (auto-lower) (cursor-type . box) (scroll-bar-width . 0) (scroll-bar-height . 0) (alpha) (no-focus-on-map) (no-accept-focus) (fullscreen) (visibility . t) (skip-taskbar) (z-group) (display-type . color) (background-mode . dark) (cursor-color . "#00ff00") (sticky) (environment) (eyebrowse-last-slot . 1) (eyebrowse-current-slot . 1) (eyebrowse-window-configs (1 (((min-height . 4) (min-width . 20) (min-height-ignore . 2) (min-width-ignore . 12) (min-height-safe . 1) (min-width-safe . 4) (min-pixel-height . 68) (min-pixel-width . 160) (min-pixel-height-ignore . 34) (min-pixel-width-ignore . 96) (min-pixel-height-safe . 17) (min-pixel-width-safe . 32)) hc (pixel-width . 1920) (pixel-height . 956) (total-width . 240) (total-height . 56) (normal-height . 1.0) (normal-width . 1.0) (combination-limit) (leaf (pixel-width . 960) (pixel-height . 956) (total-width . 120) (total-height . 56) (normal-height . 1.0) (normal-width . 0.5) (buffer "*scratch*" (selected) (hscroll . 0) (fringes 8 8 nil) (margins nil) (scroll-bars nil 2 t nil 0 t) (vscroll . 0) (dedicated) (point . 1) (start . 1))) (leaf (last . t) (pixel-width . 960) (pixel-height . 956) (total-width . 120) (total-height . 56) (normal-height . 1.0) (normal-width . 0.5) (buffer "init.el" (selected . t) (hscroll . 0) (fringes 8 8 nil) (margins nil) (scroll-bars nil 2 t nil 0 t) (vscroll . 0) (dedicated) (point . 26218) (start . 18969)))) "")) (powerline-cache) (frameset--id . "16EB-A29F-16E4-B5E7") (frameset--mini t . t) (frameset--text-pixel-height . 1056) (height . 62) (width . 238) (modeline . t) (unsplittable) (left . 0) (top . 0) (icon-name) (display . ":0") (explicit-name)) ((min-height . 5) (min-width . 20) (min-height-ignore . 5) (min-width-ignore . 8) (min-height-safe . 1) (min-width-safe . 4) (min-pixel-height . 85) (min-pixel-width . 160) (min-pixel-height-ignore . 85) (min-pixel-width-ignore . 64) (min-pixel-height-safe . 17) (min-pixel-width-safe . 32)) hc (pixel-width . 1920) (pixel-height . 1039) (total-width . 240) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (combination-limit) (leaf (pixel-width . 960) (pixel-height . 1039) (total-width . 120) (total-height . 61) (normal-height . 1.0) (normal-width . 0.5) (buffer "*helpful variable: lisp-indent-function*" (selected) (hscroll . 0) (fringes 8 8 nil) (margins nil) (scroll-bars nil 0 t nil 0 t) (vscroll . 0) (dedicated) (point . 1) (start . 1))) (leaf (last . t) (pixel-width . 960) (pixel-height . 1039) (total-width . 120) (total-height . 61) (normal-height . 1.0) (normal-width . 0.5) (buffer "init.el" (selected . t) (hscroll . 0) (fringes 8 8 t) (margins nil) (scroll-bars nil 0 t nil 0 t) (vscroll . 0) (dedicated) (point . 69107) (start . 68265)))))])
+(setq desktop-missing-file-warning nil)
+(setq tags-file-name nil)
+(setq tags-table-list nil)
+(setq search-ring '("g-dir"))
+(setq regexp-search-ring '("concat" "mode-line" "desktop" "diff-hl" "elisp-mode \\." "lockfiles" "auto-save-dkkkk" "auto-save-default" "make-backup"))
+(setq register-alist '((48 . "  (yaml-mode . rainbow-mode)\n")))
+(setq file-name-history '("/home/gustavo/.emacs.d/config/desktop/" "~/dotfiles/emacs.d/init.el"))
+
+;; Buffer section -- buffers listed in same order as in buffer list:
+(desktop-create-buffer 208
+  "/home/gustavo/dotfiles/emacs.d/init.el"
+  "init.el"
+  'emacs-lisp-mode
+  '(eldoc-mode override-global-mode undo-tree-mode evil-commentary-mode ivy-mode counsel-mode ivy-posframe-mode ivy-explorer-mode flycheck-mode which-key-mode global-auto-revert-mode solaire-mode rainbow-mode diff-hl-mode diff-hl-flydiff-mode hes-mode drag-stuff-mode)
+  69107
+  '(68921 nil)
+  nil
+  nil
+  '((buffer-display-time 24112 40789 722835 647000) (buffer-file-coding-system . utf-8-unix) (overwrite-mode))
+  '((mark-ring (69007 68914 69008 69008 69008 66822 69009 68961 68961 68961 68961 66661 66526 66147 64266 63755))))
+
+(desktop-create-buffer 208
+  "/usr/share/emacs/26.3/lisp/desktop.el.gz"
+  "desktop.el.gz"
+  'emacs-lisp-mode
+  '(eldoc-mode override-global-mode undo-tree-mode evil-commentary-mode ivy-mode counsel-mode ivy-posframe-mode ivy-explorer-mode yas-minor-mode flycheck-mode which-key-mode global-auto-revert-mode solaire-mode rainbow-delimiters-mode highlight-indent-guides-mode rainbow-mode diff-hl-mode diff-hl-flydiff-mode hes-mode highlight-operators-mode highlight-numbers-mode highlight-parentheses-mode vi-tilde-fringe-mode smartparens-mode aggressive-indent-mode)
+  9740
+  '(nil nil)
+  t
+  nil
+  '((indicate-empty-lines . t) (buffer-display-time 24112 40657 387010 78000) (buffer-file-coding-system . utf-8-unix) (overwrite-mode))
+  '((mark-ring nil)))
+

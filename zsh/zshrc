@@ -1,16 +1,13 @@
 #########################################
 # If you come from bash you might have to change your $PATH.
-export PATH=$HOME/bin:/usr/local/bin:$PATH
-# Export a envvar for ZSH
-export ZSH=$HOME/.oh-my-zsh
+# check if exporting this line in .profile is okay
+# if not, uncomment it
+# export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 #########################################
 # use VI mode
 bindkey -v
 
-#########################################
-# export variable used by ROFI
-export XDG_USER_CONFIG_DIR=$HOME/.config
 
 #########################################
 # set theme
@@ -92,13 +89,15 @@ fi
 # fi
 
 #########################################
-# ASDF
-. $HOME/.asdf/asdf.sh
-. $HOME/.asdf/completions/asdf.bash
+# asdf
+[ -s "$HOME/.asdf/asdf.sh" ] && \. $HOME/.asdf/asdf.sh
+[ -s "$HOME/.asdf/completions/asdf.bash" ] && \. $HOME/.asdf/completions/asdf.bash
 
 #########################################
-# NVM
-export NVM_DIR="$HOME/.nvm"
+# nvm
+
+# first the NVM_DIR env var is exported in .profile
+# export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
@@ -128,22 +127,11 @@ load-nvmrc
 #########################################
 # Yarn
 
-# export YVM_DIR=/home/gustavo/.yvm
+# first the YARN_DIR is exported in .profile
+# export YVM_DIR=$HOME/.yvm
 [ -r $YVM_DIR/yvm.sh ] && . $YVM_DIR/yvm.sh
-export YVM_DIR=$HOME/.yvm
 
-#########################################
-# Preferred editor for local and remote sessions
 
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='vim'
-else
-  export EDITOR='mvim'
-fi
-
-#########################################
-# ssh
-export SSH_KEY_PATH="$HOME/.ssh/rsa_id"
 
 #########################################
 # Example aliases

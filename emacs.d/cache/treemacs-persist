@@ -3,3 +3,5 @@
  - path :: ~/code/ideadora/wego
 ** pep
  - path :: ~/code/pep
+** dotfiles
+ - path :: ~/dotfiles

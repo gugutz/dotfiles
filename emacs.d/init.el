@@ -30,10 +30,11 @@
 (use-package diminish :ensure t)
 
 
-;; **************************************************
-;;
+;; ##################################################
 ;;
 ;;; Emacs settings
+;;
+;; ##################################################
 
 ;; *********************************-
 ;;; General
@@ -51,27 +52,35 @@
 
 (setq next-line-add-newlines t) ;; C-n insert newlines if the point is at the end of the buffer.
 
-;; default indentation
-(setq-default indent-tabs-mode nil)
-;; C e C-like langs default indent size
-(setq-default tab-width 2)
-;; Perl default indent size
-(setq-default cperl-basic-offset 2)
-(setq-default c-basic-offset 2)
 
 ;; *********************************-
-;; Save Place
 ;;
-;; remember where the cursor was when opening files
+;;; Indentation
 
-(use-package saveplace
-  :ensure nil ;; built-in
-  :init
-  (save-place-mode 1)
-  (setq-default save-place t)
-  ;; dont clutter the emacs folder. save somewhere else
-  (setq save-place-file (locate-user-emacs-file "places" ".emacs-places"))
-  )
+;; make indentation commands use space only (never tab character)
+(setq-default indent-tabs-mode nil)
+;; default indent to 2 spaces
+(setq-default tab-width 2)
+
+;; make tab key always call a indent command.
+(setq-default tab-always-indent t)
+;; make tab key call indent command or insert tab character, depending on cursor position
+(setq-default tab-always-indent nil)
+;; make tab key do indent first then completion.
+(setq-default tab-always-indent 'complete)
+
+;; Perl default indent size
+(setq-default cperl-basic-offset 2)
+;; C e C-like langs default indent size
+(setq-default c-basic-offset 2)
+;; Lisp languages
+(setq-default lisp-basic-offset 2)
+
+;; make return key also do indent, for current buffer only
+;; (electric-indent-local-mode 1)
+
+;; make return key also do indent, globally
+(electric-indent-mode 1)
 
 ;; *********************************-
 ;;; Startup
@@ -91,8 +100,14 @@
 ;; *********************************-
 ;;; Folders and Files
 
-(setq create-lockfiles nil) ;; Prevent emacs to create lockfiles (.#files#). this also stops preventing editing colisions, so watch out
-(setq make-backup-files nil) ;; dont make backup files
+(setq create-lockfiles nil) ;; Prevent emacs to create lockfiles (.#files#)
+
+;; disable emacs's automatic backup~ file
+(setq make-backup-files nil)
+
+;; stop creating those #auto-save# files
+(setq auto-save-default nil)
+
 (setq confirm-kill-processes nil) ;; dont ask confirmation to kill processes
 
 ;;; Define emacs directory
@@ -111,21 +126,19 @@
   "The path to the currently loaded .emacs.d directory.  Must end with a slash.")
 
 ;; Prevent emacs from writing several files in the config folder
-(setq abbrev-file-name             (concat config-dir "abbrev.el")
-      async-byte-compile-log-file  (concat cache-dir "async-bytecomp.log")
-      bookmark-default-file        (concat config-dir "bookmarks")
-      custom-file                  (concat config-dir "custom.el")
-      desktop-dirname              (concat config-dir "desktop")
-      desktop-base-file-name       (concat cache-dir "autosave")
-      desktop-base-lock-name       (concat cache-dir "autosave-lock")
-      tramp-auto-save-directory    (concat config-dir "tramp-auto-save/")
-      tramp-backup-directory-alist backup-directory-alist
-      tramp-persistency-file-name  (concat config-dir "tramp-persistency.el")
-      url-cache-directory          (concat config-dir "url/")
-      url-configuration-directory  (concat config-dir "url/"))
+(setq abbrev-file-name             (concat config-dir "abbrev.el"))
+(setq async-byte-compile-log-file  (concat cache-dir "async-bytecomp.log"))
+(setq bookmark-default-file        (concat config-dir "bookmarks"))
+(setq custom-file                  (concat config-dir "custom.el"))
+(setq tramp-auto-save-directory    (concat config-dir "tramp-auto-save/"))
+(setq tramp-backup-directory-alist backup-directory-alist)
+(setq tramp-persistency-file-name  (concat config-dir "tramp-persistency.el"))
+(setq url-cache-directory          (concat config-dir "url/"))
+(setq url-configuration-directory  (concat config-dir "url/"))
 
 
-;; *********************************-
+;; **********************************
+;;
 ;;; Minibuffer settings
 
 ;; Show current key-sequence in minibuffer, like vim does. Any feedback after
@@ -140,9 +153,125 @@
 (setq minibuffer-prompt-properties '(read-only t intangible t cursor-intangible t face minibuffer-prompt))
 (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
+;; **********************************
+;;
+;;; Extra file extensions to support
+
+(push '("/LICENSE\\'" . text-mode) auto-mode-alist)
+(push '("\\.log\\'" . text-mode) auto-mode-alist)
+(push '("\\.env\\'" . sh-mode) auto-mode-alist)
 
 
-;; **************************************************
+;; ##################################################
+;;
+;;; EMACS SESSION AND STATE
+;;
+;; ##################################################
+
+;; *********************************-
+;;
+;; Save Place
+
+;; remember where the cursor was when opening files
+
+(use-package saveplace
+  :ensure nil ;; built-in
+  :init
+  (save-place-mode 1)
+  (setq-default save-place t)
+  ;; dont clutter the emacs folder. save somewhere else
+  (setq save-place-file (locate-user-emacs-file "places" ".emacs-places"))
+  )
+
+;; *********************************
+;;
+;; desktop
+
+;; saves sessions, like open files, buffers, variables
+;; restores emacs state when closed
+
+(use-package desktop
+  :ensure nil
+  :bind
+  ("C-c s" . desktop-save-in-desktop-dir)
+  :init
+  ;; use only one desktop
+  (setq desktop-dirname "~/.emacs.d/config/desktop")
+  (setq desktop-base-file-name "emacs-desktop")
+  (setq desktop-base-lock-name "emacs-desktop-lock")
+
+  (setq desktop-restore-eager 5) ;; restore 5 buffers immediately. the others restore lazily
+  (setq desktop-load-locked-desktop t)
+  (setq desktop-files-not-to-save "^$")
+  (setq desktop-buffers-not-to-save
+        (concat "\\("
+                "^nn\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
+                "\\|\\.emacs.*\\|\\.diary\\|\\.newsrc-dribble\\|\\.bbdb"
+                "\\)$"))
+  :config
+  (desktop-save-mode t)
+  (add-to-list 'desktop-modes-not-to-save 'dired-mode)
+  (add-to-list 'desktop-modes-not-to-save 'Info-mode)
+  (add-to-list 'desktop-modes-not-to-save 'info-lookup-mode)
+  (add-to-list 'desktop-modes-not-to-save 'fundamental-mode)
+  (add-to-list 'desktop-modes-not-to-save 'completion-list-mode)
+
+  ;; remove desktop after it's been read
+  (add-hook 'desktop-after-read-hook
+            '(lambda ()
+               ;; desktop-remove clears desktop-dirname
+               (setq desktop-dirname-tmp desktop-dirname)
+               (desktop-remove)
+               (setq desktop-dirname desktop-dirname-tmp)))
+
+  (defun saved-session ()
+    (file-exists-p (concat desktop-dirname "/" desktop-base-file-name)))
+
+  ;; use session-restore to restore the desktop manually
+  (defun session-restore ()
+    "Restore a saved emacs session."
+    (interactive)
+    (if (saved-session)
+        (desktop-read)
+      (message "No desktop found.")))
+
+  ;; use session-save to save the desktop manually
+  (defun session-save ()
+    "Save an emacs session."
+    (interactive)
+    (if (saved-session)
+        (if (y-or-n-p "Overwrite existing desktop? ")
+            (desktop-save-in-desktop-dir)
+          (message "Session not saved."))
+      (desktop-save-in-desktop-dir)))
+
+  ;; ask user whether to restore desktop at start-up
+  (add-hook 'after-init-hook
+            '(lambda ()
+               (if (saved-session)
+                   (if (y-or-n-p "Restore desktop? ")
+                       (session-restore)))))
+)
+
+;; ##################################################
+;;
+;;; Improvements of Emacs native functions
+;;
+;; ##################################################
+;;
+;; C-k kills current buffer without having to select which buffer
+
+;; prompt only if there are unsaved changes.
+(defun kill-current-buffer ()
+  "Kill current buffer."
+  (interactive)
+  (kill-buffer (current-buffer))
+  )
+
+(global-set-key (kbd "C-x k") #'kill-current-buffer)
+
+
+;; ##################################################
 ;;
 ;;; Evil
 
@@ -170,9 +299,18 @@
   (define-key evil-normal-state-map (kbd "SPC -") 'split-window-bellow)
   (define-key evil-normal-state-map (kbd "SPC |") 'split-window-right)
   (define-key evil-normal-state-map (kbd "SPC u") 'undo-tree-visualize)
-  ;; recover some useful emacs native commands
+
+  ;; ------------------------------------------
+  ;;
+  ;;; RECOVER SOME USEFUL EMACS NATIVE COMMANDS
   (define-key evil-insert-state-map (kbd "C-y") 'yank)
+  (define-key evil-normal-state-map (kbd "C-y") 'yank)
+  (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
   (define-key evil-insert-state-map (kbd "C-d") 'delete-char)
+  ;; native find definition
+  (global-set-key (kbd "M-.") 'xref-find-definitions)
+  ;; somehow global-set-key doenst work for normal mode for this binding, so i manually set it
+  (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
   )
 
 ;; *********************************
@@ -186,6 +324,44 @@
   (evil-commentary-mode)
   )
 
+;; *********************************
+;; evil-surround
+
+(use-package evil-surround
+  :preface
+  (defun evil-surround-prog-mode-hook-setup ()
+    "Documentation string, idk, put something here later."
+    (push '(47 . ("/" . "/")) evil-surround-pairs-alist)
+    (push '(40 . ("(" . ")")) evil-surround-pairs-alist)
+    (push '(41 . ("(" . ")")) evil-surround-pairs-alist)
+    (push '(91 . ("[" . "]")) evil-surround-pairs-alist)
+    (push '(93 . ("[" . "]")) evil-surround-pairs-alist)
+    )
+  (defun evil-surround-js-mode-hook-setup ()
+    "ES6." ;  this is a documentation string, a feature in Lisp
+    ;; I believe this is for auto closing pairs
+    (push '(?1 . ("{`" . "`}")) evil-surround-pairs-alist)
+    (push '(?2 . ("${" . "}")) evil-surround-pairs-alist)
+    (push '(?4 . ("(e) => " . "(e)")) evil-surround-pairs-alist)
+    ;; ReactJS
+    (push '(?3 . ("classNames(" . ")")) evil-surround-pairs-alist)
+    )
+  (defun evil-surround-emacs-lisp-mode-hook-setup ()
+    (push '(?` . ("`" . "'")) evil-surround-pairs-alist)
+    )
+  (defun evil-surround-org-mode-hook-setup ()
+    (push '(91 . ("[" . "]")) evil-surround-pairs-alist)
+    (push '(93 . ("[" . "]")) evil-surround-pairs-alist)
+    (push '(?= . ("=" . "=")) evil-surround-pairs-alist)
+    )
+  :hook
+  (prog-mode-hook . evil-surround-prog-mode-hook-setup)
+  (js2-mode-hook . evil-surround-js-mode-hook-setup)
+  (emacs-lisp-mode-hook . evil-surround-emacs-lisp-mode-hook-setup)
+  (org-mode-hook . evil-surround-org-mode-hook-setup)
+  :config
+  (global-evil-surround-mode 1)
+  )
 
 ;; **************************************************
 ;;
@@ -238,7 +414,6 @@
 
 ;; *********************************
 ;;
-;;
 ;;; Counsel
 (use-package counsel
   :ensure t
@@ -255,8 +430,8 @@
   :after ivy counsel projectile
   :config (counsel-projectile-mode 1)
   )
+
 ;; *********************************
-;;
 ;;
 ;; Enhance M-x
 ;; Enhancement for `execute-extended-command'. Auto detects and uses ivy or ido, if installed
@@ -436,7 +611,6 @@
 ;; **************************************************
 ;;
 (use-package exec-path-from-shell
-  :if (memq window-system '(mac ns x))
   :ensure t
   :config
   (exec-path-from-shell-initialize)
@@ -523,8 +697,25 @@
 ;; ################################################
 
 ;; *********************************
+;; ** Duplicate line
+
+(defun duplicate-line ()
+  "Duplicate current line."
+  (interactive)
+  (let ((col (current-column)))
+    (move-beginning-of-line 1)
+    (kill-line)
+    (yank)
+    (newline)
+    (yank)
+    (move-to-column col)))
+
+(global-set-key [(meta shift d)] 'duplicate-line)
+(global-set-key [(control shift d)] 'duplicate-line)
+
+;; *********************************
 ;;
-;; ** expand region
+;; expand region
 
 ;; smart selection of text
 
@@ -540,39 +731,51 @@
 ;;
 ;; ** subword-mode
 
-;; : Alt+x subword-mode. It change all cursor movement/edit commands to stop in-between the “camelCase” words.
-;; : subword-mode and superword-mode are mutally exclusive. Turning one on turns off the other.
+;; change all cursor movement/edit commands to stop in-between the “camelCase” words.
+;; subword-mode and superword-mode are mutally exclusive. Turning one on turns off the other.
 
 
 (use-package subword
   :ensure nil
   :hook
-  (js2-mode . superword-mode)
-  (typescript-mode . superword-mode)
+  (js2-mode . subword-mode)
+  (typescript-mode . subword-mode)
   )
-
-
-
 
 ;; *********************************
 ;;
 ;; ** superword-mode
 
-;; : Alt+x superword-mode (emacs 24.4) is similar. It treats text like “x_y” as one word. Useful for “snake_case”.
-;; : subword-mode and superword-mode are mutally exclusive. Turning one on turns off the other.
+;; treats text like “x_y” as one word. Useful for “snake_case”.
+;; subword-mode and superword-mode are mutally exclusive. Turning one on turns off the other.
 
 (use-package superword
   :ensure nil
   :hook
-  (clojure-mode . subword-mode)
-  (ruby-mode . subword-mode)
-  (elixir-mode . subword-mode)
-  (elisp-mode . subword-mode)
+  (clojure-mode . superword-mode)
+  (ruby-mode . superword-mode)
+  (elixir-mode . superword-mode)
+  (emacs-lisp-mode . superword-mode)
   )
 
 ;; *********************************
 ;;
-;; ** superword-mode
+;;; drag stuff / move text
+
+(use-package drag-stuff
+  :ensure t
+  :bind
+  ("M-k" . drag-stuff-up)
+  ("M-j" . drag-stuff-down)
+  ("M-h" . drag-stuff-left)
+  ("M-l" . drag-stuff-right)
+  :config
+  (drag-stuff-mode t)
+  )
+
+;; *********************************
+;;
+;; ** smartparens
 
 (use-package smartparens
   :ensure t
@@ -611,7 +814,7 @@
   )
 
 
-;; **************************************************
+;; ##################################################
 ;;
 ;;; WHITESPACE
 
@@ -625,7 +828,7 @@
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 
-;; **************************************************
+;; ##################################################
 ;;
 ;;; WINdow Management
 
@@ -637,7 +840,6 @@
 
 
 ;; *********************************
-;;
 ;; Zoom text - Increase and decrease text size
 
 ;; mouse scrolls are binded differently depending on the system
@@ -651,8 +853,8 @@
   )
 (global-set-key [?\C-=] 'text-scale-increase)
 (global-set-key [?\C--] 'text-scale-decrease)
+
 ;; *********************************
-;;
 ;; ** Eyebrowse
 
 (use-package eyebrowse
@@ -669,7 +871,6 @@
   )
 
 ;; *********************************
-;;
 ;; Ace-Window
 
 (use-package ace-window
@@ -684,7 +885,6 @@
   )
 
 ;; *********************************
-;;
 ;; emacsrotate
 
 (use-package rotate
@@ -694,14 +894,12 @@
   ("C-c r w" . rotate-window)
   ("C-c r l" . rotate-layout)
   ("M-S-O SPC" . rotate-layout)
-  ("M-S-O m" . tau/toggle-window-maximize)
   ("C-M-o" . hydra-frame-window/body)
   )
 
 
 
 ;; *********************************
-;;
 ;; ** windmove
 
 (use-package windmove
@@ -716,11 +914,12 @@
   (global-set-key (kbd "C-S-J") 'windmove-down)
   )
 
+
 ;; ##################################################
 ;;
 ;; PROJECTS
 
-;;
+;; *********************************
 ;;;  Projectile
 
 (use-package projectile
@@ -740,11 +939,12 @@
   (projectile-mode +1)
   )
 
+
 ;; ##################################################
 ;;
 ;; AUTOCOMPLETE
 
-;;
+;; *********************************
 ;;; ** Company
 
 (use-package company
@@ -775,7 +975,6 @@
   )
 
 ;; *********************************
-;;
 ;;; company box
 
 (use-package company-box
@@ -819,19 +1018,26 @@
             (ElispFace     . ,(all-the-icons-material "format_paint"             :face 'all-the-icons-pink)))))
   )
 
-;; **************************************************
-;;
-;; xref
 
-(use-package xref
-  :ensure nil
+;; *********************************
+;; company quickHelp
+
+;; Documentation popups for Company
+
+(use-package company-quickhelp
+  :ensure t
+  :after company
+  :bind
+  (:map company-active-map
+    ("M-h" . company-quickhelp-manual-begin)
+    )
   :config
-  (global-set-key (kbd "M-.") 'xref-find-definitions)
-)
+  (setq company-quickhelp-delay 1)
+  (company-quickhelp-mode)
+  )
 
-;; **************************************************
-;;
-;; ** LSP
+;; *********************************
+;; lsp
 
 (use-package lsp-mode
   :ensure t
@@ -839,6 +1045,8 @@
   :hook
   (prog-mode . lsp)
   (text-mode . lsp)
+  (sh-mode . lsp)
+  (conf-mode . lsp)
   :bind
   (:map evil-normal-state-map
     ("SPC l p f r" . lsp-ui-peek-find-references)
@@ -849,8 +1057,20 @@
     ("SPC l g i" . lsp-goto-implementation)
     ("SPC l f i" . lsp-find-implementation)
     ("SPC l m"   . lsp-ui-imenu)
-    ("SPC l s"   . lsp-ui-sideline-mode)
-    ("SPC l d"   . tau/toggle-lsp-ui-doc))
+    ("SPC l s"   . lsp-ui-sideline-mode))
+  (:map lsp-mode-map
+    ;; ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+    ;; ([remap xref-find-references] . lsp-ui-peek-find-references)
+    ("C-c u" . lsp-ui-imenu)
+    ("C-c l p f r" . lsp-ui-peek-find-references)
+    ("C-c l p f d" . lsp-ui-peek-find-definitions)
+    ("C-c l p f i" . lsp-ui-peek-find-implementation)
+    ("C-c l g d" . lsp-goto-type-definition)
+    ("C-c l f d" . lsp-find-definition)
+    ("C-c l g i" . lsp-goto-implementation)
+    ("C-c l f i" . lsp-find-implementation)
+    ("C-c l m"   . lsp-ui-imenu)
+    ("C-c l s"   . lsp-ui-sideline-mode))
   :custom
   ;; general
   ;; (lsp-auto-configure t) ;; auto-configure `lsp-ui' and `company-lsp'
@@ -869,8 +1089,8 @@
 
 
 ;; *********************************
-;;
 ;; lsp ui
+
 (use-package lsp-ui
   :ensure t
   :after lsp-mode
@@ -880,23 +1100,6 @@
   ;; (lsp-ui-doc-background ((nil (:background "#f9f2d9"))))
   ;; (lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic)))))
   ;; (lsp-ui-sideline-global ((nil (:inherit 'shadow :background "#f9f2d9"))))
-  :bind
-  (:map lsp-mode-map
-    ("C-c l p f r" . lsp-ui-peek-find-references)
-    ("C-c l p f d" . lsp-ui-peek-find-definitions)
-    ("C-c l p f i" . lsp-ui-peek-find-implementation)
-    ("C-c l g d" . lsp-goto-type-definition)
-    ("C-c l f d" . lsp-find-definition)
-    ("C-c l g i" . lsp-goto-implementation)
-    ("C-c l f i" . lsp-find-implementation)
-    ("C-c l m"   . lsp-ui-imenu)
-    ("C-c l s"   . lsp-ui-sideline-mode)
-    ("C-c l d"   . tau/toggle-lsp-ui-doc))
-  ;; remap native find-definitions and references to use lsp-ui
-  (:map lsp-ui-mode-map
-    ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-    ([remap xref-find-references] . lsp-ui-peek-find-references)
-    ("C-c u" . lsp-ui-imenu))
   :custom
   ;; lsp-ui-doc
   (lsp-ui-doc-enable nil)
@@ -930,10 +1133,9 @@
   )
 
 ;; *********************************
-;;
 ;; company-lsp
 
-;; Company-lsp is auto inserted into company backends
+;; company-lsp is auto inserted into company backends
 
 (use-package company-lsp :ensure t
   :ensure t
@@ -944,8 +1146,8 @@
   ;; (company-lsp-enable-recompletion t)
   )
 
-;; **************************************************
-;;
+
+;; *********************************
 ;;; ** Yasnippets
 
 (use-package yasnippet
@@ -984,9 +1186,8 @@
 (use-package yasnippet-snippets :ensure t)
 
 
-;; **************************************************
-;;
-;;; * FlyCheck linter
+;; *********************************
+;; FlyCheck linter
 
 (use-package flycheck
   :ensure t
@@ -1014,6 +1215,7 @@
   )
 
 
+;; *********************************
 ;; ** flycheck posframe
 
 (use-package flycheck-posframe
@@ -1044,67 +1246,16 @@
   (flycheck-posframe-configure-pretty-defaults)
   )
 
-;; **************************************************
-;;
-;; dumb-jump
-
-(use-package dumb-jump
-  :ensure t
-  :after ivy
-  :bind
-  ("C-c C-o" . dumb-jump-go-other-window)
-  ("C-c C-j" . dumb-jump-go)
-  ("C-c C-b" . dumb-jump-back)
-  ("C-c C-i" . dumb-jump-go-prompt)
-  :custom
-  (dumb-jump-selector 'ivy)
-  )
-
-;; **************************************************
-;;
-;; ** shell-pop
-
-(use-package shell-pop
-  :ensure t
-  :defer t
-  :init
-  (setq shell-pop-full-span t)
-  (setq shell-pop-default-directory "~/code")
-  (setq shell-pop-shell-type (quote ("ansi-term" "*ansi-term*" (lambda nil (ansi-term shell-pop-term-shell)))))
-  (setq shell-pop-term-shell "/bin/zsh")
-  (setq shell-pop-universal-key "C-c s")
-  (setq shell-pop-window-size 30)
-  (setq shell-pop-full-span t)
-  (setq shell-pop-window-position "bottom")
-  :bind
-  ("C-c s" . shell-pop)
-  )
-
-;; **************************************************
-;;
-;; ** auto revert mode
-
-(use-package autorevert
-  :ensure nil
-  :config
-  (global-auto-revert-mode)
-  (setq auto-revert-verbose nil) ; let us know when it happens
-  (setq auto-revert-use-notify nil)
-  (setq auto-revert-stop-on-user-input nil)
-  ;; Only prompts for confirmation when buffer is unsaved.
-  (setq revert-without-query (list "."))
-  (setq auto-revert-interval 1) ;; rever every 1 second
-  (setq auto-revert-check-vc-info t)
-
-  )
 
 ;; ##################################################
 ;;
 ;;; HELP SYSTEM AND GUIDANCE
+;;
+;; ##################################################
+;;
 
 ;; *********************************
-;;
-;; ** helpfull
+;; helpfull
 
 (use-package helpful
   :ensure t
@@ -1134,8 +1285,7 @@
   )
 
 ;; *********************************
-;;
-;;; ** which-key
+;; which-key
 
 (use-package which-key
   :ensure t
@@ -1155,8 +1305,7 @@
   )
 
 ;; *********************************
-;;
-;;; keyfreq
+;; keyfreq
 
 (use-package keyfreq
   :ensure t
@@ -1167,10 +1316,101 @@
   (keyfreq-autosave-mode 1)
   )
 
+;; *********************************
+;; show docstring in popup
 
-;; **************************************************
+(defun tau/elisp-function-or-variable-quickhelp (symbol)
+  "Display summary of SYMBOL at point.
+Adapted from `describe-function-or-variable'."
+  (interactive
+   (let* ((v-or-f (variable-at-point))
+          (found (symbolp v-or-f))
+          (v-or-f (if found v-or-f (function-called-at-point))))
+     (list v-or-f)))
+  (if (not (and symbol (symbolp symbol)))
+      (message "You didn't specify a function or variable")
+    (let* ((fdoc (when (fboundp symbol)
+                   (or (documentation symbol t) "Not documented.")))
+           (fdoc-short (and (stringp fdoc)
+                            (substring fdoc 0 (string-match "\n" fdoc))))
+           (vdoc (when  (boundp symbol)
+                   (or (documentation-property symbol 'variable-documentation t)
+                       "Not documented as a variable.")))
+           (vdoc-short (and (stringp vdoc)
+                            (substring vdoc 0 (string-match "\n" vdoc)))))
+      (and (require 'popup nil 'no-error)
+           (popup-tip
+            (or
+             (and fdoc-short vdoc-short
+                  (concat fdoc-short "\n\n"
+                          (make-string 30 ?-) "\n" (symbol-name symbol)
+                          " is also a " "variable." "\n\n"
+                          vdoc-short))
+             fdoc-short
+             vdoc-short)
+            :margin t)))))
+
+
+;; ##################################################
 ;;
-;; ** editorconfig
+;; PACKAGES
+;;
+;; ##################################################
+
+;; *********************************
+;; dumb-jump
+
+(use-package dumb-jump
+  :ensure t
+  :after ivy
+  :bind
+  ("C-c C-o" . dumb-jump-go-other-window)
+  ("C-c C-j" . dumb-jump-go)
+  ("C-c C-b" . dumb-jump-back)
+  ("C-c C-i" . dumb-jump-go-prompt)
+  :custom
+  (dumb-jump-selector 'ivy)
+  )
+
+;; *********************************
+;; shell-pop
+
+(use-package shell-pop
+  :ensure t
+  :defer t
+  :init
+  (setq shell-pop-full-span t)
+  (setq shell-pop-default-directory "~/code")
+  (setq shell-pop-shell-type (quote ("ansi-term" "*ansi-term*" (lambda nil (ansi-term shell-pop-term-shell)))))
+  (setq shell-pop-term-shell "/bin/zsh")
+  (setq shell-pop-universal-key "C-c s")
+  (setq shell-pop-window-size 30)
+  (setq shell-pop-full-span t)
+  (setq shell-pop-window-position "bottom")
+  :bind
+  ("C-c s" . shell-pop)
+  )
+
+;; *********************************
+;; auto revert mode
+
+(use-package autorevert
+  :ensure nil
+  :config
+  (global-auto-revert-mode)
+  (setq auto-revert-verbose nil) ; let us know when it happens
+  (setq auto-revert-use-notify nil)
+  (setq auto-revert-stop-on-user-input nil)
+  ;; Only prompts for confirmation when buffer is unsaved.
+  (setq revert-without-query (list "."))
+  (setq auto-revert-interval 1) ;; rever every 1 second
+  (setq auto-revert-check-vc-info t)
+
+  )
+
+
+;; *********************************
+;; editorconfig
 
 (use-package editorconfig
   :ensure t
@@ -1183,6 +1423,45 @@
   (css-mode . editorconfig-mode)
   (scss-mode . editorconfig-mode)
   )
+
+;; *********************************
+;;
+;; aggressive indent
+
+(use-package aggressive-indent
+  :ensure t
+  :defer t
+  :hook
+  (emacs-lisp-mode . aggressive-indent-mode)
+  (css-mode . aggressive-indent-mode)
+  :config
+  (setq aggressive-indent-comments-too t)
+  )
+
+;; *********************************
+;;
+;; conf mode
+
+;; ** Use unix-conf-mode for .*rc files
+
+(use-package conf-mode
+  :mode
+  (;; systemd
+    ("\\.service\\'"     . conf-unix-mode)
+    ("\\.timer\\'"      . conf-unix-mode)
+    ("\\.target\\'"     . conf-unix-mode)
+    ("\\.mount\\'"      . conf-unix-mode)
+    ("\\.automount\\'"  . conf-unix-mode)
+    ("\\.slice\\'"      . conf-unix-mode)
+    ("\\.socket\\'"     . conf-unix-mode)
+    ("\\.path\\'"       . conf-unix-mode)
+
+    ;; general
+    ("conf\\(ig\\)?$"   . conf-mode)
+    ("rc$"              . conf-mode))
+    )
+
+
 
 ;; ##################################################
 ;;
@@ -1226,7 +1505,8 @@
   (interactive)
   (find-file (angular--counterpart-name (buffer-file-name))))
 
-(global-set-key (kbd "C-x a o") #'angular-open-counterpart)
+(global-set-key (kbd "C-x a c") #'angular-open-counterpart)
+(define-key evil-normal-state-map (kbd "SPC a c") #'angular-open-counterpart)
 
 
 ;; *********************************
@@ -1312,12 +1592,6 @@
   :defer t
   :mode
   ("\\.js$" . js2-mode)
-  :hook
-  (js2-mode . flycheck-mode)
-  (js2-mode . add-node-modules-path)
-  (js2-mode . rainbow-mode)
-  (js2-mode . color-identifiers-mode)
-  (js2-mode . aggressive-indent-mode)
   :init
   ;; have 2 space indentation by default
   (setq js-indent-level 2)
@@ -1388,6 +1662,7 @@
 ;;
 ;; lisp mode
 (use-package lisp-mode
+  :ensure nil
   :commands emacs-lisp-mode
   :hook
   (elisp-mode . eldoc-mode)
@@ -1396,6 +1671,8 @@
   (define-key emacs-lisp-mode-map (kbd "C-c C-b") #'eval-buffer)
   (bind-key "RET" 'comment-indent-new-line emacs-lisp-mode-map)
   (bind-key "C-c c" 'compile emacs-lisp-mode-map)
+  (setq lisp-indent-function 'common-lisp-indent-function)
+  (setq-default lisp-indent-offset 2)
   )
 
 ;; *********************************
@@ -1407,6 +1684,9 @@
   :defer t
   :mode
   ("\\.yaml\\'" "\\.yml\\'")
+  :hook
+  (yaml-mode . aggressive-indent-mode)
+  (yaml-mode . rainbow-mode)
   )
 
 
@@ -1416,40 +1696,10 @@
 ;;
 ;; ##################################################
 
+
+
 ;; *********************************
-;; ** Duplicate line
-
-(defun duplicate-line ()
-  "Duplicate current line."
-  (interactive)
-  (let ((col (current-column)))
-    (move-beginning-of-line 1)
-    (kill-line)
-    (yank)
-    (newline)
-    (yank)
-    (move-to-column col)))
-
-(global-set-key [(meta shift d)] 'duplicate-line)
-(global-set-key [(control shift d)] 'duplicate-line)
-
-
-;;
-;;; drag / move text
-
-(use-package drag-stuff
-  :ensure t
-  :bind
-  ("M-k" . drag-stuff-up)
-  ("M-j" . drag-stuff-down)
-  ("M-h" . drag-stuff-left)
-  ("M-l" . drag-stuff-right)
-  :config
-  (drag-stuff-mode t)
-  )
-
-;;
-;;; Ctrl + Click jump to definition
+;;; Ctrl + mouse click jump to definition
 
 (defun my-find-func-mouse (event)
   "Support Control + Mouse click (EVENT) to go to definition."
@@ -1602,19 +1852,16 @@
 (use-package paren
   :ensure nil
   :defer t
-  :hook
-  (prog-mode . show-paren-mode)
   :custom-face
-  (show-paren-match ((nil (:background "#0a71d0" :foreground "#ffffff")))) ;; :box t
+  (show-paren-match ((nil (:background "#9370DB" :foreground "#ffffff")))) ;; :box t
   (show-paren-mismatch ((nil (:background "red" :foreground "black")))) ;; :box t
-  :custom
-  (show-paren-delay 0.4)
-  (show-paren-style 'mixed)
-  (show-paren-highlight-openparen t)
-  (show-paren-when-point-inside-paren t)
-  (show-paren-when-point-in-periphery t)
   :config
   (show-paren-mode +1)
+  (setq show-paren-delay 0.2)
+  (setq show-paren-style 'expression) ;; highlight brackets if visible, else entire expression
+  (setq show-paren-highlight-openparen t)
+  (setq show-paren-when-point-inside-paren t)
+  (setq show-paren-when-point-in-periphery t)
   )
 
 ;; *********************************
@@ -1696,7 +1943,7 @@
   ;; Better looking colours for diff indicators
   (diff-hl-change ((t (:foreground ,(face-background 'highlight)))))
   (diff-hl-change ((t (:background "#007ad3" :foreground "#ffffff"))))
-  (diff-hl-insert ((t (:background "#00ff00" :foreground "#eeeeee"))))
+  (diff-hl-insert ((t (:background "#00ff00" :foreground "#000000"))))
   (diff-hl-delete ((t (:background "#ff3300" :foreground "#ffffff"))))
   :hook
   (prog-mode . diff-hl-mode)
@@ -1856,8 +2103,8 @@
   "Display the major mode icon."
   (format " %s"
     (propertize icon
-                'help-echo (format "Major-mode: `%s`" major-mode)
-                'face `(:height 1.2 :family ,(all-the-icons-icon-family-for-buffer)))))
+      'help-echo (format "Major-mode: `%s`" major-mode)
+      'face `(:height 1.2 :family ,(all-the-icons-icon-family-for-buffer)))))
 
 
 ;; *********************************
@@ -1867,13 +2114,13 @@
   "This snippet displays useful information on the current marked region, i.e. number of lines and characters marked."
   (when mark-active
     (let ((words (count-lines (region-beginning) (region-end)))
-          (chars (count-words (region-end) (region-beginning))))
+           (chars (count-words (region-end) (region-beginning))))
       (concat
-       (propertize (format "   %s" (all-the-icons-octicon "pencil") words chars)
-                   'face `(:family ,(all-the-icons-octicon-family))
-                   'display '(raise -0.0))
-       (propertize (format " (%s, %s)" words chars)
-                   'face `(:height 0.9))))))
+        (propertize (format "   %s" (all-the-icons-octicon "pencil") words chars)
+          'face `(:family ,(all-the-icons-octicon-family))
+          'display '(raise -0.0))
+        (propertize (format " (%s, %s)" words chars)
+          'face `(:height 0.9))))))
 
 ;; *********************************
 ;;; Version control icons
@@ -1882,19 +2129,19 @@
   "Custom icon for git / github repositories."
   (let ((branch (mapconcat 'concat (cdr (split-string vc-mode "[:-]")) "-")))
     (concat
-     (propertize (format " %s" (all-the-icons-alltheicon "git")) 'face `(:height 1.2) 'display '(raise -0.1))
-     " · "
-     (propertize (format "%s" (all-the-icons-octicon "git-branch"))
-                 'face `(:height 1.3 :family ,(all-the-icons-octicon-family))
-                 'display '(raise -0.1))
-     (propertize (format " %s" branch) 'face `(:height 0.9)))))
+      (propertize (format " %s" (all-the-icons-alltheicon "git")) 'face `(:height 1.2) 'display '(raise -0.1))
+      " · "
+      (propertize (format "%s" (all-the-icons-octicon "git-branch"))
+        'face `(:height 1.3 :family ,(all-the-icons-octicon-family))
+        'display '(raise -0.1))
+      (propertize (format " %s" branch) 'face `(:height 0.9)))))
 
 (defun -custom-modeline-svn-vc ()
   "Custom icon for svn repositories."
   (let ((revision (cadr (split-string vc-mode "-"))))
     (concat
-     (propertize (format " %s" (all-the-icons-faicon "cloud")) 'face `(:height 1.2) 'display '(raise -0.1))
-     (propertize (format " · %s" revision) 'face `(:height 0.9)))))
+      (propertize (format " %s" (all-the-icons-faicon "cloud")) 'face `(:height 1.2) 'display '(raise -0.1))
+      (propertize (format " · %s" revision) 'face `(:height 0.9)))))
 
 (defun custom-modeline-icon-vc ()
   "Display a vc icon according to the type of vc system (git || svn)."
@@ -1910,22 +2157,22 @@
 (defun custom-modeline-flycheck-status ()
   "Display flycheck report on the modeline."
   (let* ((text (pcase flycheck-last-status-change
-                (`finished (if flycheck-current-errors
-                               (let ((count (let-alist (flycheck-count-errors flycheck-current-errors)
-                                              (+ (or .warning 0) (or .error 0)))))
-                                 (format "✖ %s Issue%s" count (unless (eq 1 count) "s")))
-                             "✔ No Issues"))
-                (`running     "⟲ Running")
-                (`no-checker  "⚠ No Checker")
-                (`not-checked "✖ Disabled")
-                (`errored     "⚠ Error")
-                (`interrupted "⛔ Interrupted")
-                (`suspicious  ""))))
-     (propertize text
-                 'help-echo "Show Flycheck Errors"
-                 'mouse-face '(:box 1)
-                 'local-map (make-mode-line-mouse-map
-                             'mouse-1 (lambda () (interactive) (flycheck-list-errors))))))
+                 (`finished (if flycheck-current-errors
+                              (let ((count (let-alist (flycheck-count-errors flycheck-current-errors)
+                                             (+ (or .warning 0) (or .error 0)))))
+                                (format "✖ %s Issue%s" count (unless (eq 1 count) "s")))
+                              "✔ No Issues"))
+                 (`running     "⟲ Running")
+                 (`no-checker  "⚠ No Checker")
+                 (`not-checked "✖ Disabled")
+                 (`errored     "⚠ Error")
+                 (`interrupted "⛔ Interrupted")
+                 (`suspicious  ""))))
+    (propertize text
+      'help-echo "Show Flycheck Errors"
+      'mouse-face '(:box 1)
+      'local-map (make-mode-line-mouse-map
+                   'mouse-1 (lambda () (interactive) (flycheck-list-errors))))))
 
 ;; *********************************
 ;;; Time with clock icon
@@ -1933,71 +2180,77 @@
 (defun custom-modeline-time ()
   "Display a clock icon with the current time."
   (let* ((hour (string-to-number (format-time-string "%I")))
-         (icon (all-the-icons-wicon (format "time-%s" hour) :height 1.3 :v-adjust 0.0)))
+          (icon (all-the-icons-wicon (format "time-%s" hour) :height 1.3 :v-adjust 0.0)))
     (concat
-     (propertize (format-time-string " %H:%M ") 'face `(:height 0.9))
-     (propertize (format "%s " icon) 'face `(:height 1.0 :family ,(all-the-icons-wicon-family)) 'display '(raise -0.0)))))
+      (propertize (format-time-string " %H:%M ") 'face `(:height 0.9))
+      (propertize (format "%s " icon) 'face `(:height 1.0 :family ,(all-the-icons-wicon-family)) 'display '(raise -0.0)))))
 
+;; *********************************
+;;; LSP info in the modelin
+
+(defun custom-lsp-mode-line ()
+  "Construct the mode line text."
+  (if-let (workspaces (lsp-workspaces))
+    (concat "LSP" (string-join (--map (format "[%s]" (lsp--workspace-print it))
+                                 workspaces)))
+    (concat "LSP" (propertize "[Disconnected]" 'face 'warning))))
 
 ;; *********************************
 ;;
 ;;; My personal modeline
 
-(setq-default mode-line-format
+(setq mode-line-format
   (list
-    ;; **************************************
     ;; evil status
-
     evil-mode-line-tag
     '(:eval (propertize (if (eq 'emacs evil-state) "  " "  ")
-			'face font-lock-builtin-face))
+              'face font-lock-builtin-face))
 
 
-    ;; **************************************
     ;; major mode icon
     "%2 "
     "|"
     '(:eval (custom-modeline-mode-icon))
 
-    ;; **************************************
-    ;; Buffer name
+    ;; Buffer modified status
+    "%2 "
+    ;; '(:eval   (custom-modeline-modified))
 
     ;; Display a broken chain if buffer is modified
-    "%2 "
-    '(:eval   (custom-modeline-modified))
-    ;; Display a broken chain if buffer is modified
     '(:eval
-	(when (eql (buffer-modified-p) t)
-	;; propertize adds metadata to text, so you can add colours and formatting, amongst other things
-	(propertize (all-the-icons-faicon "chain-broken")
-		    'face `(:family ,(all-the-icons-faicon-family)
-			    :height 1.2))))
+       (when (eql (buffer-modified-p) t)
+         ;; propertize adds metadata to text, so you can add colours and formatting, amongst other things
+         (propertize (all-the-icons-faicon "chain-broken")
+           'face `(:family ,(all-the-icons-faicon-family)
+                    :height 1.2))))
     ;; Display a lock if buffer is readonly
     '(:eval
-	(when (eql buffer-read-only t)
-	(propertize (all-the-icons-faicon "lock")
-		    'face `(:family ,(all-the-icons-faicon-family)
-			    :height 1.2))))
+       (when (eql buffer-read-only t)
+         (propertize (all-the-icons-faicon "lock")
+           'face `(:family ,(all-the-icons-faicon-family)
+                    :height 1.2))))
 
     ;; the buffer name; the file name as a tool tip
     ;; if buffer is modified, change the background and foreground colors
     '(:eval (propertize "%b "
-			'face
-			(let ((face (buffer-modified-p)))
-			    (if face 'font-lock-warning-face
-			    'font-lock-type-face))
-			'help-echo (buffer-file-name))
-	    (when (buffer-modified-p)
-		(propertize " " 'face 'font-lock-warning-face))
+              'face
+              (let ((face (buffer-modified-p)))
+                (if face 'font-lock-warning-face
+                  'font-lock-type-face))
+              'help-echo (buffer-file-name))
+       (when (buffer-modified-p)
+         (propertize " " 'face 'font-lock-warning-face))
 
-	    (when buffer-read-only
-		(propertize "" 'face 'font-lock-warning-face))
-    )
+       (when buffer-read-only
+         (propertize "" 'face 'font-lock-warning-face))
+       )
 
-    (propertize "%I" 'face 'font-lock-constant-face) ;; size of file
+    "("
+    (propertize "%02I" 'face 'font-lock-constant-face) ;; size of file
+    ")"
 
-    ;; **************************************
     ;; line and column
+    " "
     (propertize "%02l" 'face 'font-lock-keyword-face) ;; line number
     ":"
     (propertize "%c" 'face 'font-lock-keyword-face) ;; column number
@@ -2009,24 +2262,27 @@
     '(:eval   (custom-modeline-region-info))
 
 
+    ;; projectile
+    " | "
+    '(:eval (when (bound-and-true-p projectile-mode)
+              (projectile-mode-line-function)))
 
-    ;; **************************************
     ;; nyan cat
     "%2 "
-    '(:eval (nyan-create))
+    '(:eval (when (bound-and-true-p nyan-mode)
+              (nyan-create)))
 
 
-    ;; **************************************
     ;; party parrot
     "%2 "
-    '(:eval (parrot-create)) ;; from the nyan-mode package
+    '(:eval (when (bound-and-true-p parrot-mode)
+              (parrot-create)))
 
-    ;; **************************************
     ;; spaces to align right
     '(:eval (propertize
-    	" " 'display
-    	`((space :align-to (- (+ right right-fringe right-margin)
-    				,(+ 60 (string-width mode-name))))))) ;; the bigger the number, less space is added
+              " " 'display
+              `((space :align-to (- (+ right right-fringe right-margin)
+                                   ,(+ 60 (string-width mode-name))))))) ;; the bigger the number, less space is added
 
 
 
@@ -2038,36 +2294,36 @@
     ;; 			)))))
 
 
-    ;; **************************************
     ;; the current major mode
     '(:eval   (custom-modeline-mode-icon))
-    (propertize " %m " 'face 'font-lock-string-face)
+    (propertize "%m" 'face 'font-lock-string-face)
 
+    ;; lsp status
+    '(:eval (when (bound-and-true-p lsp-mode)
+              " | "
+              (custom-lsp-mode-line)))
 
-
-
-    ;; **************************************
     ;; day and time
-    "|"
     ;; '(:eval (propertize (format-time-string " %b %d %H:%M ")
     ;; 			'face 'font-lock-builtin-face))
-    '(:eval   (custom-modeline-time)) ;; clock icon
+    '(:eval
+       "|"
+       (custom-modeline-time))
 
-    ;; **************************************
     ;; version control
-    "|"
-    '(:eval (custom-modeline-icon-vc))
+    '(:eval
+       "|"
+       (custom-modeline-icon-vc))
     ;; '(:eval (propertize (substring vc-mode 5)
     ;; 			'face 'font-lock-comment-face))
 
-    ;; **************************************
     ;; flycheck status
-    " | "
     '(:eval (when (bound-and-true-p flycheck-mode)
-		(custom-modeline-flycheck-status)))
+              " | "
+              (custom-modeline-flycheck-status)))
 
+    )
   )
-)
 
 
 ;; Diplay file size on the modeline

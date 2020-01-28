@@ -18,20 +18,49 @@ fi
 #    source ~/.zshrc
 # fi
 
+
+
+###########################################
+# EXPORT ENVIRONMENT VARIABLES
+###########################################
+
+#########################################
+# Re-setting PATH
+export PATH=$HOME/bin:/usr/local/bin:$PATH
+
+#########################################
+# ZSH
+
+# Export a envvar for ZSH
+export ZSH=$HOME/.oh-my-zsh
+
+#########################################
+# ROFI
+
+# export variable used by ROFI
+export XDG_USER_CONFIG_DIR=$HOME/.config
+
+#########################################
+# ssh
+export SSH_KEY_PATH="$HOME/.ssh/id_rsa"
+
+#########################################
 # Setting xterm to use 256 colors
 export TERM=xterm-256color
 
+#########################################
+# Preferred editor for local and remote sessions
 # Defining default Unix text editor and command line text viewr
-export EDITOR=/usr/bin/vim
+if [ -n "$SSH_CONNECTION" ] || [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+  export EDITOR='vim'
+else
+  export EDITOR='emacs'
+fi
 export PAGER=/usr/bin/less
-
-# Dont remember what those do...
-export QT_QPA_PLATFORMTHEME="qt5ct"
-export GTK2_RC_FILES="$HOME/.gtkrc-2.0"
 
 ###########################################
 # Manjaro i3 default .profile settings
-###########################################
+
 export QT_QPA_PLATFORMTHEME="qt5ct"
 export EDITOR=/usr/bin/vim
 export GTK2_RC_FILES="$HOME/.gtkrc-2.0"
@@ -41,6 +70,12 @@ export BROWSER=/usr/bin/firefox
 ###########################################
 # Applications specific settings
 ###########################################
+
+# NVM
+export NVM_DIR="$HOME/.nvm"
+
+# Yarn
+export YVM_DIR=$HOME/.yvm
 
 # Defining npm PATH and prefix (folder) to install global packages
 PATH="$HOME/.node_modules/bin:$PATH"
