@@ -8,3 +8,9 @@ git clone https://github.com/tmux-plugins/tmux-prefix-highlight.git ~/.tmux/plug
 
 echo "## install xclip"
 sudo pacman -S --noconfirm xclip
+
+# TMUXINATOR
+echo "## installing Tmuxinator"
+sudo pacman -S --noconfirm tmux
+echo "## install tmuxinator"
+gem install tmuxinator
