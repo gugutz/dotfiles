@@ -1,0 +1,52 @@
+
+;; ----- amx-history -----
+(
+ aggressive-indent-mode
+ package-install
+ desktop-save
+ desktop-save-mode
+ rainbow-mode
+ align-regexp
+ eval-last-sexp
+)
+
+;; ----- amx-data -----
+(
+ (eval-defun . 1)
+ (evil-mode . 1)
+ (turn-on-evil-mode . 1)
+ (eval-last-sexp . 5)
+ (revert-buffer . 1)
+ (eyebrowse-mode . 8)
+ (auto-revert-mode . 1)
+ (diff-hl-mode . 14)
+ (diff-hl-margin-mode . 14)
+ (counsel-mode . 2)
+ (projectile-mode . 2)
+ (counsel-projectile-switch-project . 1)
+ (package-install . 4)
+ (bug-hunter-init-file . 1)
+ (prettier-js-mode . 2)
+ (lsp-describe-session . 3)
+ (eval-buffer . 1)
+ (rainbow-mode . 2)
+ (fringe-mode . 1)
+ (keyfreq-show . 1)
+ (evil-jump-item . 1)
+ (try . 1)
+ (better-jumper-mode . 1)
+ (better-jumper-jump-forward . 2)
+ (better-jumper-jump-backward . 1)
+ (lsp-execute-code-action . 1)
+ (eldoc-mode . 4)
+ (lsp-ui-doc-show . 1)
+ (company-show-doc-buffer . 2)
+ (company-quickhelp-manual-begin . 1)
+ (company-quickhelp-mode . 2)
+ (tau/elisp-function-or-variable-quickhelp . 1)
+ (parrot-mode . 2)
+ (aggressive-indent-mode . 5)
+ (align-regexp . 1)
+ (desktop-save-mode . 2)
+ (desktop-save . 2)
+)

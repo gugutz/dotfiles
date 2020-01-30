@@ -39,6 +39,14 @@
 ;; *********************************-
 ;;; General
 
+;; Allow access from emacsclient
+(use-package server
+  :when (display-graphic-p)
+  :defer 1
+  :config
+  (unless (or (daemonp) (server-running-p))
+    (server-start))
+  )
 
 (setq ring-bell-function 'ignore) ;; Disable the annoying Emacs bell ring (beep)
 
@@ -97,6 +105,9 @@
 ;; start with init.el
 (setq initial-buffer-choice "~/dotfiles/emacs.d/init.el")
 
+;; indicate empty lines in the fringe with --
+(setq-default indicate-empty-lines t)
+
 ;; *********************************-
 ;;; Folders and Files
 
@@ -135,6 +146,7 @@
 (setq tramp-persistency-file-name  (concat config-dir "tramp-persistency.el"))
 (setq url-cache-directory          (concat config-dir "url/"))
 (setq url-configuration-directory  (concat config-dir "url/"))
+(setq recentf-save-file "~/.emacs.d/config/recentf")
 
 
 ;; **********************************
@@ -164,6 +176,36 @@
 
 ;; ##################################################
 ;;
+;;; PERFORMANCE OPTIMIZATIONS
+;;
+;; ##################################################
+
+;; Disable bidirectional text rendering for a modest performance boost. Of
+;; course, this renders Emacs unable to detect/display right-to-left languages
+;; (sorry!), but for us left-to-right language speakers/writers, it's a boon.
+(setq-default bidi-display-reordering 'left-to-right
+  bidi-paragraph-direction 'left-to-right)
+
+;; Reduce rendering/line scan work for Emacs by not rendering cursors or regions
+;; in non-focused windows.
+(setq-default cursor-in-non-selected-windows nil)
+(setq highlight-nonselected-windows nil)
+
+;; More performant rapid scrolling over unfontified regions. May cause brief
+;; spells of inaccurate fontification immediately after scrolling.
+(setq fast-but-imprecise-scrolling t)
+
+;; Resizing the Emacs frame can be a terribly expensive part of changing the
+;; font. By inhibiting this, we halve startup times, particularly when we use
+;; fonts that are larger than the system default (which would resize the frame).
+(setq frame-inhibit-implied-resize t)
+
+;; Don't ping things that look like domain names.
+(setq ffap-machine-p-known 'reject)
+
+
+;; ##################################################
+;;
 ;;; EMACS SESSION AND STATE
 ;;
 ;; ##################################################
@@ -180,7 +222,7 @@
   (save-place-mode 1)
   (setq-default save-place t)
   ;; dont clutter the emacs folder. save somewhere else
-  (setq save-place-file (locate-user-emacs-file "places" ".emacs-places"))
+  (setq save-place-file "~/.emacs.d/config/places")
   )
 
 ;; *********************************
@@ -196,7 +238,7 @@
   ("C-c s" . desktop-save-in-desktop-dir)
   :init
   ;; use only one desktop
-  (setq desktop-dirname "~/.emacs.d/config/desktop")
+  (setq desktop-dirname "~/.emacs.d/config/desktop/")
   (setq desktop-base-file-name "emacs-desktop")
   (setq desktop-base-lock-name "emacs-desktop-lock")
 
@@ -204,10 +246,10 @@
   (setq desktop-load-locked-desktop t)
   (setq desktop-files-not-to-save "^$")
   (setq desktop-buffers-not-to-save
-        (concat "\\("
-                "^nn\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
-                "\\|\\.emacs.*\\|\\.diary\\|\\.newsrc-dribble\\|\\.bbdb"
-                "\\)$"))
+    (concat "\\("
+      "^nn\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
+      "\\|\\.emacs.*\\|\\.diary\\|\\.newsrc-dribble\\|\\.bbdb"
+      "\\)$"))
   :config
   (desktop-save-mode t)
   (add-to-list 'desktop-modes-not-to-save 'dired-mode)
@@ -218,11 +260,11 @@
 
   ;; remove desktop after it's been read
   (add-hook 'desktop-after-read-hook
-            '(lambda ()
-               ;; desktop-remove clears desktop-dirname
-               (setq desktop-dirname-tmp desktop-dirname)
-               (desktop-remove)
-               (setq desktop-dirname desktop-dirname-tmp)))
+    '(lambda ()
+       ;; desktop-remove clears desktop-dirname
+       (setq desktop-dirname-tmp desktop-dirname)
+       (desktop-remove)
+       (setq desktop-dirname desktop-dirname-tmp)))
 
   (defun saved-session ()
     (file-exists-p (concat desktop-dirname "/" desktop-base-file-name)))
@@ -232,7 +274,7 @@
     "Restore a saved emacs session."
     (interactive)
     (if (saved-session)
-        (desktop-read)
+      (desktop-read)
       (message "No desktop found.")))
 
   ;; use session-save to save the desktop manually
@@ -240,18 +282,18 @@
     "Save an emacs session."
     (interactive)
     (if (saved-session)
-        (if (y-or-n-p "Overwrite existing desktop? ")
-            (desktop-save-in-desktop-dir)
-          (message "Session not saved."))
+      (if (y-or-n-p "Overwrite existing desktop? ")
+        (desktop-save-in-desktop-dir)
+        (message "Session not saved."))
       (desktop-save-in-desktop-dir)))
 
   ;; ask user whether to restore desktop at start-up
   (add-hook 'after-init-hook
-            '(lambda ()
-               (if (saved-session)
-                   (if (y-or-n-p "Restore desktop? ")
-                       (session-restore)))))
-)
+    '(lambda ()
+       (if (saved-session)
+         (if (y-or-n-p "Restore desktop? ")
+           (session-restore)))))
+  )
 
 ;; ##################################################
 ;;
@@ -295,15 +337,19 @@
   ;; ("SPC q" . kill-buffer-and-window) ;; check if evil quit does this
   (define-key evil-normal-state-map (kbd "SPC w") 'save-buffer)
   (define-key evil-normal-state-map (kbd "SPC d") 'delete-frame)
-  (define-key evil-normal-state-map (kbd "SPC k") 'kill-buffer)
+  (define-key evil-normal-state-map (kbd "SPC k") 'kill-current-buffer)
+  (define-key evil-normal-state-map (kbd "SPC 0") 'delete-window)
   (define-key evil-normal-state-map (kbd "SPC -") 'split-window-bellow)
   (define-key evil-normal-state-map (kbd "SPC |") 'split-window-right)
   (define-key evil-normal-state-map (kbd "SPC u") 'undo-tree-visualize)
+  (define-key evil-normal-state-map (kbd "SPC o") 'other-window)
 
   ;; ------------------------------------------
   ;;
   ;;; RECOVER SOME USEFUL EMACS NATIVE COMMANDS
   (define-key evil-insert-state-map (kbd "C-y") 'yank)
+  (define-key evil-insert-state-map (kbd "C-a") 'beginning-of-line)
+  (define-key evil-insert-state-map (kbd "C-e") 'end-of-line)
   (define-key evil-normal-state-map (kbd "C-y") 'yank)
   (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
   (define-key evil-insert-state-map (kbd "C-d") 'delete-char)
@@ -322,6 +368,13 @@
   :diminish
   :config
   (evil-commentary-mode)
+  )
+
+;; *********************************
+;; evil-surround
+(use-package evil-matchit
+  :config
+  (global-evil-matchit-mode 1)
   )
 
 ;; *********************************
@@ -440,6 +493,7 @@
   :after ivy
   :config
   (amx-mode)
+  (setq amx-save-file "~/.emacs.d/config/amx-items")
   )
 
 ;; *********************************
@@ -452,51 +506,51 @@
   ;; use all-the-icons for `ivy-switch-buffer'
   (defun ivy-rich-switch-buffer-icon (candidate)
     (with-current-buffer
-	(get-buffer candidate)
+      (get-buffer candidate)
       (let ((icon (all-the-icons-icon-for-mode major-mode)))
         (if (symbolp icon)
-	    (all-the-icons-icon-for-mode 'fundamental-mode)
+          (all-the-icons-icon-for-mode 'fundamental-mode)
           icon))))
   :init
   ;; To abbreviate paths using abbreviate-file-name (e.g. replace “/home/username” with “~”)
   (setq ivy-rich-path-style 'abbrev)
   ;; customizing functions
   (setq ivy-rich--display-transformers-list
-	'(ivy-switch-buffer
-	  (:columns
-	   ((ivy-rich-switch-buffer-icon (:width 2))
-	    (ivy-rich-candidate (:width 30))
-	    (ivy-rich-switch-buffer-size (:width 7))
-	    (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
-	    (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))
-	    (ivy-rich-switch-buffer-project (:width 15 :face success))
-	    (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
-	   :predicate
-	   (lambda (cand) (get-buffer cand)))
-	  counsel-find-file
-	  (:columns
-	   ((ivy-read-file-transformer)
-	    (ivy-rich-counsel-find-file-truename (:face font-lock-doc-face))))
-	  counsel-M-x
-	  (:columns
-	   ((counsel-M-x-transformer (:width 35))
-	    (ivy-rich-counsel-function-docstring (:width 34 :face font-lock-doc-face))))
-	  counsel-describe-function
-	  (:columns
-	   ((counsel-describe-function-transformer (:width 35))
-	    (ivy-rich-counsel-function-docstring (:width 34 :face font-lock-doc-face))))
-	  counsel-describe-variable
-	  (:columns
-	   ((counsel-describe-variable-transformer (:width 35))
-	    (ivy-rich-counsel-variable-docstring (:width 34 :face font-lock-doc-face))))
-	  package-install
-	  (:columns
-	   ((ivy-rich-candidate (:width 25))
-	    (ivy-rich-package-version (:width 12 :face font-lock-comment-face))
-	    (ivy-rich-package-archive-summary (:width 7 :face font-lock-builtin-face))
-	    (ivy-rich-package-install-summary (:width 23 :face font-lock-doc-face))))
-	  )
-	)
+    '(ivy-switch-buffer
+       (:columns
+         ((ivy-rich-switch-buffer-icon (:width 2))
+           (ivy-rich-candidate (:width 30))
+           (ivy-rich-switch-buffer-size (:width 7))
+           (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
+           (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))
+           (ivy-rich-switch-buffer-project (:width 15 :face success))
+           (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
+         :predicate
+         (lambda (cand) (get-buffer cand)))
+       counsel-find-file
+       (:columns
+         ((ivy-read-file-transformer)
+           (ivy-rich-counsel-find-file-truename (:face font-lock-doc-face))))
+       counsel-M-x
+       (:columns
+         ((counsel-M-x-transformer (:width 35))
+           (ivy-rich-counsel-function-docstring (:width 34 :face font-lock-doc-face))))
+       counsel-describe-function
+       (:columns
+         ((counsel-describe-function-transformer (:width 35))
+           (ivy-rich-counsel-function-docstring (:width 34 :face font-lock-doc-face))))
+       counsel-describe-variable
+       (:columns
+         ((counsel-describe-variable-transformer (:width 35))
+           (ivy-rich-counsel-variable-docstring (:width 34 :face font-lock-doc-face))))
+       package-install
+       (:columns
+         ((ivy-rich-candidate (:width 25))
+           (ivy-rich-package-version (:width 12 :face font-lock-comment-face))
+           (ivy-rich-package-archive-summary (:width 7 :face font-lock-builtin-face))
+           (ivy-rich-package-install-summary (:width 23 :face font-lock-doc-face))))
+       )
+    )
   :config
   ;; ivy-rich-mode needs to be called after `ivy-rich--display-transformers-list' is changed
   (ivy-rich-mode 1)
@@ -522,19 +576,19 @@
   (setq ivy-posframe-width 130)
   ;; define the position of the posframe per function
   (setq ivy-posframe-display-functions-alist
-	'(
-          (counsel-M-x     . nil)
-          (swiper          . nil)
-          (complete-symbol . ivy-posframe-display-at-point)
-          (t               . ivy-posframe-display-at-frame-center)
-	  ))
+    '(
+       (counsel-M-x     . nil)
+       (swiper          . nil)
+       (complete-symbol . ivy-posframe-display-at-point)
+       (t               . ivy-posframe-display-at-frame-center)
+       ))
   ;; custom define height of post frame per function
   (setq ivy-posframe-height-alist '(
-                                    (find-file . 15)
-                                    (counsel-ag . 15)
-                                    (counsel-projectile-ag . 30)
-                                    (t      . 20)
-				    ))
+                                     (find-file . 15)
+                                     (counsel-ag . 15)
+                                     (counsel-projectile-ag . 30)
+                                     (t      . 20)
+                                     ))
   :config
   (ivy-posframe-mode)
   )
@@ -567,12 +621,12 @@
   :config
   (all-the-icons-ivy-setup)
   (setq all-the-icons-ivy-file-commands
-	'(ivy-switch-buffer
-	  counsel-find-file
-	  counsel-file-jump
-	  counsel-recentf
-	  counsel-projectile-find-file
-	  counsel-projectile-find-dir))
+    '(ivy-switch-buffer
+       counsel-find-file
+       counsel-file-jump
+       counsel-recentf
+       counsel-projectile-find-file
+       counsel-projectile-find-dir))
   )
 
 ;; *********************************
@@ -594,14 +648,14 @@
   ("M-g w" . avy-goto-word-1)
   ("M-g e" . avy-goto-word-0)
   (:map isearch-mode-map
-	("C-'" . avy-search))
+    ("C-'" . avy-search))
   (:map evil-normal-state-map
-	("SPC SPC" . avy-goto-char)
-	("SPC g c" . avy-goto-char)
-	("SPC g l" . avy-goto-line))
+    ("SPC SPC" . avy-goto-char)
+    ("SPC g c" . avy-goto-char)
+    ("SPC g l" . avy-goto-line))
   (:map evil-visual-state-map
-	("SPC g l" . avy-goto-char)
-	("SPC g c" . avy-goto-line))
+    ("SPC g l" . avy-goto-char)
+    ("SPC g c" . avy-goto-line))
   :config
   (setq avy-background nil) ;; default nil ;; gray background will be added during the selection.
   (setq avy-highlight-first t) ;; When non-nil highlight the first decision char with avy-lead-face-0. Do this even when the char is terminating.
@@ -626,6 +680,11 @@
   ;; (global-set-key [remap goto-line] 'goto-line-preview)
   )
 
+;; ################################################
+;;
+;; FILE / DIRECTORY NAVIGATION
+;;
+;; ################################################
 
 ;; **************************************************
 ;;
@@ -688,6 +747,8 @@
   :hook
   (dired-mode . all-the-icons-dired-mode)
   )
+;; * hippie-expand (native emacs expand function)
+
 
 
 ;; ################################################
@@ -794,7 +855,6 @@
   (setq sp-highlight-pair-overlay nil)
   (setq sp-highlight-wrap-overlay nil)
   (setq sp-highlight-wrap-tag-overlay nil)
-
   (with-eval-after-load 'evil
     ;; But if someone does want overlays enabled, evil users will be stricken
     ;; with an off-by-one issue where smartparens assumes you're outside the
@@ -804,8 +864,11 @@
     ;; ...and stay highlighted until we've truly escaped the pair!
     (setq sp-cancel-autoskip-on-backward-movement nil))
 
+  ;; dont try to escape quotes in strings
+  (setq sp-escape-quotes-after-insert nil)
+
   (add-hook 'minibuffer-setup-hook
-    (defun doom-init-smartparens-in-minibuffer-maybe-h ()
+    (defun init-smartparens-in-minibuffer-maybe-h ()
       "Enable `smartparens-mode' in the minibuffer, during `eval-expression',
 `pp-eval-expression' or `evil-ex'."
       (when (memq this-command '(eval-expression pp-eval-expression evil-ex))
@@ -844,11 +907,11 @@
 
 ;; mouse scrolls are binded differently depending on the system
 (if (eq system-type 'gnu/linux)
-    (global-set-key (kbd "<C-mouse-4>") 'text-scale-increase)
+  (global-set-key (kbd "<C-mouse-4>") 'text-scale-increase)
   (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
   )
 (if (eq system-type 'windows-nt)
-    (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+  (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
   (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
   )
 (global-set-key [?\C-=] 'text-scale-increase)
@@ -927,14 +990,15 @@
   :diminish projectile-mode
   :bind
   (:map projectile-mode-map
-	("s-p" . projectile-command-map)
-	("C-c p" . projectile-command-map)
-	("M-S-O p" . counsel-projectile-switch-project)
-	)
+    ("s-p" . projectile-command-map)
+    ("C-c p" . projectile-command-map)
+    ("M-S-O p" . counsel-projectile-switch-project)
+    )
   :init
   (setq projectile-completion-system 'ivy)
   (setq projectile-mode-line-prefix "Project -> ")
   (setq projectile-mode-line-function '(lambda () (format " Proj[%s]" (projectile-project-name))))
+  (setq projectile-known-projects-file "~/.emacs.d/config/projectile-bookmarks.eld")
   :config
   (projectile-mode +1)
   )
@@ -953,15 +1017,15 @@
   (after-init . global-company-mode)
   :bind
   (:map company-active-map
-	("C-p" . company-select-previous)
-	("C-n" . company-select-next)
-	("<tab>" . company-complete-common-or-cycle)
-  ([(shift iso-lefttab)] . company-select-previous))
+    ("C-p" . company-select-previous)
+    ("C-n" . company-select-next)
+    ("<tab>" . company-complete-common-or-cycle)
+    ([(shift iso-lefttab)] . company-select-previous))
   (:map company-search-map
-	("C-p" . company-select-previous)
-	("C-n" . company-select-next))
+    ("C-p" . company-select-previous)
+    ("C-n" . company-select-next))
   :custom
-  (company-minimum-prefix-length 2)
+  (company-minimum-prefix-length 1)
   (company-idle-delay 0.1) ;; decrease delay before autocompletion popup shows
   (company-echo-delay 0) ;; remove annoying blinking
   (company-selection-wrap-around t) ; loop over candidates
@@ -971,7 +1035,7 @@
   (bind-key [remap completion-at-point] #'company-complete company-mode-map)
   ;; show tooltip even for single candidates
   (setq company-frontends '(company-pseudo-tooltip-frontend
-			    company-echo-metadata-frontend))
+                             company-echo-metadata-frontend))
   )
 
 ;; *********************************
@@ -984,38 +1048,38 @@
   :config
   (setq company-box-icons-alist 'company-box-icons-all-the-icons)
   (setq company-box-icons-all-the-icons
-        (let ((all-the-icons-scale-factor 0.9))
-          `((Unknown       . ,(all-the-icons-material "find_in_page"             :face 'all-the-icons-purple))
-            (Text          . ,(all-the-icons-material "text_fields"              :face 'all-the-icons-green))
-            (Method        . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-            (Function      . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-            (Constructor   . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-            (Field         . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-            (Variable      . ,(all-the-icons-material "adjust"                   :face 'all-the-icons-blue))
-            (Class         . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
-            (Interface     . ,(all-the-icons-material "settings_input_component" :face 'all-the-icons-red))
-            (Module        . ,(all-the-icons-material "view_module"              :face 'all-the-icons-red))
-            (Property      . ,(all-the-icons-material "settings"                 :face 'all-the-icons-red))
-            (Unit          . ,(all-the-icons-material "straighten"               :face 'all-the-icons-red))
-            (Value         . ,(all-the-icons-material "filter_1"                 :face 'all-the-icons-red))
-            (Enum          . ,(all-the-icons-material "plus_one"                 :face 'all-the-icons-red))
-            (Keyword       . ,(all-the-icons-material "filter_center_focus"      :face 'all-the-icons-red))
-            (Snippet       . ,(all-the-icons-material "short_text"               :face 'all-the-icons-red))
-            (Color         . ,(all-the-icons-material "color_lens"               :face 'all-the-icons-red))
-            (File          . ,(all-the-icons-material "insert_drive_file"        :face 'all-the-icons-red))
-            (Reference     . ,(all-the-icons-material "collections_bookmark"     :face 'all-the-icons-red))
-            (Folder        . ,(all-the-icons-material "folder"                   :face 'all-the-icons-red))
-            (EnumMember    . ,(all-the-icons-material "people"                   :face 'all-the-icons-red))
-            (Constant      . ,(all-the-icons-material "pause_circle_filled"      :face 'all-the-icons-red))
-            (Struct        . ,(all-the-icons-material "streetview"               :face 'all-the-icons-red))
-            (Event         . ,(all-the-icons-material "event"                    :face 'all-the-icons-red))
-            (Operator      . ,(all-the-icons-material "control_point"            :face 'all-the-icons-red))
-            (TypeParameter . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
-            (Template      . ,(all-the-icons-material "short_text"               :face 'all-the-icons-green))
-            (ElispFunction . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-            (ElispVariable . ,(all-the-icons-material "check_circle"             :face 'all-the-icons-blue))
-            (ElispFeature  . ,(all-the-icons-material "stars"                    :face 'all-the-icons-orange))
-            (ElispFace     . ,(all-the-icons-material "format_paint"             :face 'all-the-icons-pink)))))
+    (let ((all-the-icons-scale-factor 0.9))
+      `((Unknown       . ,(all-the-icons-material "find_in_page"             :face 'all-the-icons-purple))
+         (Text          . ,(all-the-icons-material "text_fields"              :face 'all-the-icons-green))
+         (Method        . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+         (Function      . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+         (Constructor   . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+         (Field         . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+         (Variable      . ,(all-the-icons-material "adjust"                   :face 'all-the-icons-blue))
+         (Class         . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
+         (Interface     . ,(all-the-icons-material "settings_input_component" :face 'all-the-icons-red))
+         (Module        . ,(all-the-icons-material "view_module"              :face 'all-the-icons-red))
+         (Property      . ,(all-the-icons-material "settings"                 :face 'all-the-icons-red))
+         (Unit          . ,(all-the-icons-material "straighten"               :face 'all-the-icons-red))
+         (Value         . ,(all-the-icons-material "filter_1"                 :face 'all-the-icons-red))
+         (Enum          . ,(all-the-icons-material "plus_one"                 :face 'all-the-icons-red))
+         (Keyword       . ,(all-the-icons-material "filter_center_focus"      :face 'all-the-icons-red))
+         (Snippet       . ,(all-the-icons-material "short_text"               :face 'all-the-icons-red))
+         (Color         . ,(all-the-icons-material "color_lens"               :face 'all-the-icons-red))
+         (File          . ,(all-the-icons-material "insert_drive_file"        :face 'all-the-icons-red))
+         (Reference     . ,(all-the-icons-material "collections_bookmark"     :face 'all-the-icons-red))
+         (Folder        . ,(all-the-icons-material "folder"                   :face 'all-the-icons-red))
+         (EnumMember    . ,(all-the-icons-material "people"                   :face 'all-the-icons-red))
+         (Constant      . ,(all-the-icons-material "pause_circle_filled"      :face 'all-the-icons-red))
+         (Struct        . ,(all-the-icons-material "streetview"               :face 'all-the-icons-red))
+         (Event         . ,(all-the-icons-material "event"                    :face 'all-the-icons-red))
+         (Operator      . ,(all-the-icons-material "control_point"            :face 'all-the-icons-red))
+         (TypeParameter . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
+         (Template      . ,(all-the-icons-material "short_text"               :face 'all-the-icons-green))
+         (ElispFunction . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+         (ElispVariable . ,(all-the-icons-material "check_circle"             :face 'all-the-icons-blue))
+         (ElispFeature  . ,(all-the-icons-material "stars"                    :face 'all-the-icons-orange))
+         (ElispFace     . ,(all-the-icons-material "format_paint"             :face 'all-the-icons-pink)))))
   )
 
 
@@ -1043,8 +1107,12 @@
   :ensure t
   :commands lsp
   :hook
-  (prog-mode . lsp)
-  (text-mode . lsp)
+  (typescript-mode . lsp)
+  (scss-mode . lsp)
+  (css-mode . lsp)
+  (js2-mode . lsp)
+  (go-mode . lsp)
+  (yaml-mode . lsp)
   (sh-mode . lsp)
   (conf-mode . lsp)
   :bind
@@ -1053,10 +1121,11 @@
     ("SPC l p f d" . lsp-ui-peek-find-definitions)
     ("SPC l p f i" . lsp-ui-peek-find-implementation)
     ("SPC l g d" . lsp-goto-type-definition)
-    ("SPC l f d" . lsp-find-definition)
+    ("SPC l d" . lsp-find-definition)
     ("SPC l g i" . lsp-goto-implementation)
-    ("SPC l f i" . lsp-find-implementation)
+    ("SPC l i" . lsp-find-implementation)
     ("SPC l m"   . lsp-ui-imenu)
+    ("SPC l f"   . lsp-execute-code-action)
     ("SPC l s"   . lsp-ui-sideline-mode))
   (:map lsp-mode-map
     ;; ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
@@ -1071,20 +1140,23 @@
     ("C-c l f i" . lsp-find-implementation)
     ("C-c l m"   . lsp-ui-imenu)
     ("C-c l s"   . lsp-ui-sideline-mode))
-  :custom
-  ;; general
-  ;; (lsp-auto-configure t) ;; auto-configure `lsp-ui' and `company-lsp'
-  (lsp-prefer-flymake nil) ;; t: flymake | nil: lsp-ui | :none -> none of them (flycheck)
   :config
+  ;; general
+  (setq lsp-auto-configure t) ;; auto-configure `lsp-ui' and `company-lsp'
+  (setq lsp-prefer-flymake :none) ;; t: flymake | nil: lsp-ui | :none -> none of them (flycheck)
+  (setq lsp-session-file "~/.emacs.d/config/lsp-session-v1") ;; t: flymake | nil: lsp-ui | :none -> none of them (flycheck)
   ;; angular language server
+  ;; this serves for editing templates only (both inline and external)
   (setq lsp-clients-angular-language-server-command
-	'("node"
-	  "/home/gustavo/.nvm/versions/node/v10.16.3/lib/node_modules/@angular/language-server"
-	  "--ngProbeLocations"
-	  "/home/gustavo/.nvm/versions/node/v10.16.3/lib/node_modules"
-	  "--tsProbeLocations"
-	  "/home/gustavo/.nvm/versions/node/v10.16.3/lib/node_modules"
-	  "--stdio"))
+    '("node"
+       "/home/gustavo/.nvm/versions/node/v10.16.3/lib/node_modules/@angular/language-server"
+       "--ngProbeLocations"
+       "/home/gustavo/.nvm/versions/node/v10.16.3/lib/node_modules"
+       "--tsProbeLocations"
+       "/home/gustavo/.nvm/versions/node/v10.16.3/lib/node_modules"
+       "--stdio"))
+  ;; disable angular-ls for specific modes
+  ;; (add-to-list 'lsp-disabled-clients '(web-mode . angular-ls))
   )
 
 
@@ -1096,40 +1168,34 @@
   :after lsp-mode
   :hook
   (lsp-mode . lsp-ui-mode)
-  ;; :custom-face
-  ;; (lsp-ui-doc-background ((nil (:background "#f9f2d9"))))
-  ;; (lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic)))))
-  ;; (lsp-ui-sideline-global ((nil (:inherit 'shadow :background "#f9f2d9"))))
-  :custom
-  ;; lsp-ui-doc
-  (lsp-ui-doc-enable nil)
-  (lsp-ui-doc-position 'top) ;; top, bottom, or at-point
-  (lsp-ui-doc-border (face-foreground 'default))
-  (lsp-ui-doc-max-width 100)
-  (lsp-ui-doc-max-height 30)
-  ;; lsp-ui-flycheck
-  (lsp-ui-flycheck-enable nil) ;; disable to leave `tslint' as checker for ts files
-  (lsp-ui-flycheck-list-position 'right)
-  (lsp-ui-flycheck-live-reporting t)
-  ;; lsp-ui-sideline
-  (lsp-ui-sideline-enable nil)
-  (lsp-ui-sideline-show-diagnostics t) ;; show diagnostics (flyckeck) messages in sideline
-  (lsp-ui-sideline-code-actions-prefix "")
-  ;; lsp-ui-imenu
-  (lsp-ui-imenu-enable t)
-  (lsp-ui-imenu-kind-position 'top)
-  ;; lsp-ui-peek
-  (lsp-ui-peek-enable t)
-  (lsp-ui-peek-peek-height 20)
-  (lsp-ui-peek-list-width 40)
   :config
-  ;; lsp-ui appearance
-  (add-hook 'lsp-ui-doc-frame-hook
-    (lambda (frame _w)
-      (set-face-attribute 'default frame :font "Hack 11")))
-  ;; Use lsp-ui-doc-webkit only in GUI
-  (if (display-graphic-p)
-    (setq lsp-ui-doc-use-webkit t))
+  (setq lsp-ui-flycheck-enable t) ;; disable to leave `tslint' as checker for ts files
+  (setq lsp-ui-flycheck-list-position 'right)
+
+  (setq lsp-ui-doc-enable nil)
+  (add-hook 'emacs-lisp-hook
+    (lambda ()
+      (setq lsp-ui-doc-enable t)))
+
+  (setq lsp-ui-sideline-enable nil)
+  (setq lsp-ui-sideline-show-diagnostics t) ;; show diagnostics (flyckeck) messages in sideline
+  ;; ;; (setq lsp-ui-sideline-code-actions-prefix "")
+
+  ;; (setq lsp-ui-imenu-enable t)
+  ;; ;; (setq lsp-ui-imenu-kind-position 'top)
+
+  ;; (setq lsp-ui-peek-enable t)
+  ;; ;; (setq lsp-ui-peek-peek-height 20)
+  ;; ;; (setq lsp-ui-peek-list-width 40)
+
+  ;; ;; lsp-ui doc frame appearance
+  ;; (add-hook 'lsp-ui-doc-frame-hook
+  ;;   (lambda (frame _w)
+  ;;     (set-face-attribute 'default frame :font "Hack 11")))
+
+  ;; ;; Use lsp-ui-doc-webkit only in GUI
+  ;; (if (display-graphic-p)
+  ;;   (setq lsp-ui-doc-use-webkit t))
   )
 
 ;; *********************************
@@ -1137,14 +1203,7 @@
 
 ;; company-lsp is auto inserted into company backends
 
-(use-package company-lsp :ensure t
-  :ensure t
-  ;; :custom
-  ;; (company-lsp-enable-snippet t)
-  ;; (company-lsp-async t)
-  ;; (company-lsp-cache-candidates 'auto)
-  ;; (company-lsp-enable-recompletion t)
-  )
+(use-package company-lsp :ensure t)
 
 
 ;; *********************************
@@ -1160,20 +1219,20 @@
   ;; ("<tab>" . yas-maybe-expand)
   ("C-<tab>" . yas-maybe-expand)
   (:map yas-minor-mode-map
-	;; yas-maybe-expand only expands if there are candidates.
-	;; if not, acts like binding is unbound and run whatever command is bound to that key normally
-	;; ("<tab>" . yas-maybe-expand)
-	;; Bind `C-c y' to `yas-expand' ONLY.
-	("C-c y" . yas-expand)
-	("C-SPC" . yas-expand)
-	)
+    ;; yas-maybe-expand only expands if there are candidates.
+    ;; if not, acts like binding is unbound and run whatever command is bound to that key normally
+    ;; ("<tab>" . yas-maybe-expand)
+    ;; Bind `C-c y' to `yas-expand' ONLY.
+    ("C-c y" . yas-expand)
+    ("C-SPC" . yas-expand)
+    )
   :config
   ;; set snippets directory
   ;;  (setq yas-snippet-dirs '(yasnippet-snippets-dir))
   ;; add angular snippets folder
   (with-eval-after-load 'yasnippets-snippets
     (setq yas-snippet-dirs (append yas-snippet-dirs
-				   '("~/dotfiles/emacs.d/snippets/angular/"))))
+                             '("~/dotfiles/emacs.d/snippets/angular/"))))
   (setq yas-verbosity 1)                      ; No need to be so verbose
   (setq yas-wrap-around-region t)
   (yas-reload-all) ;; tell yasnippet about updates to yas-snippet-dirs
@@ -1191,8 +1250,9 @@
 
 (use-package flycheck
   :ensure t
-  :defer t
   :diminish flycheck-mode
+  :hook
+  (prog-mode . flycheck-mode)
   :custom-face
   (flycheck-fringe-info ((nil (:background "#007ad3" :foreground "#ffffff"))))
   (flycheck-fringe-warning ((nil (:background "#fcfa23" :foreground "#000000"))))
@@ -1202,16 +1262,9 @@
   (flycheck-idle-change-delay 1.5)
   (flycheck-display-errors-delay 1)
   (flycheck-indication-mode 'left-fringe)
-  :init
-  (global-flycheck-mode)
   :config
+  ;; (global-flycheck-mode)
   (setq-default flycheck-temp-prefix ".flycheck")
-  ;; (setq flycheck-checkers '(javascript-eslint typescript-tslint))
-  ;; (flycheck-add-mode 'javascript-eslint 'js-mode)
-  ;; (flycheck-add-mode 'javascript-eslint 'js2-mode)
-  ;; (flycheck-add-mode 'typescript-tslint 'rjsx-mode)
-  ;; (flycheck-add-mode 'typescript-tslint 'typescript-mode)
-  ;; (flycheck-add-mode 'html-tidy 'sgml-mode)
   )
 
 
@@ -1224,26 +1277,16 @@
   :hook
   (flycheck-mode . flycheck-posframe-mode)
   :custom-face
-  ;; inherit from default faces
-  ;; (flycheck-posframe-info-face ((nil (:inherit 'info))))
-  ;; (flycheck-posframe-warning-face ((nil (:inherit 'warning))))
-  (flycheck-posframe-error-face ((nil (:inherit 'error))))
-  ;; personal custom faces
-  ;; (flycheck-posframe-face ((nil (:background "#20fabe" :foreground "#FFCC0E"))))
-  (flycheck-posframe-info-face ((nil (:background "#007ad3" :foreground "#ffffff" :font "DejaVuSansMono" :height 110))))
-  (flycheck-posframe-warning-face ((nil (:background "#fcfa23" :foreground "#000000" :font "DejaVuSansMono" :height 110))))
-  ;; (flycheck-posframe-error-face ((nil (:background "#ff3300" :foreground "#000000"))))
-  ;; (flycheck-posframe-background-face ((nil (:background "#FFFFFF" :foreground "#000000"))))
-  (flycheck-posframe-border-face ((nil (:foreground "#202020"))))
+  (flycheck-posframe-info-face ((nil (:background "#007ad3" :foreground "#ffffff" :height 105))))
+  (flycheck-posframe-warning-face ((nil (:background "#fcfa23" :foreground "#000000" :height 105))))
+  (flycheck-posframe-error-face ((nil (:background "#000000" :foreground "#ff3300" :height 105))))
+  (flycheck-posframe-border-face ((nil (:foreground "#288aaa" :background "#9370DB"))))
   :custom
   (flycheck-posframe-prefix "\u27a4 ") ;; default: ➤
   (flycheck-posframe-warning-prefix "\u26a0 ")
   (flycheck-posframe-info-prefix "\uf6c8 ")
   (flycheck-posframe-error-prefix "\u274c ")
   (flycheck-posframe-border-width 2)
-  :config
-  ;; Calling (flycheck-posframe-configure-pretty-defaults) will configure flycheck-posframe to show warnings and errors with nicer faces (inheriting from warning and error respectively), and set the prefix for each to nicer unicode characters.
-  (flycheck-posframe-configure-pretty-defaults)
   )
 
 
@@ -1323,32 +1366,32 @@
   "Display summary of SYMBOL at point.
 Adapted from `describe-function-or-variable'."
   (interactive
-   (let* ((v-or-f (variable-at-point))
-          (found (symbolp v-or-f))
-          (v-or-f (if found v-or-f (function-called-at-point))))
-     (list v-or-f)))
+    (let* ((v-or-f (variable-at-point))
+            (found (symbolp v-or-f))
+            (v-or-f (if found v-or-f (function-called-at-point))))
+      (list v-or-f)))
   (if (not (and symbol (symbolp symbol)))
-      (message "You didn't specify a function or variable")
+    (message "You didn't specify a function or variable")
     (let* ((fdoc (when (fboundp symbol)
                    (or (documentation symbol t) "Not documented.")))
-           (fdoc-short (and (stringp fdoc)
-                            (substring fdoc 0 (string-match "\n" fdoc))))
-           (vdoc (when  (boundp symbol)
-                   (or (documentation-property symbol 'variable-documentation t)
-                       "Not documented as a variable.")))
-           (vdoc-short (and (stringp vdoc)
-                            (substring vdoc 0 (string-match "\n" vdoc)))))
+            (fdoc-short (and (stringp fdoc)
+                          (substring fdoc 0 (string-match "\n" fdoc))))
+            (vdoc (when  (boundp symbol)
+                    (or (documentation-property symbol 'variable-documentation t)
+                      "Not documented as a variable.")))
+            (vdoc-short (and (stringp vdoc)
+                          (substring vdoc 0 (string-match "\n" vdoc)))))
       (and (require 'popup nil 'no-error)
-           (popup-tip
-            (or
-             (and fdoc-short vdoc-short
-                  (concat fdoc-short "\n\n"
-                          (make-string 30 ?-) "\n" (symbol-name symbol)
-                          " is also a " "variable." "\n\n"
-                          vdoc-short))
-             fdoc-short
-             vdoc-short)
-            :margin t)))))
+        (popup-tip
+          (or
+            (and fdoc-short vdoc-short
+              (concat fdoc-short "\n\n"
+                (make-string 30 ?-) "\n" (symbol-name symbol)
+                " is also a " "variable." "\n\n"
+                vdoc-short))
+            fdoc-short
+            vdoc-short)
+          :margin t)))))
 
 
 ;; ##################################################
@@ -1357,7 +1400,32 @@ Adapted from `describe-function-or-variable'."
 ;;
 ;; ##################################################
 
+
 ;; *********************************
+;;
+;; hippie expand
+
+(use-package hippie-exp
+  :ensure nil ;; builtin package
+  :defer t
+  :bind
+  ("<tab>" . hippie-expand)
+  ("<C-return>" . hippie-expand)
+  (:map evil-insert-state-map
+    ("<tab>" . hippie-expand)
+    )
+  :config
+  (setq-default hippie-expand-try-functions-list
+    '(yas-hippie-try-expand
+       company-indent-or-complete-common
+       emmet-expand-yas
+       emmet-expand-line
+       indent-according-to-mode
+       ))
+  )
+
+;; *********************************
+;;
 ;; dumb-jump
 
 (use-package dumb-jump
@@ -1389,6 +1457,8 @@ Adapted from `describe-function-or-variable'."
   (setq shell-pop-window-position "bottom")
   :bind
   ("C-c s" . shell-pop)
+  :config
+  (define-key evil-normal-state-map (kbd "SPC !") 'shell-pop)
   )
 
 ;; *********************************
@@ -1396,16 +1466,23 @@ Adapted from `describe-function-or-variable'."
 
 (use-package autorevert
   :ensure nil
+  ;; :hook
+  ;; revert buffers when their files/state have changed
+  ;;(focus-in . revert-buffer)
+  ;;(after-save . revert-buffer)
+  ;;(switch-buffer . revert-buffer)
+  ;;(switch-window . revert-buffer)
   :config
   (global-auto-revert-mode)
-  (setq auto-revert-verbose nil) ; let us know when it happens
+  (setq auto-revert-verbose t) ; let us know when it happens
   (setq auto-revert-use-notify nil)
   (setq auto-revert-stop-on-user-input nil)
   ;; Only prompts for confirmation when buffer is unsaved.
-  (setq revert-without-query (list "."))
-  (setq auto-revert-interval 1) ;; rever every 1 second
+  (setq revert-without-query (list "*.*"))
+  ;; auto revert timer
+  ;; (setq auto-revert-interval 1) ;; rever every 1 second
+  ;; (auto-revert-set-timer) ;; this function needs to be called after setting the `revert-interval' variable above
   (setq auto-revert-check-vc-info t)
-
   )
 
 
@@ -1459,7 +1536,7 @@ Adapted from `describe-function-or-variable'."
     ;; general
     ("conf\\(ig\\)?$"   . conf-mode)
     ("rc$"              . conf-mode))
-    )
+  )
 
 
 
@@ -1479,7 +1556,29 @@ Adapted from `describe-function-or-variable'."
   :defer t
   :mode
   (("\\.ts\\'" . typescript-mode)
-   ("\\.tsx\\'" . typescript-mode))
+    ("\\.tsx\\'" . typescript-mode))
+  )
+
+;; *********************************
+;;
+;; js2-mode
+
+(use-package js2-mode
+  :after flycheck company
+  :defer t
+  :mode
+  ("\\.js$" . js2-mode)
+  :init
+  ;; have 2 space indentation by default
+  (setq js-indent-level 2)
+  (setq js2-basic-offset 2)
+  (setq js-chain-indent t)
+  ;; Try to highlight most ECMA built-ins
+  (setq js2-highlight-level 3)
+  ;; turn off all warnings in js2-mode
+  (setq js2-mode-show-parse-errors t)
+  (setq js2-mode-show-strict-warnings nil)
+  (setq js2-strict-missing-semi-warning nil)
   )
 
 ;; *********************************
@@ -1491,9 +1590,9 @@ Adapted from `describe-function-or-variable'."
   "Return the file name of FILE's counterpart, or FILE if there is no counterpart."
   (when (not (angular--is-component file)) file)
   (let ((ext (file-name-extension file))
-        (base (file-name-sans-extension file)))
+         (base (file-name-sans-extension file)))
     (if (equal ext "ts")
-        (concat base ".html")
+      (concat base ".html")
       (concat base ".ts"))))
 
 (defun angular--is-component (file)
@@ -1531,8 +1630,6 @@ Adapted from `describe-function-or-variable'."
   ("\\.mustache\\'" . web-mode)
   ("\\.djhtml\\'" . web-mode)
   ("\\.[t]?html?\\'" . web-mode)
-  :hook
-  (web-mode . setup-web-mode)
   :custom
   ;; (web-mode-markup-indent-offset 2)
   ;; (web-mode-css-indent-offset 2)
@@ -1544,8 +1641,8 @@ Adapted from `describe-function-or-variable'."
   :config
   ;; Template
   (setq web-mode-engines-alist
-	'(("php"    . "\\.phtml\\'")
-	  ("blade"  . "\\.blade\\.")))
+    '(("php"    . "\\.phtml\\'")
+       ("blade"  . "\\.blade\\.")))
   )
 
 ;; *********************************
@@ -1583,40 +1680,6 @@ Adapted from `describe-function-or-variable'."
   )
 
 
-;; *********************************
-;;
-;; js2-mode
-
-(use-package js2-mode
-  :after flycheck company
-  :defer t
-  :mode
-  ("\\.js$" . js2-mode)
-  :init
-  ;; have 2 space indentation by default
-  (setq js-indent-level 2)
-  (setq js2-basic-offset 2)
-  (setq js-chain-indent t)
-  ;; Try to highlight most ECMA built-ins
-  (setq js2-highlight-level 3)
-  ;; turn off all warnings in js2-mode
-  (setq js2-mode-show-parse-errors t)
-  (setq js2-mode-show-strict-warnings nil)
-  (setq js2-strict-missing-semi-warning nil)
-  :config
-  ;;=======================================
-  ;; Flycheck Setup for JavaScript
-  ;; add eslint to list of flycheck checkers
-  ;;*********************************------
-  (setq flycheck-checkers '(javascript-eslint))
-  ;; disable jshint since we prefer eslint checking
-  (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))
-  ;; set modes that will use ESLint
-  (flycheck-add-mode 'javascript-eslint 'web-mode)
-  (flycheck-add-mode 'javascript-eslint 'js2-mode)
-  (flycheck-add-mode 'javascript-eslint 'js-mode)
-  )
-
 
 ;; *********************************
 ;;
@@ -1630,7 +1693,7 @@ Adapted from `describe-function-or-variable'."
   (web-mode . prettier-js-mode)
   (css-mode . prettier-js-mode)
   :custom
-  (prettier-js-show-errors 'echo) ;; options: 'buffer, 'echo or nil
+  (prettier-js-show-errors 'buffer) ;; options: 'buffer, 'echo or nil
   :config
   )
 
@@ -1684,9 +1747,6 @@ Adapted from `describe-function-or-variable'."
   :defer t
   :mode
   ("\\.yaml\\'" "\\.yml\\'")
-  :hook
-  (yaml-mode . aggressive-indent-mode)
-  (yaml-mode . rainbow-mode)
   )
 
 
@@ -1735,11 +1795,11 @@ Adapted from `describe-function-or-variable'."
   :ensure t
   :commands
   (all-the-icons-octicon
-   all-the-icons-faicon
-   all-the-icons-fileicon
-   all-the-icons-wicon
-   all-the-icons-material
-   all-the-icons-alltheicon)
+    all-the-icons-faicon
+    all-the-icons-fileicon
+    all-the-icons-wicon
+    all-the-icons-material
+    all-the-icons-alltheicon)
   )
 
 ;; disable scroll bars from frames
@@ -1749,8 +1809,21 @@ Adapted from `describe-function-or-variable'."
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 
-;; *********************************-----
-;; ** display-line-numbers
+;; always avoid GUI
+(setq use-dialog-box nil)
+
+;; Don't display floating tooltips; display their contents in the echo-area,
+;; because native tooltips are ugly.
+(when (bound-and-true-p tooltip-mode)
+  (tooltip-mode -1))
+;; ...especially on linux
+(when (eq system-type 'gnu/linux)
+  (setq x-gtk-use-system-tooltips nil))
+
+
+;; **************************************
+;;
+;; display-line-numbers
 
 (use-package display-line-numbers
   :if (version<= "26.0.50" emacs-version)
@@ -1758,7 +1831,7 @@ Adapted from `describe-function-or-variable'."
   :config
   (setq display-line-numbers-grow-only t)
   (setq display-line-numbers-width-start t)
-  (setq linum-format "%4d \u2502 ") ; 4 chars and a space with solid line separator
+  ;; (setq linum-format "%4d \u2502 ") ; 4 chars and a space with solid line separator
   ;; Explicitly define a width to reduce computation
   (setq-default display-line-numbers-width 3)
 
@@ -1777,6 +1850,7 @@ Adapted from `describe-function-or-variable'."
 ;; *********************************
 ;;
 ;; Centaur tabs
+
 (use-package centaur-tabs
   :ensure t
   :demand
@@ -1789,8 +1863,8 @@ Adapted from `describe-function-or-variable'."
   ("C-<tab>" . centaur-tabs-forward)
   ;; ("C-x p" . centaur-tabs-counsel-switch-group)
   (:map evil-normal-state-map
-	("g t" . centaur-tabs-forward)
-	("g T" . centaur-tabs-backward))
+    ("g t" . centaur-tabs-forward)
+    ("g T" . centaur-tabs-backward))
   :init
   (setq centaur-tabs-set-bar 'under) ;; display an underline over the selected tab:
   (setq x-underline-at-descent-line t)
@@ -1826,7 +1900,7 @@ Adapted from `describe-function-or-variable'."
 ;; Solaire mode
 
 (use-package solaire-mode
-:ensure t
+  :ensure t
   :hook
   ((change-major-mode after-revert ediff-prepare-buffer) . turn-on-solaire-mode)
   (minibuffer-setup . solaire-mode-in-minibuffer)
@@ -1963,14 +2037,14 @@ Adapted from `describe-function-or-variable'."
 
   (unless (display-graphic-p)
     (setq diff-hl-margin-symbols-alist
-	  '((insert . " ") (delete . " ") (change . " ")
-	    (unknown . " ") (ignored . " ")))
+      '((insert . " ") (delete . " ") (change . " ")
+         (unknown . " ") (ignored . " ")))
     ;; Fall back to the display margin since the fringe is unavailable in tty
     (diff-hl-margin-mode 1)
     ;; Avoid restoring `diff-hl-margin-mode'
     (with-eval-after-load 'desktop
       (add-to-list 'desktop-minor-mode-table
-		   '(diff-hl-margin-mode nil))))
+        '(diff-hl-margin-mode nil))))
 
   ;; Integration with magit
   (with-eval-after-load 'magit
@@ -2083,18 +2157,18 @@ Adapted from `describe-function-or-variable'."
 ;; Modeline Appearance
 
 (set-face-attribute 'mode-line nil
-                    :background "#353644"
-                    :foreground "white"
-                    :box '(:line-width 5 :color "#353644")
-                    :overline nil
-                    :underline nil)
+  :background "#353644"
+  :foreground "white"
+  :box '(:line-width 5 :color "#353644")
+  :overline nil
+  :underline nil)
 
 (set-face-attribute 'mode-line-inactive nil
-                    :background "#565063"
-                    :foreground "white"
-                    :box '(:line-width 5 :color "#565063")
-                    :overline nil
-                    :underline nil)
+  :background "#565063"
+  :foreground "white"
+  :box '(:line-width 5 :color "#565063")
+  :overline nil
+  :underline nil)
 
 ;; *********************************
 ;; Mode Icon
@@ -2199,7 +2273,7 @@ Adapted from `describe-function-or-variable'."
 ;;
 ;;; My personal modeline
 
-(setq mode-line-format
+(setq-default mode-line-format
   (list
     ;; evil status
     evil-mode-line-tag
@@ -2306,20 +2380,20 @@ Adapted from `describe-function-or-variable'."
     ;; day and time
     ;; '(:eval (propertize (format-time-string " %b %d %H:%M ")
     ;; 			'face 'font-lock-builtin-face))
+    "|"
     '(:eval
-       "|"
        (custom-modeline-time))
 
     ;; version control
+    "|"
     '(:eval
-       "|"
        (custom-modeline-icon-vc))
     ;; '(:eval (propertize (substring vc-mode 5)
     ;; 			'face 'font-lock-comment-face))
 
     ;; flycheck status
     '(:eval (when (bound-and-true-p flycheck-mode)
-              " | "
+              "   | "
               (custom-modeline-flycheck-status)))
 
     )
@@ -2337,8 +2411,8 @@ Adapted from `describe-function-or-variable'."
   :ensure t
   :bind
   (:map isearch-mode-map
-	([remap isearch-query-replace] . anzu-isearch-query-replace)
-	([remap isearch-query-replace-regexp] . anzu-isearch-query-replace-regexp))
+    ([remap isearch-query-replace] . anzu-isearch-query-replace)
+    ([remap isearch-query-replace-regexp] . anzu-isearch-query-replace-regexp))
   :custom-face
   (anzu-mode-line ((nil (:foreground "yellow" :weight 'bold))))
   :custom

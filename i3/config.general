@@ -55,9 +55,9 @@ font pango:Hack 9
 # COMPOSITOR MANAGER AND TRANSPARENCY SETUP
 ################################################
 
-# start compton composition manager
-# exec_always --no-startup-id compton
-exec --no-startup-id compton --xrender-sync-fence
+# start picom composition manager
+# exec_always --no-startup-id picom
+exec --no-startup-id picom --xrender-sync-fence
 
 ################################################
 ## sound-section - DO NOT EDIT if you wish to automatically upgrade
@@ -83,8 +83,8 @@ bindsym XF86MonBrightnessDown exec "xbacklight -dec 10; notify-send 'brightness 
 # Start applications
 ################################################
 
-# bindsym $mod+t exec --no-startup-id pkill compton
-bindsym $mod+Ctrl+t exec --no-startup-id compton -b; exec notify-send 'running compton'
+# bindsym $mod+t exec --no-startup-id pkill picom
+bindsym $mod+Ctrl+t exec --no-startup-id picom -b; exec notify-send 'running picom'
 # add ctrl to the bellow binding to i can use the original binding for dmenu
 bindsym $mod+Ctrl+Shift+d --release exec "killall dunst; exec notify-send 'restart dunst'"
 bindsym $mod+Ctrl+x --release exec --no-startup-id xkill
@@ -105,8 +105,8 @@ set $hibernate sudo systemctl suspend
 # define main terminal as st in tmux (suckless terminal)
 # this make tmux use a main session and doenst spawn multiple unused sessions
 # set $terminal st -e tmux new-session -A -s "main-session"
-set $terminal       st -e tmux new-session
-#set $terminal       st
+# set $terminal       st -e tmux new-session
+set $terminal       st
 
 # define default file managers (terminal and gui)
 set $file_manager ranger
@@ -119,6 +119,7 @@ set $browser firefox
 # set $editor st -e tmux new-session -A -s "emacs-session" emacs -t -nw
 set $editorterm         st -e tmux new-session emacsclient -c -t
 set $editorgui         st -e tmux new-session emacsclient -c -n
+
 
 #############################
 ### settings for i3-gaps: ###
@@ -233,7 +234,7 @@ bindsym $mod+Control+9 exec --no-startup-id blurlock
 
 # these were in the default manjaro i3 config, not sure what they do yet
 exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
-exec --no-startup-id nitrogen --restore; sleep 1; compton -b
+exec --no-startup-id nitrogen --restore; sleep 1; picom -b
 
 # start NetworkManager tray applet
 exec --no-startup-id nm-applet
@@ -347,19 +348,20 @@ exec_always --no-startup-id nitrogen --restore &
 #exec_always --no-startup-id feh --recursive --randomize --bg-fill $wallpapers_path
 
 # set background to solid color
-# xsetroot doesnt work with compton enabled, so using hsetroot (from aur) instead
+# xsetroot doesnt work with picom enabled, so using hsetroot (from aur) instead
 # exec_always --no-startup-id hsetroot -solid "#000"  #darkgrey
 
 # animated GIFs as wallpapers using foo-Wallpaper-Feh-Gif
 # source: https://github.com/thomas10-10/foo-Wallpaper-Feh-Gif
 # exec_always --no-startup-id killall back4.sh
 # exec_always --no-startup-id ~/dotfiles/i3/scripts/back4.sh 0.03 wallpapers/beautycity.gif
+
 ################################################
 # LOCK SCREEN AND SCREENSAVER
 ################################################
 
-# auto start blurlock after 10 minutes
-# exec --no-startup-id xautolock -time 8 -locker blurlock
+# auto start blurlock after X minutes
+exec --no-startup-id xautolock -time 5 -locker blurlock
 
 # animated screensaver on lock screen
 # exec --no-startup-id xscreensaver -no-splash &
