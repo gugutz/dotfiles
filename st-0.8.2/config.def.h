@@ -5,8 +5,8 @@
  *
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
-static char *font = "mono:pixelsize=16:antialias=true:autohint=true";
-static int borderpx = 3;
+static char *font = "Liberation Mono:pixelsize=12:antialias=true:autohint=true";
+static int borderpx = 2;
 
 /*
  * What program is execed by st depends of these precedence rules:
@@ -84,47 +84,40 @@ unsigned int tabspaces = 8;
 
 /* Terminal colors (16 first used in escape sequence) */
 static const char *colorname[] = {
-	/* Normal colors */
-	"#2d2d2d", /*  0: Base 00 - Black   */
-	"#f2777a", /*  1: Base 08 - Red     */
-	"#99cc99", /*  2: Base 0B - Green   */
-	"#ffcc66", /*  3: Base 0A - Yellow  */
-	"#6699cc", /*  4: Base 0D - Blue    */
-	"#cc99cc", /*  5: Base 0E - Magenta */
-	"#66cccc", /*  6: Base 0C - Cyan    */
-	"#d3d0c8", /*  7: Base 05 - White   */
+	/* 8 normal colors */
+	"black",
+	"red3",
+	"green3",
+	"yellow3",
+	"blue2",
+	"magenta3",
+	"cyan3",
+	"gray90",
 
-	/* Bright colors */
-	"#747369", /*  8: Base 03 - Bright Black */
-	"#f2777a", /*  9: Base 08 - Red          */
-	"#99cc99", /* 10: Base 0B - Green        */
-	"#ffcc66", /* 11: Base 0A - Yellow       */
-	"#6699cc", /* 12: Base 0D - Blue         */
-	"#cc99cc", /* 13: Base 0E - Magenta      */
-	"#66cccc", /* 14: Base 0C - Cyan         */
-	"#f2f0ec", /* 15: Base 05 - Bright White */
-
-	/* A few more colors */
-
-	"#f99157", /* 16: Base 09 */
-	"#d27b53", /* 17: Base 0F */
-	"#393939", /* 18: Base 01 */
-	"#515151", /* 19: Base 02 */
-	"#a09f93", /* 20: Base 04 */
-	"#e8e6df", /* 21: Base 06 */
+	/* 8 bright colors */
+	"gray50",
+	"red",
+	"green",
+	"yellow",
+	"#5c5cff",
+	"magenta",
+	"cyan",
+	"white",
 
 	[255] = 0,
 
-	[256] = "#d3d0c8", /* default fg: Base 05 */
-	[257] = "#2d2d2d" /* default bg: Base 00 */
+	/* more colors can be added after 255 to use with DefaultXX */
+	"#cccccc",
+	"#555555",
 };
+
 
 /*
  * Default colors (colorname index)
  * foreground, background, cursor, reverse cursor
  */
-unsigned int defaultfg = 256;
-unsigned int defaultbg = 257;
+unsigned int defaultfg = 7;
+unsigned int defaultbg = 0;
 static unsigned int defaultcs = 256;
 static unsigned int defaultrcs = 257;
 
@@ -163,8 +156,14 @@ static unsigned int defaultattr = 11;
  */
 static MouseShortcut mshortcuts[] = {
 	/* button               mask            string */
-	{ Button4,              XK_ANY_MOD,     "\031" },
-	{ Button5,              XK_ANY_MOD,     "\005" },
+	{ Button4,              XK_NO_MOD,      "\031" },
+	{ Button5,              XK_NO_MOD,      "\005" },
+};
+
+MouseKey mkeys[] = {
+	/* button               mask            function        argument */
+	{ Button4,              ShiftMask,      kscrollup,      {.i =  1} },
+	{ Button5,              ShiftMask,      kscrolldown,    {.i =  1} },
 };
 
 /* Internal keyboard shortcuts. */
@@ -183,8 +182,10 @@ static Shortcut shortcuts[] = {
 	{ TERMMOD,              XK_C,           clipcopy,       {.i =  0} },
 	{ TERMMOD,              XK_V,           clippaste,      {.i =  0} },
 	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
+	{ ShiftMask,            XK_Page_Up,     kscrollup,      {.i = -1} },
+	{ ShiftMask,            XK_Page_Down,   kscrolldown,    {.i = -1} },
+	{ ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
 	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
-	{ TERMMOD,              XK_I,           iso14755,       {.i =  0} },
 };
 
 /*
