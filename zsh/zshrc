@@ -20,6 +20,9 @@ ZSH_THEME="robbyrussell"
 plugins=(
     # native oh-my-zsh plugins
     git
+    colorize #cat with syntax highlight
+    cp # copy with progress bar
+    npm
     ruby
     docker
     docker-compose
@@ -38,7 +41,11 @@ plugins=(
 source $ZSH/oh-my-zsh.sh
 
 #########################################
-# start prompt plugin
+# pure prompt
+
+# add pure prompt to zsh path
+fpath+=("$HOME/.zsh/pure")
+# # start prompt plugin
 autoload -U promptinit; promptinit
 prompt pure > /dev/null
 
@@ -84,7 +91,7 @@ ZSH_TMUX_AUTOSTART_ONCE="true"
 
 if [ -z "$TMUX" ]
 then
-    tmux new-session TMUX
+    tmux new-session
 fi
 
 # THIS WAS GIVING ME ERRORS WITH EMACS PACKAGE `exec-path-from-shell`
@@ -142,3 +149,5 @@ load-nvmrc
 # Example aliases
 alias zshconfig="vim $HOME/.zshrc"
 alias ohmyzsh="vim $HOME/.oh-my-zsh"
+
+export YVM_DIR=/home/tau/.yvm

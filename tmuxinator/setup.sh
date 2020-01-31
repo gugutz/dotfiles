@@ -1,1 +1,1 @@
-ln -sf ~/dotfiles/tmuxinator ~/.tmuxinator
+ln -sf ~/dotfiles/tmuxinator ~/.config/tmuxinator

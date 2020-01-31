@@ -1,5 +1,11 @@
 ;;; -*- coding: utf-8 -*-
-(("/usr/share/emacs/26.3/lisp/files.el.gz" . 7252)
+(("/home/tau/dotfiles/aliases" . 1264)
+  ("/home/tau/dotfiles/zsh/setup.sh" . 622)
+  ("/home/tau/dotfiles/i3/config" . 4546)
+  ("/home/tau/dotfiles/zsh/zshrc" . 2218)
+  ("/home/tau/dotfiles/emacs.d/cache/treemacs-persist" . 105)
+  ("/home/tau/.emacs.d/config/recentf" . 1044)
+  ("/usr/share/emacs/26.3/lisp/files.el.gz" . 7252)
   ("/usr/share/emacs/26.3/lisp/autorevert.el.gz" . 5801)
   ("/usr/share/emacs/26.3/lisp/desktop.el.gz" . 9740)
   ("/usr/share/emacs/26.3/lisp/emacs-lisp/lisp-mode.el.gz" . 32434)
