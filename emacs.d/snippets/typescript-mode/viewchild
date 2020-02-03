@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: Angular component
+# key: vc
+# --
+
+@ViewChild('$1', { static: false }) $2: $3
+
+
+

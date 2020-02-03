@@ -1,38 +1,17 @@
 
 ;; ----- amx-history -----
 (
-<<<<<<< HEAD
- aggressive-indent-mode
- package-install
- desktop-save
- desktop-save-mode
- rainbow-mode
- align-regexp
- eval-last-sexp
-=======
-<<<<<<< HEAD
- bug-hunter-init-file
+ vc-annotate
+ prettier-js
+ prettier-js-mode
  execute-extended-command
  revert-buffer
  parrot-mode
  eval-defun
- nyan-mode
- package-install
-=======
- prettier-js
- prettier-js-mode
- dumb-jump-back
- dumb-jump-go
- aggressive-indent-mode
- package-install
- desktop-save
->>>>>>> c120ed187c6acace1ee93129809541974f23774a
->>>>>>> 4eb8af0e7a03dfe2b4d77698dcc0063998ab6bae
 )
 
 ;; ----- amx-data -----
 (
-<<<<<<< HEAD
  (bug-hunter-init-file . 10)
  (scss-mode . 12)
  (eslintd-fix-mode . 3)
@@ -90,7 +69,7 @@
  (org-table-create . 1)
  (org-table-create-or-convert-from-region . 5)
  (revert-buffer . 2)
- (prettier-js-mode . 13)
+ (prettier-js-mode . 15)
  (org-mode . 6)
  (which-key-mode . 5)
  (eval-region . 1)
@@ -101,7 +80,7 @@
  (web-beautify-html . 2)
  (editorconfig-apply . 1)
  (er/expand-region . 2)
- (prettier-js . 14)
+ (prettier-js . 15)
  (highlight-operators-mode . 3)
  (highlight-parentheses-mode . 4)
  (show-paren-mode . 4)
@@ -136,7 +115,7 @@
  (speedbar . 1)
  (evil-goggles-mode . 2)
  (elisp-format-buffer . 1)
- (vc-annotate . 1)
+ (vc-annotate . 2)
  (diffview-current . 1)
  (vc-msg-show . 1)
  (counsel-switch-buffer . 2)
@@ -172,49 +151,4 @@
  (timeclock-mode-line-display . 1)
  (parrot-start-animation . 1)
  (execute-extended-command . 1)
-=======
- (eval-defun . 1)
- (evil-mode . 1)
- (turn-on-evil-mode . 1)
- (eval-last-sexp . 5)
- (revert-buffer . 1)
- (eyebrowse-mode . 8)
- (auto-revert-mode . 1)
- (diff-hl-mode . 14)
- (diff-hl-margin-mode . 14)
- (counsel-mode . 2)
- (projectile-mode . 2)
- (counsel-projectile-switch-project . 1)
- (package-install . 4)
- (bug-hunter-init-file . 1)
- (prettier-js-mode . 2)
- (lsp-describe-session . 3)
- (eval-buffer . 1)
- (rainbow-mode . 2)
- (fringe-mode . 1)
- (keyfreq-show . 1)
- (evil-jump-item . 1)
- (try . 1)
- (better-jumper-mode . 1)
- (better-jumper-jump-forward . 2)
- (better-jumper-jump-backward . 1)
- (lsp-execute-code-action . 1)
- (eldoc-mode . 4)
- (lsp-ui-doc-show . 1)
- (company-show-doc-buffer . 2)
- (company-quickhelp-manual-begin . 1)
- (company-quickhelp-mode . 2)
- (tau/elisp-function-or-variable-quickhelp . 1)
- (parrot-mode . 2)
- (aggressive-indent-mode . 5)
- (align-regexp . 1)
- (desktop-save-mode . 2)
- (desktop-save . 2)
-<<<<<<< HEAD
-=======
- (dumb-jump-go . 1)
- (dumb-jump-back . 1)
- (prettier-js . 1)
->>>>>>> c120ed187c6acace1ee93129809541974f23774a
->>>>>>> 4eb8af0e7a03dfe2b4d77698dcc0063998ab6bae
 )

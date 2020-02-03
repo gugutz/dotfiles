@@ -1,7 +1,7 @@
 # ~/.tmuxinator/sample.yml
 
 name: pep
-root: ~/code/pep
+root: ~/code/qualirede/pep
 
 # Optional. tmux socket
 # socket_name: foo

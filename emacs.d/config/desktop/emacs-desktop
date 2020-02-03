@@ -2,42 +2,102 @@
 ;; --------------------------------------------------------------------------
 ;; Desktop File for Emacs
 ;; --------------------------------------------------------------------------
-;; Created Wed Jan 29 09:51:53 2020
+;; Created Mon Feb  3 16:42:59 2020
 ;; Desktop file format version 208
 ;; Emacs version 26.3
 
 ;; Global section:
-(setq desktop-saved-frameset [frameset 1 (24113 32745 954888 716000) (desktop . "208") "gustavo@gustavo-pc" nil nil ((((minibuffer . t) (undecorated) (override-redirect) (font-backend xft x) (font . "-ADBO-Source Code Pro-normal-normal-normal-*-13-*-*-*-m-0-iso10646-1") (font-parameter . "Source Code Pro 10") (border-width . 0) (internal-border-width . 0) (right-divider-width . 0) (bottom-divider-width . 0) (vertical-scroll-bars) (horizontal-scroll-bars) (foreground-color . "#d4d4d4") (background-color . "#252526") (mouse-color . "black") (border-color . "black") (screen-gamma) (line-spacing) (left-fringe . 8) (right-fringe . 8) (no-special-glyphs) (scroll-bar-foreground . "#d8d8d8") (scroll-bar-background . "#d8d8d8") (menu-bar-lines . 0) (tool-bar-lines . 0) (title) (wait-for-wm . t) (tool-bar-position . top) (inhibit-double-buffering) (icon-type . t) (auto-raise) (auto-lower) (cursor-type . box) (scroll-bar-width . 0) (scroll-bar-height . 0) (alpha) (no-focus-on-map) (no-accept-focus) (fullscreen) (visibility . t) (skip-taskbar) (z-group) (display-type . color) (background-mode . dark) (cursor-color . "#00ff00") (sticky) (environment) (eyebrowse-last-slot . 1) (eyebrowse-current-slot . 1) (eyebrowse-window-configs (1 (((min-height . 4) (min-width . 10) (min-height-ignore . 2) (min-width-ignore . 6) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 68) (min-pixel-width . 80) (min-pixel-height-ignore . 34) (min-pixel-width-ignore . 48) (min-pixel-height-safe . 17) (min-pixel-width-safe . 16)) leaf (pixel-width . 1920) (pixel-height . 956) (total-width . 240) (total-height . 56) (normal-height . 1.0) (normal-width . 1.0) (buffer "*scratch*" (selected . t) (hscroll . 0) (fringes 8 8 nil) (margins nil) (scroll-bars nil 2 t nil 0 t) (vscroll . 0) (dedicated) (point . 1) (start . 1))) "")) (powerline-cache) (frameset--id . "95EB-A055-058B-12E3") (frameset--mini t . t) (frameset--text-pixel-height . 1056) (height . 62) (width . 238) (modeline . t) (unsplittable) (left . 0) (top . 0) (icon-name) (display . ":0") (explicit-name)) ((min-height . 5) (min-width . 47) (min-height-ignore . 5) (min-width-ignore . 8) (min-height-safe . 1) (min-width-safe . 4) (min-pixel-height . 85) (min-pixel-width . 376) (min-pixel-height-ignore . 85) (min-pixel-width-ignore . 64) (min-pixel-height-safe . 17) (min-pixel-width-safe . 32)) hc (pixel-width . 1920) (pixel-height . 1039) (total-width . 240) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (combination-limit) (leaf (pixel-width . 296) (pixel-height . 1039) (total-width . 37) (total-height . 61) (normal-height . 1.0) (normal-width . 0.15416666666666667) (parameters (window-side . left) (window-slot . 0)) (buffer " *Treemacs-Scoped-Buffer-#<frame emacs@gustavo-pc 0x1226c30>*" (selected) (hscroll . 0) (fringes 8 8 t) (margins nil) (scroll-bars nil 0 t nil 0 t) (vscroll . 0) (dedicated . t) (point . 304) (start . 1))) (leaf (last . t) (pixel-width . 1624) (pixel-height . 1039) (total-width . 203) (total-height . 61) (normal-height . 1.0) (normal-width . 0.8458333333333333) (buffer "app.component.ts" (selected . t) (hscroll . 0) (fringes 8 8 t) (margins nil) (scroll-bars nil 0 t nil 0 t) (vscroll . 0) (dedicated) (point . 575) (start . 1)))))])
+(setq desktop-saved-frameset [frameset 1 (24120 30659 67202 32000) (desktop . "208") "tau@gustavo-pc" nil nil ((((minibuffer . t) (undecorated) (override-redirect) (font-backend xft x) (font . "-ADBO-Source Code Pro-normal-normal-normal-*-13-*-*-*-m-0-iso10646-1") (font-parameter . "Source Code Pro 10") (border-width . 0) (internal-border-width . 0) (right-divider-width . 0) (bottom-divider-width . 0) (vertical-scroll-bars) (horizontal-scroll-bars) (foreground-color . "#d4d4d4") (background-color . "#252526") (mouse-color . "black") (border-color . "black") (screen-gamma) (line-spacing) (left-fringe . 8) (right-fringe . 8) (no-special-glyphs) (scroll-bar-foreground . "#d8d8d8") (scroll-bar-background . "#d8d8d8") (menu-bar-lines . 0) (tool-bar-lines . 0) (title) (wait-for-wm . t) (tool-bar-position . top) (inhibit-double-buffering) (icon-type . t) (auto-raise) (auto-lower) (cursor-type . box) (scroll-bar-width . 0) (scroll-bar-height . 0) (alpha) (no-focus-on-map) (no-accept-focus) (fullscreen) (visibility . t) (skip-taskbar) (z-group) (display-type . color) (background-mode . dark) (cursor-color . "#00ff00") (sticky) (environment) (eyebrowse-last-slot . 1) (eyebrowse-current-slot . 1) (eyebrowse-window-configs (1 (((min-height . 4) (min-width . 10) (min-height-ignore . 2) (min-width-ignore . 6) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 68) (min-pixel-width . 80) (min-pixel-height-ignore . 34) (min-pixel-width-ignore . 48) (min-pixel-height-safe . 17) (min-pixel-width-safe . 16)) leaf (pixel-width . 1920) (pixel-height . 956) (total-width . 240) (total-height . 56) (normal-height . 1.0) (normal-width . 1.0) (buffer "*scratch*" (selected . t) (hscroll . 0) (fringes 8 8 nil) (margins nil) (scroll-bars nil 2 t nil 0 t) (vscroll . 0) (dedicated) (point . 1) (start . 1))) "")) (powerline-cache) (frameset--id . "431E-B2FB-4888-B8FB") (frameset--mini t . t) (modeline . t) (unsplittable) (icon-name) (display . ":0") (explicit-name) (company-box-window . "Unprintable entity") (frameset--text-pixel-height . 1056) (height . 62) (width . 238) (left . 0) (top . 0)) ((min-height . 5) (min-width . 10) (min-height-ignore . 5) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 85) (min-pixel-width . 80) (min-pixel-height-ignore . 85) (min-pixel-width-ignore . 32) (min-pixel-height-safe . 17) (min-pixel-width-safe . 16)) leaf (pixel-width . 1920) (pixel-height . 1039) (total-width . 240) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "block-referencia.component.ts" (selected . t) (hscroll . 0) (fringes 8 8 t) (margins nil) (scroll-bars nil 0 t nil 0 t) (vscroll . 0) (dedicated) (point . 1101) (start . 1))))])
 (setq desktop-missing-file-warning nil)
 (setq tags-file-name nil)
 (setq tags-table-list nil)
 (setq search-ring nil)
-(setq regexp-search-ring nil)
-(setq register-alist nil)
-(setq file-name-history '("/home/gustavo/.emacs.d/config/desktop/"))
+(setq regexp-search-ring '("\\<View\\>" "\\<Ref\\>" "snippets/ang" "ffffff" "sideline"))
+(setq register-alist '((106) (48 . "  @ViewChild('addRefForm', { static: false }) addRefForm: ElementRef\n")))
+(setq file-name-history '("~/code/qualirede/pep/src/app/pages/home/home.component.html" "~/dotfiles/emacs.d/config/recentf" "~/dotfiles/setup.sh" "~/dotfiles/tmux/setup.sh" "~/code/qualirede/pep/src/app/components/block-referencia/block-referencia.component.html" "~/dotfiles/emacs.d/cache/treemacs-persist" "~/.emacs.d/cache/treemacs-persist" "~/.emacs.d/elpa/restart-emacs-20180601.1031/restart-emacs-autoloads.el" "~/dotfiles/emacs.d/init.el" "~/code/qualirede/pep/src/app/pages/painel/block-soap-plano/block-soap-plano.component.html" "~/.emacs.d/snippets/typescript-mode/component" "~/dotfiles/i3/config.general" "~/dotfiles/i3/config-i3-ultimo" "~/dotfiles/zsh/setup.sh" "~/dotfiles/i3/setup.sh" "~/dotfiles/i3/scripts/monitors-setup.sh" "~/dotfiles/zsh/zshrc" "~/dotfiles/bash/bash_profile" "~/dotfiles/bash/profile" "~/dotfiles/bash/bashrc"))
 
 ;; Buffer section -- buffers listed in same order as in buffer list:
 (desktop-create-buffer 208
-  "/home/gustavo/code/ideadora/wego/src/app/app.component.ts"
-  "app.component.ts"
+  "/home/tau/code/qualirede/pep/src/app/components/block-referencia/block-referencia.component.ts"
+  "block-referencia.component.ts"
   'typescript-mode
-  '(eldoc-mode override-global-mode undo-tree-mode evil-commentary-mode ivy-mode ivy-posframe-mode ivy-explorer-mode company-mode yas-minor-mode lsp-mode flycheck-mode which-key-mode global-auto-revert-mode company-box-mode solaire-mode highlight-indent-guides-mode rainbow-mode diff-hl-mode diff-hl-flydiff-mode hes-mode highlight-operators-mode highlight-numbers-mode rainbow-delimiters-mode highlight-parentheses-mode vi-tilde-fringe-mode smartparens-mode subword-mode emmet-mode prettier-js-mode editorconfig-mode)
-  575
-  '(nil nil)
+  '(eldoc-mode override-global-mode undo-tree-mode evil-commentary-mode ivy-mode counsel-mode ivy-posframe-mode ivy-explorer-mode company-mode yas-minor-mode lsp-mode which-key-mode global-auto-revert-mode solaire-mode highlight-indent-guides-mode rainbow-mode hl-todo-mode diff-hl-mode diff-hl-flydiff-mode hes-mode highlight-operators-mode highlight-numbers-mode rainbow-delimiters-mode highlight-parentheses-mode vi-tilde-fringe-mode flycheck-mode smartparens-mode emmet-mode prettier-js-mode editorconfig-mode company-box-mode subword-mode)
+  1101
+  '(916 nil)
   nil
   nil
-  '((indicate-empty-lines . t) (buffer-display-time 24113 32730 792996 589000) (buffer-file-coding-system . utf-8-unix) (overwrite-mode))
+  '((indicate-empty-lines . t) (tab-width . 2) (indent-tabs-mode) (buffer-display-time 24120 30641 696005 955000) (buffer-file-coding-system . utf-8-unix) (overwrite-mode))
+  '((mark-ring (916 916 916 916 916 916 916 916 978 978 978 911 911 911 911 911))))
+
+(desktop-create-buffer 208
+  "/home/tau/dotfiles/emacs.d/init.el"
+  "init.el"
+  'emacs-lisp-mode
+  '(eldoc-mode override-global-mode undo-tree-mode evil-commentary-mode ivy-mode counsel-mode ivy-posframe-mode ivy-explorer-mode company-mode yas-minor-mode which-key-mode global-auto-revert-mode solaire-mode highlight-indent-guides-mode rainbow-mode hl-todo-mode diff-hl-mode diff-hl-flydiff-mode hes-mode highlight-operators-mode highlight-numbers-mode rainbow-delimiters-mode highlight-parentheses-mode vi-tilde-fringe-mode flycheck-mode smartparens-mode editorconfig-mode company-box-mode aggressive-indent-mode superword-mode)
+  39453
+  '(39453 nil)
+  nil
+  nil
+  '((indicate-empty-lines . t) (tab-width . 2) (indent-tabs-mode) (buffer-display-time 24120 30549 959621 315000) (buffer-file-coding-system . utf-8-unix) (overwrite-mode))
+  '((mark-ring (39453 39453 39453 39453 39453 39453 39453 39453 40773 40773 40773 40773 40773 40049 10143 60830))))
+
+(desktop-create-buffer 208
+  "/home/tau/code/qualirede/pep/node_modules/@ng-bootstrap/ng-bootstrap/modal/modal.d.ts"
+  "modal.d.ts"
+  'typescript-mode
+  '(eldoc-mode override-global-mode undo-tree-mode evil-commentary-mode ivy-mode counsel-mode ivy-posframe-mode ivy-explorer-mode company-mode yas-minor-mode lsp-mode which-key-mode global-auto-revert-mode solaire-mode highlight-indent-guides-mode rainbow-mode hl-todo-mode diff-hl-mode diff-hl-flydiff-mode hes-mode highlight-operators-mode highlight-numbers-mode rainbow-delimiters-mode highlight-parentheses-mode vi-tilde-fringe-mode flycheck-mode smartparens-mode emmet-mode prettier-js-mode editorconfig-mode company-box-mode subword-mode)
+  425
+  '(425 nil)
+  nil
+  nil
+  '((indicate-empty-lines . t) (tab-width . 2) (indent-tabs-mode) (buffer-display-time 24120 30217 382855 536000) (buffer-file-coding-system . utf-8-unix) (overwrite-mode))
   '((mark-ring nil)))
 
 (desktop-create-buffer 208
-  "/home/gustavo/dotfiles/emacs.d/init.el"
-  "init.el"
-  'emacs-lisp-mode
-  '(eldoc-mode override-global-mode undo-tree-mode evil-commentary-mode ivy-mode ivy-posframe-mode ivy-explorer-mode company-mode yas-minor-mode flycheck-mode which-key-mode global-auto-revert-mode company-box-mode solaire-mode highlight-indent-guides-mode rainbow-mode diff-hl-mode diff-hl-flydiff-mode hes-mode highlight-operators-mode highlight-numbers-mode rainbow-delimiters-mode highlight-parentheses-mode vi-tilde-fringe-mode smartparens-mode aggressive-indent-mode superword-mode editorconfig-mode)
-  35237
-  '(35237 nil)
+  "/home/tau/code/qualirede/pep/src/app/_store/_modules/referencias/referencias.models.ts"
+  "referencias.models.ts"
+  'typescript-mode
+  '(eldoc-mode override-global-mode undo-tree-mode evil-commentary-mode ivy-mode counsel-mode ivy-posframe-mode ivy-explorer-mode company-mode yas-minor-mode lsp-mode which-key-mode global-auto-revert-mode solaire-mode highlight-indent-guides-mode rainbow-mode hl-todo-mode diff-hl-mode diff-hl-flydiff-mode hes-mode highlight-operators-mode highlight-numbers-mode rainbow-delimiters-mode highlight-parentheses-mode vi-tilde-fringe-mode flycheck-mode smartparens-mode emmet-mode prettier-js-mode editorconfig-mode company-box-mode subword-mode)
+  143
+  '(143 nil)
   nil
   nil
-  '((indicate-empty-lines . t) (buffer-display-time 24113 32721 381237 187000) (buffer-file-coding-system . utf-8-unix) (overwrite-mode))
+  '((indicate-empty-lines . t) (tab-width . 2) (indent-tabs-mode) (buffer-display-time 24120 30214 516003 725000) (buffer-file-coding-system . utf-8-unix) (overwrite-mode))
   '((mark-ring nil)))
+
+(desktop-create-buffer 208
+  "/home/tau/code/qualirede/pep/src/app/_store/_modules/referencias/referencias.actions.ts"
+  "referencias.actions.ts"
+  'typescript-mode
+  '(eldoc-mode override-global-mode undo-tree-mode evil-commentary-mode ivy-mode counsel-mode ivy-posframe-mode ivy-explorer-mode company-mode yas-minor-mode lsp-mode which-key-mode global-auto-revert-mode solaire-mode highlight-indent-guides-mode rainbow-mode hl-todo-mode diff-hl-mode diff-hl-flydiff-mode hes-mode highlight-operators-mode highlight-numbers-mode rainbow-delimiters-mode highlight-parentheses-mode vi-tilde-fringe-mode flycheck-mode smartparens-mode emmet-mode prettier-js-mode editorconfig-mode company-box-mode subword-mode)
+  133
+  '(133 nil)
+  nil
+  nil
+  '((indicate-empty-lines . t) (tab-width . 2) (indent-tabs-mode) (buffer-display-time 24120 30211 797468 815000) (buffer-file-coding-system . utf-8-unix) (overwrite-mode))
+  '((mark-ring (133))))
+
+(desktop-append-buffer-args 208
+  "/home/tau/code/qualirede/pep/src/app/components/block-referencia/block-referencia.component.html"
+  "block-referencia.component.html"
+  'web-mode
+  '(eldoc-mode override-global-mode undo-tree-mode evil-commentary-mode ivy-mode counsel-mode ivy-posframe-mode ivy-explorer-mode company-mode yas-minor-mode lsp-mode which-key-mode global-auto-revert-mode solaire-mode highlight-indent-guides-mode rainbow-mode hl-todo-mode diff-hl-mode diff-hl-flydiff-mode hes-mode highlight-operators-mode highlight-numbers-mode rainbow-delimiters-mode highlight-parentheses-mode vi-tilde-fringe-mode flycheck-mode smartparens-mode emmet-mode prettier-js-mode editorconfig-mode company-box-mode)
+  990
+  '(1034 nil)
+  nil
+  nil
+  '((indicate-empty-lines . t) (tab-width . 2) (indent-tabs-mode) (buffer-display-time 24120 30183 846804 336000) (buffer-file-coding-system . utf-8-unix) (overwrite-mode))
+  '((mark-ring (1034 934 934 895 895 895))))
+
+(desktop-append-buffer-args 208
+  "/home/tau/code/qualirede/pep/src/app/pages/home/home.component.html"
+  "home.component.html"
+  'web-mode
+  '(eldoc-mode override-global-mode undo-tree-mode evil-commentary-mode ivy-mode counsel-mode ivy-posframe-mode ivy-explorer-mode company-mode yas-minor-mode lsp-mode which-key-mode global-auto-revert-mode solaire-mode highlight-indent-guides-mode rainbow-mode hl-todo-mode diff-hl-mode diff-hl-flydiff-mode hes-mode highlight-operators-mode highlight-numbers-mode rainbow-delimiters-mode highlight-parentheses-mode vi-tilde-fringe-mode flycheck-mode smartparens-mode emmet-mode prettier-js-mode editorconfig-mode company-box-mode)
+  1
+  '(1 nil)
+  nil
+  nil
+  '((indicate-empty-lines . t) (buffer-display-time 24120 29537 393033 262000) (buffer-file-coding-system . utf-8-unix) (overwrite-mode))
+  '((mark-ring (1 1 1 1 1 1 1 1 1 1 1 1))))
 

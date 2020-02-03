@@ -575,6 +575,7 @@
   :init
   (setq ivy-posframe-parameters '((internal-border-width . 1)))
   (setq ivy-posframe-width 130)
+  (setq ivy-posframe-parameters '((alpha . 85)))
   ;; define the position of the posframe per function
   (setq ivy-posframe-display-functions-alist
     '(
@@ -1113,6 +1114,7 @@
   :commands lsp
   :hook
   (typescript-mode . lsp)
+  (web-mode . lsp)
   (scss-mode . lsp)
   (css-mode . lsp)
   (js2-mode . lsp)
@@ -1154,11 +1156,11 @@
   ;; this serves for editing templates only (both inline and external)
   (setq lsp-clients-angular-language-server-command
     '("node"
-       "/home/gustavo/.nvm/versions/node/v10.16.3/lib/node_modules/@angular/language-server"
+       "/home/tau/.nvm/versions/node/v10.9.0/lib/node_modules/@angular/language-server"
        "--ngProbeLocations"
-       "/home/gustavo/.nvm/versions/node/v10.16.3/lib/node_modules"
+       "/home/tau/.nvm/versions/node/v10.9.0/lib/node_modules"
        "--tsProbeLocations"
-       "/home/gustavo/.nvm/versions/node/v10.16.3/lib/node_modules"
+       "/home/tau/.nvm/versions/node/v10.9.0/lib/node_modules"
        "--stdio"))
   ;; disable angular-ls for specific modes
   ;; (add-to-list 'lsp-disabled-clients '(web-mode . angular-ls))
@@ -1184,7 +1186,7 @@
 
   (setq lsp-ui-sideline-enable nil)
   (setq lsp-ui-sideline-show-diagnostics t) ;; show diagnostics (flyckeck) messages in sideline
-  ;; ;; (setq lsp-ui-sideline-code-actions-prefix "")
+  ;; (setq lsp-ui-sideline-code-actions-prefix "")
 
   ;; (setq lsp-ui-imenu-enable t)
   ;; ;; (setq lsp-ui-imenu-kind-position 'top)
@@ -1232,12 +1234,9 @@
     ("C-SPC" . yas-expand)
     )
   :config
-  ;; set snippets directory
-  ;;  (setq yas-snippet-dirs '(yasnippet-snippets-dir))
-  ;; add angular snippets folder
-  (with-eval-after-load 'yasnippets-snippets
-    (setq yas-snippet-dirs (append yas-snippet-dirs
-                             '("~/dotfiles/emacs.d/snippets/angular/"))))
+  ;; add angular snippets folder (code taken from oficial docs page)
+  (setq yas-snippet-dirs (append yas-snippet-dirs
+                           '("~/dotfiles/emacs.d/snippets/")))
   (setq yas-verbosity 1)                      ; No need to be so verbose
   (setq yas-wrap-around-region t)
   (yas-reload-all) ;; tell yasnippet about updates to yas-snippet-dirs
@@ -1285,13 +1284,13 @@
   (flycheck-posframe-info-face ((nil (:background "#007ad3" :foreground "#ffffff" :height 105))))
   (flycheck-posframe-warning-face ((nil (:background "#fcfa23" :foreground "#000000" :height 105))))
   (flycheck-posframe-error-face ((nil (:background "#000000" :foreground "#ff3300" :height 105))))
-  (flycheck-posframe-border-face ((nil (:foreground "#288aaa" :background "#9370DB"))))
+  ;; (flycheck-posframe-border-face ((nil (:foreground "#9370DB"))))
   :custom
   (flycheck-posframe-prefix "\u27a4 ") ;; default: ➤
   (flycheck-posframe-warning-prefix "\u26a0 ")
   (flycheck-posframe-info-prefix "\uf6c8 ")
   (flycheck-posframe-error-prefix "\u274c ")
-  (flycheck-posframe-border-width 2)
+  (flycheck-posframe-border-width 1)
   )
 
 
@@ -1431,19 +1430,9 @@ Adapted from `describe-function-or-variable'."
 
 ;; *********************************
 ;;
-;; dumb-jump
+;; restart emacs
 
-(use-package dumb-jump
-  :ensure t
-  :after ivy
-  :bind
-  ("C-c C-o" . dumb-jump-go-other-window)
-  ("C-c C-j" . dumb-jump-go)
-  ("C-c C-b" . dumb-jump-back)
-  ("C-c C-i" . dumb-jump-go-prompt)
-  :custom
-  (dumb-jump-selector 'ivy)
-  )
+(use-package restart-emacs :ensure t)
 
 ;; *********************************
 ;; shell-pop
@@ -1798,6 +1787,73 @@ Adapted from `describe-function-or-variable'."
 ;;
 ;; ##################################################
 
+;; *********************************
+;;
+;; magit
+
+(use-package magit :ensure t)
+;; *********************************
+;;
+;; vc-msg
+
+(use-package vc-msg :ensure t)
+;; *********************************
+;;
+;; git timemachine
+
+(use-package git-timemachine :ensure t)
+
+;; *********************************
+;;
+;; ** diff-hl (highlights uncommited diffs in bar aside from the line numbers)
+
+(use-package diff-hl
+  :ensure t
+  :defer t
+  :custom-face
+  ;; Better looking colours for diff indicators
+  (diff-hl-change ((t (:foreground ,(face-background 'highlight)))))
+  (diff-hl-change ((t (:background "#007ad3" :foreground "#ffffff"))))
+  (diff-hl-insert ((t (:background "#00ff00" :foreground "#000000"))))
+  (diff-hl-delete ((t (:background "#ff3300" :foreground "#ffffff"))))
+  :hook
+  (prog-mode . diff-hl-mode)
+  (dired-mode . diff-hl-mode)
+  (magit-post-refresh . diff-hl-magit-post-refresh)
+  ;; :custom
+  ;; (diff-hl-side 'left)
+  ;; (diff-hl-margin-side 'left) ;; if using margin instead of fringe
+  :config
+  (global-diff-hl-mode)
+  (diff-hl-flydiff-mode) ;; highlighting changes on the fly
+  ;; (diff-hl-margin-mode) ;; use the margin instead of the fringe.
+  ;; Set fringe style
+  (setq-default fringes-outside-margins t)
+
+  (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
+
+  (unless (display-graphic-p)
+    (setq diff-hl-margin-symbols-alist
+      '((insert . " ") (delete . " ") (change . " ")
+         (unknown . " ") (ignored . " ")))
+    ;; Fall back to the display margin since the fringe is unavailable in tty
+    (diff-hl-margin-mode 1)
+    ;; Avoid restoring `diff-hl-margin-mode'
+    (with-eval-after-load 'desktop
+      (add-to-list 'desktop-minor-mode-table
+        '(diff-hl-margin-mode nil))))
+
+  ;; Integration with magit
+  (with-eval-after-load 'magit
+    (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
+  )
+
+;; ##################################################
+;;
+;; SIMULATE VSCODE FUNCTIONS
+;;
+;; ##################################################
+
 
 
 ;; *********************************
@@ -2048,50 +2104,6 @@ Adapted from `describe-function-or-variable'."
   )
 
 
-;; *********************************
-;;
-;; ** diff-hl (highlights uncommited diffs in bar aside from the line numbers)
-
-(use-package diff-hl
-  :ensure t
-  :defer t
-  :custom-face
-  ;; Better looking colours for diff indicators
-  (diff-hl-change ((t (:foreground ,(face-background 'highlight)))))
-  (diff-hl-change ((t (:background "#007ad3" :foreground "#ffffff"))))
-  (diff-hl-insert ((t (:background "#00ff00" :foreground "#000000"))))
-  (diff-hl-delete ((t (:background "#ff3300" :foreground "#ffffff"))))
-  :hook
-  (prog-mode . diff-hl-mode)
-  (dired-mode . diff-hl-mode)
-  (magit-post-refresh . diff-hl-magit-post-refresh)
-  ;; :custom
-  ;; (diff-hl-side 'left)
-  ;; (diff-hl-margin-side 'left) ;; if using margin instead of fringe
-  :config
-  (global-diff-hl-mode)
-  (diff-hl-flydiff-mode) ;; highlighting changes on the fly
-  ;; (diff-hl-margin-mode) ;; use the margin instead of the fringe.
-  ;; Set fringe style
-  (setq-default fringes-outside-margins t)
-
-  (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
-
-  (unless (display-graphic-p)
-    (setq diff-hl-margin-symbols-alist
-      '((insert . " ") (delete . " ") (change . " ")
-         (unknown . " ") (ignored . " ")))
-    ;; Fall back to the display margin since the fringe is unavailable in tty
-    (diff-hl-margin-mode 1)
-    ;; Avoid restoring `diff-hl-margin-mode'
-    (with-eval-after-load 'desktop
-      (add-to-list 'desktop-minor-mode-table
-        '(diff-hl-margin-mode nil))))
-
-  ;; Integration with magit
-  (with-eval-after-load 'magit
-    (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
-  )
 
 
 ;; *********************************

@@ -253,8 +253,4 @@ cdnvm(){
 # tmuxinator
 [ -s "$HOME/.bin/tmuxinator.bash" ] && . $HOME/.bin/tmuxinator.bash
 
-<<<<<<< HEAD
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
-=======
-export YVM_DIR=/home/tau/.yvm
->>>>>>> c120ed187c6acace1ee93129809541974f23774a
