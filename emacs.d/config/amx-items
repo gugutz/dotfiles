@@ -1,13 +1,13 @@
 
 ;; ----- amx-history -----
 (
- prettier-js
- prettier-js-mode
- dumb-jump-back
- dumb-jump-go
  aggressive-indent-mode
  package-install
  desktop-save
+ desktop-save-mode
+ rainbow-mode
+ align-regexp
+ eval-last-sexp
 )
 
 ;; ----- amx-data -----
@@ -26,7 +26,7 @@
  (counsel-projectile-switch-project . 1)
  (package-install . 4)
  (bug-hunter-init-file . 1)
- (prettier-js-mode . 4)
+ (prettier-js-mode . 2)
  (lsp-describe-session . 3)
  (eval-buffer . 1)
  (rainbow-mode . 2)
@@ -49,7 +49,4 @@
  (align-regexp . 1)
  (desktop-save-mode . 2)
  (desktop-save . 2)
- (dumb-jump-go . 1)
- (dumb-jump-back . 1)
- (prettier-js . 1)
 )
