@@ -106,7 +106,7 @@ set $hibernate sudo systemctl suspend
 # this make tmux use a main session and doenst spawn multiple unused sessions
 # set $terminal st -e tmux new-session -A -s "main-session"
 # set $terminal       st -e tmux new-session
-set $terminal       st
+set $terminal st
 
 # define default file managers (terminal and gui)
 set $file_manager ranger

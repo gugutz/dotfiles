@@ -1,5 +1,8 @@
 echo "## setup tmux config"
 
+echo "## install tmux"
+sudo pacman -S --noconfirm --needed xclip
+
 echo "## install tmux plugin manager"
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 

@@ -249,3 +249,5 @@ alias cd='cdnvm'
 ################################################
 # tmuxinator
 [ -s "$HOME/.bin/tmuxinator.bash" ] && . $HOME/.bin/tmuxinator.bash
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
