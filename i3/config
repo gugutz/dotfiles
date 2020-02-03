@@ -330,6 +330,8 @@ exec flatpak run com.toggl.TogglDesktop
 assign [class="Toggl Desktop"] → $ws5
 
 
+terminal -e 'bmenu' && sleep 2 && i3-msg move container to workspace 5
+
 ################################################
 # COLLOR PALETTE FOR THE TERMINAL
 ################################################
