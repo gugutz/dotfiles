@@ -24,7 +24,11 @@
  '(flycheck-indication-mode (quote left-fringe))
   '(package-selected-packages
      (quote
+<<<<<<< HEAD
+       (parrot minions anzu highlight-indent-guides rainbow-mode hl-todo diff-hl highlight-escape-sequences highlight-operators highlight-numbers rainbow-delimiters highlight-parentheses solaire-mode vi-tilde-fringe centaur-tabs yaml-mode emmet-mode prettier-js scss-mode web-mode typescript-mode aggressive-indent editorconfig shell-pop dumb-jump keyfreq which-key helpful flycheck-posframe flycheck yasnippet-snippets use-package treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil smartparens rotate nyan-mode lsp-ui ivy-rich ivy-prescient ivy-posframe ivy-explorer goto-line-preview eyebrowse expand-region exec-path-from-shell evil-commentary drag-stuff dired-k diminish counsel-projectile company-quickhelp company-lsp company-box bug-hunter amx all-the-icons-ivy all-the-icons-dired)))
+=======
        (vimrc-mode evil-matchit yasnippet-snippets yaml-mode which-key web-mode vi-tilde-fringe use-package typescript-mode treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil solaire-mode smartparens shell-pop scss-mode rotate rainbow-mode rainbow-delimiters prettier-js parrot nyan-mode minions lsp-ui keyfreq ivy-rich ivy-prescient ivy-posframe ivy-explorer hl-todo highlight-parentheses highlight-operators highlight-numbers highlight-indent-guides highlight-escape-sequences helpful goto-line-preview flycheck-posframe eyebrowse expand-region exec-path-from-shell evil-commentary emmet-mode editorconfig dumb-jump drag-stuff dired-k diminish diff-hl counsel-projectile company-quickhelp company-lsp company-box centaur-tabs anzu amx all-the-icons-ivy all-the-icons-dired aggressive-indent)))
+>>>>>>> c120ed187c6acace1ee93129809541974f23774a
  '(prettier-js-show-errors (quote buffer) t)
  '(web-mode-enable-block-face t t)
  '(web-mode-enable-current-element-highlight t t)

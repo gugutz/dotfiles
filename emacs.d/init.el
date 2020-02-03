@@ -2414,7 +2414,7 @@ Adapted from `describe-function-or-variable'."
 
 
     ;; the current major mode
-    '(:eval   (custom-modeline-mode-icon))
+    ;; '(:eval   (custom-modeline-mode-icon))
     (propertize "%m" 'face 'font-lock-string-face)
 
     ;; lsp status

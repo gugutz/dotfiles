@@ -1,7 +1,14 @@
 * Default
+<<<<<<< HEAD
+** dotfiles
+ - path :: ~/dotfiles
+** wego
+ - path :: /srv/tau/code/freelas/wego
+=======
 ** pep
  - path :: ~/code/pep
 ** dotfiles
  - path :: ~/dotfiles
 ** wego
  - path :: ~/code/wego
+>>>>>>> c120ed187c6acace1ee93129809541974f23774a

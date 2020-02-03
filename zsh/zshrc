@@ -150,4 +150,8 @@ load-nvmrc
 alias zshconfig="vim $HOME/.zshrc"
 alias ohmyzsh="vim $HOME/.oh-my-zsh"
 
+<<<<<<< HEAD
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+=======
 export YVM_DIR=/home/tau/.yvm
+>>>>>>> c120ed187c6acace1ee93129809541974f23774a
