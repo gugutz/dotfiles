@@ -23,14 +23,21 @@
 
 #exec_always --no-startup-id xrandr --output DP1 --main
 
+# monitors set with my monitors-setup.sh script
 #exec --no-startup-id ~/dotfiles/i3/scripts/monitors-setup.sh
 
-# monitors set with my monitors-setup.sh script
+# HOME MONITORS
+# set $primary_monitor DVI-I-2
+# set $secondary_monitor DVI-I-1
+
+# QUALIREDE MONITORS
 set $primary_monitor DP1
 set $secondary_monitor eDP1
 
+
 # xrandr command to setup screens layout
 exec_always --no-startup-id xrandr --output $primary_monitor --primary --mode 1920x1080 --pos 0x0 --rotate normal --output $secondary_monitor --mode 1920x1080 --pos 1920x0 --rotate normal
+
 
 ################################################
 # GENERAL I3 SETTINGS #

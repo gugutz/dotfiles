@@ -2,22 +2,22 @@
 # MY ALIASES
 #################################################
 
-alias cp="cp -i"                       # confirm before overwriting something
-alias df='df -h'                       # human-readable sizes
-alias free='free -m'                   # show sizes in MB
+alias rsync="rsync -a --stats --progress" # confirm before overwriting something
+alias df='df -h'                          # human-readable sizes
+alias free='free -m'                      # show sizes in MB
 alias np='nano -w PKGBUILD'
 alias more=less
-alias reboot='sudo reboot now'         # reboot / halt / poweroff
+alias reboot='sudo reboot now'            # reboot / halt / poweroff
 alias shutdown='sudo shutdown now'
 alias suspend='systemctl suspend'
 
-alias mkdir='mkdir -pv' # create parent directories on demand with mkdir
+alias mkdir='mkdir -pv'                   # create parent directories on demand with mkdir
 alias ll='ls -lAbhc'
 alias l='ls -lBohc'
 #History search (use: hs sometext)
 alias hs='history | grep $1'
 
-alias wget='wget -c' # resume wget downloads by default
+alias wget='wget -c'                      # resume wget downloads by default
 
 #Sudo vim
 alias svim='sudo vim'
@@ -30,13 +30,13 @@ alias cp='cp -i'
 alias ln='ln -i'
 alias mv='mv -i'
 
-#Unrar alias
+# unrar alias
 alias unrar='rar e'
 
 # get rid of command not found by mistakengly typing cd..
 alias cd..='cd ..'
 
-## Colorize the ls output ##
+## colorize the ls output ##
 alias ls='ls --color=auto'
 
 ## Use a long listing format ##

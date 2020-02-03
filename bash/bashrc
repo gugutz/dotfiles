@@ -164,9 +164,12 @@ ex ()
 # tmux
 
 # the conditional bellow checks if tmux exists, if we're in a non-interactive shell, and if we're not already inside tmux
-if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
-  exec tmux
-fi
+#### THIS IS FUCKING MY CONFIG
+
+# if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
+#   exec tmux
+# fi
+
 ################################################
 # asdf
 
@@ -238,7 +241,7 @@ cdnvm(){
     fi
 }
 # alias the cd command to use the above function
-alias cd='cdnvm'
+# alias cd='cdnvm'
 
 ################################################
 # yarn version manager
@@ -250,4 +253,8 @@ alias cd='cdnvm'
 # tmuxinator
 [ -s "$HOME/.bin/tmuxinator.bash" ] && . $HOME/.bin/tmuxinator.bash
 
+<<<<<<< HEAD
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+=======
+export YVM_DIR=/home/tau/.yvm
+>>>>>>> c120ed187c6acace1ee93129809541974f23774a

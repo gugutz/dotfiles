@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 #s(lsp-session ("/srv/tau/code/freelas/wego" "/home/gustavo/dotfiles" "/home/gustavo/code/pep" "/home/gustavo/code/ideadora/wego") nil #s(hash-table size 65 test equal rehash-size 1.5 rehash-threshold 0.8125 data ()) #s(hash-table size 65 test equal rehash-size 1.5 rehash-threshold 0.8125 data ()) #s(hash-table size 65 test equal rehash-size 1.5 rehash-threshold 0.8125 data ()))
+=======
+#s(lsp-session ("/home/tau/code/pep" "/home/tau/code/wego" "/home/tau/dotfiles" "/home/gustavo/dotfiles" "/home/gustavo/code/pep" "/home/gustavo/code/ideadora/wego") nil #s(hash-table size 65 test equal rehash-size 1.5 rehash-threshold 0.8125 data ()) #s(hash-table size 65 test equal rehash-size 1.5 rehash-threshold 0.8125 data ()) #s(hash-table size 65 test equal rehash-size 1.5 rehash-threshold 0.8125 data ()))
+>>>>>>> c120ed187c6acace1ee93129809541974f23774a

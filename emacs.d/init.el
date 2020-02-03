@@ -373,6 +373,7 @@
 ;; *********************************
 ;; evil-surround
 (use-package evil-matchit
+  :ensure t
   :config
   (global-evil-matchit-mode 1)
   )
@@ -999,6 +1000,10 @@
   (setq projectile-mode-line-prefix "Project -> ")
   (setq projectile-mode-line-function '(lambda () (format " Proj[%s]" (projectile-project-name))))
   (setq projectile-known-projects-file "~/.emacs.d/config/projectile-bookmarks.eld")
+  ;;  NOTE: remove this
+  ;; workaround for `projectile-find-file' not working because of `tmux-plugin-manager' (tpm) having a .git_modules file
+  ;; when this issue is fixed remove this
+  (setq projectile-git-submodule-command "")
   :config
   (projectile-mode +1)
   )
@@ -1461,6 +1466,26 @@ Adapted from `describe-function-or-variable'."
   (define-key evil-normal-state-map (kbd "SPC !") 'shell-pop)
   )
 
+;; Execute selected line or marked region as command in system shell
+
+(defun shell-command-on-region-or-line ()
+  "Run selected text in a terminal or use the current line."
+  (interactive)
+  (shell-command
+    (concat
+      ;; pick one!
+      "st -e "
+      ;; "gnome-terminal -e "
+      ;; "roxterm --tab -e "
+      ;; "terminator -x "
+      (if (use-region-p)
+        ;; current selection
+        (buffer-substring (region-beginning) (region-end))
+        ;; current line
+        (thing-at-point 'line t)))))
+
+(global-set-key (kbd "<C-M-S-return>") 'shell-command-on-region-or-line)
+
 ;; *********************************
 ;; auto revert mode
 
@@ -1740,6 +1765,18 @@ Adapted from `describe-function-or-variable'."
 
 ;; *********************************
 ;;
+;; shell script mode
+
+(use-package sh-script
+  :ensure nil
+  :hook
+  (sh-mode . aggressive-indent-mode)
+  (sh-mode . rainbow-mode)
+  )
+
+
+;; *********************************
+;;
 ;; YAML
 
 (use-package yaml-mode
@@ -1749,6 +1786,11 @@ Adapted from `describe-function-or-variable'."
   ("\\.yaml\\'" "\\.yml\\'")
   )
 
+(use-package vimrc-mode
+  :ensure t
+  :mode
+  ("\\.vim\\(rc\\)?\\'" . vimrc-mode)
+  )
 
 ;; ##################################################
 ;;
@@ -2064,16 +2106,19 @@ Adapted from `describe-function-or-variable'."
 ;; NOTE that the highlighting works even in comments.
 (use-package hl-todo
   :ensure t
-  :init
-  ;; (add-hook 'text-mode-hook (lambda () (hl-todo-mode t)))
+  :hook
+  (prog-mode . hl-todo-mode)
   :config
   ;; Adding a new keyword: TEST.
-  (add-to-list 'hl-todo-keyword-faces '("TODO" . "#ff3300"))
-  (add-to-list 'hl-todo-keyword-faces '("TEST" . "#dc8cc3"))
-  (add-to-list 'hl-todo-keyword-faces '("NOTE" . "#ffff00"))
-  (add-to-list 'hl-todo-keyword-faces '("DONE" . "#00ff00"))
+  (setq hl-todo-keyword-faces
+    '(("TODO"   . "#FF3300")
+       ("FIXME"  . "#FF0000")
+       ("DEBUG"  . "#A020F0")
+       ("GOTCHA" . "#FF4500")
+       ("NOTE"   . "#ffff00")
+       ("DONE"   . "#00ff00")
+       ("STUB"   . "#1E90FF")))
   )
-
 
 
 ;; *********************************

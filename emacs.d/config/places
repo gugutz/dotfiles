@@ -1,4 +1,5 @@
 ;;; -*- coding: utf-8 -*-
+<<<<<<< HEAD
 (("/home/tau/.emacs.d/elpa/yasnippet-snippets-20200122.1140/yasnippet-snippets-autoloads.el" . 751)
   ("/home/tau/.emacs.d/elpa/yasnippet-20191222.2206/yasnippet-autoloads.el" . 1675)
   ("/home/tau/.emacs.d/elpa/company-lsp-20190612.1553/company-lsp-autoloads.el" . 619)
@@ -62,6 +63,14 @@
   ("/home/tau/.emacs.d/elpa/evil-20200130.1453/evil-autoloads.el" . 3789)
   ("/home/tau/.emacs.d/elpa/goto-chg-20190110.2114/goto-chg-autoloads.el" . 1995)
   ("/home/tau/.emacs.d/elpa/undo-tree-0.7.4/undo-tree-autoloads.el" . 1842)
+=======
+(("/home/tau/dotfiles/aliases" . 1264)
+  ("/home/tau/dotfiles/zsh/setup.sh" . 622)
+  ("/home/tau/dotfiles/i3/config" . 4546)
+  ("/home/tau/dotfiles/zsh/zshrc" . 2218)
+  ("/home/tau/dotfiles/emacs.d/cache/treemacs-persist" . 105)
+  ("/home/tau/.emacs.d/config/recentf" . 1044)
+>>>>>>> c120ed187c6acace1ee93129809541974f23774a
   ("/usr/share/emacs/26.3/lisp/files.el.gz" . 7252)
   ("/usr/share/emacs/26.3/lisp/autorevert.el.gz" . 5801)
   ("/usr/share/emacs/26.3/lisp/desktop.el.gz" . 9740)

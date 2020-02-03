@@ -26,7 +26,12 @@ fi
 
 #########################################
 # Re-setting PATH
+# add ~/bin to PATH
 export PATH=$HOME/bin:/usr/local/bin:$PATH
+# add /usr/local to PATH
+export PATH=/usr/local/bin:$PATH
+# add /opt to PATH
+export PATH=/opt:$PATH
 
 #########################################
 # ZSH

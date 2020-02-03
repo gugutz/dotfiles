@@ -1,7 +1,7 @@
 # ~/.tmuxinator/sample.yml
 
-name: pep
-root: ~/code/pep
+name: wego
+root: ~/code/wego
 
 # Optional. tmux socket
 # socket_name: foo
@@ -40,14 +40,16 @@ root: ~/code/pep
 
 windows:
   - pep:
-      layout: 283a,239x64,0,0{119x64,0,0,0,119x64,120,0[119x32,120,0,2,119x31,120,33,3]}
+      layout: even-horizontal
+      # layout: 283a,239x64,0,0{119x64,0,0,0,119x64,120,0[119x32,120,0,2,119x31,120,33,3]}
       panes:
-        - ng s --host
-        - htop
-        - #empty
-  - server:
-      layout: 283a,239x64,0,0{119x64,0,0,0,119x64,120,0[119x32,120,0,2,119x31,120,33,3]}
+        - ionic serve
+        - git status
+  - info:
+      layout: even-horizontal
       panes:
         - htop
-        - cmatrix
-        - neofetch
+        - cd ~/dotfiles && git status
+  - system:
+      panes:
+        - gotop
