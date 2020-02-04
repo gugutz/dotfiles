@@ -50,11 +50,7 @@ amx*
 
 # recentf file
 recentf*
-###########################
-# LaTeX Stuff
 
-# AUCTeX auto folder
-auto/
 
 # cask packages
 .cask/
@@ -89,3 +85,9 @@ ac-comphist.dat
 .mc-lists.el
 
 emacs.log
+
+###########################
+# LaTeX Stuff
+
+# AUCTeX auto folder
+auto/

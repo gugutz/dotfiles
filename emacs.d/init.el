@@ -111,30 +111,33 @@
 ;; *********************************-
 ;;; Folders and Files
 
-(setq create-lockfiles nil) ;; Prevent emacs to create lockfiles (.#files#)
+;;; Define emacs directory
+(defconst emacs-dir (eval-when-compile (file-truename user-emacs-directory)))
 
-;; disable emacs's automatic backup~ file
-(setq make-backup-files nil)
+;; Define a config folder inside emacs-dir
+(defconst config-dir (eval-when-compile (concat emacs-dir "config/")))
+
+;; Define a config folder inside emacs-dir
+(defconst cache-dir (eval-when-compile (concat emacs-dir "cache/")))
+
+
+;; Prevent emacs to create lockfiles (.#files#)
+(setq create-lockfiles nil)
 
 ;; stop creating those #auto-save# files
-(setq auto-save-default nil)
+(use-package files
+  :config
+  (setq auto-save-file-name-transforms
+    `((".*" ,cache-dir t)))
+  (setq auto-save-list-file-prefix "~/.emacs.d/cache/auto-save-list")
+  (setq auto-save-default nil)
+  ;; disable emacs's automatic backup~ file
+  (setq make-backup-files nil)
+  ;; dont ask confirmation to kill processes
+  (setq confirm-kill-processes nil)
+  )
 
-(setq confirm-kill-processes nil) ;; dont ask confirmation to kill processes
 
-;;; Define emacs directory
-(defconst emacs-dir
-  (eval-when-compile (file-truename user-emacs-directory))
-  "The path to the currently loaded .emacs.d directory.  Must end with a slash.")
-
-;; Define a config folder inside emacs-dir
-(defconst config-dir
-  (eval-when-compile (concat emacs-dir "config/"))
-  "The path to the currently loaded .emacs.d directory.  Must end with a slash.")
-
-;; Define a config folder inside emacs-dir
-(defconst cache-dir
-  (eval-when-compile (concat emacs-dir "cache/"))
-  "The path to the currently loaded .emacs.d directory.  Must end with a slash.")
 
 ;; Prevent emacs from writing several files in the config folder
 (setq abbrev-file-name             (concat config-dir "abbrev.el"))
@@ -238,9 +241,9 @@
   ("C-c s" . desktop-save-in-desktop-dir)
   :init
   ;; use only one desktop
-  (setq desktop-dirname "~/.emacs.d/cache")
-  (setq desktop-base-file-name "~/.emacs.d/cache/emacs.desktop")
-  (setq desktop-base-lock-name "~/.emacs.d/cache/emacs.desktop.lock")
+  (setq desktop-dirname "~/.emacs.d/cache/")
+  (setq desktop-base-file-name (concat cache-dir "emacs.desktop"))
+  (setq desktop-base-lock-name (concat cache-dir "emacs.desktop.lock"))
 
   (setq desktop-restore-eager 5) ;; restore 5 buffers immediately. the others restore lazily
   (setq desktop-load-locked-desktop t)
@@ -1180,6 +1183,7 @@
        "--stdio"))
   ;; disable angular-ls for specific modes
   ;; (add-to-list 'lsp-disabled-clients '(web-mode . angular-ls))
+  (setq lsp-server-install-dir (concat cache-dir "lsp"))
   )
 
 
@@ -1843,6 +1847,28 @@ Adapted from `describe-function-or-variable'."
          vc-msg-git-extra)))
   )
 
+;; evil-magit
+
+(use-package evil-magit
+  :ensure t
+  :init
+  (setq evil-magit-state 'normal)
+  (setq evil-magit-use-y-for-yank nil)
+  :config
+  (evil-magit-init)
+  (evil-define-key evil-magit-state magit-mode-map "<tab>" 'magit-section-toggle)
+  (evil-define-key evil-magit-state magit-mode-map "l" 'magit-log-popup)
+  (evil-define-key evil-magit-state magit-mode-map "j" 'evil-next-visual-line)
+  (evil-define-key evil-magit-state magit-mode-map "k" 'evil-previous-visual-line)
+  ;; (evil-define-key evil-magit-state magit-diff-map "k" 'evil-previous-visual-line)
+  (evil-define-key evil-magit-state magit-staged-section-map "K" 'magit-discard)
+  (evil-define-key evil-magit-state magit-unstaged-section-map "K" 'magit-discard)
+  (evil-define-key evil-magit-state magit-branch-section-map "K" 'magit-branch-delete)
+  (evil-define-key evil-magit-state magit-remote-section-map "K" 'magit-remote-remove)
+  (evil-define-key evil-magit-state magit-stash-section-map "K" 'magit-stash-drop)
+  (evil-define-key evil-magit-state magit-stashes-section-map "K" 'magit-stash-clear)
+  )
+
 
 ;; ** diffview
 ;; View diffs side by side
@@ -1898,9 +1924,6 @@ Adapted from `describe-function-or-variable'."
   (prog-mode . diff-hl-mode)
   (dired-mode . diff-hl-mode)
   (magit-post-refresh . diff-hl-magit-post-refresh)
-  ;; :custom
-  ;; (diff-hl-side 'left)
-  ;; (diff-hl-margin-side 'left) ;; if using margin instead of fringe
   :config
   (global-diff-hl-mode)
   (diff-hl-flydiff-mode) ;; highlighting changes on the fly
