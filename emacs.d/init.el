@@ -239,8 +239,8 @@
   :init
   ;; use only one desktop
   (setq desktop-dirname "~/.emacs.d/config/desktop/")
-  (setq desktop-base-file-name "emacs-desktop")
-  (setq desktop-base-lock-name "emacs-desktop-lock")
+  (setq desktop-base-file-name "emacs.desktop")
+  (setq desktop-base-lock-name "emacs.desktop.lock")
 
   (setq desktop-restore-eager 5) ;; restore 5 buffers immediately. the others restore lazily
   (setq desktop-load-locked-desktop t)
