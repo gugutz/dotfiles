@@ -23,6 +23,8 @@ bracketSpacing: true
 jsxBracketSameLine: false
 # Include parentheses around a sole arrow function parameter.
 arrowParens: "avoid"
+# disable whitespace aware closing of tags,
+htmlWhitespaceSensitivity: ignore
 # use Unix standard line ending (\n, aka LF "Line Feed")
 endOfLine: "lf"
 # overrides for specific file types
@@ -35,4 +37,3 @@ overrides:
       - "legacy/**/*.js"
     options:
       tabWidth: 4
-
