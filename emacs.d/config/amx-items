@@ -1,13 +1,13 @@
 
 ;; ----- amx-history -----
 (
- smartparens-mode
- vc-annotate
- prettier-js
- prettier-js-mode
  execute-extended-command
  revert-buffer
  parrot-mode
+ eval-defun
+ nyan-mode
+ package-install
+ eval-buffer
 )
 
 ;; ----- amx-data -----
@@ -69,7 +69,7 @@
  (org-table-create . 1)
  (org-table-create-or-convert-from-region . 5)
  (revert-buffer . 2)
- (prettier-js-mode . 15)
+ (prettier-js-mode . 13)
  (org-mode . 6)
  (which-key-mode . 5)
  (eval-region . 1)
@@ -80,7 +80,7 @@
  (web-beautify-html . 2)
  (editorconfig-apply . 1)
  (er/expand-region . 2)
- (prettier-js . 15)
+ (prettier-js . 14)
  (highlight-operators-mode . 3)
  (highlight-parentheses-mode . 4)
  (show-paren-mode . 4)
@@ -115,7 +115,7 @@
  (speedbar . 1)
  (evil-goggles-mode . 2)
  (elisp-format-buffer . 1)
- (vc-annotate . 2)
+ (vc-annotate . 1)
  (diffview-current . 1)
  (vc-msg-show . 1)
  (counsel-switch-buffer . 2)
@@ -151,5 +151,4 @@
  (timeclock-mode-line-display . 1)
  (parrot-start-animation . 1)
  (execute-extended-command . 1)
- (smartparens-mode . 1)
 )
