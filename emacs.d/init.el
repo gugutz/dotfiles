@@ -238,9 +238,9 @@
   ("C-c s" . desktop-save-in-desktop-dir)
   :init
   ;; use only one desktop
-  (setq desktop-dirname "~/.emacs.d/config/desktop/")
-  (setq desktop-base-file-name "emacs.desktop")
-  (setq desktop-base-lock-name "emacs.desktop.lock")
+  (setq desktop-dirname "~/.emacs.d/cache")
+  (setq desktop-base-file-name "~/.emacs.d/cache/emacs.desktop")
+  (setq desktop-base-lock-name "~/.emacs.d/cache/emacs.desktop.lock")
 
   (setq desktop-restore-eager 5) ;; restore 5 buffers immediately. the others restore lazily
   (setq desktop-load-locked-desktop t)
@@ -1375,6 +1375,7 @@
   :defer t
   :hook (after-init . keyfreq-mode)
   :init
+  (setq keyfreq-file "~/.emacs.d/cache/.emacs.keyfreq")
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1)
   )

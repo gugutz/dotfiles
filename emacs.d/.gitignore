@@ -48,6 +48,8 @@ treemacs-persist*
 # amx itens
 amx*
 
+# recentf file
+recentf*
 ###########################
 # LaTeX Stuff
 
