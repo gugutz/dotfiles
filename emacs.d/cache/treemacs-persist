@@ -2,6 +2,4 @@
 ** dotfiles
  - path :: ~/dotfiles
 ** wego
- - path :: ~/code/out/wego
-** pep
- - path :: ~/code/qualirede/pep
+ - path :: /srv/tau/code/freelas/wego

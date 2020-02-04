@@ -1,13 +1,20 @@
 
 ;; ----- amx-history -----
 (
+<<<<<<< HEAD
+=======
+ bug-hunter-init-file
+>>>>>>> f2816f518540ff7bb1a76cdd623335507f54300b
  execute-extended-command
  revert-buffer
  parrot-mode
  eval-defun
  nyan-mode
  package-install
+<<<<<<< HEAD
  eval-buffer
+=======
+>>>>>>> f2816f518540ff7bb1a76cdd623335507f54300b
 )
 
 ;; ----- amx-data -----

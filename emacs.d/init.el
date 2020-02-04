@@ -434,9 +434,9 @@
   ("<f1> l" . counsel-find-library)
   ("<f2> i" . counsel-info-lookup-symbol)
   ("<f2> u" . counsel-unicode-char)
-  ("C-c g" . counsel-git)
-  ("C-c j" . counsel-git-grep)
-  ("C-c k" . counsel-ag)
+  ("C-c g t" . counsel-git)
+  ("C-c g g" . counsel-git-grep)
+  ("C-c a g" . counsel-ag)
   ("C-x l" . counsel-locate)
   ("C-S-o" . counsel-rhythmbox)
   :config
@@ -725,6 +725,22 @@
   :ensure t
   :config (treemacs-set-scope-type 'Perspectives))
 
+
+;; **************************************************
+
+;; ** ranger
+
+(use-package ranger
+  :ensure t
+  :defer t
+  :bind
+  ("C-x C-j" . ranger)
+  (:map evil-normal-state-map
+    ("SPC r a" . avy-goto-line))
+  :config
+  (setq ranger-show-hidden t) ;; show hidden files
+  )
+
 ;; **************************************************
 ;;
 ;; ** Dired
@@ -916,8 +932,8 @@
   (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
   (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
   )
-(global-set-key [?\C-=] 'text-scale-increase)
-(global-set-key [?\C--] 'text-scale-decrease)
+(global-set-key (kbd "C-=") 'text-scale-increase)
+(global-set-key (kbd "C--") 'text-scale-decrease)
 
 ;; *********************************
 ;; ** Eyebrowse
@@ -1775,11 +1791,16 @@ Adapted from `describe-function-or-variable'."
   ("\\.yaml\\'" "\\.yml\\'")
   )
 
+;; *********************************
+;;
+;; vimrc
+
 (use-package vimrc-mode
   :ensure t
   :mode
   ("\\.vim\\(rc\\)?\\'" . vimrc-mode)
   )
+
 
 ;; ##################################################
 ;;
@@ -1791,17 +1812,73 @@ Adapted from `describe-function-or-variable'."
 ;;
 ;; magit
 
-(use-package magit :ensure t)
+(use-package magit
+  :ensure t
+  :bind
+  ("<tab>" . magit-section-toggle)
+  ("M-g s" . magit-status)
+  ("M-g f" . magit-find-file)
+  ("M-g l" . magit-log)
+  ("M-g b" . magit-blame)
+  ("C-x g" . magit-status)
+  (:map evil-normal-state-map
+    ("SPC m s" . magit-status))
+  :config
+  (add-hook 'after-save-hook 'magit-after-save-refresh-status t)
+
+  ;; integrate with vc-msg
+  (eval-after-load 'vc-msg-git
+    '(progn
+       ;; show code of commit
+       (setq vc-msg-git-show-commit-function 'magit-show-commit)
+       ;; open file of certain revision
+       (push '("m"
+                "[m]agit-find-file"
+                (lambda ()
+                  (let* ((info vc-msg-previous-commit-info)
+                          (git-dir (locate-dominating-file default-directory ".git")))
+                    (magit-find-file (plist-get info :id )
+                      (concat git-dir (plist-get info :filename))))))
+         vc-msg-git-extra)))
+  )
+
+
+;; ** diffview
+;; View diffs side by side
+
+(use-package diffview :ensure t :defer t)
+
 ;; *********************************
 ;;
 ;; vc-msg
 
-(use-package vc-msg :ensure t)
+(use-package vc-msg
+  :ensure t
+  :defer t
+  :bind
+  ("C-c g p" . vc-msg-show)
+  (:map evil-normal-state-map
+    ("SPC g m" . git-timemachine-toggle))
+  :init
+  (setq git-messenger:show-detail t)
+  (setq git-messenger:use-magit-popup t)
+  :config
+  (define-key git-messenger-map (kbd "RET") 'git-messenger:popup-close)
+  (add-hook 'activate-mark-hook '(lambda () (vc-msg-show)))
+  (add-hook 'mouse-position-function '(lambda () (vc-msg-show)))
+  )
+
 ;; *********************************
 ;;
 ;; git timemachine
 
-(use-package git-timemachine :ensure t)
+(use-package git-timemachine
+  :ensure t
+  :bind
+  ("C-c g t" . git-timemachine-toggle)
+  (:map evil-normal-state-map
+    ("SPC g t" . git-timemachine-toggle))
+  )
 
 ;; *********************************
 ;;
@@ -1847,6 +1924,11 @@ Adapted from `describe-function-or-variable'."
   (with-eval-after-load 'magit
     (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
   )
+
+;; Mode for .gitignore files.
+(use-package gitignore-mode :ensure t :defer t)
+(use-package gitconfig-mode :ensure t :defer t)
+(use-package gitattributes-mode :ensure t :defer t)
 
 ;; ##################################################
 ;;
