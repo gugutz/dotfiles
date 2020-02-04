@@ -11,6 +11,8 @@ emacs.desktop*
 emacs.desktop.lock*
 
 *.elc
+
+# auto save
 auto-save-list
 tramp
 .\#*
@@ -46,6 +48,9 @@ treemacs-persist*
 # amx itens
 amx*
 
+###########################
+# LaTeX Stuff
+
 # AUCTeX auto folder
 auto/
 
@@ -64,7 +69,7 @@ flycheck_*.el
 projectile-*.eld
 
 # places files (dont know to what package it belongs yet)
-/config/place*
+place*
 .place*
 
 
@@ -81,7 +86,4 @@ emojis/
 ac-comphist.dat
 .mc-lists.el
 
-# the resulting filed from tangled org file and html and stuff
-emacs.html
-/config/*.el
 emacs.log
