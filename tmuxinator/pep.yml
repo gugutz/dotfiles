@@ -48,8 +48,5 @@ windows:
   - info:
       layout: even-horizontal
       panes:
-        - htop
         - cd ~/dotfiles && git status
-  - system:
-      panes:
-        - gotop
+        - gotopt

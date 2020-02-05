@@ -62,6 +62,9 @@ yay -S --noconfirm --needed toilet 1>/dev/null
 yay -S --noconfirm --needed boxes 1>/dev/null
 yay -S --noconfirm --needed beep 1>/dev/null
 
+echo "## installing libwebp"
+sudo pacman -S --noconfirm --needed libwebp
+
 echo "## installing gotop"
 yay -S --noconfirm --needed gotop
 
@@ -102,6 +105,11 @@ echo "## Configuring i3"
 echo "############################################################${reset_color}"
 ~/dotfiles/emacs.d/setup.sh
 
+
+# SEARCH TOOLS
+
+sudo pacman -S --noconfirm --needed the_silver_searcher 1>/dev/null
+sudo pacman -S --noconfirm --needed ripgrep 1>/dev/null
 
 
 # LANGUAGES CONFIG
@@ -207,3 +215,12 @@ if [ ! -d "~/.fonts/hack-ttf" ]; then
 else
     echo "## Hack font is already installed in ~/.fonts/hack-ttf"
 fi
+
+
+
+echo "%{green}############################################################"
+echo "## qualirede things"
+echo "############################################################${reset_color}"
+
+echo "## Installing Google Chat electron wrapper"
+yay -S --noconfirm google-chat-linux-git

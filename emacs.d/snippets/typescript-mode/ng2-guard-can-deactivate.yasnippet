@@ -1,0 +1,31 @@
+# -*- mode: snippet -*-
+# contributor: Translated to yasnippet by sublime-snippet import
+# key: ng2-guard-can-deactivate
+# name: Angular CanDeactivate guard
+# --
+
+import { Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot } from '@angular/router';
+import { Observable } from 'rxjs/Observable';
+
+import { ${2:NameComponent} } from './${2:nameComponent}.component';
+
+// Consider using this interface for all CanDeactivate guards,
+// and have your components implement this interface, too.
+//
+//   e.g. export class CanDeactivateGuard implements CanDeactivate<CanComponentDeactivate> {
+//
+// export interface CanComponentDeactivate {
+// canDeactivate: () => any;
+// }
+
+@Injectable()
+export class ${1:NameGuard} implements CanDeactivate<${2:NameComponent}> {
+  canDeactivate(
+    component: ${2:NameComponent},
+    currentRoute: ActivatedRouteSnapshot, 
+    currentState: RouterStateSnapshot
+  ): Observable<boolean>|Promise<boolean>|boolean {
+    return false;
+  }
+}

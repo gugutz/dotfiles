@@ -1,0 +1,20 @@
+# -*- mode: snippet -*-
+# contributor: Translated to yasnippet by sublime-snippet import
+# key: ng2-component
+# name: Angular 2 component snippet
+# --
+
+import { Component, OnInit } from '@angular/core';
+      
+@Component({
+	moduleId: module.id,
+	selector: '${1:selector}',
+	templateUrl: '${1:selector}.component.html'
+})
+export class ${3:ComponentName}Component implements OnInit {
+	constructor() { }
+
+	ngOnInit() { }
+
+	$4
+}

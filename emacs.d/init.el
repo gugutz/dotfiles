@@ -897,6 +897,10 @@
 
   )
 
+;; *********************************
+;;
+;; open file path at point
+
 (defun open-file-path-at-point ()
   "Open the file path under cursor.
 If there is text selection, uses the text selection for path.
@@ -962,6 +966,10 @@ Version 2019-01-16"
 
 (global-set-key (kbd "C-c C-x C-f") #'open-file-path-at-point)
 
+;; *********************************
+;;
+;; copy file path
+
 (defun xah-copy-file-path (&optional *dir-path-only-p)
   "Copy the current buffer's file path or dired path to `kill-ring'.
 Result is full path.
@@ -984,6 +992,61 @@ Version 2016-07-17"
         (progn
           (message "Directory path copied: 「%s」" (file-name-directory -fpath))
           (file-name-directory -fpath))))))
+
+;; ################################################
+;;
+;; CODE NAVIGATION
+;;
+;; ################################################
+
+;; *********************************
+;;
+;; dumb-jump
+
+(use-package dumb-jump
+  :ensure t
+  :bind
+  ;;("M-g o" . dumb-jump-go-other-window)
+  ;;("M-g j" . dumb-jump-go)
+  ;;("M-g b" . dumb-jump-back)
+  ;;("M-g i" . dumb-jump-go-prompt)
+  ;;("M-g x" . dumb-jump-go-prefer-external)
+  ;;("M-g z" . dumb-jump-go-prefer-external-other-window)
+  ;;("M-S-h d" . dumb-jump-hydra/body)
+  (:map prog-mode-map
+    ("C-c C-o" . dumb-jump-go-other-window)
+    ("C-c C-j" . dumb-jump-go)
+    ("C-c C-b" . dumb-jump-back)
+    ("C-c C-i" . dumb-jump-go-prompt))
+  (:map evil-normal-state-map
+    ("SPC j g" . dumb-jump-go)
+    ("SPC j b" . dumb-jump-back)
+    ("SPC j o" . dumb-jump-go-other-window))
+  :custom
+  (dumb-jump-selector 'ivy)
+  :config
+  (eval-when-compile
+    (require 'helm-source nil t))
+  )
+
+;; *********************************
+;;
+;; counsel etags
+
+(use-package counsel-etags
+  :ensure t
+  :bind
+  (:map evil-normal-state-map
+    ("SPC c f t" . counsel-etags-find-tag-at-point))
+  :init
+  (add-hook 'prog-mode-hook
+    (lambda ()
+      (add-hook 'after-save-hook
+        'counsel-etags-virtual-update-tags 'append 'local)))
+  :config
+  (setq counsel-etags-update-interval 60)
+  (push "build" counsel-etags-ignore-directories)
+  )
 
 ;; ##################################################
 ;;
@@ -1726,6 +1789,12 @@ Adapted from `describe-function-or-variable'."
   (interactive)
   (find-file (angular--counterpart-name (buffer-file-name))))
 
+;; Open templates under point
+
+(defun angular-open-counterpart ()
+  "Opens the corresponding template or component file to this one."
+  (interactive)
+  (find-file (angular--counterpart-name (buffer-file-name))))
 (global-set-key (kbd "C-x a c") #'angular-open-counterpart)
 (define-key evil-normal-state-map (kbd "SPC a c") #'angular-open-counterpart)
 
