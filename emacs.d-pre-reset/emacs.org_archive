@@ -1,0 +1,21 @@
+#    -*- mode: org -*-
+
+
+Archived entries from file /home/tau/dotfiles/emacs.d/emacs.org
+
+
+* Dired
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-09-05 qua 19:00
+  :ARCHIVE_FILE: ~/dotfiles/emacs.d/emacs.org
+  :ARCHIVE_CATEGORY: emacs
+  :END:
+
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(after 'dired
+  (require-package 'dired-k)
+  (setq dired-k-style 'git)
+  (setq dired-k-human-readable t)
+  (add-hook 'dired-initial-position-hook #'dired-k))
+#+END_SRC
+

@@ -127,8 +127,8 @@
 ;; stop creating those #auto-save# files
 (use-package files
   :config
-  (setq auto-save-file-name-transforms
-    `((".*" ,cache-dir t)))
+  ;; (setq auto-save-file-name-transforms
+  ;;   `((".*" ,cache-dir t)))
   (setq auto-save-list-file-prefix "~/.emacs.d/cache/auto-save-list")
   (setq auto-save-default nil)
   ;; disable emacs's automatic backup~ file
@@ -897,6 +897,93 @@
 
   )
 
+(defun open-file-path-at-point ()
+  "Open the file path under cursor.
+If there is text selection, uses the text selection for path.
+If the path starts with “http://”, open the URL in browser.
+Input path can be {relative, full path, URL}.
+Path may have a trailing “:‹n›” that indicates line number. If so, jump to that line number.
+If path does not have a file extension, automatically try with “.el” for elisp files.
+This command is similar to `find-file-at-point' but without prompting for confirmation.
+
+URL `http://ergoemacs.org/emacs/emacs_open_file_path_fast.html'
+Version 2019-01-16"
+  (interactive)
+  (let* (($inputStr (if (use-region-p)
+                      (buffer-substring-no-properties (region-beginning) (region-end))
+                      (let ($p0 $p1 $p2
+                             ;; chars that are likely to be delimiters of file path or url, e.g. whitespace, comma. The colon is a problem. cuz it's in url, but not in file name. Don't want to use just space as delimiter because path or url are often in brackets or quotes as in markdown or html
+                             ($pathStops "^  \t\n\"`'‘’“”|[]{}「」<>〔〕〈〉《》【】〖〗«»‹›❮❯❬❭〘〙·。\\"))
+                        (setq $p0 (point))
+                        (skip-chars-backward $pathStops)
+                        (setq $p1 (point))
+                        (goto-char $p0)
+                        (skip-chars-forward $pathStops)
+                        (setq $p2 (point))
+                        (goto-char $p0)
+                        (buffer-substring-no-properties $p1 $p2))))
+          ($path
+            (replace-regexp-in-string
+              "^file:///" "/"
+              (replace-regexp-in-string
+                ":\\'" "" $inputStr))))
+    (if (string-match-p "\\`https?://" $path)
+      (if (fboundp 'xahsite-url-to-filepath)
+        (let (($x (xahsite-url-to-filepath $path)))
+          (if (string-match "^http" $x )
+            (browse-url $x)
+            (find-file $x)))
+        (progn (browse-url $path)))
+      (if ; not starting “http://”
+        (string-match "^\\`\\(.+?\\):\\([0-9]+\\)\\'" $path)
+        (let (
+               ($fpath (match-string 1 $path))
+               ($line-num (string-to-number (match-string 2 $path))))
+          (if (file-exists-p $fpath)
+            (progn
+              (find-file $fpath)
+              (goto-char 1)
+              (forward-line (1- $line-num)))
+            (when (y-or-n-p (format "file no exist: 「%s」. Create?" $fpath))
+              (find-file $fpath))))
+        (if (file-exists-p $path)
+          (progn ; open f.ts instead of f.js
+            (let (($ext (file-name-extension $path))
+                   ($fnamecore (file-name-sans-extension $path)))
+              (if (and (string-equal $ext "js")
+                    (file-exists-p (concat $fnamecore ".ts")))
+                (find-file (concat $fnamecore ".ts"))
+                (find-file $path))))
+          (if (file-exists-p (concat $path ".el"))
+            (find-file (concat $path ".el"))
+            (when (y-or-n-p (format "file no exist: 「%s」. Create?" $path))
+              (find-file $path ))))))))
+
+
+(global-set-key (kbd "C-c C-x C-f") #'open-file-path-at-point)
+
+(defun xah-copy-file-path (&optional *dir-path-only-p)
+  "Copy the current buffer's file path or dired path to `kill-ring'.
+Result is full path.
+If `universal-argument' is called first, copy only the dir path.
+URL `http://ergoemacs.org/emacs/emacs_copy_file_path.html'
+Version 2016-07-17"
+  (interactive "P")
+  (let ((-fpath
+          (if (equal major-mode 'dired-mode)
+            (expand-file-name default-directory)
+            (if (null (buffer-file-name))
+              (user-error "Current buffer is not associated with a file.")
+              (buffer-file-name)))))
+    (kill-new
+      (if (null *dir-path-only-p)
+        (progn
+          (message "File path copied: 「%s」" -fpath)
+          -fpath
+          )
+        (progn
+          (message "Directory path copied: 「%s」" (file-name-directory -fpath))
+          (file-name-directory -fpath))))))
 
 ;; ##################################################
 ;;
@@ -1034,7 +1121,7 @@
 ;; AUTOCOMPLETE
 
 ;; *********************************
-;;; ** Company
+;;; Company
 
 (use-package company
   :ensure t
@@ -1443,8 +1530,8 @@ Adapted from `describe-function-or-variable'."
   (setq-default hippie-expand-try-functions-list
     '(yas-hippie-try-expand
        company-indent-or-complete-common
-       emmet-expand-yas
        emmet-expand-line
+       emmet-expand-yas
        indent-according-to-mode
        ))
   )
