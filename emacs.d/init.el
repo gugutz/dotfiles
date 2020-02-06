@@ -236,6 +236,7 @@
 ;; restores emacs state when closed
 
 (use-package desktop
+  :disabled
   :ensure nil
   :bind
   ("C-c s" . desktop-save-in-desktop-dir)
@@ -315,6 +316,8 @@
 
 (global-set-key (kbd "C-x k") #'kill-current-buffer)
 
+;; refresh buffer with F5
+(global-set-key [f5] '(lambda () (interactive) (revert-buffer nil t nil)))
 
 ;; ##################################################
 ;;
@@ -457,8 +460,8 @@
   ;; SPC keybindings
   (with-eval-after-load 'evil
     (define-key evil-normal-state-map (kbd "SPC b") 'counsel-switch-buffer)
-    (define-key evil-normal-state-map (kbd "SPC e") 'counsel-find-file)
-    (define-key evil-normal-state-map (kbd "SPC f") 'counsel-projectile-find-file)
+    (define-key evil-normal-state-map (kbd "SPC f f") 'counsel-find-file)
+    (define-key evil-normal-state-map (kbd "SPC p f") 'counsel-projectile-find-file)
     (define-key evil-normal-state-map (kbd "SPC a g") 'counsel-ag)
     (define-key evil-normal-state-map (kbd "SPC r g") 'counsel-rg)
     )
@@ -1984,6 +1987,7 @@ Adapted from `describe-function-or-variable'."
   ("M-g b" . magit-blame)
   ("C-x g" . magit-status)
   (:map evil-normal-state-map
+    ("SPC m b" . magit-blame)
     ("SPC m s" . magit-status))
   :config
   (add-hook 'after-save-hook 'magit-after-save-refresh-status t)

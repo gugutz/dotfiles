@@ -223,4 +223,7 @@ echo "## qualirede things"
 echo "############################################################${reset_color}"
 
 echo "## Installing Google Chat electron wrapper"
-yay -S --noconfirm google-chat-linux-git
+yay -S --noconfirm --needed google-chat-linux-git
+
+echo "## Installing Google Chat electron wrapper"
+yay -S --noconfirm --needed toggldesktop
