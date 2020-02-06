@@ -965,6 +965,7 @@ Version 2019-01-16"
 
 
 (global-set-key (kbd "C-c C-x C-f") #'open-file-path-at-point)
+(define-key evil-normal-state-map (kbd "SPC f p") #'open-file-path-at-point)
 
 ;; *********************************
 ;;
