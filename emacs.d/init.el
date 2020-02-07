@@ -2666,21 +2666,21 @@ Adapted from `describe-function-or-variable'."
               (projectile-mode-line-function)))
 
     ;; nyan cat
-    "%2 "
-    '(:eval (when (bound-and-true-p nyan-mode)
-              (nyan-create)))
+    ;; "%2 "
+    ;; '(:eval (when (bound-and-true-p nyan-mode)
+    ;;           (nyan-create)))
 
 
     ;; party parrot
-    "%2 "
-    '(:eval (when (bound-and-true-p parrot-mode)
-              (parrot-create)))
+    ;; "%2 "
+    ;; '(:eval (when (bound-and-true-p parrot-mode)
+    ;;           (parrot-create)))
 
-    ;; spaces to align right
-    '(:eval (propertize
-              " " 'display
-              `((space :align-to (- (+ right right-fringe right-margin)
-                                   ,(+ 60 (string-width mode-name))))))) ;; the bigger the number, less space is added
+    ;; ;; spaces to align right
+    ;; '(:eval (propertize
+    ;;           " " 'display
+    ;;           `((space :align-to (- (+ right right-fringe right-margin)
+    ;;                                ,(+ 60 (string-width mode-name))))))) ;; the bigger the number, less space is added
 
 
 
