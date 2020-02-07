@@ -1,0 +1,21 @@
+# -*- mode: snippet -*-
+# contributor: Translated to yasnippet by sublime-snippet import
+# key: ngcomponent
+# name: Angular 2 component snippet
+# --
+
+import { Component, OnInit } from '@angular/core';
+      
+@Component({
+  selector: '${1:selector}',
+  templateUrl: '${1:selector}.component.html',
+  styleUrls: ['$1.component.scss']
+})
+
+export class ${1:$(replace-regexp-in-string "-" "" (capitalize yas-text))}Component implements OnInit {
+  constructor() { }
+
+  ngOnInit() { }
+
+  $4
+}

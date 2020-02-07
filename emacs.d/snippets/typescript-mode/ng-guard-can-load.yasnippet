@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# contributor: Translated to yasnippet by sublime-snippet import
+# key: ng2-guard-can-load
+# name: Angular CanLoad guard
+# --
+
+import { Injectable } from '@angular/core';
+import { CanLoad, Route } from '@angular/router';
+
+@Injectable()
+export class ${1:NameGuard} implements CanLoad {
+  constructor() { }
+
+  canLoad(route: Route) {
+    return true;
+  }
+}

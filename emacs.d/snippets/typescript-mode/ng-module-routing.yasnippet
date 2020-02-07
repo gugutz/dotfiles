@@ -1,0 +1,22 @@
+# -*- mode: snippet -*-
+# contributor: Translated to yasnippet by sublime-snippet import
+# key: ng2-module-routing
+# name: Angular routing module file (forChild)
+# --
+
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { ${1:Name}Component } from './${2:name}.component';
+
+const routes: Routes = [
+  { path: 'path', component: ${1:Name}Component },
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
+})
+export class ${1:Name}RoutingModule { }
+
+export const routedComponents = [${1:Name}Component];
