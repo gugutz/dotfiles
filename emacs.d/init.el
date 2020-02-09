@@ -228,77 +228,6 @@
   (setq save-place-file "~/.emacs.d/config/places")
   )
 
-;; *********************************
-;;
-;; desktop
-
-;; saves sessions, like open files, buffers, variables
-;; restores emacs state when closed
-
-(use-package desktop
-  :disabled
-  :ensure nil
-  :bind
-  ("C-c s" . desktop-save-in-desktop-dir)
-  :init
-  ;; use only one desktop
-  (setq desktop-dirname "~/.emacs.d/cache/")
-  (setq desktop-base-file-name (concat cache-dir "emacs.desktop"))
-  (setq desktop-base-lock-name (concat cache-dir "emacs.desktop.lock"))
-
-  (setq desktop-restore-eager 5) ;; restore 5 buffers immediately. the others restore lazily
-  (setq desktop-load-locked-desktop t)
-  (setq desktop-files-not-to-save "^$")
-  (setq desktop-buffers-not-to-save
-    (concat "\\("
-      "^nn\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
-      "\\|\\.emacs.*\\|\\.diary\\|\\.newsrc-dribble\\|\\.bbdb"
-      "\\)$"))
-  :config
-  (desktop-save-mode t)
-  (add-to-list 'desktop-modes-not-to-save 'dired-mode)
-  (add-to-list 'desktop-modes-not-to-save 'Info-mode)
-  (add-to-list 'desktop-modes-not-to-save 'info-lookup-mode)
-  (add-to-list 'desktop-modes-not-to-save 'fundamental-mode)
-  (add-to-list 'desktop-modes-not-to-save 'completion-list-mode)
-
-  ;; remove desktop after it's been read
-  (add-hook 'desktop-after-read-hook
-    '(lambda ()
-       ;; desktop-remove clears desktop-dirname
-       (setq desktop-dirname-tmp desktop-dirname)
-       (desktop-remove)
-       (setq desktop-dirname desktop-dirname-tmp)))
-
-  (defun saved-session ()
-    (file-exists-p (concat desktop-dirname "/" desktop-base-file-name)))
-
-  ;; use session-restore to restore the desktop manually
-  (defun session-restore ()
-    "Restore a saved emacs session."
-    (interactive)
-    (if (saved-session)
-      (desktop-read)
-      (message "No desktop found.")))
-
-  ;; use session-save to save the desktop manually
-  (defun session-save ()
-    "Save an emacs session."
-    (interactive)
-    (if (saved-session)
-      (if (y-or-n-p "Overwrite existing desktop? ")
-        (desktop-save-in-desktop-dir)
-        (message "Session not saved."))
-      (desktop-save-in-desktop-dir)))
-
-  ;; ask user whether to restore desktop at start-up
-  (add-hook 'after-init-hook
-    '(lambda ()
-       (if (saved-session)
-         (if (y-or-n-p "Restore desktop? ")
-           (session-restore)))))
-  )
-
 ;; ##################################################
 ;;
 ;;; Improvements of Emacs native functions
@@ -771,7 +700,6 @@
   :hook
   (dired-mode . all-the-icons-dired-mode)
   )
-;; * hippie-expand (native emacs expand function)
 
 
 
@@ -860,45 +788,67 @@
 
 ;; *********************************
 ;;
-;; ** smartparens
+;; electric pair mode
 
-(use-package smartparens
-  :ensure t
+(use-package electric-pair-mode
+  :ensure nil
   :defer t
   :diminish
   :hook
-  (prog-mode . smartparens-mode)
+  (prog-mode . electric-pair-mode)
   :config
-  ;; (smartparens-global-mode +1)
-  ;; Load default smartparens rules for various languages
-  (require 'smartparens-config)
-  (sp-pair "<" ">" :actions '(wrap))
-
-  ;; Overlays are too distracting and not terribly helpful. show-parens does
-  ;; this for us already (and is faster), so...
-  (setq sp-highlight-pair-overlay nil)
-  (setq sp-highlight-wrap-overlay nil)
-  (setq sp-highlight-wrap-tag-overlay nil)
-  (with-eval-after-load 'evil
-    ;; But if someone does want overlays enabled, evil users will be stricken
-    ;; with an off-by-one issue where smartparens assumes you're outside the
-    ;; pair when you're really at the last character in insert mode. We must
-    ;; correct this vile injustice.
-    (setq sp-show-pair-from-inside t)
-    ;; ...and stay highlighted until we've truly escaped the pair!
-    (setq sp-cancel-autoskip-on-backward-movement nil))
-
-  ;; dont try to escape quotes in strings
-  (setq sp-escape-quotes-after-insert nil)
-
-  (add-hook 'minibuffer-setup-hook
-    (defun init-smartparens-in-minibuffer-maybe-h ()
-      "Enable `smartparens-mode' in the minibuffer, during `eval-expression',
-`pp-eval-expression' or `evil-ex'."
-      (when (memq this-command '(eval-expression pp-eval-expression evil-ex))
-        (smartparens-mode))))
-
+  (add-hook 'prog-mode-hook
+    (lambda ()
+      (define-key prog-mode-map "\"" 'electric-pair)
+      (define-key prog-mode-map "\'" 'electric-pair)
+      (define-key prog-mode-map "(" 'electric-pair)
+      (define-key prog-mode-map "[" 'electric-pair)
+      (define-key prog-mode-map "{" 'electric-pair)))
+  (add-hook 'web-mode-hook
+    (lambda ()
+      (define-key web-mode-map "<" 'electric-pair)))
   )
+;; ;; *********************************
+;; ;;
+;; ;; ** smartparens
+
+;; (use-package smartparens
+;;   :ensure t
+;;   :defer t
+;;   :diminish
+;;   :hook
+;;   (prog-mode . smartparens-mode)
+;;   :config
+;;   ;; (smartparens-global-mode +1)
+;;   ;; Load default smartparens rules for various languages
+;;   (require 'smartparens-config)
+;;   (sp-pair "<" ">" :actions '(wrap))
+
+;;   ;; Overlays are too distracting and not terribly helpful. show-parens does
+;;   ;; this for us already (and is faster), so...
+;;   (setq sp-highlight-pair-overlay nil)
+;;   (setq sp-highlight-wrap-overlay nil)
+;;   (setq sp-highlight-wrap-tag-overlay nil)
+;;   (with-eval-after-load 'evil
+;;     ;; But if someone does want overlays enabled, evil users will be stricken
+;;     ;; with an off-by-one issue where smartparens assumes you're outside the
+;;     ;; pair when you're really at the last character in insert mode. We must
+;;     ;; correct this vile injustice.
+;;     (setq sp-show-pair-from-inside t)
+;;     ;; ...and stay highlighted until we've truly escaped the pair!
+;;     (setq sp-cancel-autoskip-on-backward-movement nil))
+
+;;   ;; dont try to escape quotes in strings
+;;   (setq sp-escape-quotes-after-insert nil)
+
+;;   (add-hook 'minibuffer-setup-hook
+;;     (defun init-smartparens-in-minibuffer-maybe-h ()
+;;       "Enable `smartparens-mode' in the minibuffer, during `eval-expression',
+;; `pp-eval-expression' or `evil-ex'."
+;;       (when (memq this-command '(eval-expression pp-eval-expression evil-ex))
+;;         (smartparens-mode))))
+
+;;   )
 
 ;; *********************************
 ;;
@@ -1033,24 +983,7 @@ Version 2016-07-17"
     (require 'helm-source nil t))
   )
 
-;; *********************************
-;;
-;; counsel etags
 
-(use-package counsel-etags
-  :ensure t
-  :bind
-  (:map evil-normal-state-map
-    ("SPC c f t" . counsel-etags-find-tag-at-point))
-  :init
-  (add-hook 'prog-mode-hook
-    (lambda ()
-      (add-hook 'after-save-hook
-        'counsel-etags-virtual-update-tags 'append 'local)))
-  :config
-  (setq counsel-etags-update-interval 60)
-  (push "build" counsel-etags-ignore-directories)
-  )
 
 ;; ##################################################
 ;;
@@ -1595,7 +1528,8 @@ Adapted from `describe-function-or-variable'."
     )
   :config
   (setq-default hippie-expand-try-functions-list
-    '(yas-hippie-try-expand
+    '(
+       yas-hippie-try-expand
        company-indent-or-complete-common
        emmet-expand-line
        emmet-expand-yas
@@ -1699,6 +1633,7 @@ Adapted from `describe-function-or-variable'."
   :defer t
   :hook
   (emacs-lisp-mode . aggressive-indent-mode)
+  (prog-mode . aggressive-indent-mode)
   (css-mode . aggressive-indent-mode)
   :config
   (setq aggressive-indent-comments-too t)
