@@ -2,6 +2,27 @@
 #
 # ~/.xinitrc
 #
+
+# Sourcing xprofile from a session started with xinit
+#
+# The xprofile files are natively sourced by the following display managers:
+# - GDM - /etc/gdm/Xsession
+# - LightDM - /etc/lightdm/Xsession
+# - LXDM - /etc/lxdm/Xsession
+# - SDDM - /usr/share/sddm/scripts/Xsession
+#
+# In case of any display manager that isnt in the above list, xprofile has to be source from xinitrc
+# It is possible to source xprofile from a session started with one of the following programs:
+# - startx
+# - xinit
+# - XDM
+# - Any other Display manager which uses ~/.xsession or ~/.xinitrc
+# All of these execute, directly or indirectly, ~/.xinitrc or /etc/X11/xinit/xinitrc if it does not exist. That is why xprofile has to be sourced from these files.
+#
+# Make sure this is before the 'exec' command or it won't be sourced.
+[ -f /etc/xprofile ] && . /etc/xprofile
+[ -f ~/.xprofile ] && . ~/.xprofile
+
 # Executed by startx (run your window manager from here)
 
 userresources=$HOME/.Xresources

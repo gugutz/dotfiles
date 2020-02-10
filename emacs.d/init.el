@@ -29,6 +29,17 @@
 
 (use-package diminish :ensure t)
 
+;; quelpa
+;;
+(use-package quelpa
+  :ensure t
+  :if (require 'quelpa nil t)
+  )
+
+(use-package quelpa-use-package
+  :ensure t
+  :after quelpa
+  )
 
 ;; ##################################################
 ;;
@@ -121,6 +132,11 @@
 (defconst cache-dir (eval-when-compile (concat emacs-dir "cache/")))
 
 
+;; Resolve symlinks when opening files, so that any operations are conducted
+;; from the file's true directory (like `find-file').
+(setq find-file-visit-truename t)
+(setq vc-follow-symlinks t)
+
 ;; Prevent emacs to create lockfiles (.#files#)
 (setq create-lockfiles nil)
 
@@ -154,6 +170,15 @@
 
 ;; **********************************
 ;;
+;;; Extra file extensions to support
+
+(push '("/LICENSE\\'" . text-mode) auto-mode-alist)
+(push '("\\.log\\'" . text-mode) auto-mode-alist)
+(push '("\\.env\\'" . sh-mode) auto-mode-alist)
+
+
+;; **********************************
+;;
 ;;; Minibuffer settings
 
 ;; Show current key-sequence in minibuffer, like vim does. Any feedback after
@@ -163,18 +188,17 @@
 ;; Typing yes/no is obnoxious when y/n will do
 (fset #'yes-or-no-p #'y-or-n-p)
 
+;; Expand the minibuffer to fit multi-line text displayed in the echo-area. This
+;; doesn't look too great with direnv, however...
+(setq resize-mini-windows 'grow-only)
+
+;; But don't let the minibuffer grow beyond this size
+(setq max-mini-window-height 0.15)
+
 ;; Try really hard to keep the cursor from getting stuck in the read-only prompt
 ;; portion of the minibuffer.
 (setq minibuffer-prompt-properties '(read-only t intangible t cursor-intangible t face minibuffer-prompt))
 (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
-;; **********************************
-;;
-;;; Extra file extensions to support
-
-(push '("/LICENSE\\'" . text-mode) auto-mode-alist)
-(push '("\\.log\\'" . text-mode) auto-mode-alist)
-(push '("\\.env\\'" . sh-mode) auto-mode-alist)
 
 
 ;; ##################################################
@@ -485,6 +509,17 @@
            (ivy-rich-package-version (:width 12 :face font-lock-comment-face))
            (ivy-rich-package-archive-summary (:width 7 :face font-lock-builtin-face))
            (ivy-rich-package-install-summary (:width 23 :face font-lock-doc-face))))
+       counsel-projectile-find-file
+       (:columns
+         ((ivy-rich-switch-buffer-icon (:width 2))
+           (ivy-rich-candidate (:width 30))
+           (ivy-rich-switch-buffer-size (:width 7))
+           (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
+           (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))
+           (ivy-rich-switch-buffer-project (:width 15 :face success))
+           (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
+         :predicate
+         (lambda (cand) (get-buffer cand)))
        )
     )
   :config
@@ -1010,20 +1045,6 @@ Version 2016-07-17"
 (global-set-key (kbd "C-M-+") 'balance-windows-area)
 
 
-;; *********************************
-;; Zoom text - Increase and decrease text size
-
-;; mouse scrolls are binded differently depending on the system
-(if (eq system-type 'gnu/linux)
-  (global-set-key (kbd "<C-mouse-4>") 'text-scale-increase)
-  (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
-  )
-(if (eq system-type 'windows-nt)
-  (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
-  (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
-  )
-(global-set-key (kbd "C-=") 'text-scale-increase)
-(global-set-key (kbd "C--") 'text-scale-decrease)
 
 ;; *********************************
 ;; ** Eyebrowse
@@ -1084,6 +1105,44 @@ Version 2016-07-17"
   (global-set-key (kbd "C-S-K") 'windmove-up)
   (global-set-key (kbd "C-S-J") 'windmove-down)
   )
+
+;; ##################################################
+;;
+;; ** FONTS AND ICONS
+
+;; set default font
+
+;; Find the first font in the list and use it
+(require 'cl)
+(defun font-candidate (&rest fonts)
+  "Return existing font which first match."
+  (find-if (lambda (f) (find-font (font-spec :name f))) fonts))
+
+;; define list of fonts to be used in the above function
+;; the first one found will be used
+(set-face-attribute 'default nil :font (font-candidate '
+                                         "Consolas-11:weight=normal"
+                                         "DejaVu Sans Mono-11:weight=normal"
+                                         "Hack-11:weight=normal"
+                                         "Droid Sans Mono-10:weight=normal"
+                                         "Ubuntu Mono-12:weight=normal"
+                                         ))
+
+
+;; *********************************
+;; Zoom text - Increase and decrease text size
+;; mouse scrolls are binded differently depending on the system
+(if (eq system-type 'gnu/linux)
+  (global-set-key (kbd "<C-mouse-4>") 'text-scale-increase)
+  (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
+  )
+(if (eq system-type 'windows-nt)
+  (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+  (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
+  )
+(global-set-key (kbd "C-=") 'text-scale-increase)
+(global-set-key (kbd "C--") 'text-scale-decrease)
+
 
 
 ;; ##################################################
@@ -2396,9 +2455,25 @@ Adapted from `describe-function-or-variable'."
   )
 
 ;; ========================================
+;;
 ;;; UI -> Modeline
+
 ;; *********************************
 ;;
+;; mini modeline
+;; this show modeline information on the minibuffer
+(use-package mini-modeline
+  :quelpa (mini-modeline :repo "kiennq/emacs-mini-modeline" :fetcher github)
+  :init
+  (setq mini-modeline-color "#202020") ;; Background of mini-modeline. Will be set if mini-modeline-enhance-visual is t.
+  (setq mini-modeline-enhance-visual t) ;; Enhance minibuffer and window's visibility. This will enable window-divider-mode since without the mode line, two continuous windows are nearly indistinguishable.
+  (setq mini-modeline-echo-duration 4) ;; default 2 ; Duration to keep display echo. mini-modeline will display the message which has been echoed to echo area as part of mode line. Those echo will be automatically clear after this interval. Check out the gif to see it in action.
+  (setq mini-modeline-update-interval 0.1) ;; default 0.1 ; The minimum interval to update mini-modeline. If you found mini-modeline is being updated to frequently, you can customize this variable.
+  (setq mini-modeline-frame nil) ;; default nil ; Frame to display mini-modeline on. nil means current selected frame.
+  (setq mini-modeline-truncate-p t) ;; default t ; Truncates the mini-modeline to fit in one line.
+  :config
+  (mini-modeline-mode t)
+  )
 
 ;; *********************************
 ;; Modified or Read Only

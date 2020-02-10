@@ -23,9 +23,15 @@ set ffs=unix,dos,mac
 
 " With a map leader it's possible to do extra key combinations
 " like <leader>w saves the current file
-let mapleader = ","
+let g:mapleader = "\<Space>"
+let g:maplocalleader = ","
+" Map leader and localleader to activate which key when pressed
+nnoremap <silent> <leader> :<c-u>WhichKey '<Space>'<CR>
+nnoremap <silent> <localleader> :<c-u>WhichKey ','<CR>
+
 
 " Fast saving
+
 nmap <leader>w :w!<cr>
 
 " Fast quitting
@@ -35,14 +41,48 @@ nmap <leader>q :q!<cr>
 " (useful for handling the permission-denied error)
 command! W w !sudo tee % > /dev/null
 
+" quicly edit/reload configuration file
+nnoremap cfo :e $MYVIMRC<CR>
+nnoremap cfs :so $MYVIMRC<CR>
+
 " auto reload (source) vimrc if changed
 " this makes unnecessary to restart vim after adding plugins or changing something in the config
 if has ('autocmd') " Remain compatible with earlier versions
     augroup vimrc     " Source vim configuration upon save
-        autocmd! BufWritePost $MYVIMRC source % | echom "Reloaded " . $MYVIMRC 
+        autocmd! BufWritePost $MYVIMRC source % | echom "Reloaded " . $MYVIMRC | redraw
         autocmd! BufWritePost $MYGVIMRC if has('gui_running') | so % | echom "Reloaded " . $MYGVIMRC | endif | redraw
     augroup END
 endif " has autocmd
+
+
+" Clipboard
+" Vim commands such as :yank or :paste operate with the unnamed register, which by default corresponds to the "* register.
+" If the +clipboard feature is available, the "* register is reflected to the PRIMARY buffer in X.
+
+" To change the default register, you can :set clipboard=unnamedplus to use the "+ register instead.
+" The "+ register corresponds to the CLIPBOARD buffer in X.
+
+" With this addition, copied text from vim can be pasted by CTRL+V and copied text from CTRL+C can be pasted into vim with ‘p’.
+
+" If you want to delete text without overwriting your register, you can run “_ before your command, such as:
+
+" _dd
+" to delete a line.
+"
+set clipboard=unnamed " for windows clipboards
+set clipboard=unnamedplus " for linux clipboards
+
+set clipboard+=unnamed  " use the clipboards of vim and win
+set paste               " Paste from a windows or from vim
+set go+=a               " Visual selection automatically copied to the clipboard
+
+" copy and paste
+vmap <C-c> "+yi
+vmap <C-x> "+c
+vmap <C-v> c<ESC>"+p
+imap <C-v> <ESC>"+pa
+
+
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -175,7 +215,7 @@ set incsearch
 " Pressing ,ss will toggle and untoggle spell checking
 map <leader>ss :setlocal spell!<cr>
 
-" Spellchecking shortcuts 
+" Spellchecking shortcuts
 map <leader>sn ]s
 map <leader>sp [s
 map <leader>sa zg
@@ -223,7 +263,7 @@ noremap <Leader>rx :call RunFile()<CR>
 
 
 """""""""""""""""""""""""""""""""""""""
-" HTML 
+" HTML
 
 " auto indent HTML files on save and in open
 " autocmd BufWritePre,BufRead *.html :normal gg=G
@@ -239,12 +279,12 @@ noremap <Leader>rr :!rake<CR>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => SYNTAX HIGHLIGHTING
 
-" enable syntax highlighting
-syntax enable
-
 " Native vim filetype plugin enables syntax highlighting base on file type
 filetype on
 filetype plugin on
+
+" enable syntax highlighting
+syntax enable
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -279,7 +319,7 @@ set omnifunc=syntaxcomplete#Complete
 " set title of tmux window to currently open file in vim
 autocmd BufEnter * call system("tmux rename-window " . expand("%:t"))
 autocmd VimLeave * call system("tmux setw automatic-rename")
-autocmd BufEnter * let &titlestring = ' ' . expand("%:t")                                                                 
+autocmd BufEnter * let &titlestring = ' ' . expand("%:t")
 set title
 
 
@@ -362,8 +402,8 @@ au TabLeave * let g:lasttab = tabpagenr()
 " Super useful when editing files in the same directory
 map <leader>te :tabedit <c-r>=expand("%:p:h")<cr>/
 " Map <Space> to / (search) and Ctrl-<Space> to ? (backwards search)
-map <space> /
-map <c-space> ?
+" map <space> /
+" map <c-space> ?
 
 " Disable highlight when <leader><cr> is pressed
 map <silent> <leader><cr> :noh<cr>
@@ -432,7 +472,7 @@ Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'unblevable/quick-scope'            " Highlight jump characters
 Plug 'francoiscabrol/ranger.vim'         " Install ranger-vim integration with ranger file manager
-Plug 'christoomey/vim-tmux-navigator'    
+Plug 'christoomey/vim-tmux-navigator'
 Plug 'RRethy/vim-illuminate'             " illuminate other uses of current word under cursor
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-git'
@@ -451,6 +491,7 @@ Plug 'xojs/vim-xo'                       " Install vim-xo for xo linting support
 Plug 'mxw/vim-jsx'                       " JSX syntax colors and indent support. Depends on vim-javascript
 Plug 'tpope/vim-rake'
 Plug 'tpope/vim-bundler'
+Plug 'tpope/vim-rsi'
 Plug 'vim-ruby/vim-ruby'
 Plug 'tpope/vim-rails'
 Plug 'sunaku/vim-ruby-minitest'
@@ -475,6 +516,10 @@ Plug 'mhinz/vim-mix-format'
 Plug 'vim-scripts/vim-auto-save'
 Plug 'nathanaelkane/vim-indent-guides'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" vim which key on-demand lazy load
+Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
+
+
 
 " Initialize plugin system
 call plug#end()
@@ -506,7 +551,7 @@ colorscheme codedark
 " The above command will change the 'completeopt' option so that Vim's popup menu doesn't select the first completion item, but rather just inserts the longest common text of all matches; and the menu will come up even if there's only one match.
 :set completeopt=longest,menuone
 
-" The following mapping will change the behavior of the <Enter> key when the popup menu is visible. In that case the Enter key will simply select the highlighted menu item, just as <C-Y> does. 
+" The following mapping will change the behavior of the <Enter> key when the popup menu is visible. In that case the Enter key will simply select the highlighted menu item, just as <C-Y> does.
 :inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 
 " Navigate through suggestions with C-j and C-k
@@ -541,6 +586,7 @@ let g:airline_powerline_fonts=1                     " needed by devicons
 
 " Toogle NERDTree
 map <leader>e :NERDTreeToggle<CR>
+map <F8> :NERDTreeToggle<CR>
 
 " Open NerdTree on Vim startup
 autocmd VimEnter * NERDTree

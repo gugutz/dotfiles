@@ -19,6 +19,10 @@ case ${TERM} in
 		;;
 esac
 
+# saving this unicode because its cool ⏎
+# make caps lock behave like esc and control
+/usr/bin/setxkbmap -option 'caps:ctrl_modifier'
+/usr/bin/xcape -e 'Caps_Lock=Escape' -t 100
 
 #################################################
 # my shell aliases
