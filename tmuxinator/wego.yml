@@ -1,7 +1,7 @@
 # ~/.tmuxinator/sample.yml
 
 name: wego
-root: ~/code/wego
+root: ~/code/out/wego
 
 # Optional. tmux socket
 # socket_name: foo
@@ -43,8 +43,8 @@ windows:
       layout: even-horizontal
       # layout: 283a,239x64,0,0{119x64,0,0,0,119x64,120,0[119x32,120,0,2,119x31,120,33,3]}
       panes:
-        - ionic serve
         - git status
+        - ionic serve
   - info:
       layout: even-horizontal
       panes:

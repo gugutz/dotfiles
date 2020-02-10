@@ -218,6 +218,12 @@ fi
 
 
 
+echo "## xcape for keyboard modifications"
+sudo pacman --noconfirm --needed xcape
+
+echo "## installing fontpreview for terminal utility"
+yay --noconfirm --needed fontpreview
+
 echo "%{green}############################################################"
 echo "## qualirede things"
 echo "############################################################${reset_color}"
@@ -225,5 +231,5 @@ echo "############################################################${reset_color}
 echo "## Installing Google Chat electron wrapper"
 yay -S --noconfirm --needed google-chat-linux-git
 
-echo "## Installing Google Chat electron wrapper"
-yay -S --noconfirm --needed toggldesktop
+echo "## Installing clockify time tracker"
+yay -S --noconfirm --needed clockify-desktop

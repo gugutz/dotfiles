@@ -45,14 +45,17 @@ command! W w !sudo tee % > /dev/null
 nnoremap cfo :e $MYVIMRC<CR>
 nnoremap cfs :so $MYVIMRC<CR>
 
+
+" #######################################################
 " auto reload (source) vimrc if changed
 " this makes unnecessary to restart vim after adding plugins or changing something in the config
-if has ('autocmd') " Remain compatible with earlier versions
-    augroup vimrc     " Source vim configuration upon save
-        autocmd! BufWritePost $MYVIMRC source % | echom "Reloaded " . $MYVIMRC | redraw
-        autocmd! BufWritePost $MYGVIMRC if has('gui_running') | so % | echom "Reloaded " . $MYGVIMRC | endif | redraw
-    augroup END
-endif " has autocmd
+
+" if has ('autocmd') " Remain compatible with earlier versions
+"     augroup vimrc     " Source vim configuration upon save
+"         autocmd! BufWritePost $MYVIMRC source % | echom "Reloaded " . $MYVIMRC | redraw
+"         autocmd! BufWritePost $MYGVIMRC if has('gui_running') | so % | echom "Reloaded " . $MYGVIMRC | endif | redraw
+"     augroup END
+" endif " has autocmd
 
 
 " Clipboard
@@ -461,7 +464,8 @@ Plug 'tomasiser/vim-code-dark'
 Plug 'vim-airline/vim-airline'           " Vim Airline statusbar
 Plug 'vim-airline/vim-airline-themes'
 Plug 'mkitt/tabline.vim'                 " Cleaner tabs
-Plug 'kien/rainbow_parentheses.vim'      " Colour matched brackets
+" Colour matched brackets
+Plug 'kien/rainbow_parentheses.vim'      
 Plug 'ryanoasis/vim-devicons'            " Icons for dev file types
 Plug 'editorconfig/editorconfig-vim'
 Plug 'tpope/vim-surround'
@@ -482,13 +486,14 @@ Plug 'amiorin/vim-project'
 Plug 'pbrisbin/vim-runfile'
 Plug 'chrisbra/Colorizer'                " Show hex codes as colours
 Plug 'mattn/emmet-vim'
-Plug 'SirVer/ultisnips'
+" Plug 'SirVer/ultisnips' " tries to use py3 instead of python and bugs the hell out
 Plug 'honza/vim-snippets'
 Plug 'adelarsq/vim-matchit' " Matchit extends the % function, navigating to more than a single character
 Plug 'valloric/MatchTagAlways'           " Show matching and closing tags
 Plug 'pangloss/vim-javascript'
 Plug 'xojs/vim-xo'                       " Install vim-xo for xo linting support
 Plug 'mxw/vim-jsx'                       " JSX syntax colors and indent support. Depends on vim-javascript
+"Rubythins
 Plug 'tpope/vim-rake'
 Plug 'tpope/vim-bundler'
 Plug 'tpope/vim-rsi'
@@ -524,7 +529,7 @@ Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
 " Initialize plugin system
 call plug#end()
 
-"######################################
+" ######################################
 " PLUGINS SETTINGS
 
 " Disable folding on Vim Markdown
@@ -538,11 +543,15 @@ set completefunc=syntaxcomplete#Complete
 " only becomes available after the plug#end() line
 colorscheme codedark
 
-
+"############################################
 " ALE LINTER SETTINGS
 " show linting errors on a separate window
 " let g:ale_open_list = 1
 " let g:ale_list_window_size = 5
+
+
+"############################################
+" AUTOCOMPLETE
 
 
 " VIM NATIVE'S OMNICOMPLETE COMPLETION ENGINE SETTINGS
@@ -563,16 +572,19 @@ inoremap <expr> <C-k> pumvisible() ? "\<C-P>" : "\<C-k>"
 " autocmd FileType html set omnifunc=htmlcomplete#CompleteTags
 " autocmd FileType css set omnifunc=csscomplete#CompleteCSS
 
-"""""""""""""""""""""""""""""""""""""""
+"############################################
+" SNIPPETS
+
 " UltSnips Snippets settings
 " Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
-let g:UltiSnipsExpandTrigger="<S-tab>"
-let g:UltiSnipsJumpForwardTrigger="<c-b>"
-let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+" let g:UltiSnipsExpandTrigger="<S-tab>"
+" let g:UltiSnipsJumpForwardTrigger="<c-b>"
+" let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
 " If you want :UltiSnipsEdit to split your window.
-let g:UltiSnipsEditSplit="vertical"
+" let g:UltiSnipsEditSplit="vertical"
 
+"############################################
 " VIM AIRLINE SETTINGS
 " set rtp+=/usr/lib/python3.6/site-packages/powerline/bindings/vim
 let g:airline_theme='codedark'                        " this airline theme resembles VSCode blueish status bar
@@ -586,7 +598,7 @@ let g:airline_powerline_fonts=1                     " needed by devicons
 
 " Toogle NERDTree
 map <leader>e :NERDTreeToggle<CR>
-map <F8> :NERDTreeToggle<CR>
+set<F8>=<leader>e
 
 " Open NerdTree on Vim startup
 autocmd VimEnter * NERDTree
@@ -605,6 +617,8 @@ let NERDTreeDirArrows = 1
 " autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
+" closenerdtreeonopneninfile
+let NERDTreeQuitOnOpen = 1
 
 "############################################
 " EMMET SETTINGS

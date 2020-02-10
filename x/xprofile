@@ -6,7 +6,7 @@
 # make caps behave like esc and control
 # this can also be made in bashrc, but will only work for each bash session
 # The trailing & puts the xcape command into the background so that it doesn't block your session. The setxkbmap makes its change immediately.
-setxkbmap -option 'caps:ctrl_modifier' && xcape -e 'Caps_Lock=Escape' -t 100 &
+setxkbmap -option 'caps:ctrl_modifier' && xcape -e 'Caps_Lock=Escape' -t 40 &
 # Notice the part -t 100, if you don't set it, you may notice a delay in Esc if you use vim.
 
 

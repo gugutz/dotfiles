@@ -330,6 +330,10 @@ exec TogglDesktop
 assign [class="Toggl Desktop"] → $ws10
 for_window [class="Toggl Desktop"] floating enable
 
+# Clockify
+exec clockify
+assign [class="Clockify"] → $ws10
+for_window [class="Clockify"] floating enable
 
 # terminal -e 'bmenu' && sleep 2 && i3-msg move container to workspace 5
 

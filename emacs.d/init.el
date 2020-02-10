@@ -1121,10 +1121,10 @@ Version 2016-07-17"
 ;; define list of fonts to be used in the above function
 ;; the first one found will be used
 (set-face-attribute 'default nil :font (font-candidate '
-                                         "Consolas-11:weight=normal"
-                                         "DejaVu Sans Mono-11:weight=normal"
                                          "Hack-11:weight=normal"
                                          "Droid Sans Mono-10:weight=normal"
+                                         "Consolas-10:weight=normal"
+                                         "DejaVu Sans Mono-11:weight=normal"
                                          "Ubuntu Mono-12:weight=normal"
                                          ))
 
@@ -1161,6 +1161,10 @@ Version 2016-07-17"
     ("C-c p" . projectile-command-map)
     ("M-S-O p" . counsel-projectile-switch-project)
     )
+  (:map evil-normal-state-map
+    ("SPC p s" . projectile-switch-project)
+    ("SPC p a g" . projectile-ag)
+    ("SPC p r g" . projectile-ripgrep))
   :init
   (setq projectile-completion-system 'ivy)
   (setq projectile-mode-line-prefix "Project -> ")
@@ -1315,6 +1319,7 @@ Version 2016-07-17"
   :config
   ;; general
   (setq lsp-auto-configure t) ;; auto-configure `lsp-ui' and `company-lsp'
+  (setq lsp-enable-indentation nil) ;; NOTE: indentation with lsp is super slow on emacs 26. try again no future versions
   (setq lsp-prefer-flymake :none) ;; t: flymake | nil: lsp-ui | :none -> none of them (flycheck)
   (setq lsp-session-file "~/.emacs.d/config/lsp-session-v1") ;; t: flymake | nil: lsp-ui | :none -> none of them (flycheck)
   ;; angular language server
@@ -1586,6 +1591,8 @@ Adapted from `describe-function-or-variable'."
     ("<tab>" . hippie-expand)
     )
   :config
+  (:map evil-insert-state-map
+    ("<tab>" . company-indent-or-complete-common))
   (setq-default hippie-expand-try-functions-list
     '(
        yas-hippie-try-expand
@@ -1974,13 +1981,13 @@ Adapted from `describe-function-or-variable'."
 (use-package magit
   :ensure t
   :bind
-  ("<tab>" . magit-section-toggle)
   ("M-g s" . magit-status)
   ("M-g f" . magit-find-file)
   ("M-g l" . magit-log)
   ("M-g b" . magit-blame)
   ("C-x g" . magit-status)
-  (:map evil-normal-state-map
+  (:map magit-mode-map
+    ("<tab>" . magit-section-toggle)
     ("SPC m b" . magit-blame)
     ("SPC m s" . magit-status))
   :config
