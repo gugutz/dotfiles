@@ -1,14 +1,92 @@
 {
+  "editor.fontSize": 13,
+  "editor.tabSize": 2,
+  // workaround to use keycodes in order to make xmodmap customizations work
+  "keyboard.dispatch": "keyCode",
+  "files.trimTrailingWhitespace": true,
+  // show trailing whitespaces
+  "editor.renderWhitespace": "boundary",
+  "editor.formatOnSave": true,
+  "[typescript]": {
     "editor.formatOnSave": true,
-
-    "[typescript]": {
-      "editor.formatOnSave": true,
-  "editor.formatOnPaste": true
-  },
-  "[markdown]": {
-    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
     "editor.wordWrap": "on",
     "editor.renderWhitespace": "all",
     "editor.acceptSuggestionOnEnter": "off"
+  },
+  // use # and * to search forward and backward in visual mode
+  "vim.visualstar": true,
+  "vim.easymotion": true,
+  "vim.sneak": true,
+  "vim.incsearch": true,
+  "vim.useSystemClipboard": true,
+  "vim.useCtrlKeys": true,
+  "vim.hlsearch": true,
+  "vim.leader": "<space>",
+  "vim.insertModeKeyBindings": [
+    {
+      "before": [
+        "ctrl+a"
+      ],
+      "commands": [
+        "cursorHome"
+      ]
+    },
+    {
+      "before": [
+        "ctrl+e"
+      ],
+      "commands": [
+        "cursorEnd"
+      ]
+    },
+    {
+      "before": [
+        "ctrl+y"
+      ],
+      "commands": [
+        "editor.action.clipboardPasteAction"
+      ]
+    },
+    {
+      "before": [
+        "ctrl+k"
+      ],
+      "commands": [
+        "editor.action.deleteLines"
+      ]
+    }
+  ],
+  "vim.normalModeKeyBindingsNonRecursive": [
+    {
+      "before": [
+        ":"
+      ],
+      "commands": [
+        "workbench.action.showCommands"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "w"
+      ],
+      "commands": [
+        "workbench.action.files.save"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "o"
+      ],
+      "commands": [
+        "workbench.action.quickSwitchWindow"
+      ]
+    }
+  ],
+  "vim.handleKeys": {
+    "<C-a>": false,
+    "<C-f>": false
   }
 }

@@ -50,3 +50,16 @@ alias path='echo -e ${PATH//:/\\n}'
 alias nowtime='date +"%T"'
 # alias nowtime=now
 alias nowdate='date +"%d-%m-%Y"'
+
+# git aliases
+alias gst='git status'
+alias gsts='git stash'
+alias gstp='git stash pop'
+alias ga='git add'
+alias gcm='git commit -m'
+alias gcam='git commit -m'
+alias gpom='git push origin master'
+alias gplom='git pull origin master'
+alias gpod='git push origin develop'
+alias gplod='git pull origin develop'
+alias glg='git log'
