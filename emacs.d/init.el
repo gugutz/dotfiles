@@ -1987,7 +1987,8 @@ Adapted from `describe-function-or-variable'."
   ("M-g b" . magit-blame)
   ("C-x g" . magit-status)
   (:map magit-mode-map
-    ("<tab>" . magit-section-toggle)
+    ("<tab>" . magit-section-toggle))
+  (:map evil-normal-state-map
     ("SPC m b" . magit-blame)
     ("SPC m s" . magit-status))
   :config
