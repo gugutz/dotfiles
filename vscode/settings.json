@@ -58,14 +58,14 @@
     }
   ],
   "vim.normalModeKeyBindingsNonRecursive": [
-    {
-      "before": [
-        ":"
-      ],
-      "commands": [
-        "workbench.action.showCommands"
-      ]
-    },
+    // {
+    //   "before": [
+    //     ":"
+    //   ],
+    //   "commands": [
+    //     "workbench.action.showCommands"
+    //   ]
+    // },
     {
       "before": [
         "leader",
@@ -88,5 +88,6 @@
   "vim.handleKeys": {
     "<C-a>": false,
     "<C-f>": false
-  }
+  },
+  "go.formatTool": "goimports"
 }
