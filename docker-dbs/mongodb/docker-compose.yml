@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  mongo:
+    image: mongo:latest
+    restart: always
+    environment:
+      # MONGO_INITDB_ROOT_USERNAME: root
+      # MONGO_INITDB_ROOT_PASSWORD: example
+      # MONGO_DATA_DIR=/data/db
+      # MONGO_LOG_DIR=/dev/null
+      MONGODB_USER: "user" 
+      MONGODB_PASS: "pass"
+    volumes:
+      - ./data/db:/data/db
+      # - db-data:./data/db:/data/db
+    ports:
+      - "27017:27017"
+    command: mongod --quiet --logpath=/dev/null
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - "8081:8081"
+    depends_on:
+      - "mongo"
+    # environment:
+      # ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      # ME_CONFIG_MONGODB_ADMINPASSWORD: example
+
+
+
