@@ -91,6 +91,11 @@ export PATH=$PATH:/home/tau/.nvm/versions/node/v10.12.0/bin
 # Add gradle in PATH
 export PATH=$PATH:/opt/gradle/gradle-4.8/bin
 
+# add spring boot in path
+if [ -f ~/.bashrc ]; then
+    echo ".profile is sourcing " ~/.bashrc
+    export PATH=$PATH:/opt/spring
+fi
 # Add $GOPATH env var
 # export GOPATH=/srv/tau/code/go
 # export PATH=$PATH:$GOPATH/bin

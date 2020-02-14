@@ -2,21 +2,59 @@
 " my vim setup
 """""""""""""""""""""""""""""""""""""""""""""""
 
+" Configuration only for Neovim:
+
+if has('nvim')
+        tnoremap <Esc> <C-\><C-n>
+endif
+
+" Configuration only for Vim
+
+if !has('nvim')
+	" settings that are default in neovim
+	set encoding=utf8         " Set utf8 as standard encoding and en_US as the standard language
+	set autoindent
+	set autoread              " Set to auto read when a file is changed from the outside
+
+
+  set backspace=indent,eol,start  " Configure backspace so it acts as it should act
+
+
+	set belloff=all
+	set sidescroll=1
+
+	set history=10000  " Sets how many lines of history VIM has to remember
+
+	" search related settings
+	set hlsearch " Highlight search results
+	set incsearch  " Makes search act like search in modern browsers
+
+	set ruler  "Always show current position
+
+	" ui related settings
+	set wildmenu  " Turn on the Wild menu
+	set wildoptions=pum,tagfile
+	set laststatus=2 " Always show the status line (without this airline doenst show up)
+
+	" don't give |ins-completion-menu| messages.
+	set shortmess+=c
+
+	set display+=lastline,msgsep
+	set showcmd " show partial commands in the status line
+	set smarttab  " Be smart when using tabs
+
+
+	set ttymouse=xterm2
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => General
 
-" Set utf8 as standard encoding and en_US as the standard language
-set encoding=utf8
 
 " Shows line numbering
 set number
 
-" Sets how many lines of history VIM has to remember
-set history=500
 
-" Set to auto read when a file is changed from the outside
-set autoread
 
 " Use Unix as the standard file type
 set ffs=unix,dos,mac
@@ -31,11 +69,31 @@ nnoremap <silent> <localleader> :<c-u>WhichKey ','<CR>
 
 
 " Fast saving
-
 nmap <leader>w :w!<cr>
 
 " Fast quitting
 nmap <leader>q :q!<cr>
+
+" Delete trailing whitespace on saving for certain file types
+autocmd BufWritePre * %s/\s\+$//e
+
+" source: https://stackoverflow.com/questions/19936145/vim-remove-whitespace-for-specific-files
+" function! StripTrailingWhitespace()
+"     " Preparation: save last search, and cursor position.
+"     let _s=@/
+"     let l = line(".")
+"     let c = col(".")
+"     " do the business:
+"     %s/\s\+$//e
+"     " clean up: restore previous search history, and cursor position
+"     let @/=_s
+"     call cursor(l, c)
+" endfunction
+
+" let noStripWhiteSpaceTypes = ['markdown']
+" autocmd BufWritePre * if index(noStripWhiteSpaceTypes, &ft) < 0 | call StripTrailingWhitespace() | endif
+
+
 
 " :W sudo saves the file
 " (useful for handling the permission-denied error)
@@ -44,6 +102,34 @@ command! W w !sudo tee % > /dev/null
 " quicly edit/reload configuration file
 nnoremap cfo :e $MYVIMRC<CR>
 nnoremap cfs :so $MYVIMRC<CR>
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => SYNTAX HIGHLIGHTING
+
+" Native vim filetype plugin enables syntax highlighting base on file type
+filetype on
+filetype plugin on
+
+" enable syntax highlighting
+syntax enable
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => INDENTATION
+
+filetype indent on
+set autoindent " Auto indent
+set smartindent  " Smart indent
+set wrap " Wrap lines
+
+" Use spaces instead of tabs
+set expandtab
+
+
+" 1 tab == 4 spaces
+set shiftwidth=2
+set tabstop=2
 
 
 " #######################################################
@@ -59,37 +145,10 @@ nnoremap cfs :so $MYVIMRC<CR>
 
 
 " Clipboard
-" Vim commands such as :yank or :paste operate with the unnamed register, which by default corresponds to the "* register.
-" If the +clipboard feature is available, the "* register is reflected to the PRIMARY buffer in X.
-
-" To change the default register, you can :set clipboard=unnamedplus to use the "+ register instead.
-" The "+ register corresponds to the CLIPBOARD buffer in X.
-
-" With this addition, copied text from vim can be pasted by CTRL+V and copied text from CTRL+C can be pasted into vim with ‘p’.
-
-" If you want to delete text without overwriting your register, you can run “_ before your command, such as:
-
-" _dd
-" to delete a line.
-"
-set clipboard=unnamed " for windows clipboards
-set clipboard=unnamedplus " for linux clipboards
-
-set clipboard+=unnamed  " use the clipboards of vim and win
+set clipboard=unnamed
 set paste               " Paste from a windows or from vim
 set go+=a               " Visual selection automatically copied to the clipboard
 
-" copy and paste
-vmap <C-c> "+yi
-vmap <C-x> "+c
-vmap <C-v> c<ESC>"+p
-imap <C-v> <ESC>"+pa
-
-
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => VIM USER INTERFACE
 
 " Set 7 lines to the cursor - when moving vertically using j/k
 set so=7
@@ -100,8 +159,6 @@ set langmenu=en
 source $VIMRUNTIME/delmenu.vim
 source $VIMRUNTIME/menu.vim
 
-" Turn on the Wild menu
-set wildmenu
 
 " Ignore compiled files
 set wildignore=*.o,*~,*.pyc
@@ -111,27 +168,21 @@ else
     set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store
 endif
 
-"Always show current position
-set ruler
+" Make wildmenu behave like bash completion. Finding commands are so easy now.
+set wildmode=list:longest
 
-" Height of the command bar
-set cmdheight=2
+
+set cmdheight=2   " Height of the command bar
 
 " A buffer becomes hidden when it is abandoned
 set hid
 
-" Configure backspace so it acts as it should act
-set backspace=eol,start,indent
 set whichwrap+=<,>,h,l
 
 
 " don't duplicate an existing open buffer
 set switchbuf=useopen
 
-" show auto complete menus.
-set wildmenu
-" Make wildmenu behave like bash completion. Finding commands are so easy now.
-set wildmode=list:longest
 
 " Don't redraw while executing macros (good performance config)
 set lazyredraw
@@ -139,8 +190,9 @@ set lazyredraw
 " For regular expressions turn magic on
 set magic
 
-" Show matching brackets when text indicator is over them
-set showmatch
+
+set showmatch " Show matching brackets when text indicator is over them
+
 " How many tenths of a second to blink when matching brackets
 set mat=2
 
@@ -157,6 +209,16 @@ set foldcolumn=1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => TEXT EDITING SETTINGS
 
+" bindings to move text up and down (line or block)
+nnoremap <M-j> :m .+1<CR>==
+nnoremap <M-k> :m .-2<CR>==
+inoremap <M-j> <Esc>:m .+1<CR>==gi
+inoremap <M-k> <Esc>:m .-2<CR>==gi
+vnoremap <M-j> :m '>+1<CR>gv=gv
+vnoremap <M-k> :m '<-2<CR>gv=gv
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 " replace all instances of currently selected word for new input (leader + r)
 map <leader>r :%s///g<left><left>
 
@@ -166,19 +228,6 @@ set tw=500
 
 " Disable Vim native text folding
 set nofoldenable
-
-" Move a line of text using ALT+[jk] or Command+[jk] on mac
-nmap <M-j> mz:m+<cr>`z
-nmap <M-k> mz:m-2<cr>`z
-vmap <M-j> :m'>+<cr>`<my`>mzgv`yo`z
-vmap <M-k> :m'<-2<cr>`>my`<mzgv`yo`z
-
-if has("mac") || has("macunix")
-    nmap <D-j> <M-j>
-    nmap <D-k> <M-k>
-    vmap <D-j> <M-j>
-    vmap <D-k> <M-k>
-endif
 
 " Remap VIM 0 to first non-blank character
 " not sure what this does, i copied from somewhere
@@ -195,21 +244,16 @@ au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g
 set ignorecase
 
 " case insensitive search if all lowercase
-set ignorecase smartcase
-
-" Highlight search results
-set hlsearch
+set smartcase
 
 " Makes Esc clear last search highlights after searching
 nnoremap <esc> :noh<return><esc>
 
-" Makes search act like search in modern browsers
-set incsearch
 
 " Visual mode pressing * or # searches for the current selection
 " Super useful! From an idea by Michael Naumann
-" vnoremap <silent> * :<C-u>call VisualSelection('', '')<CR>/<C-R>=@/<CR><CR>
-" vnoremap <silent> # :<C-u>call VisualSelection('', '')<CR>?<C-R>=@/<CR><CR>
+vnoremap <silent> * :<C-u>call VisualSelection('', '')<CR>/<C-R>=@/<CR><CR>
+vnoremap <silent> # :<C-u>call VisualSelection('', '')<CR>?<C-R>=@/<CR><CR>
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -225,23 +269,36 @@ map <leader>sa zg
 map <leader>s? z=
 
 
+" Persistent undo
+"
+ if !isdirectory($HOME."/.config/nvim/undo-dir")
+	 call mkdir($HOME."/.config/nvim/undo-dir", "", 0700)
+ endif
+ set undodir=~/.config/nvim/undo-dir
+ set undofile
+
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => CODE EDITING GENERAL SETTINGS
 
 " Delete trailing white space on save, useful for some filetypes ;)
-fun! CleanExtraSpaces()
-    let save_cursor = getpos(".")
-    let old_query = getreg('/')
-    silent! %s/\s\+$//e
-    call setpos('.', save_cursor)
-    call setreg('/', old_query)
-endfun
+autocmd BufWritePre * %s/\s\+$//e
 
-if has("autocmd")
-    autocmd BufWritePre *.txt,*.js,*.py,*.wiki,*.sh,*.coffee :call CleanExtraSpaces()
-endif
+" alternative i can select which file extensions will be trimmed
+" fun! CleanExtraSpaces()
+"     let save_cursor = getpos(".")
+"     let old_query = getreg('/')
+"     silent! %s/\s\+$//e
+"     call setpos('.', save_cursor)
+"     call setreg('/', old_query)
+" endfun
+
+" if has("autocmd")
+"     autocmd BufWritePre *.txt,*.js,*.py,*.wiki,*.sh,*.coffee :call CleanExtraSpaces()
+" endif
 
 
+"""""""""""""""""""""""""""""""""""""""
 " RunFile() Function (copied from http://urgetopunt.com/2014/02/19/run-scripts-from-vim.html)
 " added Shell Scripts and PHP support
 function! RunFile()
@@ -269,6 +326,7 @@ noremap <Leader>rx :call RunFile()<CR>
 " HTML
 
 " auto indent HTML files on save and in open
+" disabled in favor o prettier
 " autocmd BufWritePre,BufRead *.html :normal gg=G
 
 
@@ -279,41 +337,13 @@ noremap <Leader>rx :call RunFile()<CR>
 noremap <Leader>rr :!rake<CR>
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => SYNTAX HIGHLIGHTING
-
-" Native vim filetype plugin enables syntax highlighting base on file type
-filetype on
-filetype plugin on
-
-" enable syntax highlighting
-syntax enable
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => INDENTATION
-
-filetype indent on
-set ai "Auto indent
-set si "Smart indent
-set wrap "Wrap lines
-
-" Use spaces instead of tabs
-set expandtab
-
-" Be smart when using tabs
-set smarttab
-
-" 1 tab == 4 spaces
-set shiftwidth=4
-set tabstop=4
-
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => CODE COMPLETION
 
 " Activate Vim native completion engine (Omnicomplete)
-set omnifunc=syntaxcomplete#Complete
+" disabled > use COC instead
+" set omnifunc=syntaxcomplete#Complete
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -327,6 +357,12 @@ set title
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" UI SETTINGS
+
+
+
+:set cursorline " highlight current line
+:set cursorcolumn " highlight current column
 " => COLORS AND FONTs
 
 set t_Co=256
@@ -437,8 +473,6 @@ endtry
 " => Status line
 """"""""""""""""""""""""""""""
 
-" Always show the status line
-set laststatus=2
 
 " Format the status line
 " set statusline=\ %{HasPaste()}%F%m%r%h\ %w\ \ CWD:\ %r%{getcwd()}%h\ \ \ Line:\ %l\ \ Column:\ %c
@@ -460,13 +494,31 @@ set laststatus=2
 
 call plug#begin('~/.vim/plugged')
 
+" Autocomplete
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
+" Linting
+Plug 'w0rp/ale'                          " ALE Asynchronous ESLinter for several languages
+
+" Snippets
+Plug 'honza/vim-snippets'
+
+" vim which key on-demand lazy load
+Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
+
+" UI / Colorscheme / tema
 Plug 'tomasiser/vim-code-dark'
-Plug 'vim-airline/vim-airline'           " Vim Airline statusbar
+Plug 'nathanaelkane/vim-indent-guides'
+Plug 'chrisbra/Colorizer'                " Show hex codes as colours
+
+" Vim Airline statusbar
+Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'mkitt/tabline.vim'                 " Cleaner tabs
+
 " Colour matched brackets
-Plug 'kien/rainbow_parentheses.vim'      
-Plug 'ryanoasis/vim-devicons'            " Icons for dev file types
+Plug 'kien/rainbow_parentheses.vim'
+Plug 'ryanoasis/vim-devicons'            " Icons for dev file types. Has to be loaded after airline
 Plug 'editorconfig/editorconfig-vim'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'                  " so that vim-surroud actions will be repeatable with dot command .
@@ -478,53 +530,66 @@ Plug 'unblevable/quick-scope'            " Highlight jump characters
 Plug 'francoiscabrol/ranger.vim'         " Install ranger-vim integration with ranger file manager
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'RRethy/vim-illuminate'             " illuminate other uses of current word under cursor
+
+" Git interfaces
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-git'
-Plug 'w0rp/ale'                          " ALE Asynchronous ESLinter for several languages
-Plug 'prettier/vim-prettier', { 'do': 'npm install' }
+Plug 'airblade/vim-gitgutter'
+
+
 Plug 'amiorin/vim-project'
 Plug 'pbrisbin/vim-runfile'
-Plug 'chrisbra/Colorizer'                " Show hex codes as colours
 Plug 'mattn/emmet-vim'
-" Plug 'SirVer/ultisnips' " tries to use py3 instead of python and bugs the hell out
-Plug 'honza/vim-snippets'
-Plug 'adelarsq/vim-matchit' " Matchit extends the % function, navigating to more than a single character
+
+" Vim matchit to extend % function (already comes installed in nvim)
+if !has('nvim')
+  Plug 'adelarsq/vim-matchit' " Matchit extends the % function, navigating to more than a single character
+endif
+
 Plug 'valloric/MatchTagAlways'           " Show matching and closing tags
+
+" Javascript Plugins
 Plug 'pangloss/vim-javascript'
-Plug 'xojs/vim-xo'                       " Install vim-xo for xo linting support
 Plug 'mxw/vim-jsx'                       " JSX syntax colors and indent support. Depends on vim-javascript
-"Rubythins
-Plug 'tpope/vim-rake'
-Plug 'tpope/vim-bundler'
-Plug 'tpope/vim-rsi'
-Plug 'vim-ruby/vim-ruby'
-Plug 'tpope/vim-rails'
-Plug 'sunaku/vim-ruby-minitest'
+Plug 'xojs/vim-xo'                       " Install vim-xo for xo linting support
+Plug 'prettier/vim-prettier', { 'do': 'npm install' }
+
+" Typescript
+Plug 'heavenshell/vim-tslint'
+
+" Elixir
 Plug 'elixir-editors/vim-elixir'
 Plug 'slashmili/alchemist.vim'
-Plug 'shawncplus/phpcomplete.vim'       " better php omnicompletion
-Plug 'lervag/vimtex'
+Plug 'mhinz/vim-mix-format'
+
+" Ruby
+Plug 'vim-ruby/vim-ruby'
+Plug 'tpope/vim-rails'
+Plug 'tpope/vim-rake'
+Plug 'sunaku/vim-ruby-minitest'
+Plug 'tpope/vim-bundler'
+
+" Readline shortcuts for insert mode
+Plug 'tpope/vim-rsi'
+
+
+" Markdown
+Plug 'plasticboy/vim-markdown'
 Plug 'suan/vim-instant-markdown'         " Markdown preview instant-markdown-
 Plug 'godlygeek/tabular'                 " Tabular align texts that grow
-Plug 'plasticboy/vim-markdown'
-Plug 'vim-pandoc/vim-pandoc'             " Pandoc for vim
-Plug 'vim-pandoc/vim-pandoc-syntax'      " Syntax colors for pandoc-markdown files
+
+" FZF
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
+
+" CtrlP
+Plug 'ctrlp/ctrlp.vim'                 " Tabular align texts that grow
+Plug 'gabesoft/vim-ags' " ag, rg support
+
 Plug 'tpope/vim-sensible'
-Plug 'vim-airline/vim-airline'
-Plug 'airblade/vim-gitgutter'
-Plug 'tpope/vim-eunuch'
-Plug 'ntpeters/vim-better-whitespace'
-Plug 'sheerun/vim-polyglot'
-Plug 'mhinz/vim-mix-format'
-Plug 'vim-scripts/vim-auto-save'
-Plug 'nathanaelkane/vim-indent-guides'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-" vim which key on-demand lazy load
-Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
-
-
+Plug 'tpope/vim-eunuch' " Vim sugar for the UNIX shell commands, like :Delete to delete buffer and file at same time, SudoWrite, etc...
+Plug 'ntpeters/vim-better-whitespace' " Highlight trailing whitespace
+Plug 'sheerun/vim-polyglot' " Syntax highliht, indent and filetype plugin support for several languages
 
 " Initialize plugin system
 call plug#end()
@@ -544,10 +609,69 @@ set completefunc=syntaxcomplete#Complete
 colorscheme codedark
 
 "############################################
+" FZF settings
+
+" Mapping selecting mappings
+nmap <leader><tab> <plug>(fzf-maps-n)
+xmap <leader><tab> <plug>(fzf-maps-x)
+omap <leader><tab> <plug>(fzf-maps-o)
+
+" Insert mode completion
+imap <c-x><c-k> <plug>(fzf-complete-word)
+imap <c-x><c-f> <plug>(fzf-complete-path)
+imap <c-x><c-j> <plug>(fzf-complete-file-ag)
+imap <c-x><c-l> <plug>(fzf-complete-line)
+
+" Advanced customization using Vim function
+inoremap <expr> <c-x><c-k> fzf#vim#complete#word({'left': '15%'})
+
+" Replace the default dictionary completion with fzf-based fuzzy completion
+inoremap <expr> <c-x><c-k> fzf#vim#complete('cat /usr/share/dict/words')
+
+"############################################
+" CtrlP fuzzy finder
+let g:ctrlp_map = '<c-p>'
+let g:ctrlp_cmd = 'CtrlP'
+
+"############################################
+" AGs (silver searcher, ripgrep supoort)
+
+" use ripgrep instead of the_silver_searcher
+let g:ags_agexe = 'rg'
+
+let g:ags_agargs = {
+  \ '--column'         : ['', ''],
+  \ '--line-number'    : ['', ''],
+  \ '--context'        : ['g:ags_agcontext', '-C'],
+  \ '--max-count'      : ['g:ags_agmaxcount', ''],
+  \ '--heading'        : ['',''],
+  \ '--smart-case'     : ['','-S'],
+  \ '--color'          : ['always',''],
+  \ '--colors'         : [['match:fg:green', 'match:bg:black', 'match:style:nobold', 'path:fg:red', 'path:style:bold', 'line:fg:black', 'line:style:bold'] ,''],
+  \ }
+
+" Search for the word under cursor
+nnoremap <Leader>s :Ags<Space><C-R>=expand('<cword>')<CR><CR>
+" Search for the visually selected text
+vnoremap <Leader>s y:Ags<Space><C-R>='"' . escape(@", '"*?()[]{}.') . '"'<CR><CR>
+" Run Ags
+nnoremap <Leader>a :Ags<Space>
+" Quit Ags
+nnoremap <Leader><Leader>a :AgsQuit<CR>
+
+
+"############################################
 " ALE LINTER SETTINGS
+
 " show linting errors on a separate window
 " let g:ale_open_list = 1
 " let g:ale_list_window_size = 5
+
+"############################################
+" TSLint settings
+
+" auto lint when saving typescript files
+autocmd BufWritePost *.ts,*.tsx call tslint#run('a', win_getid())
 
 
 "############################################
@@ -585,12 +709,20 @@ inoremap <expr> <C-k> pumvisible() ? "\<C-P>" : "\<C-k>"
 " let g:UltiSnipsEditSplit="vertical"
 
 "############################################
-" VIM AIRLINE SETTINGS
-" set rtp+=/usr/lib/python3.6/site-packages/powerline/bindings/vim
+" Airline setup
 let g:airline_theme='codedark'                        " this airline theme resembles VSCode blueish status bar
-let g:airline#extensions#tabline#enabled=1
-let g:airline#extensions#tabline#formatter='unique_tail'
-let g:airline_powerline_fonts=1                     " needed by devicons
+let g:airline#extensions#tabline#enabled = 1       " enable tabline upport
+let g:airline#extensions#tabline#tab_nr_type = 1   " show tab numbers
+let g:airline#extensions#tabline#show_buffers = 0  " hide buffers
+let g:airline#extensions#tabline#tab_min_count = 2 " hide tabline for one tab
+let g:airline#extensions#tabline#formatter = 'unique_tail'
+let g:airline_powerline_fonts = 1                     " needed by devicons
+
+
+
+"############################################
+" COC Settings
+
 
 
 "############################################
@@ -647,6 +779,9 @@ let g:Illuminate_ftblacklist = ['nerdtree']
 
 "############################################
 " VIM DEVICONS SETTINGS
+
+
+set guifont=DroidSansMono\ Nerd\ Font\ 11
 
 let g:webdevicons_enable = 1
 

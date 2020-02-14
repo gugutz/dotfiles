@@ -14,7 +14,7 @@ bg_white=`tput setab 7`
 echo "%{green}############################################################"
 echo "## install ASDF"
 echo "############################################################${reset_color}"
-DIR=~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+DIR=~/.asdf
 if [ ! -d "$DIR" ]; then
     echo "## installing asdf"
     git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.7.6

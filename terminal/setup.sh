@@ -1,6 +1,11 @@
 TERMINAL_DIR="$HOME/dotfiles/terminal"
 ST_DIR="$TERMINAL_DIR/st-0.8.2"
 
+if [ -f "/etc/debian_version" ];
+   sudo apt install libfontconfig1-dev libx11-dev libxft-dev
+   export PKG_CONFIG_PATH=/usr/lib/pkgconfig >> ~/.bashrc
+   export PKG_CONFIG_PATH=/usr/lib/pkgconfig >> ~/.zshrc
+fi
 
 if [ -d "$ST_DIR" ]; then
     echo "## entering directory to download st stuff"
