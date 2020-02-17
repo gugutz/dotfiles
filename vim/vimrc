@@ -394,8 +394,10 @@ set noswapfile
 " use <leader>s for horizontal split, <leader>v for vertical split
 " <leader>q closes pane
 nnoremap <silent> <leader>s :split<CR>
+nnoremap <silent> <leader>- :split<CR>
+
 nnoremap <silent> <leader>v :vsplit<CR>
-nnoremap <silent> <leader>q :close<CR>
+nnoremap <silent> <leader>| :vsplit<CR>
 
 " easier 'vim style' window navigation
 map <C-j> <C-W>j
@@ -404,10 +406,10 @@ map <C-h> <C-W>h
 map <C-l> <C-W>lR
 
 " easier 'vim style' tab navigation
-nnoremap <M-J> <C-W><C-J>
-nnoremap <M-K> <C-W><C-K>
-nnoremap <M-L> <C-W><C-L>
-nnoremap <M-H> <C-W><C-H>
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
 
 " navigate to tabs using <leader><number>, similar to i3 workspaces switch
 nnoremap <leader>1 1gt
@@ -556,6 +558,9 @@ Plug 'prettier/vim-prettier', { 'do': 'npm install' }
 
 " Typescript
 Plug 'heavenshell/vim-tslint'
+
+" Go
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 
 " Elixir
 Plug 'elixir-editors/vim-elixir'
@@ -722,7 +727,14 @@ let g:airline_powerline_fonts = 1                     " needed by devicons
 
 "############################################
 " COC Settings
+" to get the correct comment highlighting
+autocmd FileType json syntax match Comment +\/\/.\+$+
 
+" Remap keys for gotos
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
 
 
 "############################################

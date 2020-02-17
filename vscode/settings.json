@@ -14,6 +14,7 @@
     "editor.renderWhitespace": "all",
     "editor.acceptSuggestionOnEnter": "off"
   },
+  "go.formatTool": "gofmt",
   // use # and * to search forward and backward in visual mode
   "vim.visualstar": true,
   "vim.easymotion": true,
