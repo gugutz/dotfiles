@@ -4,9 +4,9 @@
 # if not, uncomment it
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
-#########################################
-# use VI mode
-bindkey -v
+# load all my env vars first
+[[ -f $HOME/dotfiles/envvars ]] && source $HOME/dotfiles/envvars
+
 
 
 #########################################
@@ -155,3 +155,28 @@ alias ohmyzsh="vim $HOME/.oh-my-zsh"
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="/home/tau/.sdkman"
 [[ -s "/home/tau/.sdkman/bin/sdkman-init.sh" ]] && source "/home/tau/.sdkman/bin/sdkman-init.sh"
+
+
+
+#########################################
+
+# Emacs mode
+# bindkey -e
+
+# VI mode
+bindkey -v
+
+#########################################
+#
+# My Binding and Macros
+
+# zjsh does not use readline, instead it uses its own and more powerful zle. It does not read /etc/inputrc or ~/.inputrc. Zle has an emacs mode and a vi mode. By default, it tries to guess whether emacs or vi keys from the $EDITOR environment variable are desired. If it is empty, it will default to emacs. Change this with bindkey -e or bindkey -v respectively for emacs mode or vi mode.
+
+# For a complete list of codes to use for each key, visit: http://zshwiki.org/home/zle/bindkeys
+# You may want to call different history search commands, e.g.
+# down-line-or-history or down-line-or-search (and up-*)
+bindkey '^P' history-search-backward
+bindkey '^N' history-search-forward
+bindkey '\e[A' history-search-backward
+bindkey '\e[B' history-search-forward
+# The others should work already

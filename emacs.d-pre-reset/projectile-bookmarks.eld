@@ -1,0 +1,1 @@
+("~/dotfiles/" "/srv/tau/code/stairs/pep/" "~/ifsc/tcc/" "~/ifsc/" "/srv/tau/code/contributing/floripa-tech-companies/")

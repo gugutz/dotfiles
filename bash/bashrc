@@ -2,11 +2,14 @@
 # my bashrc
 #################################################
 
+# load all my env vars first
+[[ -f $HOME/dotfiles/envvars ]] && . $HOME/dotfiles/envvars
+
 # Enable history appending instead of overwriting.  #139609
 shopt -s histappend
 
 
-set -o vi
+
 [[ $- != *i* ]] && return
 
 # Change the window title of X terminals
@@ -260,5 +263,14 @@ cdnvm(){
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="/home/tau/.sdkman"
-[[ -s "/home/tau/.sdkman/bin/sdkman-init.sh" ]] && source "/home/tau/.sdkman/bin/sdkman-init.sh"
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+# enable VI mode (if this is at the beggining of the file somehow it doenst activate. some other setting must overide it in the way)
+set -o vi
+
+# create a binding (alt-e) to toggle between emacs (readline) and vi mode
+set -o emacs
+bind '"\ee": vi-editing-mode'
+set -o vi
+bind '"\ee": emacs-editing-mode'

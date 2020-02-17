@@ -1,45 +1,160 @@
+;; -*- lexical-binding: t; -*-
+
+;; FROM DOOM EMACS:
+;; Use lexical-binding everywhere
+
+;; Add ;; -*- lexical-binding: t; -*- to the top of your elisp files. This can break code if you’ve written it to depend on undeclared dynamic variables, but I’ve designed Doom not to.
+
+;; This buys a small improvement in performance, but every little bit helps.
+;; source: https://github.com/hlissner/doom-emacs/blob/develop/docs/faq.org#how-does-doom-start-up-so-quickly
+
+;; **************************************************
+;;
+;; Emacs Initialization
+;; source: https://raw.githubusercontent.com/gilbertw1/emacs-literate-starter/master/emacs.org
+
+
+;; We're going to increase the gc-cons-threshold to a very high number to decrease the load and compile time.
+;; We'll lower this value significantly after initialization has completed. We don't want to keep this value
+;; too high or it will result in long GC pauses during normal usage.
+
+;; Code
+(eval-and-compile
+  (setq gc-cons-threshold most-positive-fixnum ; 2^61 bytes
+    gc-cons-percentage 0.6))
+
+;; Disable certain byte compiler warnings to cut down on the noise. This is a personal choice and can be removed if you would like to see any and all byte compiler warnings.
+
+(setq byte-compile-warnings '(not free-vars unresolved noruntime lexical make-local))
+
+
+;; Unset file-name-handler-alist temporarily.
+;; Every file opened and loaded by Emacs will run through this list to check for a proper handler for the file, but during startup, it won’t need any of them. Doom doesn’t, at least.
+
+(defvar doom--file-name-handler-alist file-name-handler-alist)
+(setq file-name-handler-alist nil)
+
+;; re-set file-name-handler-alist when emacs finally starts
+(add-hook 'emacs-startup-hook
+  (setq file-name-handler-alist doom--file-name-handler-alist))
+;; -------------------------------------
+
+
+
 ;; **************************************************
 ;;
 ;;; * PACKAGE MANAGEMENT
 
+;; FROM DOOM EMACS:
+;; Lazy load package management system(s)
+
+;; Initializing package.el or straight.el at startup is expensive. We can save some time by delaying that initialization until we actually need these libraries (and load them only when we’re doing package management, e.g. when we run doom sync).
+
+;; Among other things, doom sync does a lot for us. It generates concatenated autoloads files; caches expensive variables like caches load-path, Info-directory-list and auto-mode-alist; and preforms all your package management activities there – far away from your interactive sessions.
+
+;; How exactly Doom accomplishes all this is a long story, so here is a boiled-down version you can use in your own configs (for package.el, not straight.el):
+
+(defvar cache-file "~/.emacs.d/cache/autoloads")
+
+;; (defun initialize ()
+;;   (unless (load cache-file t t)
+;;     (setq package-activated-list nil)
+;;     (package-initialize)
+;;     (with-temp-buffer
+;;       (cl-pushnew user-emacs-directory load-path :test #'string=)
+;;       (dolist (desc (delq nil (mapcar #'cdr package-alist)))
+;;         (let ((load-file-name (concat (package--autoloads-file-name desc) ".el")))
+;;           (when (file-readable-p load-file-name)
+;;             (condition-case _
+;;               (while t (insert (read (current-buffer))))
+;;               (end-of-file)))))
+;;       (prin1 `(setq load-path ',load-path
+;;                 auto-mode-alist ',auto-mode-alist
+;;                 Info-directory-list ',Info-directory-list)
+;;         (current-buffer))
+;;       (write-file (concat cache-file ".el"))
+;;       (byte-compile-file cache-file))))
+
+;; (initialize)
+
+;; You’ll need to delete cache-files any time you install, remove, or update a new package. You could advise package-install and package-delete to call initialize when they succeed, or make initialize interactive and call it manually when necessary. Up to you!
+;; -------------------------------------
+
+
+
+;; We're going to set the =load-path= ourselves and avoid calling =(package-initilize)= (forperformance reasons) so we need to set =package--init-file-ensured= to true to tell =package.el= to not automatically call it on our behalf. Additionally we're setting =package-enable-at-startup= to nil so that packages will not automatically be loaded for us since =use-package= will be handling that.
+
+;; in ~/.emacs.d/init.el (or ~/.emacs.d/early-init.el in Emacs 27)
+(eval-and-compile
+  (setq load-prefer-newer t
+    package-user-dir (concat user-emacs-directory "elpa/")
+    package-enable-at-startup nil
+    package--init-file-ensured t)
+
+  (unless (file-directory-p package-user-dir)
+    (make-directory package-user-dir t)))
+;; -------------------------------------
+
+
+;; Tell =use-package= to always defer loading packages unless explicitly told otherwise. This speeds up initialization significantly as many packages are only loaded later when they are explicitly used.
+
+(setq use-package-always-defer t
+  use-package-verbose t)
+;; -------------------------------------
+
+
+;; Manually Set Load Path
 ;;
-;;; ** package.el
+;; We're going to set the load path ourselves so that we don't have to call =package-initialize= at
+;; runtime and incur a large performance hit. This load-path will actually be faster than the one
+;; created by =package-initialize= because it appends the elpa packages to the end of the load path.
+;; Otherwise any time a builtin package was required it would have to search all of third party paths
+;; first.
 
-(require 'package)
-(setq package-user-dir (concat user-emacs-directory "elpa/"))
-(setq package-gnupghome-dir (expand-file-name "gpg" package-user-dir))
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
-(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t) ; Org-mode's repository
+(eval-and-compile
+  (setq load-path (append load-path (directory-files package-user-dir t "^[^.]" t))))
+;; -------------------------------------
 
-(package-initialize)
 
+;; Initialize Package Management
 ;;
-;;; ** use-package
+;; Next we are going to require =package.el= and add our additional package archives, 'melpa' and 'org'.
+;; Afterwards we need to initialize our packages and then ensure that =use-package= is installed, which
+;; we promptly install if it's missing. Finally we load =use-package= and tell it to always install any
+;; missing packages.
 
-;; install use-package if not already installed
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package)
-  )
+;; Note that this entire block is wrapped in =eval-when-compile=. The effect of this is to perform all
+;; of the package initialization during compilation so that when byte compiled, all of this time consuming
+;; code is skipped. This can be done because the result of byte compiling =use-package= statements results
+;; in the macro being fully expanded at which point =use-package= isn't actually required any longer.
 
-;; load use-package
+;; Since the code is automatically compiled during runtime, if the configuration hasn't already been
+;; previously compiled manually then all of the package initialization will still take place at startup.
+
 (eval-when-compile
-  (require 'use-package))
+  (require 'package)
 
-(use-package diminish :ensure t)
+  (unless (assoc-default "melpa" package-archives)
+    (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t))
+  (unless (assoc-default "org" package-archives)
+    (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
 
-;; quelpa
+  (package-initialize)
+
+  ;; load use-package
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
+  (require 'use-package)
+  (setq use-package-always-ensure t))
+;; -------------------------------------
+
 ;;
-(use-package quelpa
-  :ensure t
-  :if (require 'quelpa nil t)
-  )
+;; OTHER SETTINGS
 
-(use-package quelpa-use-package
-  :ensure t
-  :after quelpa
-  )
+(use-package diminish :demand t)
+
+
 
 ;; ##################################################
 ;;
@@ -51,13 +166,9 @@
 ;;; General
 
 ;; Allow access from emacsclient
-(use-package server
-  :when (display-graphic-p)
-  :defer 1
-  :config
-  (unless (or (daemonp) (server-running-p))
-    (server-start))
-  )
+;; disable because i dont use server and emacsclient anymore
+;; (unless (or (daemonp) (server-running-p))
+;;   (server-start))
 
 (setq ring-bell-function 'ignore) ;; Disable the annoying Emacs bell ring (beep)
 
@@ -119,7 +230,9 @@
 ;; indicate empty lines in the fringe with --
 (setq-default indicate-empty-lines t)
 
-;; *********************************-
+
+;; **********************************
+;;
 ;;; Folders and Files
 
 ;;; Define emacs directory
@@ -141,17 +254,14 @@
 (setq create-lockfiles nil)
 
 ;; stop creating those #auto-save# files
-(use-package files
-  :config
-  ;; (setq auto-save-file-name-transforms
-  ;;   `((".*" ,cache-dir t)))
-  (setq auto-save-list-file-prefix "~/.emacs.d/cache/auto-save-list")
-  (setq auto-save-default nil)
-  ;; disable emacs's automatic backup~ file
-  (setq make-backup-files nil)
-  ;; dont ask confirmation to kill processes
-  (setq confirm-kill-processes nil)
-  )
+(setq auto-save-list-file-prefix "~/.emacs.d/cache/auto-save-list")
+(setq auto-save-default nil)
+
+;; disable emacs's automatic backup~ file
+(setq make-backup-files nil)
+
+;; dont ask confirmation to kill processes
+(setq confirm-kill-processes nil)
 
 
 
@@ -244,9 +354,12 @@
 ;; remember where the cursor was when opening files
 
 (use-package saveplace
-  :ensure nil ;; built-in
+  :ensure nil
+  :demand t;; built-in
+  :defer t
   :init
-  (save-place-mode 1)
+  (eval-when-compile
+    (save-place-mode 1))
   (setq-default save-place t)
   ;; dont clutter the emacs folder. save somewhere else
   (setq save-place-file "~/.emacs.d/config/places")
@@ -272,12 +385,24 @@
 ;; refresh buffer with F5
 (global-set-key [f5] '(lambda () (interactive) (revert-buffer nil t nil)))
 
+
+;; ##################################################
+;;
+;;; GC magic hack (used in doom-emacs)
+
+
+(use-package gcmh
+  :demand t
+  :config
+  (gcmh-mode 1)
+  )
+
 ;; ##################################################
 ;;
 ;;; Evil
 
 (use-package evil
-  :ensure t
+  :demand t
   :custom
   ;; change cursor color according to mode
   (evil-emacs-state-cursor '("#ff0000" box))
@@ -290,39 +415,45 @@
   ;; evil in modeline
   (evil-mode-line-format '(before . mode-line-front-space)) ;; move evil tag to beginning of modeline
   :config
-  (evil-mode 1)
+  (eval-when-compile
+    (evil-mode 1)
   ;;; FOR SOME REASON WHEN I MAP KEYS IN :bind EVIL DOENST LOAD ON STARTUP
-  (define-key evil-normal-state-map (kbd "SPC q") 'evil-quit)
-  ;; ("SPC q" . kill-buffer-and-window) ;; check if evil quit does this
-  (define-key evil-normal-state-map (kbd "SPC w") 'save-buffer)
-  (define-key evil-normal-state-map (kbd "SPC d") 'delete-frame)
-  (define-key evil-normal-state-map (kbd "SPC k") 'kill-current-buffer)
-  (define-key evil-normal-state-map (kbd "SPC 0") 'delete-window)
-  (define-key evil-normal-state-map (kbd "SPC -") 'split-window-bellow)
-  (define-key evil-normal-state-map (kbd "SPC |") 'split-window-right)
-  (define-key evil-normal-state-map (kbd "SPC u") 'undo-tree-visualize)
-  (define-key evil-normal-state-map (kbd "SPC o") 'other-window)
+    (define-key evil-normal-state-map (kbd "SPC q") 'evil-quit)
+    ;; ("SPC q" . kill-buffer-and-window) ;; check if evil quit does this
+    (define-key evil-normal-state-map (kbd "SPC w") 'save-buffer)
+    (define-key evil-normal-state-map (kbd "SPC d") 'delete-frame)
+    (define-key evil-normal-state-map (kbd "SPC k") 'kill-current-buffer)
+    (define-key evil-normal-state-map (kbd "SPC 0") 'delete-window)
+    (define-key evil-normal-state-map (kbd "SPC -") 'split-window-bellow)
+    (define-key evil-normal-state-map (kbd "SPC |") 'split-window-right)
+    (define-key evil-normal-state-map (kbd "SPC u") 'undo-tree-visualize)
+    (define-key evil-normal-state-map (kbd "SPC o") 'other-window)
 
-  ;; ------------------------------------------
-  ;;
+    ;; ------------------------------------------
+    ;;
   ;;; RECOVER SOME USEFUL EMACS NATIVE COMMANDS
-  (define-key evil-insert-state-map (kbd "C-y") 'yank)
-  (define-key evil-insert-state-map (kbd "C-a") 'beginning-of-line)
-  (define-key evil-insert-state-map (kbd "C-e") 'end-of-line)
-  (define-key evil-normal-state-map (kbd "C-y") 'yank)
-  (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
-  (define-key evil-insert-state-map (kbd "C-d") 'delete-char)
-  ;; native find definition
-  (global-set-key (kbd "M-.") 'xref-find-definitions)
-  ;; somehow global-set-key doenst work for normal mode for this binding, so i manually set it
-  (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
+    (define-key evil-insert-state-map (kbd "C-y") 'yank)
+    (define-key evil-insert-state-map (kbd "C-a") 'beginning-of-line)
+    (define-key evil-insert-state-map (kbd "C-e") 'end-of-line)
+    (define-key evil-normal-state-map (kbd "C-y") 'yank)
+    (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
+    (define-key evil-insert-state-map (kbd "C-d") 'delete-char)
+    ;; native find definition
+    (global-set-key (kbd "M-.") 'xref-find-definitions)
+    ;; somehow global-set-key doenst work for normal mode for this binding, so i manually set it
+    (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
+
+    (global-set-key (kbd "C-S-H") 'evil-window-left)
+    (global-set-key (kbd "C-S-L") 'evil-window-right)
+    (global-set-key (kbd "C-S-K") 'evil-window-up)
+    (global-set-key (kbd "C-S-J") 'evil-window-down))
   )
 
 ;; *********************************
 ;; evil-commentary
 
 (use-package evil-commentary
-  :ensure t
+  :demand t
   :after evil
   :diminish
   :config
@@ -332,7 +463,7 @@
 ;; *********************************
 ;; evil-surround
 (use-package evil-matchit
-  :ensure t
+  :demand t
   :config
   (global-evil-matchit-mode 1)
   )
@@ -381,7 +512,8 @@
 ;;; Ivy
 
 (use-package ivy
-  :ensure t
+  :demand t
+  :defer t
   :bind
   ("C-s" . swiper)
   ("C-c C-r" . ivy-resume)
@@ -399,16 +531,17 @@
   ("C-x l" . counsel-locate)
   ("C-S-o" . counsel-rhythmbox)
   :config
-  (ivy-mode 1)
-  ;; Add recent files and bookmarks to the ivy-switch-buffer
-  (setq ivy-use-virtual-buffers t)
-  ;;Displays the current and total number in the collection in the prompt
-  (setq enable-recursive-minibuffers t)
-  ;; display an arrow on the selected item in the list
-  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-arrow)
-  ;; enable this if you want `swiper' to use it
-  ;; (setq search-default-mode #'char-fold-to-regexp)
-  (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
+  (eval-when-compile
+    (ivy-mode 1)
+    ;; Add recent files and bookmarks to the ivy-switch-buffer
+    (setq ivy-use-virtual-buffers t)
+    ;;Displays the current and total number in the collection in the prompt
+    (setq enable-recursive-minibuffers t)
+    ;; display an arrow on the selected item in the list
+    (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-arrow)
+    ;; enable this if you want `swiper' to use it
+    ;; (setq search-default-mode #'char-fold-to-regexp)
+    (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
 
   ;; SPC keybindings
   (with-eval-after-load 'evil
@@ -429,7 +562,8 @@
 ;;
 ;;; Counsel
 (use-package counsel
-  :ensure t
+  :demand t
+  :defer t
   :after ivy
   :diminish counsel-mode
   :hook
@@ -439,9 +573,12 @@
 ;; ** Counsel integration for Projectile
 
 (use-package counsel-projectile
-  :ensure t
+  :demand t
+  :defer t
   :after ivy counsel projectile
-  :config (counsel-projectile-mode 1)
+  :config
+  (eval-when-compile
+    (counsel-projectile-mode 1))
   )
 
 ;; *********************************
@@ -449,11 +586,14 @@
 ;; Enhance M-x
 ;; Enhancement for `execute-extended-command'. Auto detects and uses ivy or ido, if installed
 (use-package amx
-  :ensure t
+  :demand t
+  :defer t
   :after ivy
-  :config
-  (amx-mode)
+  :init
   (setq amx-save-file "~/.emacs.d/config/amx-items")
+  :config
+  (evan-when-compile
+    (amx-mode))
   )
 
 ;; *********************************
@@ -461,7 +601,8 @@
 ;; ivy-rich
 
 (use-package ivy-rich
-  :ensure t
+  :demand t
+  :defer t
   :preface
   ;; use all-the-icons for `ivy-switch-buffer'
   (defun ivy-rich-switch-buffer-icon (candidate)
@@ -524,7 +665,8 @@
     )
   :config
   ;; ivy-rich-mode needs to be called after `ivy-rich--display-transformers-list' is changed
-  (ivy-rich-mode 1)
+  (eval-when-compile
+    (ivy-rich-mode 1))
   )
 
 ;; *********************************
@@ -534,8 +676,8 @@
 ;; Requires: Emacs >= 26
 
 (use-package ivy-posframe
-  :ensure t
   :demand t
+  :defer t
   :after ivy
   :diminish ivy-posframe-mode
   :custom-face
@@ -562,25 +704,30 @@
                                      (t      . 20)
                                      ))
   :config
-  (ivy-posframe-mode)
+  (eval-when-compile
+    (ivy-posframe-mode))
   )
 
 (use-package ivy-explorer
-  :ensure t
+  :demand t
+  :defer t
   :diminish
   :after ivy
   :config
-  (ivy-explorer-mode 1)
+  (eval-when-compile
+    (ivy-explorer-mode 1))
   )
 
 ;; *********************************
 ;;
 ;; ** ivy-prescient
 (use-package ivy-prescient
-  :ensure t
+  :demand t
+  :defer t
   :after ivy
   :config
-  (ivy-prescient-mode)
+  (eval-when-compile
+    (ivy-prescient-mode))
   )
 
 ;; *********************************
@@ -588,10 +735,10 @@
 ;; all the icons for ivy
 
 (use-package all-the-icons-ivy
-  :ensure t
+  :demand t
+  :defer t
   :after ivy
-  :config
-  (all-the-icons-ivy-setup)
+  :init
   (setq all-the-icons-ivy-file-commands
     '(ivy-switch-buffer
        counsel-find-file
@@ -599,6 +746,9 @@
        counsel-recentf
        counsel-projectile-find-file
        counsel-projectile-find-dir))
+  :config
+  (eval-when-compile
+    (all-the-icons-ivy-setup))
   )
 
 ;; *********************************
@@ -606,7 +756,8 @@
 ;;
 ;;; avy
 (use-package avy
-  :ensure t
+  :demand t
+  :defer t
   :bind
   ("M-g j" . avy-goto-char-2)
   ("C-:" . avy-goto-char)
@@ -636,18 +787,19 @@
 
 ;; **************************************************
 ;;
-(use-package exec-path-from-shell
-  :ensure t
-  :config
-  (exec-path-from-shell-initialize)
-  )
+;; (use-package exec-path-from-shell
+;;   :demand t
+;;   :config
+;;   (exec-path-from-shell-initialize)
+;;   )
 
 ;; *********************************
 ;;
 ;; goto-line-preview
 
 (use-package goto-line-preview
-  :ensure t
+  :demand t
+  :defer t
   ;; :config
   ;; (global-set-key [remap goto-line] 'goto-line-preview)
   )
@@ -663,7 +815,7 @@
 ;;; Treemacs
 
 (use-package treemacs
-  :ensure t
+  :demand t
   :defer t
   :bind
   ("<f8>" . treemacs)
@@ -675,24 +827,29 @@
 
 (use-package treemacs-evil
   :after treemacs evil
-  :ensure t)
+  :demand t
+  :defer t)
 
 (use-package treemacs-projectile
   :after treemacs projectile
-  :ensure t)
+  :demand t
+  :defer t)
 
 (use-package treemacs-icons-dired
   :after treemacs dired
-  :ensure t
+  :demand t
+  :defer t
   :config (treemacs-icons-dired-mode))
 
 (use-package treemacs-magit
   :after treemacs magit
-  :ensure t)
+  :demand t
+  :defer t)
 
 (use-package treemacs-persp
   :after treemacs persp-mode
-  :ensure t
+  :demand t
+  :defer t
   :config (treemacs-set-scope-type 'Perspectives))
 
 
@@ -701,12 +858,12 @@
 ;; ** ranger
 
 (use-package ranger
-  :ensure t
+  :demand t
   :defer t
   :bind
   ("C-x C-j" . ranger)
   (:map evil-normal-state-map
-    ("SPC r a" . avy-goto-line))
+    ("SPC f r" . ranger))
   :config
   (setq ranger-show-hidden t) ;; show hidden files
   )
@@ -718,7 +875,8 @@
 ;; Make dired look like k
 
 (use-package dired-k
-  :ensure t
+  :demand t
+  :defer t
   :after dired
   :config
   (setq dired-k-style 'git)
@@ -730,7 +888,7 @@
 ;; ** all the icons dired
 
 (use-package all-the-icons-dired
-  :ensure t
+  :demand t
   :defer t
   :hook
   (dired-mode . all-the-icons-dired-mode)
@@ -768,7 +926,7 @@
 ;; smart selection of text
 
 (use-package expand-region
-  :ensure t
+  :demand t
   :defer t
   :bind
   ([(control shift iso-lefttab)] . er/expand-region)
@@ -785,6 +943,8 @@
 
 (use-package subword
   :ensure nil
+  :defer t
+  :demand t
   :hook
   (js2-mode . subword-mode)
   (typescript-mode . subword-mode)
@@ -799,6 +959,8 @@
 
 (use-package superword
   :ensure nil
+  :demand t
+  :defer t
   :hook
   (clojure-mode . superword-mode)
   (ruby-mode . superword-mode)
@@ -811,7 +973,7 @@
 ;;; drag stuff / move text
 
 (use-package drag-stuff
-  :ensure t
+  :demand t
   :bind
   ("M-k" . drag-stuff-up)
   ("M-j" . drag-stuff-down)
@@ -827,6 +989,7 @@
 
 (use-package electric-pair-mode
   :ensure nil
+  :demand t
   :defer t
   :diminish
   :hook
@@ -843,12 +1006,13 @@
     (lambda ()
       (define-key web-mode-map "<" 'electric-pair)))
   )
+
 ;; ;; *********************************
 ;; ;;
 ;; ;; ** smartparens
 
 ;; (use-package smartparens
-;;   :ensure t
+;;   :demand t
 ;;   :defer t
 ;;   :diminish
 ;;   :hook
@@ -993,7 +1157,7 @@ Version 2016-07-17"
 ;; dumb-jump
 
 (use-package dumb-jump
-  :ensure t
+  :demand t
   :bind
   ;;("M-g o" . dumb-jump-go-other-window)
   ;;("M-g j" . dumb-jump-go)
@@ -1024,9 +1188,9 @@ Version 2016-07-17"
 ;;
 ;;; WHITESPACE
 
-;;
 ;; Highlight trailing whitespace
 (setq-default show-trailing-whitespace t)
+
 ;; Set the whitespace highlight color
 (set-face-background 'trailing-whitespace "#f44545")
 
@@ -1036,7 +1200,7 @@ Version 2016-07-17"
 
 ;; ##################################################
 ;;
-;;; WINdow Management
+;;; Window Management
 
 ;; auto balance windows on opening and closing frames
 (setq window-combination-resize t)
@@ -1047,26 +1211,26 @@ Version 2016-07-17"
 
 
 ;; *********************************
-;; ** Eyebrowse
+;; Eyebrowse
 
 (use-package eyebrowse
-  :ensure t
+  :demand t
   :config
-  (eyebrowse-mode t)
-  (setq eyebrowse-new-workspace t)
-  (define-key eyebrowse-mode-map (kbd "M-1") 'eyebrowse-switch-to-window-config-1)
-  (define-key eyebrowse-mode-map (kbd "M-2") 'eyebrowse-switch-to-window-config-2)
-  (define-key eyebrowse-mode-map (kbd "M-3") 'eyebrowse-switch-to-window-config-3)
-  (define-key eyebrowse-mode-map (kbd "M-4") 'eyebrowse-switch-to-window-config-4)
-  (define-key eyebrowse-mode-map (kbd "H-<right>") 'eyebrowse-next-window-config)
-  (define-key eyebrowse-mode-map (kbd "H-<left>") 'eyebrowse-prev-window-config)
+  (eval-when-compile
+    (eyebrowse-mode t)
+    (setq eyebrowse-new-workspace t)
+    (define-key eyebrowse-mode-map (kbd "M-1") 'eyebrowse-switch-to-window-config-1)
+    (define-key eyebrowse-mode-map (kbd "M-2") 'eyebrowse-switch-to-window-config-2)
+    (define-key eyebrowse-mode-map (kbd "M-3") 'eyebrowse-switch-to-window-config-3)
+    (define-key eyebrowse-mode-map (kbd "M-4") 'eyebrowse-switch-to-window-config-4))
   )
 
 ;; *********************************
 ;; Ace-Window
 
 (use-package ace-window
-  :ensure t
+  :demand t
+  :defer t
   :bind
   ("M-o" . ace-window)
   :custom-face
@@ -1080,7 +1244,7 @@ Version 2016-07-17"
 ;; emacsrotate
 
 (use-package rotate
-  :ensure t
+  :demand t
   :defer t
   :bind
   ("C-c r w" . rotate-window)
@@ -1094,17 +1258,13 @@ Version 2016-07-17"
 ;; *********************************
 ;; ** windmove
 
-(use-package windmove
-  :ensure t
-  :config
-  ;; use shift + arrow keys to switch between visible buffers
-  ;; (windmove-default-keybindings)
-  (windmove-default-keybindings 'control)
-  (global-set-key (kbd "C-S-H") 'windmove-left)
-  (global-set-key (kbd "C-S-L") 'windmove-right)
-  (global-set-key (kbd "C-S-K") 'windmove-up)
-  (global-set-key (kbd "C-S-J") 'windmove-down)
-  )
+;; (use-package windmove
+;;   :demand t
+;;   :defer t
+;;   :config
+;;   ;; use shift + arrow keys to switch between visible buffers
+;;   ;; (windmove-default-keybindings)
+;;   )
 
 ;; ##################################################
 ;;
@@ -1153,7 +1313,8 @@ Version 2016-07-17"
 ;;;  Projectile
 
 (use-package projectile
-  :ensure t
+  :demand t
+  :defer t
   :diminish projectile-mode
   :bind
   (:map projectile-mode-map
@@ -1175,7 +1336,8 @@ Version 2016-07-17"
   ;; when this issue is fixed remove this
   (setq projectile-git-submodule-command "")
   :config
-  (projectile-mode +1)
+  (eval-when-compile
+    (projectile-mode +1))
   )
 
 
@@ -1187,9 +1349,8 @@ Version 2016-07-17"
 ;;; Company
 
 (use-package company
-  :ensure t
-  :hook
-  (after-init . global-company-mode)
+  :demand t
+  :defer t
   :bind
   (:map company-active-map
     ("C-p" . company-select-previous)
@@ -1199,25 +1360,30 @@ Version 2016-07-17"
   (:map company-search-map
     ("C-p" . company-select-previous)
     ("C-n" . company-select-next))
-  :custom
-  (company-minimum-prefix-length 1)
-  (company-idle-delay 0.1) ;; decrease delay before autocompletion popup shows
-  (company-echo-delay 0) ;; remove annoying blinking
-  (company-selection-wrap-around t) ; loop over candidates
-  (company-tooltip-align-annotations t) ;; align annotations to the right tooltip border.
-  (company-tooltip-margin 2) ;; width of margin columns to show around the tooltip
+  :init
+  (setq company-minimum-prefix-length 1)
+  (setq company-idle-delay 0.1) ;; decrease delay before autocompletion popup shows
+  (setq company-echo-delay 0) ;; remove annoying blinking
+  (setq company-selection-wrap-around t) ; loop over candidates
+  (setq company-tooltip-align-annotations t) ;; align annotations to the right tooltip border.
+  (setq company-tooltip-margin 2) ;; width of margin columns to show around the tooltip
   :config
-  (bind-key [remap completion-at-point] #'company-complete company-mode-map)
-  ;; show tooltip even for single candidates
-  (setq company-frontends '(company-pseudo-tooltip-frontend
-                             company-echo-metadata-frontend))
+
+  (eval-when-compile
+    (global-company-mode)
+    (bind-key [remap completion-at-point] #'company-complete company-mode-map)
+    ;; show tooltip even for single candidates
+    (setq company-frontends '(company-pseudo-tooltip-frontend
+                               company-echo-metadata-frontend)))
   )
 
 ;; *********************************
 ;;; company box
 
 (use-package company-box
-  :ensure t
+  :demand t
+  :defer t
+  :after company
   :hook
   ((global-company-mode company-mode) . company-box-mode)
   :config
@@ -1264,7 +1430,8 @@ Version 2016-07-17"
 ;; Documentation popups for Company
 
 (use-package company-quickhelp
-  :ensure t
+  :demand t
+  :defer t
   :after company
   :bind
   (:map company-active-map
@@ -1279,7 +1446,8 @@ Version 2016-07-17"
 ;; lsp
 
 (use-package lsp-mode
-  :ensure t
+  :demand t
+  :defer t
   :commands lsp
   :hook
   (typescript-mode . lsp)
@@ -1342,7 +1510,8 @@ Version 2016-07-17"
 ;; lsp ui
 
 (use-package lsp-ui
-  :ensure t
+  :demand t
+  :defer t
   :after lsp-mode
   :hook
   (lsp-mode . lsp-ui-mode)
@@ -1357,7 +1526,7 @@ Version 2016-07-17"
 
   (setq lsp-ui-sideline-enable nil)
   (setq lsp-ui-sideline-show-diagnostics t) ;; show diagnostics (flyckeck) messages in sideline
-  ;; (setq lsp-ui-sideline-code-actions-prefix "")
+  (setq lsp-ui-sideline-code-actions-prefix "")
 
   ;; (setq lsp-ui-imenu-enable t)
   ;; ;; (setq lsp-ui-imenu-kind-position 'top)
@@ -1381,14 +1550,15 @@ Version 2016-07-17"
 
 ;; company-lsp is auto inserted into company backends
 
-(use-package company-lsp :ensure t)
+(use-package company-lsp :demand t :defer t)
 
 
 ;; *********************************
 ;;; ** Yasnippets
 
 (use-package yasnippet
-  :ensure t
+  :demand t
+  :defer t
   :diminish yas-minor-mode
   :hook
   (prog-mode . yas-minor-mode)
@@ -1417,14 +1587,14 @@ Version 2016-07-17"
 
 ;;
 ;; Colection of snippets
-(use-package yasnippet-snippets :ensure t)
+(use-package yasnippet-snippets :demand t :defer t)
 
 
 ;; *********************************
 ;; FlyCheck linter
 
 (use-package flycheck
-  :ensure t
+  :demand t
   :diminish flycheck-mode
   :hook
   (prog-mode . flycheck-mode)
@@ -1447,7 +1617,8 @@ Version 2016-07-17"
 ;; ** flycheck posframe
 
 (use-package flycheck-posframe
-  :ensure t
+  :demand t
+  :defer t
   :after flycheck
   :hook
   (flycheck-mode . flycheck-posframe-mode)
@@ -1476,7 +1647,8 @@ Version 2016-07-17"
 ;; helpfull
 
 (use-package helpful
-  :ensure t
+  :demand t
+  :defer t
   :config
   (global-set-key (kbd "C-h f") #'helpful-callable)
   (global-set-key (kbd "C-h v") #'helpful-variable)
@@ -1506,7 +1678,8 @@ Version 2016-07-17"
 ;; which-key
 
 (use-package which-key
-  :ensure t
+  :demand t
+  :defer t
   :diminish
   :init
   (setq which-key-idle-secondary-delay 0.05) ;; make it refresh quicly between displays
@@ -1526,7 +1699,7 @@ Version 2016-07-17"
 ;; keyfreq
 
 (use-package keyfreq
-  :ensure t
+  :demand t
   :defer t
   :hook (after-init . keyfreq-mode)
   :init
@@ -1582,7 +1755,8 @@ Adapted from `describe-function-or-variable'."
 ;; hippie expand
 
 (use-package hippie-exp
-  :ensure nil ;; builtin package
+  :ensure nil
+  :demand t ;; builtin package
   :defer t
   :bind
   ("<tab>" . hippie-expand)
@@ -1607,13 +1781,13 @@ Adapted from `describe-function-or-variable'."
 ;;
 ;; restart emacs
 
-(use-package restart-emacs :ensure t)
+(use-package restart-emacs :demand t :defer t)
 
 ;; *********************************
 ;; shell-pop
 
 (use-package shell-pop
-  :ensure t
+  :demand t
   :defer t
   :init
   (setq shell-pop-full-span t)
@@ -1655,6 +1829,8 @@ Adapted from `describe-function-or-variable'."
 
 (use-package autorevert
   :ensure nil
+  :demand t
+  :defer t
   ;; :hook
   ;; revert buffers when their files/state have changed
   ;;(focus-in . revert-buffer)
@@ -1662,7 +1838,8 @@ Adapted from `describe-function-or-variable'."
   ;;(switch-buffer . revert-buffer)
   ;;(switch-window . revert-buffer)
   :config
-  (global-auto-revert-mode)
+  (eval-when-compile
+    (global-auto-revert-mode))
   (setq auto-revert-verbose t) ; let us know when it happens
   (setq auto-revert-use-notify nil)
   (setq auto-revert-stop-on-user-input nil)
@@ -1679,7 +1856,7 @@ Adapted from `describe-function-or-variable'."
 ;; editorconfig
 
 (use-package editorconfig
-  :ensure t
+  :demand t
   :defer t
   :diminish
   :hook
@@ -1695,7 +1872,7 @@ Adapted from `describe-function-or-variable'."
 ;; aggressive indent
 
 (use-package aggressive-indent
-  :ensure t
+  :demand t
   :defer t
   :hook
   (emacs-lisp-mode . aggressive-indent-mode)
@@ -1712,6 +1889,7 @@ Adapted from `describe-function-or-variable'."
 ;; ** Use unix-conf-mode for .*rc files
 
 (use-package conf-mode
+  :defer t
   :mode
   (;; systemd
     ("\\.service\\'"     . conf-unix-mode)
@@ -1742,7 +1920,7 @@ Adapted from `describe-function-or-variable'."
 ;; Typescript Mode
 
 (use-package typescript-mode
-  :ensure t
+  :demand t
   :defer t
   :mode
   (("\\.ts\\'" . typescript-mode)
@@ -1754,7 +1932,7 @@ Adapted from `describe-function-or-variable'."
 ;; js2-mode
 
 (use-package js2-mode
-  :after flycheck company
+  :demand t
   :defer t
   :mode
   ("\\.js$" . js2-mode)
@@ -1809,7 +1987,7 @@ Adapted from `describe-function-or-variable'."
 ;; Web-Mode
 
 (use-package web-mode
-  :ensure t
+  :demand t
   :defer t
   :custom-face
   (css-selector ((t (:inherit default :foreground "#66CCFF"))))
@@ -1846,7 +2024,7 @@ Adapted from `describe-function-or-variable'."
 ;; CSS
 
 (use-package css-mode
-  :ensure t
+  :demand t
   :defer t
   :mode "\\.css\\'"
   :preface
@@ -1863,7 +2041,7 @@ Adapted from `describe-function-or-variable'."
 ;; SCSS
 
 (use-package scss-mode
-  :ensure t
+  :demand t
   :defer t
   ;; this mode doenst load using :mode from use-package, dunno why
   :mode ("\\.scss\\'")
@@ -1882,7 +2060,7 @@ Adapted from `describe-function-or-variable'."
 ;; ** PrettierJS
 
 (use-package prettier-js
-  :ensure t
+  :demand t
   :defer t
   :hook
   (typescript-mode . prettier-js-mode)
@@ -1898,7 +2076,7 @@ Adapted from `describe-function-or-variable'."
 ;; ** Emmet
 
 (use-package emmet-mode
-  :ensure t
+  :demand t
   :defer t
   :commands emmet-mode
   :hook
@@ -1922,6 +2100,8 @@ Adapted from `describe-function-or-variable'."
 ;; lisp mode
 (use-package lisp-mode
   :ensure nil
+  :demand t
+  :defer t
   :commands emacs-lisp-mode
   :hook
   (elisp-mode . eldoc-mode)
@@ -1940,6 +2120,8 @@ Adapted from `describe-function-or-variable'."
 
 (use-package sh-script
   :ensure nil
+  :demand t
+  :defer t
   :hook
   (sh-mode . aggressive-indent-mode)
   (sh-mode . rainbow-mode)
@@ -1951,7 +2133,7 @@ Adapted from `describe-function-or-variable'."
 ;; YAML
 
 (use-package yaml-mode
-  :ensure t
+  :demand t
   :defer t
   :mode
   ("\\.yaml\\'" "\\.yml\\'")
@@ -1962,7 +2144,8 @@ Adapted from `describe-function-or-variable'."
 ;; vimrc
 
 (use-package vimrc-mode
-  :ensure t
+  :demand t
+  :defer t
   :mode
   ("\\.vim\\(rc\\)?\\'" . vimrc-mode)
   )
@@ -1979,7 +2162,8 @@ Adapted from `describe-function-or-variable'."
 ;; magit
 
 (use-package magit
-  :ensure t
+  :demand t
+  :defer t
   :bind
   ("M-g s" . magit-status)
   ("M-g f" . magit-find-file)
@@ -2013,37 +2197,39 @@ Adapted from `describe-function-or-variable'."
 ;; evil-magit
 
 (use-package evil-magit
-  :ensure t
+  :demand t
+  :defer t
   :init
   (setq evil-magit-state 'normal)
   (setq evil-magit-use-y-for-yank nil)
   :config
-  (evil-magit-init)
-  (evil-define-key evil-magit-state magit-mode-map "<tab>" 'magit-section-toggle)
-  (evil-define-key evil-magit-state magit-mode-map "l" 'magit-log-popup)
-  (evil-define-key evil-magit-state magit-mode-map "j" 'evil-next-visual-line)
-  (evil-define-key evil-magit-state magit-mode-map "k" 'evil-previous-visual-line)
-  ;; (evil-define-key evil-magit-state magit-diff-map "k" 'evil-previous-visual-line)
-  (evil-define-key evil-magit-state magit-staged-section-map "K" 'magit-discard)
-  (evil-define-key evil-magit-state magit-unstaged-section-map "K" 'magit-discard)
-  (evil-define-key evil-magit-state magit-branch-section-map "K" 'magit-branch-delete)
-  (evil-define-key evil-magit-state magit-remote-section-map "K" 'magit-remote-remove)
-  (evil-define-key evil-magit-state magit-stash-section-map "K" 'magit-stash-drop)
-  (evil-define-key evil-magit-state magit-stashes-section-map "K" 'magit-stash-clear)
+  (eval-when-compile
+    (evil-magit-init)
+    (evil-define-key evil-magit-state magit-mode-map "<tab>" 'magit-section-toggle)
+    (evil-define-key evil-magit-state magit-mode-map "l" 'magit-log-popup)
+    (evil-define-key evil-magit-state magit-mode-map "j" 'evil-next-visual-line)
+    (evil-define-key evil-magit-state magit-mode-map "k" 'evil-previous-visual-line)
+    ;; (evil-define-key evil-magit-state magit-diff-map "k" 'evil-previous-visual-line)
+    (evil-define-key evil-magit-state magit-staged-section-map "K" 'magit-discard)
+    (evil-define-key evil-magit-state magit-unstaged-section-map "K" 'magit-discard)
+    (evil-define-key evil-magit-state magit-branch-section-map "K" 'magit-branch-delete)
+    (evil-define-key evil-magit-state magit-remote-section-map "K" 'magit-remote-remove)
+    (evil-define-key evil-magit-state magit-stash-section-map "K" 'magit-stash-drop)
+    (evil-define-key evil-magit-state magit-stashes-section-map "K" 'magit-stash-clear))
   )
 
 
 ;; ** diffview
 ;; View diffs side by side
 
-(use-package diffview :ensure t :defer t)
+(use-package diffview :demand t :defer t)
 
 ;; *********************************
 ;;
 ;; vc-msg
 
 (use-package vc-msg
-  :ensure t
+  :demand t
   :defer t
   :bind
   ("C-c g p" . vc-msg-show)
@@ -2063,7 +2249,8 @@ Adapted from `describe-function-or-variable'."
 ;; git timemachine
 
 (use-package git-timemachine
-  :ensure t
+  :demand t
+  :defer t
   :bind
   ("C-c g t" . git-timemachine-toggle)
   (:map evil-normal-state-map
@@ -2075,7 +2262,7 @@ Adapted from `describe-function-or-variable'."
 ;; ** diff-hl (highlights uncommited diffs in bar aside from the line numbers)
 
 (use-package diff-hl
-  :ensure t
+  :demand t
   :defer t
   :custom-face
   ;; Better looking colours for diff indicators
@@ -2113,9 +2300,9 @@ Adapted from `describe-function-or-variable'."
   )
 
 ;; Mode for .gitignore files.
-(use-package gitignore-mode :ensure t :defer t)
-(use-package gitconfig-mode :ensure t :defer t)
-(use-package gitattributes-mode :ensure t :defer t)
+(use-package gitignore-mode :demand t :defer t)
+(use-package gitconfig-mode :demand t :defer t)
+(use-package gitattributes-mode :demand t :defer t)
 
 ;; ##################################################
 ;;
@@ -2159,7 +2346,7 @@ Adapted from `describe-function-or-variable'."
 
 (use-package all-the-icons
   :if window-system
-  :ensure t
+  :demand t
   :commands
   (all-the-icons-octicon
     all-the-icons-faicon
@@ -2195,6 +2382,8 @@ Adapted from `describe-function-or-variable'."
 (use-package display-line-numbers
   :if (version<= "26.0.50" emacs-version)
   :ensure nil
+  :demand t
+  :defer t
   :config
   (setq display-line-numbers-grow-only t)
   (setq display-line-numbers-width-start t)
@@ -2219,8 +2408,8 @@ Adapted from `describe-function-or-variable'."
 ;; Centaur tabs
 
 (use-package centaur-tabs
-  :ensure t
-  :demand
+  :demand t
+  :defer t
   :config
   (centaur-tabs-mode t)
   :bind
@@ -2255,11 +2444,13 @@ Adapted from `describe-function-or-variable'."
 ;; Displays tildes in the fringe on empty lines a la Vi.
 
 (use-package vi-tilde-fringe
-  :ensure t
+  :demand t
+  :defer t
   :diminish
-  :hook
-  (prog-mode . vi-tilde-fringe-mode)
-  (text-mode . vi-tilde-fringe-mode)
+  :config
+  (eval-when-compile
+    (prog-mode . vi-tilde-fringe-mode)
+    (text-mode . vi-tilde-fringe-mode))
   )
 
 ;; *********************************
@@ -2267,13 +2458,15 @@ Adapted from `describe-function-or-variable'."
 ;; Solaire mode
 
 (use-package solaire-mode
-  :ensure t
+  :demand t
+  :defer t
   :hook
   ((change-major-mode after-revert ediff-prepare-buffer) . turn-on-solaire-mode)
   (minibuffer-setup . solaire-mode-in-minibuffer)
   :config
-  (solaire-global-mode +1)
-  (solaire-mode-swap-bg)
+  (eval-when-compile
+    (solaire-global-mode +1)
+    (solaire-mode-swap-bg))
   )
 
 
@@ -2292,17 +2485,20 @@ Adapted from `describe-function-or-variable'."
 
 (use-package paren
   :ensure nil
+  :demand t
   :defer t
   :custom-face
   (show-paren-match ((nil (:background "#9370DB" :foreground "#ffffff")))) ;; :box t
   (show-paren-mismatch ((nil (:background "red" :foreground "black")))) ;; :box t
-  :config
-  (show-paren-mode +1)
+  :init
   (setq show-paren-delay 0.2)
   (setq show-paren-style 'expression) ;; highlight brackets if visible, else entire expression
   (setq show-paren-highlight-openparen t)
   (setq show-paren-when-point-inside-paren t)
   (setq show-paren-when-point-in-periphery t)
+  :config
+  (eval-when-compile
+    (show-paren-mode +1))
   )
 
 ;; *********************************
@@ -2312,7 +2508,7 @@ Adapted from `describe-function-or-variable'."
 ;; This mode highlights (coloring) the current pair in which the point (cursor) is
 
 (use-package highlight-parentheses
-  :ensure t
+  :demand t
   :defer t
   :diminish
   :hook
@@ -2328,7 +2524,7 @@ Adapted from `describe-function-or-variable'."
 
 
 (use-package rainbow-delimiters
-  :ensure t
+  :demand t
   :defer t
   :hook
   (prog-mode . rainbow-delimiters-mode)
@@ -2343,7 +2539,7 @@ Adapted from `describe-function-or-variable'."
 
 
 (use-package highlight-numbers
-  :ensure t
+  :demand t
   :defer t
   :hook
   (prog-mode . highlight-numbers-mode)
@@ -2354,7 +2550,7 @@ Adapted from `describe-function-or-variable'."
 ;; ** Highlighting operators
 
 (use-package highlight-operators
-  :ensure t
+  :demand t
   :defer t
   :hook
   (prog-mode . highlight-operators-mode)
@@ -2366,7 +2562,7 @@ Adapted from `describe-function-or-variable'."
 
 
 (use-package highlight-escape-sequences
-  :ensure t
+  :demand t
   :defer t
   :hook
   (prog-mode . hes-mode)
@@ -2386,7 +2582,8 @@ Adapted from `describe-function-or-variable'."
 
 ;; NOTE that the highlighting works even in comments.
 (use-package hl-todo
-  :ensure t
+  :demand t
+  :defer t
   :hook
   (prog-mode . hl-todo-mode)
   :config
@@ -2409,7 +2606,7 @@ Adapted from `describe-function-or-variable'."
 ;; : Colorize hex, rgb and named color codes
 
 (use-package rainbow-mode
-  :ensure t
+  :demand t
   :defer t
   :diminish
   :hook
@@ -2426,7 +2623,8 @@ Adapted from `describe-function-or-variable'."
 ;; ** Highlight lines
 
 (use-package hl-line
-  :ensure nil ;; built-in
+  :ensure nil
+  :demand t ;; built-in
   :defer t
   :config
   (global-hl-line-mode)
@@ -2435,23 +2633,10 @@ Adapted from `describe-function-or-variable'."
 
 ;; *********************************
 ;;
-;; ** Highlight columns
-
-(use-package col-highlight
-  :load-path "packages/col-highlight"
-  :ensure nil
-  :defer t
-  :config
-  (col-highlight-toggle-when-idle)
-  (col-highlight-set-interval 2)
-  )
-
-;; *********************************
-;;
 ;; ** highlight indent guides
 
 (use-package highlight-indent-guides
-  :ensure t
+  :demand t
   :defer t
   :diminish
   :hook
@@ -2471,7 +2656,8 @@ Adapted from `describe-function-or-variable'."
 ;; mini modeline
 ;; this show modeline information on the minibuffer
 (use-package mini-modeline
-  :quelpa (mini-modeline :repo "kiennq/emacs-mini-modeline" :fetcher github)
+  :demand t
+  :defer t
   :init
   (setq mini-modeline-color "#202020") ;; Background of mini-modeline. Will be set if mini-modeline-enhance-visual is t.
   (setq mini-modeline-enhance-visual t) ;; Enhance minibuffer and window's visibility. This will enable window-divider-mode since without the mode line, two continuous windows are nearly indistinguishable.
@@ -2480,7 +2666,8 @@ Adapted from `describe-function-or-variable'."
   (setq mini-modeline-frame nil) ;; default nil ; Frame to display mini-modeline on. nil means current selected frame.
   (setq mini-modeline-truncate-p t) ;; default t ; Truncates the mini-modeline to fit in one line.
   :config
-  (mini-modeline-mode t)
+  (eval-when-compile
+    (mini-modeline-mode t))
   )
 
 ;; *********************************
@@ -2750,23 +2937,25 @@ Adapted from `describe-function-or-variable'."
 ;; anzu.el is an Emacs port of anzu.vim. anzu.el provides a minor mode which displays current match and total matches information in the mode-line in various search modes.
 
 (use-package anzu
-  :ensure t
+  :demand t
+  :defer t
   :bind
   (:map isearch-mode-map
     ([remap isearch-query-replace] . anzu-isearch-query-replace)
     ([remap isearch-query-replace-regexp] . anzu-isearch-query-replace-regexp))
-  :custom-face
-  (anzu-mode-line ((nil (:foreground "yellow" :weight 'bold))))
-  :custom
-  (anzu-mode-lighter "")
-  (anzu-deactivate-region t)
-  (anzu-search-threshold 1000)
-  (anzu-replace-threshold 50)
-  (anzu-replace-to-string-separator " => ")
+  ;; :custom-face
+  ;; (anzu-mode-line ((nil (:foreground "yellow" :weight 'bold))))
+  :init
+  (setq anzu-mode-lighter "")
+  (setq anzu-deactivate-region t)
+  (setq anzu-search-threshold 1000)
+  (setq anzu-replace-threshold 50)
+  (setq anzu-replace-to-string-separator " => ")
   :config
-  (global-anzu-mode +1)
-  (define-key isearch-mode-map [remap isearch-query-replace]  #'anzu-isearch-query-replace)
-  (define-key isearch-mode-map [remap isearch-query-replace-regexp] #'anzu-isearch-query-replace-regexp)
+  (eval-when-compile
+    (global-anzu-mode +1)
+    (define-key isearch-mode-map [remap isearch-query-replace]  #'anzu-isearch-query-replace)
+    (define-key isearch-mode-map [remap isearch-query-replace-regexp] #'anzu-isearch-query-replace-regexp))
   )
 
 ;; Minions
@@ -2774,7 +2963,7 @@ Adapted from `describe-function-or-variable'."
 ;; Group all minor modes in a single menu in the modeline
 
 (use-package minions
-  :ensure t
+  :demand t
   :config
   (minions-mode 1)
   )
@@ -2784,7 +2973,7 @@ Adapted from `describe-function-or-variable'."
 ;; parrot-mode
 
 (use-package parrot
-  :ensure t
+  :demand t
   ;; :hook
   ;; (parrot-click . parrot-start-animation)
   ;; (after-save . parrot-start-animation)
@@ -2807,7 +2996,7 @@ Adapted from `describe-function-or-variable'."
 ;; nyan-mode
 
 (use-package nyan-mode
-  :ensure t
+  :demand t
   ;; :if window-system
   :init
   (setq nyan-cat-face-number 4)
@@ -2817,3 +3006,12 @@ Adapted from `describe-function-or-variable'."
   (nyan-mode)
   (nyan-start-animation)
   )
+
+;; *********************************
+;;
+;; Post Initialization
+
+;; Let's lower our GC thresholds back down to a sane level.
+
+(setq gc-cons-threshold 16777216
+  gc-cons-percentage 0.1)

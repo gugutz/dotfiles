@@ -1,0 +1,29 @@
+ls
+exit
+ls
+ls
+exit
+ls
+ls
+exit
+ls
+ls
+pwd
+exit
+ls
+echo $SHELL
+exit
+ls
+exit
+ls
+exit
+ls
+prettier-js
+prettier
+which prettier
+exit
+ls
+echo $PATH
+which prettier
+which prettier-js
+ls

@@ -1,0 +1,187 @@
+# inputrc
+# this file is used as configuration by any program that uses the GNU Readline library
+
+# Allow the command prompt to wrap to the next line
+set horizontal-scroll-mode Off
+
+# Enable 8bit input
+set meta-flag On
+set input-meta On
+
+# Turns off 8th bit stripping
+set convert-meta Off
+
+# Keep the 8th bit for display
+set output-meta On
+
+# none, visible or audible
+set bell-style none
+
+# Color files by types
+# Note that this may cause completion text blink in some terminals (e.g. xterm).
+set colored-stats On
+
+# Append char to indicate type
+set visible-stats On
+
+# Mark symlinked directories
+set mark-symlinked-directories On
+
+# Color the common prefix
+set colored-completion-prefix On
+
+# Color the common prefix in menu-complete
+set menu-complete-display-prefix On
+
+##################################
+# VI mode settings
+
+# Vi-style editing has two modes: command and insert. You can display which one is currently active by adding the following option:
+set show-mode-in-prompt on
+
+
+# Different cursor shapes for each mode
+# You can set a different cursor shape for each mode by using "\1 .. \2" escapes:
+# The Virtual Console uses different escape codes, so you should check first which term is being used:
+
+$if term=linux
+	set vi-ins-mode-string \1\e[?0c\2
+	set vi-cmd-mode-string \1\e[?8c\2
+$else
+	set vi-ins-mode-string \1\e[6 q\2
+	set vi-cmd-mode-string \1\e[2 q\2
+$endif
+# This will set a block shaped cursor when in command mode and a pipe cursor when in insert mode. Note that you must have the mode indicator enabled for this to work (see #Mode indicator in prompt.
+
+
+set completion-ignore-case on
+set expand-tilde on
+set show-all-if-ambiguous on
+
+set visible-stats on
+
+##################################
+# BINDINGS
+
+# \e means the ASCII "ESCAPE" character (octal 033 hex 1B decimal 27). Which is part of a command sequence introduction (CSI).
+
+# To get a list of which escape sequences correspond to which keyboard-keys, you can use a command such as infocmp -L -1 or infocmp -L -1 xterm
+
+
+# All of the following map the escape sequence of the value
+# contained in the 1st argument to the readline specific functions
+"\eOd": backward-word
+"\eOc": forward-word
+
+# for linux console
+"\e[1~": beginning-of-line
+"\e[4~": end-of-line
+"\e[5~": beginning-of-history
+"\e[6~": end-of-history
+"\e[3~": delete-char
+"\e[2~": quoted-insert
+
+# for xterm
+"\eOH": beginning-of-line
+"\eOF": end-of-line
+
+# for Konsole
+"\e[H": beginning-of-line
+"\e[F": end-of-line
+
+###############################
+# my personal mappings
+
+set keymap emacs
+"\ea": vi-editing-mode
+
+set keymap vi-command
+"k": history-search-backward
+"j": history-search-forward
+"z": emacs-editing-mode
+"\ea": emacs-editing-mode
+# ---------
+
+set keymap vi-insert
+"\ea": emacs-editing-mode
+"\C-l": clear-screen
+"\C-e": end-of-line
+"\C-k": kill-line
+# ---------
+"\C-A": beginning-of-line
+"\C-B": backward-char
+"\C-D": delete-char
+"\C-E": end-of-line
+"\C-F": forward-char
+"\C-K": kill-line
+"\C-L": clear-screen
+"\C-N": next-history
+"\C-P": previous-history
+"\C-O": operate-and-get-next
+
+# Enable Readline not waiting for additional input when a key is pressed.
+# Needed for the mappings below.
+set keyseq-timeout 0
+
+# `yank-last-arg` does not work exactly as in emacs mode
+"\e.": yank-last-arg
+"\e\177": backward-kill-word
+"\e0": digit-argument
+"\e1": digit-argument
+"\e2": digit-argument
+"\e3": digit-argument
+"\e4": digit-argument
+"\e5": digit-argument
+"\e6": digit-argument
+"\e7": digit-argument
+"\e8": digit-argument
+"\e9": digit-argument
+"\eb": backward-word
+"\ec": capitalize-word
+"\ed": kill-word
+"\ef": forward-word
+"\el": downcase-word
+"\en": non-incremental-forward-search-history
+"\ep": non-incremental-reverse-search-history
+"\et": transpose-words
+"\eu": upcase-word
+"\ey": yank-pop
+
+# some other useful mappings
+
+"\e/": complete-filename
+"\ek": kill-whole-line
+"\eo": "\C-v\C-j"
+# quickly switch to "normal" mode
+"\C-[": vi-movement-mode
+# perserve the currently editing line so that we can
+# do something else before restoring it.
+"\eg": insert-comment
+"\er": "\C-R#\C-A\C-D\C-E"
+
+set editing-mode vi
+
+###################################
+#
+# MY MACROS
+
+# examples taken from the arch wiki:
+# https://wiki.archlinux.org/index.php/Readline
+
+# Ctrl+Alt+L append "| less" to the line and run it (Ctrl+M is equivalent to Enter):
+"\e\C-l": "\C-e | less\C-m"
+
+# The next one prefixes the line with 'yes |' when pressing Ctrl+Alt+Y, confirming any yes/no question the command might ask:
+"\e\C-y": "\C-ayes | \C-m"
+
+# This example wraps the line in su -c '', if Alt+S is pressed:
+"\es": "\C-a su -c '\C-e'\C-m"
+
+# This example prefixes the line with sudo , if Alt+S is pressed. It's safer because it won't input the Enter key.
+"\es": "\C-asudo \C-e"
+
+As a last example, quickly send a command in the background with Ctrl+Alt+B, discarding all of its output:
+
+"\e\C-b": "\C-e > /dev/null 2>&1 &\C-m"
+
+# End /etc/inputrc

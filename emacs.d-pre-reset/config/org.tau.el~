@@ -1,0 +1,20 @@
+;;; package -- Summary
+;############################################
+;; evil mode
+
+;############################################
+;;; Commentary:
+
+;; these are the bindings i eventually got to
+;; while trying to resolve conflicts
+;; with evil disabling native Emacs bindings
+
+;############################################
+;;; Code:
+
+; require Evil related packages
+
+(require 'org)
+
+(provide 'org.tau)
+;;; org.tau.el ends here

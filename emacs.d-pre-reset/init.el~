@@ -1,0 +1,285 @@
+;; **************************************************
+;;
+;;; * PACKAGE MANAGEMENT
+
+;;
+;;; ** package.el
+
+(require 'package)
+(setq package-user-dir (concat user-emacs-directory "elpa/"))
+(setq package-gnupghome-dir (expand-file-name "gpg" package-user-dir))
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t) ; Org-mode's repository
+(package-initialize)
+
+;;
+;;; ** use-package
+
+;; install use-package if not already installed
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package)
+  )
+
+;; load use-package
+(eval-when-compile
+  (require 'use-package))
+
+(use-package diminish :ensure t)
+
+;; **************************************************
+;;
+;;; Evil
+;; Enable Evil
+(use-package evil
+  :ensure t
+  :config
+  (evil-mode 1)
+  ;; change cursor color according to mode
+  (evil-emacs-state-cursor '("#ff0000" box))
+  (evil-motion-state-cursor '("#FFFFFF" box))
+  (evil-normal-state-cursor '("#00ff00" box))
+  (evil-visual-state-cursor '("#abcdef" box))
+  (evil-insert-state-cursor '("#e2f00f" bar))
+  (evil-replace-state-cursor '("red" hbar))
+  (evil-operator-state-cursor '("red" hollow))
+  )
+
+;; evil-commentary
+
+;; gcc -> comments a line
+;; gc -> comments the target of a motion (eg: gcap -> comment all paragraph)
+
+(use-package evil-commentary
+  :ensure t
+  :diminish
+  :config
+  (evil-commentary-mode)
+  )
+
+;; evil-leader
+
+
+(use-package evil-leader
+  :ensure t
+  :after evil
+  :config
+  (global-evil-leader-mode)
+  (evil-leader/set-leader ",")
+  (evil-leader/set-key
+    ;;"e" 'find-file  ;; removed in favor of counsel-find-file
+    "q" 'evil-quit
+    "w" 'save-buffer
+    "d" 'delete-frame
+    "k" 'kill-buffer
+    "b" 'ivy-switch-buffer
+    "-" 'split-window-bellow
+    "|" 'split-window-right
+    "." 'find-tag
+    "t" 'projectile-find-file
+    "b" 'ivy-switch-buffer
+    "vc" 'evilnc-comment-or-uncomment-lines
+    "ag" 'projectile-ag
+    "," 'switch-to-previous-buffer
+    ;;counsel bindings
+    "e" 'counsel-find-file
+    "f" 'counsel-projectile-find-file
+    "cg" 'counsel-ag
+    "r" 'counsel-rg
+                                        ; "gg" 'git-gutter+:toggle
+                                        ; "gd" 'git-gutter+:popup-diff
+                                        ; "gp" 'git-gutter+:previous-hunk
+                                        ; "gn" 'git-gutter+:next-hunk
+                                        ; "gr" 'git-gutter+:revert-hunk
+    "gb" 'mo-git-blame-current
+    "gL" 'magit-log
+    "gs" 'magit-status
+    "q"  'kill-buffer-and-window
+    "u"  'undo-tree-visualize
+    "nn" 'neotree-toggle
+    "nm" 'next-match
+    "nf" 'neotree-find
+    ;; windmove bindings
+    "gk" 'windmove-up
+    "gj" 'windmove-down
+    "gl" 'windmove-right
+    "gh" 'windmove-left
+    "vs" 'split-window-right
+    "hs" 'split-window-below
+    "s"  'ispell-word
+    "ht" 'alchemist-help-search-at-point
+    "gt" 'alchemist-goto-definition-at-point
+    "mf" 'elixir-format
+    "ll" 'longlines-mode
+    "x" 'smex)
+  "|" 'split-window-right
+  )
+
+;; **************************************************
+;;
+;;; Ivy
+
+(use-package ivy
+  :bind
+  ([remap execute-extended-command] . counsel-M-x)
+  ([remap find-file] . counsel-find-file)
+  ([find-file] . counsel-find-file)
+  ([remap switch-to-buffer] . ivy-switch-buffer)
+  ("\C-s" . swiper)
+  ("C-c C-r" . ivy-resume)
+  ("<f6>" . ivy-resume)
+  ("M-x" . counsel-M-x)
+  ("C-x C-f" . counsel-find-file)
+  ("<f1> f" . counsel-describe-function)
+  ("<f1> v" . counsel-describe-variable)
+  ("<f1> l" . counsel-find-library)
+  ("<f2> i" . counsel-info-lookup-symbol)
+  ("<f2> u" . counsel-unicode-char)
+  ("C-c g" . counsel-git)
+  ("C-c j" . counsel-git-grep)
+  ("C-c k" . counsel-ag)
+  ("C-x l" . counsel-locate)
+  ("C-S-o" 'counsel-rhythmbox)
+  :config
+  (ivy-mode 1)
+  ;; Add recent files and bookmarks to the ivy-switch-buffer
+  (setq ivy-use-virtual-buffers t)
+  ;;Displays the current and total number in the collection in the prompt
+  (setq enable-recursive-minibuffers t)
+  ;; display an arrow on the selected item in the list
+  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-pretty)
+  ;; enable this if you want `swiper' to use it
+  ;; (setq search-default-mode #'char-fold-to-regexp)
+  (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
+  )
+
+
+;; ;;
+;; ;; Counsel
+;; (use-package counsel
+;;   :ensure t
+;;   :after ivy
+;;   :diminish counsel-mode
+;;   :hook
+;;   (ivy-mode . counsel-mode)
+;;   ;; use helpful for counsel help functions
+;;   (counsel-describe-function-function #'helpful-callable)
+;;   (counsel-describe-variable-function #'helpful-variable)
+;;   ;; Add smart-casing (-S) to default command arguments:
+;;   (counsel-rg-base-command "rg -S --no-heading --line-number --color never %s .")
+;;   (counsel-ag-base-command "ag -S --nocolor --nogroup %s")
+;;   (counsel-pt-base-command "pt -S --nocolor --nogroup -e %s")
+;;   (counsel-grep-base-command "ag -S --noheading --nocolor --nofilename --numbers '%s' %s")
+;;   :bind
+;;   ("C-s" . swiper)
+;;   ("<f1> f" . counsel-describe-function)
+;;   ("<f1> v" . counsel-describe-variable)
+;;   ("<f1> l" . counsel-find-library)
+;;   ("<f2> i" . counsel-info-lookup-symbol)
+;;   ("<f2> u" . counsel-unicode-char)
+;;   ("C-c g g" . counsel-git)
+;;   ("C-c j" . counsel-git-grep)
+;;   ("C-c k" . counsel-ag)
+;;   ("M-s c" . counsel-ag)
+;;   ("C-x l" . counsel-locate)
+;;   ("C-S-o" . counsel-rhythmbox)
+;;   (:map ivy-minibuffer-map
+;;     ("C-w" . ivy-backward-kill-word)
+;;     ("C-k" . ivy-kill-line)
+;;     ("C-j" . ivy-immediate-done)
+;;     ("RET" . ivy-alt-done)
+;;     ("C-h" . ivy-backward-delete-char))
+;;   :config
+;;   ;; Integration with `projectile'
+;;   (with-eval-after-load 'projectile
+;;     (setq projectile-completion-system 'ivy))
+
+;;   ;; Integration with `magit'
+;;   (with-eval-after-load 'magit
+;;     (setq magit-completing-read-function 'ivy-completing-read))
+;;   )
+
+;; **************************************************
+;;
+;;; Treemacs
+
+(use-package treemacs
+  :ensure t
+  :defer t
+  :bind
+  (:map global-map
+    ("<f8>" . treemacs))
+  )
+
+(use-package treemacs-evil
+  :after treemacs evil
+  :ensure t)
+
+(use-package treemacs-projectile
+  :after treemacs projectile
+  :ensure t)
+
+(use-package treemacs-icons-dired
+  :after treemacs dired
+  :ensure t
+  :config (treemacs-icons-dired-mode))
+
+(use-package treemacs-magit
+  :after treemacs magit
+  :ensure t)
+
+(use-package treemacs-persp
+  :after treemacs persp-mode
+  :ensure t
+  :config (treemacs-set-scope-type 'Perspectives))
+
+;; **************************************************
+;;
+;;; UI Settings
+
+;; Add `./themes' to path
+(add-to-list 'custom-theme-load-path "~/dotfiles/emacs.d/themes/")
+
+;; Set the used theme
+(setq my-theme 'vscode-default-dark)
+
+;;  Load the theme
+(load-theme my-theme t)
+
+
+;; **************************************************
+;;
+;;; ** Projectile
+
+(use-package projectile
+  :ensure t
+  :diminish projectile-mode
+  :bind
+  (:map projectile-mode-map
+    ("s-p" . projectile-command-map)
+    ("C-c p" . projectile-command-map)
+    ("M-S-O p" . counsel-projectile-switch-project)
+    )
+  :custom
+  (projectile-completion-system 'ivy)
+  :init
+  (setq projectile-mode-line-prefix "Project -> ")
+  (setq projectile-mode-line-function '(lambda () (format " Proj[%s]" (projectile-project-name))))
+  :config
+  (projectile-mode +1)
+  )
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (treemacs-persp treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil treemacs evil-leader evil-commentary diminish ivy evil use-package))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
