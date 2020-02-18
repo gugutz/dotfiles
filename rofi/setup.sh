@@ -1,4 +1,4 @@
-sudo pacman -S --noconfirm rofi
+sudo pacman -S --noconfirm --needed rofi
 
 mkdir -p ~/.config/rofi
 

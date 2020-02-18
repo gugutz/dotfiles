@@ -150,7 +150,7 @@ set $hibernate sudo systemctl suspend
 # this make tmux use a main session and doenst spawn multiple unused sessions
 # set $terminal st -e tmux new-session -A -s "main-session"
 # set $terminal       st -e tmux new-session
-set $terminal       st
+set $terminal i3-sensible-terminal
 
 # define default file managers (terminal and gui)
 set $file_manager ranger
@@ -507,7 +507,7 @@ bindsym $mod+m bar mode toggle
 
 # Runs the tmuxinit script, which searches for an earlier tmux instance,
 # otherwise starts a new one (to prevent multiple dropdown sessions).
-exec --no-startup-id st -n dropdown
+exec --no-startup-id $terminal -n dropdown
 # Runs neofetch on first tmux screen if installed.
 exec_always --no-startup-id "tmux send-keys -t 0:0 'clear && neofetch 2>/dev/null' Enter"
 
@@ -782,7 +782,7 @@ workspace $ws5 gaps outer 0
 
 
 # Workspaces setup between monitors
-workspace $ws1 output $primary_monitor
+workspace $ws1 output $primary_monitor $secondary_monitor
 workspace $ws2 output $primary_monitor
 workspace $ws3 output $primary_monitor
 workspace $ws4 output $primary_monitor
@@ -918,3 +918,4 @@ for_window [title="Authy"] floating enable border pixel 1
 # set 'App' window_class as floating windows
 # this makes my java build and runs float on top of the idea, and not divide the screen with another window
 for_window [instance="App"] floating enable
+

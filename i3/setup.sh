@@ -1,6 +1,7 @@
 
 DOTFILES_DIR="~/dotfiles"
 DOTFILES_BACKUP_DIR="~/dotfiles/backup"
+mkdir -p #DOTFILES_BACKUP_DIR
 echo "## install xwininfo to use the find-window-criteria script"
 sudo pacman -S --noconfirm --needed xorg-xwininfo
 

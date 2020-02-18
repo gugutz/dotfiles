@@ -592,8 +592,7 @@
   :init
   (setq amx-save-file "~/.emacs.d/config/amx-items")
   :config
-  (evan-when-compile
-    (amx-mode))
+  (amx-mode)
   )
 
 ;; *********************************
@@ -787,11 +786,11 @@
 
 ;; **************************************************
 ;;
-;; (use-package exec-path-from-shell
-;;   :demand t
-;;   :config
-;;   (exec-path-from-shell-initialize)
-;;   )
+(use-package exec-path-from-shell
+  :demand t
+  :config
+  (exec-path-from-shell-initialize)
+  )
 
 ;; *********************************
 ;;
@@ -1281,11 +1280,11 @@ Version 2016-07-17"
 ;; define list of fonts to be used in the above function
 ;; the first one found will be used
 (set-face-attribute 'default nil :font (font-candidate '
-                                         "Hack-11:weight=normal"
+                                         "Hack-10:weight=normal"
                                          "Droid Sans Mono-10:weight=normal"
                                          "Consolas-10:weight=normal"
                                          "DejaVu Sans Mono-11:weight=normal"
-                                         "Ubuntu Mono-12:weight=normal"
+                                         "Ubuntu Mono-10:weight=normal"
                                          ))
 
 
@@ -1838,8 +1837,7 @@ Adapted from `describe-function-or-variable'."
   ;;(switch-buffer . revert-buffer)
   ;;(switch-window . revert-buffer)
   :config
-  (eval-when-compile
-    (global-auto-revert-mode))
+  (global-auto-revert-mode)
   (setq auto-revert-verbose t) ; let us know when it happens
   (setq auto-revert-use-notify nil)
   (setq auto-revert-stop-on-user-input nil)
@@ -2097,6 +2095,23 @@ Adapted from `describe-function-or-variable'."
 
 ;; *********************************
 ;;
+;; go mode
+
+
+(use-package go-mode
+  :ensure nil
+  :demand t
+  :defer t
+  :commands emacs-lisp-mode
+  :mode
+  ("\\.go$" . go-mode)
+  :config
+  (add-hook 'before-save-hook #'gofmt-before-save)
+  )
+
+
+;; *********************************
+;;
 ;; lisp mode
 (use-package lisp-mode
   :ensure nil
@@ -2339,7 +2354,7 @@ Adapted from `describe-function-or-variable'."
 (add-to-list 'custom-theme-load-path "~/dotfiles/emacs.d/themes/")
 
 ;; Set the used theme
-(setq my-theme 'vscode-default-dark)
+(setq my-theme 'vscode-dark-plus)
 
 ;;  Load the theme
 (load-theme my-theme t)
@@ -2383,7 +2398,6 @@ Adapted from `describe-function-or-variable'."
   :if (version<= "26.0.50" emacs-version)
   :ensure nil
   :demand t
-  :defer t
   :config
   (setq display-line-numbers-grow-only t)
   (setq display-line-numbers-width-start t)
@@ -2492,7 +2506,7 @@ Adapted from `describe-function-or-variable'."
   (show-paren-mismatch ((nil (:background "red" :foreground "black")))) ;; :box t
   :init
   (setq show-paren-delay 0.2)
-  (setq show-paren-style 'expression) ;; highlight brackets if visible, else entire expression
+  (setq show-paren-style 'parenthesis) ;; highlight brackets if visible, else entire expression
   (setq show-paren-highlight-openparen t)
   (setq show-paren-when-point-inside-paren t)
   (setq show-paren-when-point-in-periphery t)

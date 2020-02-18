@@ -101,6 +101,7 @@ command! W w !sudo tee % > /dev/null
 
 " quicly edit/reload configuration file
 nnoremap cfo :e $MYVIMRC<CR>
+nnoremap cfe :e ~/.vimrc<CR>
 nnoremap cfs :so $MYVIMRC<CR>
 
 
@@ -378,6 +379,10 @@ endif
 " Set vim font (using NerdFont pached Hack for devicons plugin)
 set guifont=Hack\ Nerd\ Font\ 15
 
+" APPLY THE COLOR SCHEME
+" This has to be put after the plugins load. The downloaded color scheme
+" only becomes available after the plug#end() line
+colorscheme codedark
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => FILES, BACKUPS AND UNDO
@@ -391,13 +396,14 @@ set noswapfile
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => NAVIGATION AROUND, TABS, WINDOWS AND BUFFERS
 
-" use <leader>s for horizontal split, <leader>v for vertical split
+" use <leader>s for horizontal split,
 " <leader>q closes pane
 nnoremap <silent> <leader>s :split<CR>
 nnoremap <silent> <leader>- :split<CR>
 
+" <leader>v or | for vertical split
 nnoremap <silent> <leader>v :vsplit<CR>
-nnoremap <silent> <leader>| :vsplit<CR>
+nnoremap <silent> <leader>\| :vsplit<CR>
 
 " easier 'vim style' window navigation
 map <C-j> <C-W>j
@@ -608,10 +614,6 @@ let g:vim_markdown_folding_disabled = 1
 " RUBY MINITEST SETTINGS (i_ctrl+x_ctrl+u for minitest method completion)
 set completefunc=syntaxcomplete#Complete
 
-" APPLY THE COLOR SCHEME
-" This has to be put after the plugins load. The downloaded color scheme
-" only becomes available after the plug#end() line
-colorscheme codedark
 
 "############################################
 " FZF settings
@@ -671,6 +673,11 @@ nnoremap <Leader><Leader>a :AgsQuit<CR>
 " show linting errors on a separate window
 " let g:ale_open_list = 1
 " let g:ale_list_window_size = 5
+let g:ale_sign_error = '>>'
+let g:ale_sign_warning = '--'
+
+" Show X lines of errors (default: 10)
+let g:ale_list_window_size = 10
 
 "############################################
 " TSLint settings
@@ -742,11 +749,22 @@ nmap <silent> gr <Plug>(coc-references)
 
 " Toogle NERDTree
 map <leader>e :NERDTreeToggle<CR>
+
+" Toogle NERDTree on currently open file
+nnoremap <silent> <Leader>v :NERDTreeFind<CR>
+
 set<F8>=<leader>e
 
 " Open NerdTree on Vim startup
 autocmd VimEnter * NERDTree
 autocmd VimEnter * if argc() | wincmd p | endif
+
+
+" Show bookmarks table on Nerdtree
+let NERDTreeShowBookmarks=1
+
+" Open nerdtree directly on a specif path
+" au VimEnter *  NERDTree /path/to/a/folder/
 
 " Open NerdTree directly on the file currently being edited
 set autochdir
@@ -761,8 +779,11 @@ let NERDTreeDirArrows = 1
 " autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
-" closenerdtreeonopneninfile
-let NERDTreeQuitOnOpen = 1
+" Automatically delete the buffer of the file you just deleted with NerdTree:
+let NERDTreeAutoDeleteBuffer = 1
+
+" close nerd tree on opening file
+let NERDTreeQuitOnOpen = 0
 
 "############################################
 " EMMET SETTINGS
