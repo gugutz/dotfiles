@@ -19,9 +19,8 @@
 ;; too high or it will result in long GC pauses during normal usage.
 
 ;; Code
-(eval-and-compile
-  (setq gc-cons-threshold most-positive-fixnum ; 2^61 bytes
-    gc-cons-percentage 0.6))
+(setq gc-cons-threshold most-positive-fixnum ;; 2^61 bytes
+  gc-cons-percentage 0.6)
 
 ;; Disable certain byte compiler warnings to cut down on the noise. This is a personal choice and can be removed if you would like to see any and all byte compiler warnings.
 
@@ -415,38 +414,37 @@
   ;; evil in modeline
   (evil-mode-line-format '(before . mode-line-front-space)) ;; move evil tag to beginning of modeline
   :config
-  (eval-when-compile
-    (evil-mode 1)
+  (evil-mode 1)
   ;;; FOR SOME REASON WHEN I MAP KEYS IN :bind EVIL DOENST LOAD ON STARTUP
-    (define-key evil-normal-state-map (kbd "SPC q") 'evil-quit)
-    ;; ("SPC q" . kill-buffer-and-window) ;; check if evil quit does this
-    (define-key evil-normal-state-map (kbd "SPC w") 'save-buffer)
-    (define-key evil-normal-state-map (kbd "SPC d") 'delete-frame)
-    (define-key evil-normal-state-map (kbd "SPC k") 'kill-current-buffer)
-    (define-key evil-normal-state-map (kbd "SPC 0") 'delete-window)
-    (define-key evil-normal-state-map (kbd "SPC -") 'split-window-bellow)
-    (define-key evil-normal-state-map (kbd "SPC |") 'split-window-right)
-    (define-key evil-normal-state-map (kbd "SPC u") 'undo-tree-visualize)
-    (define-key evil-normal-state-map (kbd "SPC o") 'other-window)
+  (define-key evil-normal-state-map (kbd "SPC q") 'evil-quit)
+  ;; ("SPC q" . kill-buffer-and-window) ;; check if evil quit does this
+  (define-key evil-normal-state-map (kbd "SPC w") 'save-buffer)
+  (define-key evil-normal-state-map (kbd "SPC d") 'delete-frame)
+  (define-key evil-normal-state-map (kbd "SPC k") 'kill-current-buffer)
+  (define-key evil-normal-state-map (kbd "SPC 0") 'delete-window)
+  (define-key evil-normal-state-map (kbd "SPC -") 'split-window-bellow)
+  (define-key evil-normal-state-map (kbd "SPC |") 'split-window-right)
+  (define-key evil-normal-state-map (kbd "SPC u") 'undo-tree-visualize)
+  (define-key evil-normal-state-map (kbd "SPC o") 'other-window)
 
-    ;; ------------------------------------------
-    ;;
+  ;; ------------------------------------------
+  ;;
   ;;; RECOVER SOME USEFUL EMACS NATIVE COMMANDS
-    (define-key evil-insert-state-map (kbd "C-y") 'yank)
-    (define-key evil-insert-state-map (kbd "C-a") 'beginning-of-line)
-    (define-key evil-insert-state-map (kbd "C-e") 'end-of-line)
-    (define-key evil-normal-state-map (kbd "C-y") 'yank)
-    (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
-    (define-key evil-insert-state-map (kbd "C-d") 'delete-char)
-    ;; native find definition
-    (global-set-key (kbd "M-.") 'xref-find-definitions)
-    ;; somehow global-set-key doenst work for normal mode for this binding, so i manually set it
-    (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
+  (define-key evil-insert-state-map (kbd "C-y") 'yank)
+  (define-key evil-insert-state-map (kbd "C-a") 'beginning-of-line)
+  (define-key evil-insert-state-map (kbd "C-e") 'end-of-line)
+  (define-key evil-normal-state-map (kbd "C-y") 'yank)
+  (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
+  (define-key evil-insert-state-map (kbd "C-d") 'delete-char)
+  ;; native find definition
+  (global-set-key (kbd "M-.") 'xref-find-definitions)
+  ;; somehow global-set-key doenst work for normal mode for this binding, so i manually set it
+  (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
 
-    (global-set-key (kbd "C-S-H") 'evil-window-left)
-    (global-set-key (kbd "C-S-L") 'evil-window-right)
-    (global-set-key (kbd "C-S-K") 'evil-window-up)
-    (global-set-key (kbd "C-S-J") 'evil-window-down))
+  (global-set-key (kbd "C-S-H") 'evil-window-left)
+  (global-set-key (kbd "C-S-L") 'evil-window-right)
+  (global-set-key (kbd "C-S-K") 'evil-window-up)
+  (global-set-key (kbd "C-S-J") 'evil-window-down)
   )
 
 ;; *********************************
@@ -826,29 +824,26 @@
 
 (use-package treemacs-evil
   :after treemacs evil
-  :demand t
-  :defer t)
+  :demand t)
 
 (use-package treemacs-projectile
   :after treemacs projectile
   :demand t
-  :defer t)
+  )
 
 (use-package treemacs-icons-dired
   :after treemacs dired
   :demand t
-  :defer t
   :config (treemacs-icons-dired-mode))
 
 (use-package treemacs-magit
   :after treemacs magit
   :demand t
-  :defer t)
+  )
 
 (use-package treemacs-persp
   :after treemacs persp-mode
   :demand t
-  :defer t
   :config (treemacs-set-scope-type 'Perspectives))
 
 
@@ -2419,8 +2414,20 @@ Adapted from `describe-function-or-variable'."
 
 ;; *********************************
 ;;
-;; Centaur tabs
+;; emacs 27 native tabs
 
+(use-package tabbar
+  :disabled
+  :ensure nil
+  :demand t
+  :config
+  (tab-bar-mode +1) ;; per-frame
+  ;; (tab-line-mode +1) ;; per window
+  )
+
+;; *********************************
+;;
+;; Centaur tabs
 (use-package centaur-tabs
   :demand t
   :defer t
@@ -2502,17 +2509,16 @@ Adapted from `describe-function-or-variable'."
   :demand t
   :defer t
   :custom-face
-  (show-paren-match ((nil (:background "#9370DB" :foreground "#ffffff")))) ;; :box t
+  (show-paren-match ((nil (:background "#9370DB" :foreground "#ffffff" :weight bold :box t)))) ;; :box t
   (show-paren-mismatch ((nil (:background "red" :foreground "black")))) ;; :box t
   :init
-  (setq show-paren-delay 0.2)
+  (setq show-paren-delay 0)
   (setq show-paren-style 'parenthesis) ;; highlight brackets if visible, else entire expression
   (setq show-paren-highlight-openparen t)
   (setq show-paren-when-point-inside-paren t)
   (setq show-paren-when-point-in-periphery t)
   :config
-  (eval-when-compile
-    (show-paren-mode +1))
+  (show-paren-mode +1)
   )
 
 ;; *********************************
@@ -2527,6 +2533,9 @@ Adapted from `describe-function-or-variable'."
   :diminish
   :hook
   (prog-mode . highlight-parentheses-mode)
+  :init
+  (setq hl-paren-colors '("firebrick1" "IndianRed1" "IndianRed3" "IndianRed4"))
+  (setq hl-paren-background-colors '("#eee222" "#eee555" "#eee777" "#eee999"))
   )
 
 ;; *********************************
@@ -2650,42 +2659,26 @@ Adapted from `describe-function-or-variable'."
 ;; ** highlight indent guides
 
 (use-package highlight-indent-guides
-  :demand t
-  :defer t
-  :diminish
-  :hook
-  ((prog-mode yaml-mode toml-mode) . highlight-indent-guides-mode)
-  :custom
-  (highlight-indent-guides-auto-enabled t)
-  (highlight-indent-guides-responsive t)
-  (highlight-indent-guides-method 'character) ; column
-  )
+:demand t
+:defer t
+:diminish
+:hook
+((prog-mode yaml-mode toml-mode) . highlight-indent-guides-mode)
+:custom
+(highlight-indent-guides-auto-enabled t)
+(highlight-indent-guides-responsive t)
+(highlight-indent-guides-method 'character) ; column
+)
 
 ;; ========================================
 ;;
 ;;; UI -> Modeline
 
-;; *********************************
-;;
-;; mini modeline
-;; this show modeline information on the minibuffer
-(use-package mini-modeline
-  :demand t
-  :defer t
-  :init
-  (setq mini-modeline-color "#202020") ;; Background of mini-modeline. Will be set if mini-modeline-enhance-visual is t.
-  (setq mini-modeline-enhance-visual t) ;; Enhance minibuffer and window's visibility. This will enable window-divider-mode since without the mode line, two continuous windows are nearly indistinguishable.
-  (setq mini-modeline-echo-duration 4) ;; default 2 ; Duration to keep display echo. mini-modeline will display the message which has been echoed to echo area as part of mode line. Those echo will be automatically clear after this interval. Check out the gif to see it in action.
-  (setq mini-modeline-update-interval 0.1) ;; default 0.1 ; The minimum interval to update mini-modeline. If you found mini-modeline is being updated to frequently, you can customize this variable.
-  (setq mini-modeline-frame nil) ;; default nil ; Frame to display mini-modeline on. nil means current selected frame.
-  (setq mini-modeline-truncate-p t) ;; default t ; Truncates the mini-modeline to fit in one line.
-  :config
-  (eval-when-compile
-    (mini-modeline-mode t))
-  )
 
 ;; *********************************
 ;; Modified or Read Only
+
+
 ;; This snippet displays a chain icon when the current file is saved, a broken chain when it is modified and a pad lock when the file is read only.
 
 ;; (defun custom-modeline-modified
@@ -2957,8 +2950,8 @@ Adapted from `describe-function-or-variable'."
   (:map isearch-mode-map
     ([remap isearch-query-replace] . anzu-isearch-query-replace)
     ([remap isearch-query-replace-regexp] . anzu-isearch-query-replace-regexp))
-  ;; :custom-face
-  ;; (anzu-mode-line ((nil (:foreground "yellow" :weight 'bold))))
+  :custom-face
+  (anzu-mode-line ((nil (:foreground "yellow" :weight bold))))
   :init
   (setq anzu-mode-lighter "")
   (setq anzu-deactivate-region t)
@@ -3028,4 +3021,4 @@ Adapted from `describe-function-or-variable'."
 ;; Let's lower our GC thresholds back down to a sane level.
 
 (setq gc-cons-threshold 16777216
-  gc-cons-percentage 0.1)
+gc-cons-percentage 0.1)
