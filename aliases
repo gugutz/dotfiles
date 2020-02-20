@@ -33,8 +33,6 @@ alias mv='mv -i'
 # unrar alias
 alias unrar='rar e'
 
-# get rid of command not found by mistakengly typing cd..
-alias cd..='cd ..'
 
 ## colorize the ls output ##
 alias ls='ls --color=auto'
@@ -50,8 +48,28 @@ alias path='echo -e ${PATH//:/\\n}'
 alias nowtime='date +"%T"'
 # alias nowtime=now
 alias nowdate='date +"%d-%m-%Y"'
+# ---------------------------------------------
+
+# DIRECTORY ALIASES
+
+# get rid of command not found by mistakengly typing cd..
+alias cd..='cd ..'
+
+# cd into dotfiles dir
+alias cddt='cd ~/dotfiles'
+
+# cd into PEP directory
+alias cdpep='cd ~/code/qualirede/pep'
+
+# cd into PEP directory
+alias cdpepapi='cd ~/code/qualirede/pep-api'
+# ---------------------------------------------
 
 # git aliases
+
+# auto commit and push dotfiles
+alias gpushdt='cd ~/dotfiles && git status && git add . && git commit -am && git push origin master'
+
 alias gst='git status'
 alias gsts='git stash'
 alias gstp='git stash pop'

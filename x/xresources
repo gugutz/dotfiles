@@ -6,6 +6,10 @@ Xft.autohint:  false
 Xft.hintstyle: hintslight
 Xft.lcdfilter: lcddefault
 
+!#########################################################
+! XTERM SETTTINGS
+!#########################################################
+
 XTerm*background:        #222D31
 XTerm*foreground:        #d8d8d8
 XTerm*pointerColor:      #1ABB9B
@@ -21,6 +25,10 @@ XTerm*selectToClipboard: true
 *cursorColor:                     #1ABB9B
 *pointerColorBackground:          #2B2C2B
 *pointerColorForeground:          #16A085
+
+!#########################################################
+! COLORS
+!#########################################################
 
 !! black dark/light
 *color0:                          #222D31
@@ -57,7 +65,20 @@ XTerm*selectToClipboard: true
 Xcursor.theme: xcursor-breeze
 Xcursor.size:                     0
 
+!#########################################################
+! UXRVT settings
+!#########################################################
+
+! do not scroll with output
+URxvt*scrollTtyOutput: false
+
+! scroll in relation to buffer (with mouse scroll or Shift+Page Up)
+URxvt*scrollWithBuffer: true
+
+! scroll back to the bottom on keypress
+URxvt*scrollTtyKeypress: true
 URxvt.font:                       9x15,xft:TerminessTTFNerdFontMono
+! URxvt.font:                       9x15,xft:HackTTFNerdFontMono
 
 ! alternative font settings with 'terminus':
 ! URxvt.font:      -xos4-terminus-medium-r-normal--16-160-72-72-c-80-iso10646-1
