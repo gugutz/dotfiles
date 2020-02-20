@@ -5,7 +5,7 @@
 " Configuration only for Neovim:
 
 if has('nvim')
-        tnoremap <Esc> <C-\><C-n>
+	tnoremap <Esc> <C-\><C-n>
 endif
 
 " Configuration only for Vim
@@ -54,16 +54,14 @@ endif
 " Shows line numbering
 set number
 
-
-
 " Use Unix as the standard file type
 set ffs=unix,dos,mac
 
-" With a map leader it's possible to do extra key combinations
-" like <leader>w saves the current file
+" leader key
 let g:mapleader = "\<Space>"
 let g:maplocalleader = ","
-" Map leader and localleader to activate which key when pressed
+
+" which key activate on leader press
 nnoremap <silent> <leader> :<c-u>WhichKey '<Space>'<CR>
 nnoremap <silent> <localleader> :<c-u>WhichKey ','<CR>
 
@@ -74,26 +72,12 @@ nmap <leader>w :w!<cr>
 " Fast quitting
 nmap <leader>q :q!<cr>
 
-" Delete trailing whitespace on saving for certain file types
-autocmd BufWritePre * %s/\s\+$//e
+" ----------------------------------------------
 
+" Delete trailing whitespace on save
 " source: https://stackoverflow.com/questions/19936145/vim-remove-whitespace-for-specific-files
-" function! StripTrailingWhitespace()
-"     " Preparation: save last search, and cursor position.
-"     let _s=@/
-"     let l = line(".")
-"     let c = col(".")
-"     " do the business:
-"     %s/\s\+$//e
-"     " clean up: restore previous search history, and cursor position
-"     let @/=_s
-"     call cursor(l, c)
-" endfunction
-
-" let noStripWhiteSpaceTypes = ['markdown']
-" autocmd BufWritePre * if index(noStripWhiteSpaceTypes, &ft) < 0 | call StripTrailingWhitespace() | endif
-
-
+autocmd BufWritePre * %s/\s\+$//e
+" ----------------------------------------------
 
 " :W sudo saves the file
 " (useful for handling the permission-denied error)
@@ -103,10 +87,11 @@ command! W w !sudo tee % > /dev/null
 nnoremap cfo :e $MYVIMRC<CR>
 nnoremap cfe :e ~/.vimrc<CR>
 nnoremap cfs :so $MYVIMRC<CR>
+" ----------------------------------------------
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => SYNTAX HIGHLIGHTING
+"##############################################################
+" SYNTAX HIGHLIGHTING
 
 " Native vim filetype plugin enables syntax highlighting base on file type
 filetype on
@@ -116,8 +101,8 @@ filetype plugin on
 syntax enable
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => INDENTATION
+"##############################################################
+" INDENTATION
 
 filetype indent on
 set autoindent " Auto indent
@@ -133,16 +118,16 @@ set shiftwidth=2
 set tabstop=2
 
 
-" #######################################################
+"##############################################################
 " auto reload (source) vimrc if changed
 " this makes unnecessary to restart vim after adding plugins or changing something in the config
 
-" if has ('autocmd') " Remain compatible with earlier versions
-"     augroup vimrc     " Source vim configuration upon save
-"         autocmd! BufWritePost $MYVIMRC source % | echom "Reloaded " . $MYVIMRC | redraw
-"         autocmd! BufWritePost $MYGVIMRC if has('gui_running') | so % | echom "Reloaded " . $MYGVIMRC | endif | redraw
-"     augroup END
-" endif " has autocmd
+if has ('autocmd') " Remain compatible with earlier versions
+    augroup vimrc     " Source vim configuration upon save
+        autocmd! BufWritePost $MYVIMRC source % | echom "Reloaded " . $MYVIMRC | redraw
+        autocmd! BufWritePost $MYGVIMRC if has('gui_running') | so % | echom "Reloaded " . $MYGVIMRC | endif | redraw
+    augroup END
+endif " has autocmd
 
 
 " Clipboard
@@ -157,8 +142,6 @@ set so=7
 " Avoid garbled characters in Chinese language windows OS
 let $LANG='en'
 set langmenu=en
-source $VIMRUNTIME/delmenu.vim
-source $VIMRUNTIME/menu.vim
 
 
 " Ignore compiled files
@@ -191,8 +174,8 @@ set lazyredraw
 " For regular expressions turn magic on
 set magic
 
-
-set showmatch " Show matching brackets when text indicator is over them
+" Show matching brackets when text indicator is over them
+set showmatch
 
 " How many tenths of a second to blink when matching brackets
 set mat=2
@@ -208,7 +191,7 @@ set foldcolumn=1
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => TEXT EDITING SETTINGS
+" TEXT EDITING SETTINGS
 
 " bindings to move text up and down (line or block)
 nnoremap <M-j> :m .+1<CR>==
@@ -218,7 +201,6 @@ inoremap <M-k> <Esc>:m .-2<CR>==gi
 vnoremap <M-j> :m '>+1<CR>gv=gv
 vnoremap <M-k> :m '<-2<CR>gv=gv
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " replace all instances of currently selected word for new input (leader + r)
 map <leader>r :%s///g<left><left>
@@ -239,7 +221,7 @@ au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => SEARCH SETTINGS
+" SEARCH SETTINGS
 
 " Ignore case when searching
 set ignorecase
@@ -258,7 +240,7 @@ vnoremap <silent> # :<C-u>call VisualSelection('', '')<CR>?<C-R>=@/<CR><CR>
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => SPELL CHECKING
+" SPELL CHECKING
 
 " Pressing ,ss will toggle and untoggle spell checking
 map <leader>ss :setlocal spell!<cr>
@@ -363,7 +345,7 @@ set title
 
 
 :set cursorline " highlight current line
-:set cursorcolumn " highlight current column
+" :set cursorcolumn " highlight current column
 " => COLORS AND FONTs
 
 set t_Co=256
@@ -398,11 +380,11 @@ set noswapfile
 
 " use <leader>s for horizontal split,
 " <leader>q closes pane
-nnoremap <silent> <leader>s :split<CR>
+nnoremap <silent> <leader>sh :split<CR>
 nnoremap <silent> <leader>- :split<CR>
 
 " <leader>v or | for vertical split
-nnoremap <silent> <leader>v :vsplit<CR>
+nnoremap <silent> <leader>sv :vsplit<CR>
 nnoremap <silent> <leader>\| :vsplit<CR>
 
 " easier 'vim style' window navigation
@@ -593,8 +575,8 @@ Plug 'godlygeek/tabular'                 " Tabular align texts that grow
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 
-" CtrlP
-Plug 'ctrlp/ctrlp.vim'                 " Tabular align texts that grow
+" " CtrlP
+" Plug 'ctrlp/ctrlp.vim'                 " Tabular align texts that grow
 Plug 'gabesoft/vim-ags' " ag, rg support
 
 Plug 'tpope/vim-sensible'

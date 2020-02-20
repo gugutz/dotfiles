@@ -51,7 +51,7 @@ prompt pure > /dev/null
 
 #########################################
 # my aliases
-[[ -e $HOME/.aliases ]] && emulate sh -c 'source $HOME/.aliases'
+[[ -e $HOME/dotfiles/aliases ]] && source $HOME/dotfiles/aliases
 
 #########################################
 # ZSH settings

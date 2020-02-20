@@ -20,11 +20,6 @@ echo "## install whatsapp (nativefier)"
 yay -S --noconfirm --needed whatsapp-nativefier
 
 #echo "## install discord"
-#echo "## creating symbolic link fqor discord appimage in local disk"
-#sudo ln -sf ~/apps/discord-stable-0.0.5-x86_64.AppImage /usr/local/bin/discord
-# if getting key error...
-# gpg --recv-keys --keyserver hkp://pgp.mit.edu A2C794A986419D8A
-# discord client
 # yay -S --noconfirm discord
 
 #echo "## install slack desktop"
@@ -37,6 +32,7 @@ sudo pacman -S --noconfirm --needed arandr
 
 #echo "## install virtual box"
 #sudo pacman -S --noconfirm --needed virtualbox
+
 #echo "## install linux 4.14 virtuabox host modules"
 #sudo pacman -S --noconfirm linux414-virtualbox-host-modules
 #sudo modprobe vboxdrv
@@ -44,3 +40,18 @@ sudo pacman -S --noconfirm --needed arandr
 #echo "## install obs studio"
 #sudo pacman -S --noconfirm --needed obs-studio
 
+echo "## install spotify-tui"
+yay -S --noconfirm --needed spotify-tui
+
+echo "## install spotify deamon for playback on spotify-tui"
+yay -S --noconfirm --needed spotifyd
+
+echo "%{green}############################################################"
+echo "## qualirede things"
+echo "############################################################${reset_color}"
+
+echo "## Installing Google Chat electron wrapper"
+yay -S --noconfirm --needed google-chat-linux-git
+
+echo "## Installing clockify time tracker"
+yay -S --noconfirm --needed clockify-desktop

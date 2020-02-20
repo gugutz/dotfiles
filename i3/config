@@ -326,7 +326,7 @@ assign [class="TelegramDesktop"] → $ws9
 
 # Whatsapp Desktop
 exec whatsapp-nativefier
-assign [class="whats-app-nativefier-d52542"] → $ws9
+assign [class="whatsapp-nativefier-d52542"] → $ws9
 
 # Toggl Desktop
 exec TogglDesktop
@@ -505,21 +505,26 @@ bindsym $mod+m bar mode toggle
 # SCRATCHPAD SETTINGS
 ################################################
 
-# Runs the tmuxinit script, which searches for an earlier tmux instance,
-# otherwise starts a new one (to prevent multiple dropdown sessions).
-exec --no-startup-id $terminal -n dropdown
+# Terminal scratchpad
+
+# for st
+# exec --no-startup-id $terminal -n terminal_dropdown
+# for urxvt (default terminal on manjaro i3)
+exec --no-startup-id $terminal -name terminal-scratchpad
+
+for_window [instance="terminal-scratchpad"] floating enable
+for_window [instance="terminal-scratchpad"] resize set 1000 700
+for_window [instance="terminal-scratchpad"] move scratchpad
+for_window [instance="terminal-scratchpad"] border pixel 5
+bindsym $mod+z [instance="terminal-scratchpad"] scratchpad show; [instance="terminal-scratchpad"] move position center
+# ----------------------------------------------
+
 # Runs neofetch on first tmux screen if installed.
 exec_always --no-startup-id "tmux send-keys -t 0:0 'clear && neofetch 2>/dev/null' Enter"
 
-# Terminal scratchpad
-for_window [instance="dropdown"] floating enable
-for_window [instance="dropdown"] resize set 1000 700
-for_window [instance="dropdown"] move scratchpad
-for_window [instance="dropdown"] border pixel 5
+# ----------------------------------------------
 
-
-bindsym $mod+z [instance="dropdown"] scratchpad show; [instance="dropdown"] move position center
-
+# multiapps scratchpad
 
 # move the currently focused window to the scratchpad
 bindsym $mod+Shift+minus move scratchpad
@@ -527,7 +532,73 @@ bindsym $mod+Shift+minus move scratchpad
 # Show the next scratchpad window or hide the focused scratchpad window.
 # If there are multiple scratchpad windows, this command cycles through them.
 bindsym $mod+minus scratchpad show; [instance="dropdown"] move position center
+# ----------------------------------------------
 
+#calc (galculator)
+# exec --no-startup-id $terminal -T "galculator-scratchpad" -e galculator
+exec --no-startup-id galculator
+
+bindsym XF86Calculator [instance="galculator"] scratchpad show
+bindsym $mod+F12 [instance="galculator"] scratchpad show
+
+for_window [instance="galculator"] move scratchpad
+for_window [instance="galculator"] resize set height 10 px
+for_window [instance="galculator"] resize set width 30 px
+# ----------------------------------------------
+
+#tmux for terminals/weechat/builds and upgrades
+exec $terminal -title spad -e sh -c "tmux attach -t spad || tmux new-session -s spad"
+
+for_window [title="spad"] move scratchpad
+
+bindsym $mod+F7 [title="spad"] scratchpad show
+bindsym $mod+Shift+F7 exec --no-startup-id $term -title spad -e sh -c "tmux attach -t spad || tmux new-session -s spad"
+# ----------------------------------------------
+
+#music
+exec $terminal -title spad -e ncmpcpp
+for_window [title="ncmpcpp_scratchpad"] move scratchpad
+for_window [title="ncmpcpp_scratchpad"] resize grow width 700 px
+for_window [title="ncmpcpp_scratchpad"] resize grow height 350 px
+
+bindsym $mod+F8[title="ncmpcpp_music"] scratchpad show
+bindsym $mod+Shift+F8 exec --no-startup-id $terminal -title music -e sh -c ncmpcpp_music
+# ----------------------------------------------
+
+# spotify-tui
+exec $terminal -title spotify-tui-scratchpad -e spt
+for_window [title="spotify-tui-scratchpad"] move scratchpad
+for_window [title="spotify-tui-scratchpad"] resize set width 1200 px
+for_window [title="spotify-tui-scratchpad"] resize set height 800 px
+
+bindsym $mod+F6 [title="spotify-tui-scratchpad"] scratchpad show;  [title="spotify-tui-scratchpad"] move position center
+bindsym $mod+Shift+F6 exec --no-startup-id $terminal -title spotify-tui-scratchpad -e spt
+# ----------------------------------------------
+
+# ranger
+
+# for uxrvt (default term in i3 manjaro)
+exec --no-startup-id $terminal -T ranger-scratchpad -e ranger
+
+for_window [title="ranger-scratchpad"] move scratchpad
+for_window [title="ranger-scratchpad"] resize set width 1200 px
+for_window [title="ranger-scratchpad"] resize set height 1000 px
+
+bindsym $mod+F11 [title="ranger-scratchpad"] scratchpad show; [title="ranger-scratchpad"] move position center
+bindsym $mod+Shift+F11 exec --no-startup-id $terminal -T "ranger-scratchpad" -e ranger
+# ----------------------------------------------
+
+# gui file manager
+
+# for uxrvt (default term in i3 manjaro)
+exec --no-startup-id $terminal -name pcmanfm-scratchpad -e pcmanfm
+
+for_window [instance="pcmanfm-scratchpad"] move scratchpad
+for_window [instance="pcmanfm-scratchpad"] resize set height 150 px
+for_window [instance="pcmanfm-scratchpad"] resize set width 200 px
+
+bindsym $mod+F10 [title="pcmanfm-scratchpad"] scratchpad show; [title="pcmanfm-scratchpad"] move position center
+bindsym $mod++Shift+10 exec --no-startup-id $terminal -T "pcmanfm-scratchpad" -e pcmanfm
 
 ################################################
 # BINDINGS FOR EDITING SEVERAL CONFIG AND
@@ -918,4 +989,3 @@ for_window [title="Authy"] floating enable border pixel 1
 # set 'App' window_class as floating windows
 # this makes my java build and runs float on top of the idea, and not divide the screen with another window
 for_window [instance="App"] floating enable
-
