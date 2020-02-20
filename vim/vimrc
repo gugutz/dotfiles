@@ -33,7 +33,7 @@ if !has('nvim')
 
 	" ui related settings
 	set wildmenu  " Turn on the Wild menu
-	set wildoptions=pum,tagfile
+	set wildoptions+=pum,tagfile
 	set laststatus=2 " Always show the status line (without this airline doenst show up)
 
 	" don't give |ins-completion-menu| messages.
@@ -363,7 +363,7 @@ set title
 
 
 :set cursorline " highlight current line
-:set cursorcolumn " highlight current column
+" :set cursorcolumn " highlight current column
 " => COLORS AND FONTs
 
 set t_Co=256

@@ -1275,8 +1275,8 @@ Version 2016-07-17"
 ;; define list of fonts to be used in the above function
 ;; the first one found will be used
 (set-face-attribute 'default nil :font (font-candidate '
-                                         "Hack-10:weight=normal"
-                                         "Droid Sans Mono-10:weight=normal"
+                                         "Hack-11:weight=normal"
+                                         "Droid Sans Mono-11:weight=normal"
                                          "Consolas-10:weight=normal"
                                          "DejaVu Sans Mono-11:weight=normal"
                                          "Ubuntu Mono-10:weight=normal"
@@ -1749,7 +1749,6 @@ Adapted from `describe-function-or-variable'."
 ;; hippie expand
 
 (use-package hippie-exp
-  :ensure nil
   :demand t ;; builtin package
   :defer t
   :bind
@@ -1758,9 +1757,7 @@ Adapted from `describe-function-or-variable'."
   (:map evil-insert-state-map
     ("<tab>" . hippie-expand)
     )
-  :config
-  (:map evil-insert-state-map
-    ("<tab>" . company-indent-or-complete-common))
+  :init
   (setq-default hippie-expand-try-functions-list
     '(
        yas-hippie-try-expand
@@ -1769,6 +1766,9 @@ Adapted from `describe-function-or-variable'."
        emmet-expand-yas
        indent-according-to-mode
        ))
+  :config
+  (:map evil-insert-state-map
+    ("<tab>" . company-indent-or-complete-common))
   )
 
 ;; *********************************
