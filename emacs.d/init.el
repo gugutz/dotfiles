@@ -2555,6 +2555,18 @@ Adapted from `describe-function-or-variable'."
   (setq rainbow-delimiters-max-face-count 3)
   )
 
+;; *********************************
+;;
+;; ** Rainbow Blocks
+
+
+(use-package rainbow-blocks
+  :demand t
+  :defer t
+  :hook
+  (prog-mode . rainbow-blocks-mode)
+  )
+
 
 ;; *********************************
 ;;
@@ -2659,16 +2671,16 @@ Adapted from `describe-function-or-variable'."
 ;; ** highlight indent guides
 
 (use-package highlight-indent-guides
-:demand t
-:defer t
-:diminish
-:hook
-((prog-mode yaml-mode toml-mode) . highlight-indent-guides-mode)
-:custom
-(highlight-indent-guides-auto-enabled t)
-(highlight-indent-guides-responsive t)
-(highlight-indent-guides-method 'character) ; column
-)
+  :demand t
+  :defer t
+  :diminish
+  :hook
+  ((prog-mode yaml-mode toml-mode) . highlight-indent-guides-mode)
+  :custom
+  (highlight-indent-guides-auto-enabled t)
+  (highlight-indent-guides-responsive t)
+  (highlight-indent-guides-method 'character) ; column
+  )
 
 ;; ========================================
 ;;

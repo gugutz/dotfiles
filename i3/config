@@ -561,10 +561,20 @@ for_window [title="ncmpcpp_scratchpad"] move scratchpad
 for_window [title="ncmpcpp_scratchpad"] resize grow width 700 px
 for_window [title="ncmpcpp_scratchpad"] resize grow height 350 px
 
-bindsym $mod+F8[title="ncmpcpp_music"] scratchpad show
+bindsym $mod+F8 [title="ncmpcpp_music"] scratchpad show
 bindsym $mod+Shift+F8 exec --no-startup-id $terminal -title music -e sh -c ncmpcpp_music
 # ----------------------------------------------
 
+# start Music on Console app
+
+exec $terminal -title spotify-tui-scratchpad -e moc
+for_window [title="moc-scratchpad"] move scratchpad
+for_window [title="moc-scratchpad"] resize set width 900 px
+for_window [title="moc-scratchpad"] resize set height 700 px
+
+bindsym $mod+F5 [title="moc-scratchpad"] scratchpad show;  [title="moc-scratchpad"] move position center
+bindsym $mod+Shift+F5 exec --no-startup-id $terminal -title moc-scratchpad -e moc
+# ----------------------------------------------
 # spotify-tui
 exec $terminal -title spotify-tui-scratchpad -e spt
 for_window [title="spotify-tui-scratchpad"] move scratchpad
@@ -723,8 +733,6 @@ bindsym $mod+Control+Shift+Return       exec --no-startup-id $editorgui
 # start vim
 bindsym $mod+Control+Return         exec --no-startup-id st -e tmux new-session vim
 
-# start Music on Console app
-bindsym $mod+F5 exec terminal -e 'mocp'
 
 
 

@@ -68,7 +68,7 @@ alias cdpepapi='cd ~/code/qualirede/pep-api'
 # git aliases
 
 # auto commit and push dotfiles
-alias gpushdt='cd ~/dotfiles && git status && git commit -am && git push origin master'
+alias gpushdt='cd ~/dotfiles && git status && git add . && git commit -am && git push origin master'
 
 alias gst='git status'
 alias gsts='git stash'

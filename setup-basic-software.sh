@@ -40,6 +40,9 @@ sudo pacman -S --noconfirm --needed arandr
 #echo "## install obs studio"
 #sudo pacman -S --noconfirm --needed obs-studio
 
+echo "## install MOC music player for terminal"
+sudo pacman -S --noconfirm --needed moc
+
 echo "## install spotify-tui"
 yay -S --noconfirm --needed spotify-tui
 
