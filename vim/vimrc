@@ -2,6 +2,224 @@
 " my vim setup
 """""""""""""""""""""""""""""""""""""""""""""""
 
+" plugins
+
+call plug#begin('~/.vim/plugged')
+
+" Autocomplete
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
+" Linting
+Plug 'w0rp/ale'                          " ALE Asynchronous ESLinter for several languages
+
+" Snippets
+Plug 'honza/vim-snippets'
+
+" vim which key on-demand lazy load
+Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
+
+" UI / Colorscheme / tema
+Plug 'tomasiser/vim-code-dark'
+Plug 'nathanaelkane/vim-indent-guides'
+Plug 'chrisbra/Colorizer'                " Show hex codes as colours
+
+" Vim Airline statusbar
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'mkitt/tabline.vim'                 " Cleaner tabs
+
+" Colour matched brackets
+Plug 'kien/rainbow_parentheses.vim'
+Plug 'ryanoasis/vim-devicons'            " Icons for dev file types. Has to be loaded after airline
+
+" Rainbow Parentheses Improved
+Plug 'luochen1990/rainbow'
+
+Plug 'editorconfig/editorconfig-vim'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-repeat'                  " so that vim-surroud actions will be repeatable with dot command .
+Plug 'tpope/vim-commentary'              " use with 'gc', equivalent to vscode ctrl+/)
+Plug 'terryma/vim-multiple-cursors'       " Install vim-multiple-cursors (equivalent to vscode ctrl+d)
+Plug 'scrooloose/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
+Plug 'unblevable/quick-scope'            " Highlight jump characters
+Plug 'francoiscabrol/ranger.vim'         " Install ranger-vim integration with ranger file manager
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'RRethy/vim-illuminate'             " illuminate other uses of current word under cursor
+
+" Git interfaces
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-git'
+Plug 'airblade/vim-gitgutter'
+
+
+Plug 'amiorin/vim-project'
+Plug 'pbrisbin/vim-runfile'
+Plug 'mattn/emmet-vim'
+
+" Vim matchit to extend % function (already comes installed in nvim)
+if !has('nvim')
+  Plug 'adelarsq/vim-matchit' " Matchit extends the % function, navigating to more than a single character
+endif
+
+Plug 'valloric/MatchTagAlways'           " Show matching and closing tags
+
+" Javascript Plugins
+Plug 'pangloss/vim-javascript'
+Plug 'mxw/vim-jsx'                       " JSX syntax colors and indent support. Depends on vim-javascript
+Plug 'xojs/vim-xo'                       " Install vim-xo for xo linting support
+Plug 'prettier/vim-prettier', { 'do': 'npm install' }
+
+" Typescript
+Plug 'heavenshell/vim-tslint'
+
+" Go
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+
+" Elixir
+Plug 'elixir-editors/vim-elixir'
+Plug 'slashmili/alchemist.vim'
+Plug 'mhinz/vim-mix-format'
+
+" Ruby
+Plug 'vim-ruby/vim-ruby'
+Plug 'tpope/vim-rails'
+Plug 'tpope/vim-rake'
+Plug 'sunaku/vim-ruby-minitest'
+Plug 'tpope/vim-bundler'
+
+" Readline shortcuts for insert mode
+Plug 'tpope/vim-rsi'
+
+
+" Markdown
+Plug 'plasticboy/vim-markdown'
+Plug 'suan/vim-instant-markdown'         " Markdown preview instant-markdown-
+Plug 'godlygeek/tabular'                 " Tabular align texts that grow
+
+" FZF
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+
+" " CtrlP
+" Plug 'ctrlp/ctrlp.vim'                 " Tabular align texts that grow
+Plug 'gabesoft/vim-ags' " ag, rg support
+
+Plug 'tpope/vim-sensible'
+Plug 'tpope/vim-eunuch' " Vim sugar for the UNIX shell commands, like :Delete to delete buffer and file at same time, SudoWrite, etc...
+Plug 'ntpeters/vim-better-whitespace' " Highlight trailing whitespace
+Plug 'sheerun/vim-polyglot' " Syntax highliht, indent and filetype plugin support for several languages
+
+" Initialize plugin system
+call plug#end()
+" Rainbow Parentheses Improved
+Plug 'luochen1990/rainbow'
+
+
+" Auto install vim-plug and Plugins
+if empty(glob('~/.config/nvim/autoload/plug.vim'))
+    if !executable("curl")
+        echoerr "You have to install curl or first install vim-plug yourself!"
+        execute "q!"
+    endif
+    echo "Installing Vim-Plug..."
+    echo ""
+    silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
+                \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+
+
+
+
+
+" SERAPHY BR CONFIG
+" REVISAR ISTO
+" Put your non-Plugin stuff after this line
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" General:
+set autoindent               " Auto-indent new lines
+set background=dark
+set clipboard=unnamedplus
+set cursorline              " Highlight cursor line
+set encoding=utf-8          " Define o encoding exibido no terminal
+set expandtab               " Use spaces instead of tabs
+set fileencoding=utf-8      " Define o encoding na escrita dos arquivos
+set hidden
+set hlsearch                " Highlight all search results
+set ignorecase              " Always case-insensitive
+set inccommand=split
+set incsearch                     " Searches for strings incrementally
+set linebreak                     " Break lines at word (requires Wrap lines)
+set list listchars=trail:·,tab:>· " Show trailing spaces as dots
+set mouse=a                 " Enable mouse. see :help mouse for info.
+set noshowmode
+set number                  " Show line numbers
+set pumblend=11             " pseudo-transparent popup menu
+set pumheight=10
+set relativenumber
+set scrolloff=1000           " Always show N lines above/below the cursor
+set shell=/bin/zsh
+set shiftwidth=4            " Number of auto-indent spaces
+set showbreak=+++           " Wrap-broken line prefix
+set showmatch               " Highlight matching brace
+set smartcase               " Enable smart-case search
+set smartindent             " Enable smart-indent
+set smarttab                " Enable smart-tabs
+set softtabstop=4           " Number of spaces per Tab
+set spelllang=pt_br,en_us
+set splitbelow
+set termguicolors
+set textwidth=110                    " Line wrap (number of cols)
+set virtualedit=insert,block,onemore " Permite mover o cursor onde não há texto
+set visualbell                       " Use visual bell (no beeping)
+set wildmenu
+set wildmode=full
+
+set wildignore+=*.ai,*.bmp,*.gif,*.ico,*.jpg,*.jpeg,*.png,*.psd,*.webp
+set wildignore+=*.aux,*.out,*.toc
+set wildignore+=*.avi,*.divx,*.mp4,*.webm,*.mov,*.m2ts,*.mkv,*.vob,*.mpg,*.mpeg
+set wildignore+=*.doc,*.pdf,*.cbr,*.cbz,*.docx,*.ppt,*.odt
+set wildignore+=*.eot,*.otf,*.ttf,*.woff
+set wildignore+=*.mp3,*.oga,*.ogg,*.wav,*.flac
+set wildignore+=*.o,*.obj,*.exe,*.dll,*.manifest,*.rbc,*.class,*.jar,*.iso
+set wildignore+=*.swp,.lock,.DS_Store,._*
+set wildignore+=*.zip,*.tar.gz,*.tar.bz2,*.rar,*.tar.xz,*.kgb
+set wildignore+=.git,.hg,.svn
+
+"" Advanced:
+set backspace=indent,eol,start " Backspace behaviour
+set ruler                      " Show row and column ruler information
+set undolevels=1500            " Number of undo levels
+
+"" Persistent Undo:
+" Let's save undo info!
+if !isdirectory($HOME."/.config/nvim/undo-dir")
+    call mkdir($HOME."/.config/nvim/undo-dir", "", 0700)
+endif
+set undodir=~/.config/nvim/undo-dir
+set undofile
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 " Configuration only for Neovim:
 
 if has('nvim')
@@ -36,7 +254,7 @@ if !has('nvim')
 	set wildoptions+=pum,tagfile
 	set laststatus=2 " Always show the status line (without this airline doenst show up)
 
-	" don't give |ins-completion-menu| messages.
+	" Don't pass messages to |ins-completion-menu|.
 	set shortmess+=c
 
 	set display+=lastline,msgsep
@@ -366,17 +584,42 @@ set guifont=Hack\ Nerd\ Font\ 15
 " only becomes available after the plug#end() line
 colorscheme codedark
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => FILES, BACKUPS AND UNDO
+"############################################
+"
+" FILES, BACKUPS AND UNDO
 
 " Turn backup off, since most stuff is in SVN, git et.c anyway...
 set nobackup
-set nowb
+set nowritebackup
 set noswapfile
 
+"-----------------------------
+" FZF settings
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => NAVIGATION AROUND, TABS, WINDOWS AND BUFFERS
+" Mapping selecting mappings
+nmap <leader><tab> <plug>(fzf-maps-n)
+xmap <leader><tab> <plug>(fzf-maps-x)
+omap <leader><tab> <plug>(fzf-maps-o)
+
+map <leader>ff :Files<cr>
+map <leader>b :Buffers<cr>
+
+" Insert mode completion
+imap <c-x><c-k> <plug>(fzf-complete-word)
+imap <c-x><c-f> <plug>(fzf-complete-path)
+imap <c-x><c-j> <plug>(fzf-complete-file-ag)
+imap <c-x><c-l> <plug>(fzf-complete-line)
+
+" Advanced customization using Vim function
+inoremap <expr> <c-x><c-k> fzf#vim#complete#word({'left': '15%'})
+
+" Replace the default dictionary completion with fzf-based fuzzy completion
+inoremap <expr> <c-x><c-k> fzf#vim#complete('cat /usr/share/dict/words')
+
+
+"############################################
+"
+" TABS, WINDOWS AND BUFFERS
 
 " use <leader>s for horizontal split,
 " <leader>q closes pane
@@ -406,6 +649,8 @@ nnoremap <leader>3 3gt
 nnoremap <leader>4 4gt
 nnoremap <leader>5 5gt
 
+
+nnoremap <leader>bl :Buffers<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " TABS AND WINDOW SPLTTING
@@ -479,113 +724,6 @@ endtry
 " set statusline+=%b,0x%-8B\                   " current char
 " set statusline+=%-14.(%l,%c%V%)\ %<%P        " offset
 
-"##########################################
-" plugins
-
-call plug#begin('~/.vim/plugged')
-
-" Autocomplete
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-
-" Linting
-Plug 'w0rp/ale'                          " ALE Asynchronous ESLinter for several languages
-
-" Snippets
-Plug 'honza/vim-snippets'
-
-" vim which key on-demand lazy load
-Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
-
-" UI / Colorscheme / tema
-Plug 'tomasiser/vim-code-dark'
-Plug 'nathanaelkane/vim-indent-guides'
-Plug 'chrisbra/Colorizer'                " Show hex codes as colours
-
-" Vim Airline statusbar
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'mkitt/tabline.vim'                 " Cleaner tabs
-
-" Colour matched brackets
-Plug 'kien/rainbow_parentheses.vim'
-Plug 'ryanoasis/vim-devicons'            " Icons for dev file types. Has to be loaded after airline
-Plug 'editorconfig/editorconfig-vim'
-Plug 'tpope/vim-surround'
-Plug 'tpope/vim-repeat'                  " so that vim-surroud actions will be repeatable with dot command .
-Plug 'tpope/vim-commentary'              " use with 'gc', equivalent to vscode ctrl+/)
-Plug 'terryma/vim-multiple-cursors'       " Install vim-multiple-cursors (equivalent to vscode ctrl+d)
-Plug 'scrooloose/nerdtree'
-Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'unblevable/quick-scope'            " Highlight jump characters
-Plug 'francoiscabrol/ranger.vim'         " Install ranger-vim integration with ranger file manager
-Plug 'christoomey/vim-tmux-navigator'
-Plug 'RRethy/vim-illuminate'             " illuminate other uses of current word under cursor
-
-" Git interfaces
-Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-git'
-Plug 'airblade/vim-gitgutter'
-
-
-Plug 'amiorin/vim-project'
-Plug 'pbrisbin/vim-runfile'
-Plug 'mattn/emmet-vim'
-
-" Vim matchit to extend % function (already comes installed in nvim)
-if !has('nvim')
-  Plug 'adelarsq/vim-matchit' " Matchit extends the % function, navigating to more than a single character
-endif
-
-Plug 'valloric/MatchTagAlways'           " Show matching and closing tags
-
-" Javascript Plugins
-Plug 'pangloss/vim-javascript'
-Plug 'mxw/vim-jsx'                       " JSX syntax colors and indent support. Depends on vim-javascript
-Plug 'xojs/vim-xo'                       " Install vim-xo for xo linting support
-Plug 'prettier/vim-prettier', { 'do': 'npm install' }
-
-" Typescript
-Plug 'heavenshell/vim-tslint'
-
-" Go
-Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-
-" Elixir
-Plug 'elixir-editors/vim-elixir'
-Plug 'slashmili/alchemist.vim'
-Plug 'mhinz/vim-mix-format'
-
-" Ruby
-Plug 'vim-ruby/vim-ruby'
-Plug 'tpope/vim-rails'
-Plug 'tpope/vim-rake'
-Plug 'sunaku/vim-ruby-minitest'
-Plug 'tpope/vim-bundler'
-
-" Readline shortcuts for insert mode
-Plug 'tpope/vim-rsi'
-
-
-" Markdown
-Plug 'plasticboy/vim-markdown'
-Plug 'suan/vim-instant-markdown'         " Markdown preview instant-markdown-
-Plug 'godlygeek/tabular'                 " Tabular align texts that grow
-
-" FZF
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'junegunn/fzf.vim'
-
-" " CtrlP
-" Plug 'ctrlp/ctrlp.vim'                 " Tabular align texts that grow
-Plug 'gabesoft/vim-ags' " ag, rg support
-
-Plug 'tpope/vim-sensible'
-Plug 'tpope/vim-eunuch' " Vim sugar for the UNIX shell commands, like :Delete to delete buffer and file at same time, SudoWrite, etc...
-Plug 'ntpeters/vim-better-whitespace' " Highlight trailing whitespace
-Plug 'sheerun/vim-polyglot' " Syntax highliht, indent and filetype plugin support for several languages
-
-" Initialize plugin system
-call plug#end()
 
 " ######################################
 " PLUGINS SETTINGS
@@ -596,26 +734,6 @@ let g:vim_markdown_folding_disabled = 1
 " RUBY MINITEST SETTINGS (i_ctrl+x_ctrl+u for minitest method completion)
 set completefunc=syntaxcomplete#Complete
 
-
-"############################################
-" FZF settings
-
-" Mapping selecting mappings
-nmap <leader><tab> <plug>(fzf-maps-n)
-xmap <leader><tab> <plug>(fzf-maps-x)
-omap <leader><tab> <plug>(fzf-maps-o)
-
-" Insert mode completion
-imap <c-x><c-k> <plug>(fzf-complete-word)
-imap <c-x><c-f> <plug>(fzf-complete-path)
-imap <c-x><c-j> <plug>(fzf-complete-file-ag)
-imap <c-x><c-l> <plug>(fzf-complete-line)
-
-" Advanced customization using Vim function
-inoremap <expr> <c-x><c-k> fzf#vim#complete#word({'left': '15%'})
-
-" Replace the default dictionary completion with fzf-based fuzzy completion
-inoremap <expr> <c-x><c-k> fzf#vim#complete('cat /usr/share/dict/words')
 
 "############################################
 " CtrlP fuzzy finder
@@ -676,14 +794,14 @@ autocmd BufWritePost *.ts,*.tsx call tslint#run('a', win_getid())
 " taken from http://vim.wikia.com/wiki/Make_Vim_completion_popup_menu_work_just_like_in_an_IDE
 
 " The above command will change the 'completeopt' option so that Vim's popup menu doesn't select the first completion item, but rather just inserts the longest common text of all matches; and the menu will come up even if there's only one match.
-:set completeopt=longest,menuone
+" :set completeopt=longest,menuone
 
 " The following mapping will change the behavior of the <Enter> key when the popup menu is visible. In that case the Enter key will simply select the highlighted menu item, just as <C-Y> does.
-:inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+" :inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 
 " Navigate through suggestions with C-j and C-k
-inoremap <expr> <C-j> pumvisible() ? "\<C-N>" : "\<C-j>"
-inoremap <expr> <C-k> pumvisible() ? "\<C-P>" : "\<C-k>"
+" inoremap <expr> <C-j> pumvisible() ? "\<C-N>" : "\<C-j>"
+" inoremap <expr> <C-k> pumvisible() ? "\<C-P>" : "\<C-k>"
 
 " autocmd FileType python set omnifunc=pythoncomplete#Complete
 " autocmd FileType javascript set omnifunc=javascriptcomplete#CompleteJS
@@ -713,17 +831,194 @@ let g:airline#extensions#tabline#formatter = 'unique_tail'
 let g:airline_powerline_fonts = 1                     " needed by devicons
 
 
+" SERAPHYBR airline config
+"" Airline status line:
+set laststatus=2
+let g:airline_powerline_fonts = 1
+let g:airline_theme='deus'
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#left_sep = ' '
+let g:airline#extensions#tabline#left_alt_sep = '|'
+let g:airline#extensions#ale#enabled = 1
+let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
+let g:airline_section_error = '%{airline#util#wrap(airline#extensions#coc#get_error(),0)}'
+let g:airline_section_warning = '%{airline#util#wrap(airline#extensions#coc#get_warning(),0)}'
+
+
 
 "############################################
 " COC Settings
-" to get the correct comment highlighting
+" settings taken from: https://github.com/neoclide/coc.nvim#example-vim-configuration
+
+" TextEdit might fail if hidden is not set.
+set hidden
+
+" Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
+" delays and poor user experience.
+set updatetime=300
+
+" Always show the signcolumn, otherwise it would shift the text each time
+" diagnostics appear/become resolved.
+set signcolumn=yes
+
+" to get the correct comment highlighting for jsonc
 autocmd FileType json syntax match Comment +\/\/.\+$+
+
+" Use <c-space> to trigger completion.
+inoremap <silent><expr> <c-space> coc#refresh()
+
+
+" Use tab for trigger completion with characters ahead and navigate.
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Use <Tab> and <S-Tab> to navigate the completion list:
+
+inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+
+
+" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
+" position. Coc only does snippet and additional edit on confirm.
+if has('patch8.1.1068')
+  " Use `complete_info` if your (Neo)Vim version supports it.
+  inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
+else
+  imap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+endif
+
+" To make <cr> select the first completion item and confirm the completion when no item has been selected:
+inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm() : "\<C-g>u\<CR>"
+
 
 " Remap keys for gotos
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
+
+" Use K to show documentation in preview window.
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" Highlight the symbol and its references when holding the cursor.
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Symbol renaming.
+nmap <leader>rn <Plug>(coc-rename)
+
+
+" Formatting selected code.
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+
+augroup mygroup
+  autocmd!
+  " Setup formatexpr specified filetype(s).
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  " Update signature help on jump placeholder.
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+
+
+" Applying codeAction to the selected region.
+" Example: `<leader>aap` for current paragraph
+xmap <leader>a  <Plug>(coc-codeaction-selected)
+nmap <leader>a  <Plug>(coc-codeaction-selected)
+
+" Remap keys for applying codeAction to the current line.
+nmap <leader>ac  <Plug>(coc-codeaction)
+" Apply AutoFix to problem on the current line.
+nmap <leader>qf  <Plug>(coc-fix-current)
+
+
+" Introduce function text object
+" NOTE: Requires 'textDocument.documentSymbol' support from the language server.
+xmap if <Plug>(coc-funcobj-i)
+xmap af <Plug>(coc-funcobj-a)
+omap if <Plug>(coc-funcobj-i)
+omap af <Plug>(coc-funcobj-a)
+
+" Use <TAB> for selections ranges.
+" NOTE: Requires 'textDocument/selectionRange' support from the language server.
+" coc-tsserver, coc-python are the examples of servers that support it.
+nmap <silent> <TAB> <Plug>(coc-range-select)
+xmap <silent> <TAB> <Plug>(coc-range-select)
+
+
+" Add `:Format` command to format current buffer.
+command! -nargs=0 Format :call CocAction('format')
+
+
+" Add `:Fold` command to fold current buffer.
+command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+
+" Add `:OR` command for organize imports of the current buffer.
+command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
+
+" Add (Neo)Vim's native statusline support.
+" NOTE: Please see `:h coc-status` for integrations with external plugins that
+" provide custom statusline: lightline.vim, vim-airline.
+set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+
+
+" Mappings using CoCList:
+" Show all diagnostics.
+nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
+" Manage extensions.
+nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
+" Show commands.
+nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
+" Find symbol of current document.
+nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
+" Search workspace symbols.
+nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
+" Do default action for next item.
+nnoremap <silent> <space>j  :<C-u>CocNext<CR>
+" Do default action for previous item.
+nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
+" Resume latest coc list.
+nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
+
+
+" Extensions
+let g:coc_global_extensions = [
+      \ 'coc-git',
+      \ 'coc-highlight',
+      \ 'coc-marketplace',
+      \ 'coc-pairs',
+      " Programming languages
+      \ 'coc-html',
+      \ 'coc-css',
+      \ 'coc-json',
+      \ 'coc-java',
+      \ 'coc-rls',
+      \ 'coc-tsserver',
+      \ 'coc-yaml',
+      \ 'coc-vimlsp',
+      " Tools
+      \ 'coc-prettier',
+      \ 'coc-project',
+      \ 'coc-snippets',
+      \ 'coc-actions'
+      \ ]
 
 
 "############################################
@@ -777,6 +1072,14 @@ map <C-Space> <c-y>,
 " navigate to edit points
 inoremap <C->> <c-y>n<CR>
 
+"" Prettier
+let g:prettier#config#print_width = 100
+let g:prettier#autoformat = 0
+let g:prettier#config#tab_width = 4
+
+"" Rainbow Parentheses Improved
+let g:rainbow_active = 1
+let g:rainbow_conf = {'guifgs': ['#FFD700','#C466C0','#7AB9E0']}
 
 "############################################
 " VIM COLORIZER SETTINGS
@@ -881,3 +1184,8 @@ command! ZoomToggle call s:ZoomToggle()
 noremap <leader>z :ZoomToggle<CR>
 
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" settings to fix the mouse issue on alacritty terminal
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+set ttymouse=sgr

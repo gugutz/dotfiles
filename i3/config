@@ -598,17 +598,20 @@ bindsym $mod+F11 [title="ranger-scratchpad"] scratchpad show; [title="ranger-scr
 bindsym $mod+Shift+F11 exec --no-startup-id $terminal -T "ranger-scratchpad" -e ranger
 # ----------------------------------------------
 
-# gui file manager
+# pcmanfm
+# since this is a GUI programa, it needs to provide a flag to set some WINDOW PROPS by itself.
+# luckly pcmanfm provides the --role flag to set the WM_WINDOW_ROLE, which can be used here.
+# the --role flag only works if used together with the -n (or --new-win) flag
 
 # for uxrvt (default term in i3 manjaro)
-exec --no-startup-id $terminal -name pcmanfm-scratchpad -e pcmanfm
+exec --no-startup-id pcmanfm --new-win --role pcmanfm-scratchpad
 
-for_window [instance="pcmanfm-scratchpad"] move scratchpad
-for_window [instance="pcmanfm-scratchpad"] resize set height 150 px
-for_window [instance="pcmanfm-scratchpad"] resize set width 200 px
+for_window [window_role="pcmanfm-scratchpad"] move scratchpad
+for_window [window_role="pcmanfm-scratchpad"] resize set width 1300 px
+for_window [window_role="pcmanfm-scratchpad"] resize set height 900 px
 
-bindsym $mod+F10 [title="pcmanfm-scratchpad"] scratchpad show; [title="pcmanfm-scratchpad"] move position center
-bindsym $mod++Shift+10 exec --no-startup-id $terminal -T "pcmanfm-scratchpad" -e pcmanfm
+bindsym $mod+F10 [window_role="pcmanfm-scratchpad"] scratchpad show; [window_role="pcmanfm-scratchpad"] move position center
+bindsym $mod++Shift+F10 exec --no-startup-id pcmanfm --new-win --role pcmanfm-scratchpad
 
 ################################################
 # BINDINGS FOR EDITING SEVERAL CONFIG AND

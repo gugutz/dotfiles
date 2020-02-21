@@ -53,3 +53,9 @@ patch -Np1 -i st-alpha-0.8.2.diff
 
 echo "# building st"
 make install
+
+echo "installing alacritty rust gpu accelerated terminal"
+sudo pacman -S --noconfirm --needed alacritty
+
+echo "installing dust - du replacement written in rust"
+yay -S --noconfirm --needed dust
