@@ -2535,7 +2535,7 @@ Adapted from `describe-function-or-variable'."
   (prog-mode . highlight-parentheses-mode)
   :init
   (setq hl-paren-colors '("firebrick1" "IndianRed1" "IndianRed3" "IndianRed4"))
-  (setq hl-paren-background-colors '("#eee222" "#eee555" "#eee777" "#eee999"))
+  (setq hl-paren-background-colors '("#eee222" "#ccba85" "#bceae7" "#2aa020"))
   )
 
 ;; *********************************
