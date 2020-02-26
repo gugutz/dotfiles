@@ -34,15 +34,20 @@ set colored-completion-prefix On
 set menu-complete-display-prefix On
 
 ##################################
+#
 # VI mode settings
 
 # Vi-style editing has two modes: command and insert. You can display which one is currently active by adding the following option:
 set show-mode-in-prompt on
 
-
 # Different cursor shapes for each mode
 # You can set a different cursor shape for each mode by using "\1 .. \2" escapes:
 # The Virtual Console uses different escape codes, so you should check first which term is being used:
+
+#set vi-ins-mode-string "\1\e[5 q\2"
+#set vi-cmd-mode-string "\1\e[2 q\2"
+set vi-ins-mode-string \1\e[5 q\2
+set vi-cmd-mode-string \1\e[2 q\2
 
 $if term=linux
 	set vi-ins-mode-string \1\e[?0c\2
@@ -61,12 +66,11 @@ set show-all-if-ambiguous on
 set visible-stats on
 
 ##################################
+#
 # BINDINGS
 
 # \e means the ASCII "ESCAPE" character (octal 033 hex 1B decimal 27). Which is part of a command sequence introduction (CSI).
-
 # To get a list of which escape sequences correspond to which keyboard-keys, you can use a command such as infocmp -L -1 or infocmp -L -1 xterm
-
 
 # All of the following map the escape sequence of the value
 # contained in the 1st argument to the readline specific functions
@@ -90,7 +94,15 @@ set visible-stats on
 "\e[F": end-of-line
 
 ###############################
+#
 # my personal mappings
+
+# j and k should search for the string of characters preceding the cursor
+"k": history-search-backward
+"j": history-search-forward
+
+set keymap vi-insert
+# inoremap jk <Esc>
 
 set keymap emacs
 "\ea": vi-editing-mode
@@ -100,14 +112,13 @@ set keymap vi-command
 "j": history-search-forward
 "z": emacs-editing-mode
 "\ea": emacs-editing-mode
-# ---------
 
 set keymap vi-insert
+"jk": vi-movement-mode
 "\ea": emacs-editing-mode
 "\C-l": clear-screen
 "\C-e": end-of-line
 "\C-k": kill-line
-# ---------
 "\C-A": beginning-of-line
 "\C-B": backward-char
 "\C-D": delete-char
@@ -180,7 +191,7 @@ set editing-mode vi
 # This example prefixes the line with sudo , if Alt+S is pressed. It's safer because it won't input the Enter key.
 "\es": "\C-asudo \C-e"
 
-As a last example, quickly send a command in the background with Ctrl+Alt+B, discarding all of its output:
+# As a last example, quickly send a command in the background with Ctrl+Alt+B, discarding all of its output:
 
 "\e\C-b": "\C-e > /dev/null 2>&1 &\C-m"
 

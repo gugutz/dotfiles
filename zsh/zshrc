@@ -166,6 +166,13 @@ export SDKMAN_DIR="/home/tau/.sdkman"
 # VI mode
 bindkey -v
 
+# change cursor shape according to vi mode
+# since zsh doenst use readline's inputrc file, but its own ZLE instaed, this has to be here
+
+zle-line-init() {
+    zle -K viins # initiate `vi insert` as keymap (can be removed if `bindkey -V` has been set elsewhere)
+    echo -ne "\e[5 q"
+}
 #########################################
 #
 # My Binding and Macros

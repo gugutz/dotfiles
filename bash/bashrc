@@ -269,6 +269,7 @@ export SDKMAN_DIR="$HOME/.sdkman"
 # enable VI mode (if this is at the beggining of the file somehow it doenst activate. some other setting must overide it in the way)
 set -o vi
 
+
 # create a binding (alt-e) to toggle between emacs (readline) and vi mode
 set -o emacs
 bind '"\ee": vi-editing-mode'

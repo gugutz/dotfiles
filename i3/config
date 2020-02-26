@@ -6,45 +6,153 @@
 ################################################
 
 ################################################
-# SET FIRST AND SECOND MONITORS
-# this must be run before the rest of the script
+# Monitors Setup
+
+set $home_primary_monitor DVI-I-2
+set $home_secondary_monitor DVI-I-1
+set $work_primary_monitor DP1
+set $work_secondary_monitor eDP1
+
+set $primary_monitor $home_primary_monitor
+set $secondary_monitor $home_secondary_monitor
+
+set $home_single_monitor_layout xrandr --output DVI-I-2 --mode 1920x1080 --rotate normal --output DVI-I-1 --mode 1280x1024 --same-as $home_primary_monitor
+
+set $home_dual_monitor_layout xrandr --output DVI-I-1 --mode 1280x1024 --pos 0x0 --rotate normal --output DVI-I-2 --primary --mode 1920x1080 --pos 1280x0 --rotate normal
+
+set $work_single_monitor_layout xrandr --output $work_primary_monitor --mode 1920x1080 --pos 0x0 --rotate normal --output $work_secondary_monitor --primary --mode 1920x1080 --pos 0x0 --rotate normal
+
+set $work_dual_monitor_layout xrandr --output $work_primary_monitor --primary --mode 1920x1080 --pos 0x0 --rotate normal --output $work_secondary_monitor --mode 1920x1080 --pos 1920x0 --rotate normal
+
+# setup monitors
+exec_always --no-startup-id $home_dual_monitor_layout
 
 
-# name of first and second monitors
-# find out yours with the commands:
-# xrandr --current OR xrandr --listmonitors
+# HOME
+bindsym $mod+Control+Shift+1 exec $home_single_monitor_layout
+bindsym $mod+Control+Shift+2 exec $home_dual_monitor_layout
+
+# WORK
+bindsym $mod+Control+Shift+9 exec $work_single_monitor_layout
+bindsym $mod+Control+Shift+0 exec $work_dual_monitor_layout
+
+
+################################################
+# Terminal Settings
+
+set $terminal alacritty
+
+set $term_wm_set_prop_flag --class
+set $term_wm_prop instance
+
+# st
+# set $term_wm_set_prop_flag -n
+# set $term_wm_prop instance
+
+# uxrvt
+# set $term_wm_set_prop_flag -T
+# set $term_wm_prop title
+
+bindsym $mod+Return exec --no-startup-id $terminal
+
+# emergency binding to i3-sensible-terminal in case of new setup without alacritty
+bindsym $mod+Shift+Return exec --no-startup-id i3-sensible-terminal
+
+
+# Terminal scratchpad
+exec --no-startup-id $terminal $term_wm_set_prop_flag terminal-scratchpad # alacritty
+
+for_window [$term_wm_prop="terminal-scratchpad"] floating enable
+for_window [$term_wm_prop="terminal-scratchpad"] resize set 1000 700
+for_window [$term_wm_prop="terminal-scratchpad"] move scratchpad
+for_window [$term_wm_prop="terminal-scratchpad"] border pixel 5
+bindsym $mod+z [$term_wm_prop="terminal-scratchpad"] scratchpad show; [$term_wm_prop="terminal-scratchpad"] move position center
+
+
+# Color palette used for the Xresources terminal ( ~/.Xresources file )
 #
-# Home monitor config
-#set DP1 DVI-I-2
-#set  DVI-I-1
-# STAIRS monitor config
-# set DP1  eDP1
-# set   DP1
-
-#exec_always --no-startup-id xrandr --output DP1 --main
-
-# monitors set with my monitors-setup.sh script
-#exec --no-startup-id ~/dotfiles/i3/scripts/monitors-setup.sh
-
-# HOME MONITORS
-# set $primary_monitor DVI-I-2
-# set $secondary_monitor DVI-I-1
-
-# QUALIREDE MONITORS
-set $primary_monitor DP1
-set $secondary_monitor eDP1
-
-
-# xrandr command to setup screens layout
-# exec_always --no-startup-id xrandr --output $primary_monitor --primary --mode 1920x1080 --pos 0x0 --rotate normal --output $secondary_monitor --mode 1920x1080 --pos 1920x0 --rotate normal
-
-# monitor home setup
-exec_always --no-startup-id xrandr --output DVI-I-0 --off --output DVI-I-1 --mode 1280x1024 --pos 0x56 --rotate normal --output DVI-I-2 --mode 1920x1080 --pos 1280x0 --rotate normal --output HDMI-0 --off --output DVI-I-3 --off
+# Colors are gathered based on the documentation:
+# https://i3wm.org/docs/userguide.html#xresources
+# Change the variable name at the place you want to match the color
+# of your terminal like this:
+# [example]
+# If you want your bar to have the same background color as your
+# terminal background change the line 362 from:
+# background #14191D
+# to:
+# background $term_background
+# Same logic applied to everything else.
+set_from_resource $term_background background
+set_from_resource $term_foreground foreground
+set_from_resource $term_color0     color0
+set_from_resource $term_color1     color1
+set_from_resource $term_color2     color2
+set_from_resource $term_color3     color3
+set_from_resource $term_color4     color4
+set_from_resource $term_color5     color5
+set_from_resource $term_color6     color6
+set_from_resource $term_color7     color7
+set_from_resource $term_color8     color8
+set_from_resource $term_color9     color9
+set_from_resource $term_color10    color10
+set_from_resource $term_color11    color11
+set_from_resource $term_color12    color12
+set_from_resource $term_color13    color13
+set_from_resource $term_color14    color14
+set_from_resource $term_color15    color15
 
 
 ################################################
-# GENERAL I3 SETTINGS #
+# Text Editors
+
+set $editorterm $terminal -e vim
+set $editorgui emacs
+
+# start vim
+bindsym $mod+$alt+v exec $terminal -e tmux new-session vim
+
+# start emacs on terminal mode
+bindsym $mod+$alt+e exec $editorgui
+
+# start emacs on terminal mode
+bindsym $mod+$alt+r exec $editorgui -nw
+
 ################################################
+# File Managers
+
+# define default file managers (terminal and gui)
+set $file_manager_gui pcmanfm
+set $file_manager_term ranger
+
+# Ranger
+
+bindsym $mod+F3 exec $terminal -e $file_manager_term
+bindsym $mod+Shift+F3	exec $terminal -e sudo $file_manager_term /
+
+# Ranger scratchpad
+exec --no-startup-id $terminal $term_wm_set_prop_flag ranger-scratchpad -e ranger
+for_window [$term_wm_prop="ranger-scratchpad"] move scratchpad
+for_window [$term_wm_prop="ranger-scratchpad"] resize set width 1200 px
+for_window [$term_wm_prop="ranger-scratchpad"] resize set height 1000 px
+bindsym $mod+F11 [$term_wm_prop="ranger-scratchpad"] scratchpad show; [$term_wm_prop="ranger-scratchpad"] move position center
+bindsym $mod+Shift+F11 exec --no-startup-id $terminal $term_wm_set_prop_flag ranger-scratchpad -e ranger
+
+# pcmanfm
+
+bindsym $mod+F4 exec $file_manager_gui
+bindsym $mod+Shift+F4 exec gksu $file_manager_gui
+
+# pcmanfm scratchpad
+exec --no-startup-id pcmanfm --new-win --role pcmanfm-scratchpad
+for_window [window_role="pcmanfm-scratchpad"] move scratchpad
+for_window [window_role="pcmanfm-scratchpad"] resize set width 1300 px
+for_window [window_role="pcmanfm-scratchpad"] resize set height 900 px
+bindsym $mod+F10 [window_role="pcmanfm-scratchpad"] scratchpad show; [window_role="pcmanfm-scratchpad"] move position center
+bindsym $mod++Shift+F10 exec --no-startup-id pcmanfm --new-win --role pcmanfm-scratchpad
+
+
+################################################
+# GENERAL I3 SETTINGS
 
 # Set mod key (Mod1=<Alt>, Mod4=<Super>)
 set $mod Mod4
@@ -52,24 +160,10 @@ set $mod Mod4
 # define variable to use alt in keybindings
 set $alt Mod1
 
-# set default desktop layout (default is tiling)
-# workspace_layout tabbed <stacking|tabbed>
+# bind single mod key press to morc_menu, simulating a "Start Menu" like in some DEs
+bindcode --release 133 exec rofi -show run # use xev to find the keycode of your mod key
 
-# Configure brder style <normal|1pixel|pixel xx|none|pixel>
-default_border pixel 1
-default_floating_border normal
 
-# Configure border style <normal|1pixel|pixel xx|none|pixel>
-new_window pixel 1
-new_float normal
-
-# Hide borders
-hide_edge_borders none
-
-# change borders
-bindsym $mod+u border none
-bindsym $mod+y border pixel 1
-bindsym $mod+n border normal
 
 
 # set main mod key (super aka win key)
@@ -77,39 +171,28 @@ floating_modifier $mod
 
 ################################################
 # BASIC I3 WM CONTROL BINDINGS
-################################################
 
 # kill focused window
 bindsym $mod+q        kill
 bindsym $mod+Shift+q  kill
 
-################################################
-# fonts
-################################################
-
-# Font for window titles. Will also be used by the bar unless a different font
-# is used in the bar {} block below.
-font xft:URWGothic-Book 11
-
-#font pango:monospace 8
-# font pango:DejaVu Sans Mono 8
-font pango:Hack 9
 
 #################################################
 # COMPOSITOR MANAGER AND TRANSPARENCY SETUP
-################################################
 
 # start picom composition manager
-# exec_always --no-startup-id picom
 exec --no-startup-id picom --xrender-sync-fence
+
+# bindsym $mod+t exec --no-startup-id pkill picom
+bindsym $mod+Ctrl+t exec --no-startup-id picom -b; exec notify-send 'running picom'
 
 ################################################
 ## sound-section - DO NOT EDIT if you wish to automatically upgrade
 ## Alsa -> Pulseaudio later! ##
-################################################
 
 exec --no-startup-id volumeicon
 bindsym $mod+Ctrl+m exec $terminal -e 'alsamixer'
+
 # exec --no-startup-id pulseaudio
 # exec --no-startup-id pa-applet
 # bindsym $mod+Ctrl+Shift+m exec pavucontrol
@@ -117,7 +200,6 @@ bindsym $mod+Ctrl+m exec $terminal -e 'alsamixer'
 
 ################################################
 # Misc Apps
-################################################
 
 # Screen brightness controls
 bindsym XF86MonBrightnessUp exec "xbacklight -inc 10; notify-send 'brightness up'"
@@ -125,20 +207,19 @@ bindsym XF86MonBrightnessDown exec "xbacklight -dec 10; notify-send 'brightness 
 
 ################################################
 # Start applications
-################################################
 
-# bindsym $mod+t exec --no-startup-id pkill picom
-bindsym $mod+Ctrl+t exec --no-startup-id picom -b; exec notify-send 'running picom'
+
 # add ctrl to the bellow binding to i can use the original binding for dmenu
 bindsym $mod+Ctrl+Shift+d --release exec "killall dunst; exec notify-send 'restart dunst'"
+
 bindsym $mod+Ctrl+x --release exec --no-startup-id xkill
 
 # Call for i3 help pdf
 # bindsym $mod+Shift+h exec xdg-open /usr/share/doc/manjaro/i3_help.pdf
 
+
 ################################################
 # GLOBAL VARIABLE SETUP
-################################################
 
 #power and wm options
 set $shutdown sudo shutdown -h now
@@ -146,28 +227,15 @@ set $reboot sudo reboot now
 set $netrefresh sudo systemctl restart NetworkManager
 set $hibernate sudo systemctl suspend
 
-# define main terminal as st in tmux (suckless terminal)
-# this make tmux use a main session and doenst spawn multiple unused sessions
-# set $terminal st -e tmux new-session -A -s "main-session"
-# set $terminal       st -e tmux new-session
-set $terminal i3-sensible-terminal
-
-# define default file managers (terminal and gui)
-set $file_manager ranger
-set $file_manager_gui pcmanfm
 
 # define default browser
 set $browser firefox
 
-# define default text editor
-# set $editor st -e tmux new-session -A -s "emacs-session" emacs -t -nw
-set $editorterm         st -e tmux new-session emacsclient -c -t
-set $editorgui         st -e tmux new-session emacsclient -c -n
 
 
-#############################
-### settings for i3-gaps: ###
-#############################
+################################################
+# settings for i3-gaps
+################################################
 
 # Disable window titlebars entirely
 # this might not be needed in manjaro i3, currently testing
@@ -228,7 +296,7 @@ mode "$mode_gaps_outer" {
 ################################################
 
 # reload the configuration file
-bindsym $mod+Shift+c            reload
+bindsym $mod+Shift+c reload
 
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Shift+r restart
@@ -254,7 +322,7 @@ mode "$mode_system" {
 }
 
 # hibernate
-bindsym $mod+$alt+Control+Shift+F4		        exec --no-startup-id $hibernate
+bindsym $mod+$alt+Control+Shift+F4 exec --no-startup-id $hibernate
 bindsym $mod+$alt+Control+Shift+h	exec --no-startup-id $hibernate
 bindsym $mod+$alt+Control+Shift+r	exec --no-startup-id $reboot
 
@@ -266,10 +334,6 @@ bindsym $alt+q	        exec prompt "Are you sure you want to shutdown?" "$shutdo
 bindsym XF86PowerOff		exec prompt "Are you sure you want to shutdown?" "$shutdown"
 
 
-################################################
-# Lock screen
-################################################
-bindsym $mod+Control+9 exec --no-startup-id blurlock
 
 
 ################################################
@@ -293,8 +357,7 @@ exec --no-startup-id pamac-tray
 exec --no-startup-id clipit
 
 # start blueman bluetooth manager tray applet
-# exec --no-startup-id blueman-applet
-
+exec --no-startup-id blueman-applet
 
 # exec_always --no-startup-id sbxkb
 exec_always --no-startup-id ff-theme-util
@@ -302,13 +365,6 @@ exec_always --no-startup-id fix_xcursor
 
 # Conky
 exec_always --no-startup-id ~/dotfiles/conky/scripts/conky-start.sh
-
-# emacs server
-exec --no-startup-id emacs --daemon
-
-# Discord
-exec discord
-assign [class="discord"] → $ws8
 
 # Slack
 exec slack
@@ -328,11 +384,6 @@ assign [class="TelegramDesktop"] → $ws9
 exec whatsapp-nativefier
 assign [class="whatsapp-nativefier-d52542"] → $ws9
 
-# Toggl Desktop
-exec TogglDesktop
-assign [class="Toggl Desktop"] → $ws10
-for_window [class="Toggl Desktop"] floating enable
-
 # Clockify
 exec clockify
 assign [class="Clockify"] → $ws10
@@ -340,44 +391,39 @@ for_window [class="Clockify"] floating enable
 
 # terminal -e 'bmenu' && sleep 2 && i3-msg move container to workspace 5
 
-################################################
-# COLLOR PALETTE FOR THE TERMINAL
-################################################
-
-# Color palette used for the terminal ( ~/.Xresources file )
-# Colors are gathered based on the documentation:
-# https://i3wm.org/docs/userguide.html#xresources
-# Change the variable name at the place you want to match the color
-# of your terminal like this:
-# [example]
-# If you want your bar to have the same background color as your
-# terminal background change the line 362 from:
-# background #14191D
-# to:
-# background $term_background
-# Same logic applied to everything else.
-set_from_resource $term_background background
-set_from_resource $term_foreground foreground
-set_from_resource $term_color0     color0
-set_from_resource $term_color1     color1
-set_from_resource $term_color2     color2
-set_from_resource $term_color3     color3
-set_from_resource $term_color4     color4
-set_from_resource $term_color5     color5
-set_from_resource $term_color6     color6
-set_from_resource $term_color7     color7
-set_from_resource $term_color8     color8
-set_from_resource $term_color9     color9
-set_from_resource $term_color10    color10
-set_from_resource $term_color11    color11
-set_from_resource $term_color12    color12
-set_from_resource $term_color13    color13
-set_from_resource $term_color14    color14
-set_from_resource $term_color15    color15
 
 ################################################
+# APPEARANCE / UI SETTINGS
+################################################
+
+# Configure border style <normal|1pixel|pixel xx|none|pixel>
+default_border pixel 1
+default_floating_border normal
+
+# Configure border style <normal|1pixel|pixel xx|none|pixel>
+new_window pixel 1
+new_float normal
+
+# Hide borders
+hide_edge_borders none
+
+# change borders
+bindsym $mod+u border none
+bindsym $mod+y border pixel 1
+bindsym $mod+n border normal
+
+#-----------------------------------------------
+# Fonts
+
+# Font for window titles. Will also be used by the bar unless a different font
+# is used in the bar {} block below.
+font xft:URWGothic-Book 11
+# font pango:monospace 8
+# font pango:DejaVu Sans Mono 8
+font pango:Hack 9
+
+#-----------------------------------------------
 # WALLPAPER SETUP
-################################################
 
 # use nitrogen to restore latest set wallpapers (for both monitors)
 exec_always --no-startup-id nitrogen --restore &
@@ -407,10 +453,12 @@ exec_always --no-startup-id nitrogen --restore &
 # exec_always --no-startup-id killall back4.sh
 # exec_always --no-startup-id ~/dotfiles/i3/scripts/back4.sh 0.03 wallpapers/beautycity.gif
 
+
 ################################################
-# LOCK SCREEN AND SCREENSAVER
+# Lock screen and Screensaver
 ################################################
 
+bindsym $mod+Control+9 exec --no-startup-id blurlock
 # auto start blurlock after X minutes
 exec --no-startup-id xautolock -time 5 -locker blurlock
 
@@ -419,7 +467,7 @@ exec --no-startup-id xautolock -time 5 -locker blurlock
 # exec --no-startup-id xautolock -time 8 -locker i3lock -c 000000
 
 ################################################
-# SCREENSHOTS SETUP
+# Screenshots Setup
 ################################################
 
 # take scrCloses equivalent do VS Code Ctrl + Deenshot of the entire screen (root window)
@@ -445,22 +493,19 @@ bindsym $alt+Print exec scrot ~/img/screenshots/last-scrot.png -s -e 'mv $f /tmp
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
- 	font pango:Hack Nerd Font Mono 11
-	i3bar_command i3bar
-        # i3blocks
-        status_command i3blocks -c ~/dotfiles/i3/i3blocks.conf
-	# status_command i3status
-	position bottom
-        separator_symbol "|"
+    font pango:Hack Nerd Font Mono 11
+    i3bar_command i3bar
+    # status_command i3status
+    status_command i3blocks -c ~/dotfiles/i3/i3blocks.conf
+    position bottom
+    separator_symbol "|"
 
-## please set your primary output first. Example: 'xrandr --output eDP1 --primary'
-	tray_output $primary_monitor
-#	tray_output eDP1
+    tray_output $primary_monitor
 
-	bindsym button4 nop
-	bindsym button5 nop
-        #   font xft:URWGothic-Book 11
-	strip_workspace_numbers no
+    bindsym button4 nop
+    bindsym button5 nop
+    # font xft:URWGothic-Book 11
+    strip_workspace_numbers no
 
     colors {
         # Manjaro I3 default colors
@@ -505,19 +550,6 @@ bindsym $mod+m bar mode toggle
 # SCRATCHPAD SETTINGS
 ################################################
 
-# Terminal scratchpad
-
-# for st
-# exec --no-startup-id $terminal -n terminal_dropdown
-# for urxvt (default terminal on manjaro i3)
-exec --no-startup-id $terminal -name terminal-scratchpad
-
-for_window [instance="terminal-scratchpad"] floating enable
-for_window [instance="terminal-scratchpad"] resize set 1000 700
-for_window [instance="terminal-scratchpad"] move scratchpad
-for_window [instance="terminal-scratchpad"] border pixel 5
-bindsym $mod+z [instance="terminal-scratchpad"] scratchpad show; [instance="terminal-scratchpad"] move position center
-# ----------------------------------------------
 
 # Runs neofetch on first tmux screen if installed.
 exec_always --no-startup-id "tmux send-keys -t 0:0 'clear && neofetch 2>/dev/null' Enter"
@@ -538,126 +570,44 @@ bindsym $mod+minus scratchpad show; [instance="dropdown"] move position center
 # exec --no-startup-id $terminal -T "galculator-scratchpad" -e galculator
 exec --no-startup-id galculator
 
-bindsym XF86Calculator [instance="galculator"] scratchpad show
-bindsym $mod+F12 [instance="galculator"] scratchpad show
-
 for_window [instance="galculator"] move scratchpad
 for_window [instance="galculator"] resize set height 10 px
 for_window [instance="galculator"] resize set width 30 px
-# ----------------------------------------------
 
-#tmux for terminals/weechat/builds and upgrades
-exec $terminal -title spad -e sh -c "tmux attach -t spad || tmux new-session -s spad"
-
-for_window [title="spad"] move scratchpad
-
-bindsym $mod+F7 [title="spad"] scratchpad show
-bindsym $mod+Shift+F7 exec --no-startup-id $term -title spad -e sh -c "tmux attach -t spad || tmux new-session -s spad"
+bindsym XF86Calculator [instance="galculator"] scratchpad show
+bindsym $mod+F12 [instance="galculator"] scratchpad show
+bindsym $mod+Shift+F12 exec --no-startup-id galculator
 # ----------------------------------------------
 
 #music
-exec $terminal -title spad -e ncmpcpp
-for_window [title="ncmpcpp_scratchpad"] move scratchpad
-for_window [title="ncmpcpp_scratchpad"] resize grow width 700 px
-for_window [title="ncmpcpp_scratchpad"] resize grow height 350 px
+exec $terminal $term_wm_set_prop_flag ncmpcpp_scratchpad -e ncmpcpp
+for_window [$term_wm_prop="ncmpcpp_scratchpad"] move scratchpad
+for_window [$term_wm_prop="ncmpcpp_scratchpad"] resize grow width 700 px
+for_window [$term_wm_prop="ncmpcpp_scratchpad"] resize grow height 350 px
 
-bindsym $mod+F8 [title="ncmpcpp_music"] scratchpad show
-bindsym $mod+Shift+F8 exec --no-startup-id $terminal -title music -e sh -c ncmpcpp_music
+bindsym $mod+F8 [$term_wm_prop="ncmpcpp_music"] scratchpad show
+bindsym $mod+Shift+F8 exec --no-startup-id $terminal $term_wm_set_prop_flag ncmpcpp_scratchpad -e sh -c ncmpcpp_music
 # ----------------------------------------------
 
 # start Music on Console app
 
-exec $terminal -title spotify-tui-scratchpad -e moc
-for_window [title="moc-scratchpad"] move scratchpad
-for_window [title="moc-scratchpad"] resize set width 900 px
-for_window [title="moc-scratchpad"] resize set height 700 px
+exec $terminal $term_wm_set_props_flag moc-scratchpad -e moc
+for_window [$term_wm_prop="moc-scratchpad"] move scratchpad
+for_window [$term_wm_prop="moc-scratchpad"] resize set width 900 px
+for_window [$term_wm_prop="moc-scratchpad"] resize set height 700 px
 
-bindsym $mod+F5 [title="moc-scratchpad"] scratchpad show;  [title="moc-scratchpad"] move position center
+bindsym $mod+F5 [$term_wm_prop="moc-scratchpad"] scratchpad show;  [$term_wm_prop="moc-scratchpad"] move position center
 bindsym $mod+Shift+F5 exec --no-startup-id $terminal -title moc-scratchpad -e moc
 # ----------------------------------------------
+
 # spotify-tui
 exec $terminal -title spotify-tui-scratchpad -e spt
-for_window [title="spotify-tui-scratchpad"] move scratchpad
-for_window [title="spotify-tui-scratchpad"] resize set width 1200 px
-for_window [title="spotify-tui-scratchpad"] resize set height 800 px
+for_window [$term_wm_prop="spotify-tui-scratchpad"] move scratchpad
+for_window [$term_wm_prop="spotify-tui-scratchpad"] resize set width 1200 px
+for_window [$term_wm_prop="spotify-tui-scratchpad"] resize set height 800 px
 
-bindsym $mod+F6 [title="spotify-tui-scratchpad"] scratchpad show;  [title="spotify-tui-scratchpad"] move position center
-bindsym $mod+Shift+F6 exec --no-startup-id $terminal -title spotify-tui-scratchpad -e spt
-# ----------------------------------------------
-
-# ranger
-
-# for uxrvt (default term in i3 manjaro)
-exec --no-startup-id $terminal -T ranger-scratchpad -e ranger
-
-for_window [title="ranger-scratchpad"] move scratchpad
-for_window [title="ranger-scratchpad"] resize set width 1200 px
-for_window [title="ranger-scratchpad"] resize set height 1000 px
-
-bindsym $mod+F11 [title="ranger-scratchpad"] scratchpad show; [title="ranger-scratchpad"] move position center
-bindsym $mod+Shift+F11 exec --no-startup-id $terminal -T "ranger-scratchpad" -e ranger
-# ----------------------------------------------
-
-# pcmanfm
-# since this is a GUI programa, it needs to provide a flag to set some WINDOW PROPS by itself.
-# luckly pcmanfm provides the --role flag to set the WM_WINDOW_ROLE, which can be used here.
-# the --role flag only works if used together with the -n (or --new-win) flag
-
-# for uxrvt (default term in i3 manjaro)
-exec --no-startup-id pcmanfm --new-win --role pcmanfm-scratchpad
-
-for_window [window_role="pcmanfm-scratchpad"] move scratchpad
-for_window [window_role="pcmanfm-scratchpad"] resize set width 1300 px
-for_window [window_role="pcmanfm-scratchpad"] resize set height 900 px
-
-bindsym $mod+F10 [window_role="pcmanfm-scratchpad"] scratchpad show; [window_role="pcmanfm-scratchpad"] move position center
-bindsym $mod++Shift+F10 exec --no-startup-id pcmanfm --new-win --role pcmanfm-scratchpad
-
-################################################
-# BINDINGS FOR EDITING SEVERAL CONFIG AND
-# DOT FILES IN VIM
-################################################
-
-# open i3 config file
-bindsym $mod+$alt+i    exec --no-startup-id $editorgui ~/.i3/config
-
-# open vim config file
-bindsym $mod+$alt+v    exec --no-startup-id $editorgui ~/.vimrc
-
-# open emacs config file
-bindsym $mod+$alt+e    exec --no-startup-id $editorgui ~/.emacs.d/emacs.org
-
-# open tmux config file
-bindsym $mod+$alt+t    exec --no-startup-id $editorgui ~/.tmux.conf
-
-# open bashrc config file
-bindsym $mod+$alt+b    exec --no-startup-id $editorgui ~/.bashrc
-
-# open profile file
-bindsym $mod+$alt+p    exec --no-startup-id $editorgui ~/.profile
-
-# open zsh config file
-bindsym $mod+$alt+z    exec --no-startup-id $editorgui ~/.zshrc
-
-# open ranger config file
-bindsym $mod+$alt+r    exec --no-startup-id $editorgui ~/.config/ranger/rc.conf
-
-
-################################################
-# BINDINGS FOR EDITING MY SCRIPT FILES
-################################################
-
-# open my dev-environment setup shell script
-bindsym $mod+$alt+Control+t    exec --no-startup-id $editorterm ~/sync/scripts/system/manjaro-terminal-tools.sh
-
-# open my dev-environment setup shell script
-bindsym $mod+$alt+Control+d    exec --no-startup-id $editorterm ~/sync/scripts/system/manjaro-dev-env-setup.sh
-
-# open my libs setup shell script
-bindsym $mod+$alt+Control+l    exec --no-startup-id $editorterm ~/sync/scripts/system/manjaro-dev-libs-setup.sh
-
-# open my libs setup shell script
-bindsym $mod+$alt+Control+b    exec --no-startup-id $editorterm ~/sync/scripts/system/manjaro-basic-software.sh
+bindsym $mod+F6 [$term_wm_prop="spotify-tui-scratchpad"] scratchpad show;  [$term_wm_prop="spotify-tui-scratchpad"] move position center
+bindsym $mod+Shift+F6 exec --no-startup-id $terminal $term_wm_set_prop_flag spotify-tui-scratchpad -e spt
 
 
 ################################################
@@ -704,37 +654,11 @@ bindsym $mod+Shift+z exec --no-startup-id morc_menu
 # htop
 bindsym $mod+p            exec $terminal -e htop
 
-# start emacs ide
-bindsym $mod+F9                   exec --no-startup-id $codemacs
-
 # start browser
 bindsym $mod+F2 exec $browser
 
-# start ranger file manager
-bindsym $mod+F3                   exec $terminal -e $file_manager
-bindsym $mod+Shift+F3	          exec $terminal -e sudo $file_manager /
-bindsym $alt+e                    exec --no-startup-id $terminal -e $file_manager
-bindsym $mod+Control+r	          exec $terminal -e sudo $file_manager /
-
-# start gui file manager
-bindsym $mod+F4 exec $file_manager_gui
-bindsym Control+Shift+r           exec --no-startup-id pcmanfm
-bindsym $mod+Shift+F4 exec gksu pcmanfm
 
 
-# start a st terminal instance
-bindsym $mod+Return               exec --no-startup-id $terminal
-for_window[class="^st"] focus
-# assign [class="st"]          → $ws10
-
-# start emacsclient on terminal mode
-bindsym $mod+Shift+Return       exec --no-startup-id $editorterm
-
-# start emacsclient on gui mode
-bindsym $mod+Control+Shift+Return       exec --no-startup-id $editorgui
-
-# start vim
-bindsym $mod+Control+Return         exec --no-startup-id st -e tmux new-session vim
 
 
 
@@ -841,6 +765,9 @@ for_window [urgent=latest] focus
 # WORKSPACES SETUP
 ################################################
 
+# set default desktop layout (tiling | stacking | tabbed)
+workspace_layout default
+
 # setting variables to hold the workspaces names
 set $ws1 "1: emacs"
 set $ws2 "2: terminal"
@@ -911,16 +838,6 @@ bindsym $mod+b workspace back_and_forth
 bindsym $mod+Shift+b move container to workspace back_and_forth; workspace back_and_forth
 
 
-#--------------------------------------------
-# BINDINGS TO CHANGE SCREEN LAYOUT
-
-# WORK - Use dual-screen layout
-bindsym $mod+Control+Shift+KP_1 exec ~/dotfiles/stairs/stairs-single-screen-layout.sh
-bindsym $mod+Control+Shift+1 exec ~/dotfiles/stairs/stairs-single-screen-layout.sh
-
-# WORK - Use dual-screen layout
-bindsym $mod+Control+Shift+KP_2 exec ~/dotfiles/stairs/stairs-dual-screen-layout.sh
-bindsym $mod+Control+Shift+2 exec ~/dotfiles/stairs/stairs-dual-screen-layout.sh
 
 ################################################
 # RESIZE MODE

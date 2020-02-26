@@ -48,6 +48,14 @@ sudo pacman -S --noconfirm --needed bat 1>/dev/null
 sudo pacman -S --noconfirm --needed ncdu 1>/dev/null
 
 
+echo "Install ranger"
+sudo pacman -S --noconfirm --needed ranger 1>/dev/null
+
+echo "Install vifm"
+sudo pacman -S --noconfirm --needed vifm 1>/dev/null
+
+
+
 echo "## installing set of terminal ASCII tools to complement terminal appearance"
 sudo pacman -S --noconfirm --needed neofetch 1>/dev/null
 sudo pacman -S --noconfirm --needed screenfetch 1>/dev/null
@@ -56,97 +64,113 @@ sudo pacman -S --noconfirm --needed cmatrix 1>/dev/null
 sudo pacman -S --noconfirm --needed figlet 1>/dev/null
 sudo pacman -S --noconfirm --needed cowsay 1>/dev/null
 sudo pacman -S --noconfirm --needed sl 1>/dev/null
+sudo pacman -S --noconfirm --needed asciiquarium 1>/dev/null
+sudo pacman -S --noconfirm --needed aafire 1>/dev/null
+sudo pacman -S --noconfirm --needed aafire 1>/dev/null
+sudo pacman -S --noconfirm --needed cool-retro-term-git 1>/dev/null
 
 yay -S --noconfirm --needed bash-pipes 1>/dev/null
 yay -S --noconfirm --needed toilet 1>/dev/null
 yay -S --noconfirm --needed boxes 1>/dev/null
 yay -S --noconfirm --needed beep 1>/dev/null
+yay -S --noconfirm --needed tty-clock 1>/dev/null
+yay -S --noconfirm --needed hollywood 1>/dev/null
+ yay -S --noconfirm --needed bb 1>/dev/null
+ yay -S --noconfirm --needed bullshit 1>/dev/null
+ yay -S --noconfirm --needed glances 1>/dev/null
 
-echo "## installing libwebp"
-sudo pacman -S --noconfirm --needed libwebp
+ echo "## installing libwebp"
+ sudo pacman -S --noconfirm --needed libwebp
 
-echo "## installing gotop"
-yay -S --noconfirm --needed gotop
+ echo "## installing gotop"
+ yay -S --noconfirm --needed gotop
 
+ echo "## installing nvtop"
+ yay -S --noconfirm --needed nvtop 1>/dev/null
 
+ echo "## installing cava audio visualizar"
+ yay -S --noconfirm --needed cava 1>/dev/null
 
-echo "%{green}############################################################"
-echo "## Configuring terminal (st)"
-echo "############################################################${reset_color}"
-~/dotfiles/terminal/setup.sh
+ echo "## installing mapscii map visualizer"
+ sudo snap install mapscii
 
-echo "%{green}############################################################"
-echo "## Configuring shells"
-echo "############################################################${reset_color}"
+ echo "%{green}############################################################"
+ echo "## Configuring terminal (st)"
+ echo "############################################################${reset_color}"
+ ~/dotfiles/terminal/setup.sh
 
-echo "## bash"
-~/dotfiles/bash/setup.sh
+ echo "%{green}############################################################"
+ echo "## Configuring shells"
+ echo "############################################################${reset_color}"
 
-echo "## zsh"
-~/dotfiles/zsh/setup.sh
+ echo "## bash"
+ ~/dotfiles/bash/setup.sh
 
-echo "%{green}############################################################"
-echo "## Configuring tmux"
-echo "############################################################${reset_color}"
-~/dotfiles/tmux/setup.sh
+ echo "## zsh"
+ ~/dotfiles/zsh/setup.sh
 
-echo "%{green}############################################################"
-echo "## Configuring rofi"
-echo "############################################################${reset_color}"
-~/dotfiles/rofi/setup.sh
+ echo "%{green}############################################################"
+ echo "## Configuring tmux"
+ echo "############################################################${reset_color}"
+ ~/dotfiles/tmux/setup.sh
 
-echo "%{green}############################################################"
-echo "## Configuring vim"
-echo "############################################################${reset_color}"
-~/dotfiles/vim/setup.sh
+ echo "%{green}############################################################"
+ echo "## Configuring rofi"
+ echo "############################################################${reset_color}"
+ ~/dotfiles/rofi/setup.sh
 
-echo "%{green}############################################################"
-echo "## Configuring i3"
-echo "############################################################${reset_color}"
-~/dotfiles/emacs.d/setup.sh
+ echo "%{green}############################################################"
+ echo "## Configuring vim"
+ echo "############################################################${reset_color}"
+ ~/dotfiles/vim/setup.sh
 
-
-# SEARCH TOOLS
-
-sudo pacman -S --noconfirm --needed the_silver_searcher 1>/dev/null
-sudo pacman -S --noconfirm --needed ripgrep 1>/dev/null
-
-
-# LANGUAGES CONFIG
-
-echo "###############################"
-echo "## ASDF"
-if [ ! -d "~/.asdf" ]; then
-    echo "## install asdf"
-    git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.7.6
-else
-    echo "ASDF is already installed in ~/.asdf"
-fi
+ echo "%{green}############################################################"
+ echo "## Configuring i3"
+ echo "############################################################${reset_color}"
+ ~/dotfiles/emacs.d/setup.sh
 
 
-echo "###############################"
-echo "## install Ruby"
-asdf plugin-add ruby
-asdf install ruby 2.6.4
-asdf global ruby 2.6.4
+ # SEARCH TOOLS
 
-echo "# Pry enhanced irb with colors and indentation"
-gem install pry
-
-echo "# install rails"
-gem install rails
-
-echo "## Ruby installed"
+ sudo pacman -S --noconfirm --needed the_silver_searcher 1>/dev/null
+ sudo pacman -S --noconfirm --needed ripgrep 1>/dev/null
 
 
-echo "%{green}############################################################"
-echo "## setting up JavaScript environment"
-echo "############################################################${reset_color}"
+ # LANGUAGES CONFIG
+
+ echo "###############################"
+ echo "## ASDF"
+ if [ ! -d "~/.asdf" ]; then
+     echo "## install asdf"
+     git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.7.6
+ else
+     echo "ASDF is already installed in ~/.asdf"
+ fi
 
 
-echo "## NVM"
-if [ ! -d "~/.nvm" ]; then
-    echo "## installing NVM"
+ echo "###############################"
+ echo "## install Ruby"
+ asdf plugin-add ruby
+ asdf install ruby 2.6.4
+ asdf global ruby 2.6.4
+
+ echo "# Pry enhanced irb with colors and indentation"
+ gem install pry
+
+ echo "# install rails"
+ gem install rails
+
+ echo "## Ruby installed"
+
+
+ echo "%{green}############################################################"
+ echo "## setting up JavaScript environment"
+ echo "############################################################${reset_color}"
+
+
+ echo "## NVM"
+ if [ ! -d "~/.nvm" ]; then
+     echo "## installing NVM"
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.2/install.sh | bash
 else
     echo "nvm is already installed in ~/.asdf"

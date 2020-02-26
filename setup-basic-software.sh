@@ -50,6 +50,13 @@ echo "## install spotify deamon for playback on spotify-tui"
 yay -S --noconfirm --needed spotifyd
 
 echo "%{green}############################################################"
+echo "## linux terminal utilities"
+echo "############################################################${reset_color}"
+
+echo "installing dust - du replacement written in rust"
+yay -S --noconfirm --needed dust
+
+echo "%{green}############################################################"
 echo "## qualirede things"
 echo "############################################################${reset_color}"
 
