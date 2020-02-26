@@ -10,31 +10,38 @@
 
 set $home_primary_monitor DVI-I-2
 set $home_secondary_monitor DVI-I-1
+# dell monitor screen
 set $work_primary_monitor DP1
+# notebook screen
 set $work_secondary_monitor eDP1
 
-set $primary_monitor $home_primary_monitor
-set $secondary_monitor $home_secondary_monitor
+set $primary_monitor $work_primary_monitor
+set $secondary_monitor $work_secondary_monitor
 
-set $home_single_monitor_layout xrandr --output DVI-I-2 --mode 1920x1080 --rotate normal --output DVI-I-1 --mode 1280x1024 --same-as $home_primary_monitor
+# home mirrored layout
+set $home_dual_monitor_mirrored_layout xrandr --output DVI-I-2 --mode 1920x1080 --rotate normal --output DVI-I-1 --mode 1280x1024 --same-as $home_primary_monitor
+# home extended layout
+set $home_dual_monitor_extended_layout xrandr --output DVI-I-1 --mode 1280x1024 --pos 0x0 --rotate normal --output DVI-I-2 --primary --mode 1920x1080 --pos 1280x0 --rotate normal
 
-set $home_dual_monitor_layout xrandr --output DVI-I-1 --mode 1280x1024 --pos 0x0 --rotate normal --output DVI-I-2 --primary --mode 1920x1080 --pos 1280x0 --rotate normal
 
-set $work_single_monitor_layout xrandr --output $work_primary_monitor --mode 1920x1080 --pos 0x0 --rotate normal --output $work_secondary_monitor --primary --mode 1920x1080 --pos 0x0 --rotate normal
-
-set $work_dual_monitor_layout xrandr --output $work_primary_monitor --primary --mode 1920x1080 --pos 0x0 --rotate normal --output $work_secondary_monitor --mode 1920x1080 --pos 1920x0 --rotate normal
+# just the notebook screen
+set $work_single_monitor_layout xrandr --output eDP1 --primary --mode 1920x1080 --pos 0x0 --rotate normal --output DP1 --off
+# mirrored layout
+set $work_dual_monitor_mirrored_layout xrandr --output eDP1 --mode 1920x1080 --pos 0x0 --rotate normal --output DP1 --primary --mode 1920x1080 --pos 0x0 --rotate normal
+# extended layout
+set $work_dual_monitor_extended_layout xrandr --output eDP1 --mode 1920x1080 --pos 1920x0 --rotate normal --output DP1 --primary --mode 1920x1080 --pos 0x0 --rotate normal
 
 # setup monitors
-exec_always --no-startup-id $home_dual_monitor_layout
-
+exec_always --no-startup-id $work_dual_monitor_extended_layout
 
 # HOME
 bindsym $mod+Control+Shift+1 exec $home_single_monitor_layout
 bindsym $mod+Control+Shift+2 exec $home_dual_monitor_layout
 
 # WORK
-bindsym $mod+Control+Shift+9 exec $work_single_monitor_layout
-bindsym $mod+Control+Shift+0 exec $work_dual_monitor_layout
+bindsym $mod+Control+Shift+8 exec $work_single_monitor_layout
+bindsym $mod+Control+Shift+9 exec $work_dual_monitor_mirrored_layout
+bindsym $mod+Control+Shift+0 exec $work_dual_monitor_extended_layout
 
 
 ################################################

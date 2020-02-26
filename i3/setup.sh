@@ -1,4 +1,3 @@
-
 DOTFILES_DIR="~/dotfiles"
 DOTFILES_BACKUP_DIR="~/dotfiles/backup"
 mkdir -p #DOTFILES_BACKUP_DIR
@@ -7,7 +6,7 @@ sudo pacman -S --noconfirm --needed xorg-xwininfo
 
 echo "## install i3blocks blocks to /usr/lib/i3blocks"
 sudo pacman -S --noconfirm --needed i3blocks
-# yay -S --noconfirm i3blocks-contrib
+yay -S --noconfirm --needed i3blocks-contrib
 
 echo "## install hsetroot for solid colors wallpapers"
 sudo pacman -S --noconfirm --needed hsetroot
@@ -22,10 +21,8 @@ echo "## install xscreensaver"
 sudo pacman -S --noconfirm --needed xscreensaver
 
 
-# i3 setup 
+# i3 setup
 if [ -e $HOME/.i3/config ]; then
     mv -v  $HOME/i3/config $DOTFILES_BACKUP_DIR/i3.config.bkp
 fi
 ln -sf $DOTFILES_DIR/i3/config $HOME/.i3/config
-
-

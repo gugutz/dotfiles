@@ -50,14 +50,15 @@ DEBUG envvar will enable this at startup.")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Emacs Initialization
+;; Garbage Collection GC Settings
+
 ;; source: https://raw.githubusercontent.com/gilbertw1/emacs-literate-starter/master/emacs.org
 
 ;; defer GC on startup
 
 (setq gc-cons-threshold most-positive-fixnum ;; 2^61 bytes
-  gc-cons-percentage 0.6)
-(setq garbage-collection-messages t)
+  gc-cons-percentage 0.6
+garbage-collection-messages t)
 
 ;; reset gc after emacs loads
 
@@ -100,7 +101,7 @@ DEBUG envvar will enable this at startup.")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;; * PACKAGE MANAGEMENT
+;;; BOOTSTRAP PACKAGE MANAGEMENT
 
 
 ;; New emacs 27 'package-quickstart' feature
@@ -108,6 +109,7 @@ DEBUG envvar will enable this at startup.")
 
 (when EMACS27+
   (setq package-quickstart t))
+
 
 ;; We're going to set the =load-path= ourselves and avoid calling =(package-initilize)= (forperformance reasons) so we need to set =package--init-file-ensured= to true to tell =package.el= to not automatically call it on our behalf. Additionally we're setting =package-enable-at-startup= to nil so that packages will not automatically be loaded for us since =use-package= will be handling that.
 
@@ -123,14 +125,6 @@ DEBUG envvar will enable this at startup.")
 ;; -------------------------------------
 
 
-;; Tell =use-package= to always defer loading packages unless explicitly told otherwise.
-;; This speeds up initialization significantly as many packages are only loaded later when they are explicitly used.
-
-(setq use-package-always-defer t
-  use-package-verbose t)
-;; -------------------------------------
-
-
 ;; Manually Set Load Path
 ;;
 ;; We're going to set the load path ourselves so that we don't have to call =package-initialize= at
@@ -141,19 +135,16 @@ DEBUG envvar will enable this at startup.")
 
 (eval-and-compile
   (setq load-path (append load-path (directory-files package-user-dir t "^[^.]" t))))
-;; -------------------------------------
 
+;; -------------------------------------
 
 ;; Initialize Package Management
 ;;
-;; Next we are going to require =package.el= and add our additional package archives, 'melpa' and 'org'.
-;; Afterwards we need to initialize our packages and then ensure that =use-package= is installed, which
-;; we promptly install if it's missing. Finally we load =use-package= and tell it to always install any
-;; missing packages.
+;; Require package.el, add melpa and org archives and install and load use-package if not already installed
 
-;; Note that this entire block is wrapped in =eval-when-compile=. The effect of this is to perform all
-;; of the package initialization during compilation so that when byte compiled, all of this time consuming
-;; code is skipped. This can be done because the result of byte compiling =use-package= statements results
+;; Using `eval-when-compile' to perform all of the package initialization during compilation so that when byte compiled, all of this time consuming
+;; code is skipped.
+;; This can be done because the result of byte compiling =use-package= statements results
 ;; in the macro being fully expanded at which point =use-package= isn't actually required any longer.
 
 ;; Since the code is automatically compiled during runtime, if the configuration hasn't already been
@@ -167,19 +158,29 @@ DEBUG envvar will enable this at startup.")
   (unless (assoc-default "org" package-archives)
     (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
 
+  ;; emacs 27 calls package initialize automatically so `package-initilize' is only required on older versions
   (package-initialize)
 
-  ;; load use-package
+  ;; install use-package if not already installed
   (unless (package-installed-p 'use-package)
     (package-refresh-contents)
     (package-install 'use-package))
+  ;; load use-package
   (require 'use-package)
-  (setq use-package-always-ensure t))
+  (setq use-package-always-defer t
+    use-package-verbose t
+    use-package-always-ensure t
+    use-package-enable-imenu-support t
+    use-package-minimum-reported-time 0
+    use-package-verbose t
+    use-package-compute-statistics t)
+  )
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; Optimizations from doom emacs
+
 ;;; Source: https://github.com/hlissner/doom-emacs/blob/develop/core/core.el#L228
 
 ;; Disable bidirectional text rendering for a modest performance boost. Of
@@ -211,9 +212,6 @@ DEBUG envvar will enable this at startup.")
 (unless IS-MAC   (setq command-line-ns-option-alist nil))
 (unless IS-LINUX (setq command-line-x-option-alist nil))
 
-;; Delete files to trash on macOS, as an extra layer of precaution against
-;; accidentally deleting wanted files.
-(setq delete-by-moving-to-trash IS-MAC)
 
 ;; Adopt a sneaky garbage collection strategy of waiting until idle time to
 ;; collect; staving off the collector while the user is working.
@@ -238,7 +236,22 @@ DEBUG envvar will enable this at startup.")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;; UI Settings
+;;; EMACS CORE EDITOR SETTINGS
+
+(setq ring-bell-function 'ignore) ;; Disable the annoying Emacs bell ring (beep)
+
+
+;; Emacs "updates" its ui more often than it needs to, so we slow it down
+;; slightly, from 0.5s:
+(setq idle-update-delay 1)
+
+(setq kill-do-not-save-duplicates t) ;; Eliminate duplicates in the kill ring.
+
+(setq next-line-add-newlines t) ;; C-n insert newlines if the point is at the end of the buffer.
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; UI SETTINGS AND APPEARANCE
 
 
 ;; **************************************
@@ -246,7 +259,6 @@ DEBUG envvar will enable this at startup.")
 
 ;; Underline looks a bit better when drawn lower
 (setq x-underline-at-descent-line t)
-
 
 ;; Add `./themes' to path
 (add-to-list 'custom-theme-load-path "~/dotfiles/emacs.d/themes/")
@@ -257,8 +269,9 @@ DEBUG envvar will enable this at startup.")
 ;;  Load the theme
 (load-theme my-theme t)
 
-;; **************************************
-;;; Scrolling
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; SCROLLING SETTINGS
 
 (setq hscroll-margin 2
   hscroll-step 1
@@ -282,8 +295,9 @@ DEBUG envvar will enable this at startup.")
 (add-hook 'term-mode-hook (lambda () (hscroll-margin 0)))
 
 
-;; **************************************
-;;; Cursor
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; CURSOR SETTINGS
 
 ;; Don't blink the cursor, it's too distracting.
 (blink-cursor-mode -1)
@@ -297,8 +311,10 @@ DEBUG envvar will enable this at startup.")
 ;; especially for tabs.
 (setq x-stretch-cursor nil)
 
-;; **************************************
-;;; Fringes
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; FRINGES
 
 ;; Reduce the clutter in the fringes; we'd like to reserve that space for more
 ;; useful information, like git-gutter and flycheck.
@@ -308,6 +324,9 @@ DEBUG envvar will enable this at startup.")
 ;; remove continuation arrow on right fringe (find out why this isnt working)
 ;; (delq 'fringe-indicator-alist 'assq)
 ;; (delq 'continuation 'assq)
+
+;; indicate empty lines in the fringe with --
+(setq-default indicate-empty-lines t)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -376,7 +395,6 @@ DEBUG envvar will enable this at startup.")
   (setq x-gtk-use-system-tooltips nil))
 
 
-
 ;; auto balance windows on opening and closing frames
 (setq window-combination-resize t)
 
@@ -443,9 +461,14 @@ DEBUG envvar will enable this at startup.")
 	  (when hl-line-mode
 	    (setq-local tau-buffer-hl-line-mode t)
 	    (hl-line-mode -1)))
+
   (defun tau-enable-hl-line-maybe-h ()
 	  (when tau-buffer-hl-line-mode
 	    (hl-line-mode +1)))
+
+  ;; Temporarily disable `hl-line' when selection is active, since it doesn't
+  ;; serve much purpose when the selection is so much more visible.
+  (defvar tau-buffer-hl-line-mode nil)
   :hook
   ((prog-mode text-mode conf-mode) . hl-line-mode)
   ((evil-visual-state-entry-hook activate-mark-hook) . tau-disable-hl-line-h)
@@ -456,9 +479,6 @@ DEBUG envvar will enable this at startup.")
   (setq hl-line-sticky-flag nil
     global-hl-line-sticky-flag nil)
 
-  ;; Temporarily disable `hl-line' when selection is active, since it doesn't
-  ;; serve much purpose when the selection is so much more visible.
-  (defvar tau-buffer-hl-line-mode nil)
   )
 
 
@@ -483,6 +503,7 @@ DEBUG envvar will enable this at startup.")
 
 (use-package paren
   :ensure nil
+  :defer 2
   :custom-face
   (show-paren-match ((nil (:background "#9370DB" :foreground "#ffffff" :weight bold :box t)))) ;; :box t
   (show-paren-mismatch ((nil (:background "red" :foreground "black")))) ;; :box t
@@ -492,10 +513,9 @@ DEBUG envvar will enable this at startup.")
   (setq show-paren-when-point-inside-paren t)
   (setq show-paren-when-point-in-periphery t)
   :config
-  (show-paren-mode +1)
+  (eval-when-compile
+    (show-paren-mode +1))
   )
-
-
 
 
 ;; **************************************
@@ -550,7 +570,6 @@ DEBUG envvar will enable this at startup.")
   :init
   ;; Explicitly define a width to reduce computation
   (setq-default display-line-numbers-width 3)
-
   ;; Show absolute line numbers for narrowed regions makes it easier to tell the
   ;; buffer is narrowed, and where you are, exactly.
   (setq-default display-line-numbers-widen t)
@@ -572,65 +591,6 @@ DEBUG envvar will enable this at startup.")
   ;; (tab-line-mode +1) ;; per window
   )
 
-;; *********************************
-;; Centaur tabs
-
-(use-package centaur-tabs
-  :if (version<= "27.1" emacs-version)
-  :after evil
-  :config
-  (centaur-tabs-mode t)
-  :bind
-  ("C-<prior>" . centaur-tabs-backward)
-  ("C-<next>" . centaur-tabs-forward)
-  ("C-S-<tab>" . centaur-tabs-backward)
-  ("C-<tab>" . centaur-tabs-forward)
-  ;; ("C-x p" . centaur-tabs-counsel-switch-group)
-  (:map evil-normal-state-map
-    ("g t" . centaur-tabs-forward)
-    ("g T" . centaur-tabs-backward))
-  :init
-  (setq centaur-tabs-set-bar 'under) ;; display an underline over the selected tab:
-  (setq x-underline-at-descent-line t)
-  (setq centaur-tabs-set-modified-marker t) ;; display a marker indicating that a buffer has been modified (atom-style)
-  (setq centaur-tabs-modified-marker " ● ")
-  (setq centaur-tabs-close-button " × ")
-  (setq centaur-tabs-cycle-scope 'tabs) ;; dont change tabs groups, cicle through
-  (setq centaur-tabs-height 24)
-  (setq centaur-tabs-set-icons t) ;; use icons from all the icons
-  (setq centaur-tabs-show-navigation-buttons t) ;; display cool navigations buttons
-  :config
-  (centaur-tabs-headline-match)
-  (centaur-tabs-group-by-projectile-project)
-  (when (member "Arial" (font-family-list))
-    (centaur-tabs-change-fonts "Arial" 130)))
-
-
-;; *********************************
-;; vi tilde fringe
-
-;; Displays tildes in the fringe on empty lines a la Vi.
-
-(use-package vi-tilde-fringe
-  :diminish
-  :config
-  (eval-when-compile
-    (prog-mode . vi-tilde-fringe-mode)
-    (text-mode . vi-tilde-fringe-mode))
-  )
-
-;; *********************************
-;; Solaire mode
-
-(use-package solaire-mode
-  :hook
-  ((change-major-mode after-revert ediff-prepare-buffer) . turn-on-solaire-mode)
-  (minibuffer-setup . solaire-mode-in-minibuffer)
-  :config
-  (eval-when-compile
-    (solaire-global-mode +1)
-    (solaire-mode-swap-bg))
-  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -792,36 +752,166 @@ all hooks after it are ignored.")
 
 
 
-;; ##################################################
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; Emacs settings
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; ##################################################
+;;; Startup
 
-;; *********************************-
-;;; General
-
-;; Allow access from emacsclient
-;; disable because i dont use server and emacsclient anymore
-;; (unless (or (daemonp) (server-running-p))
-;;   (server-start))
-
-(setq ring-bell-function 'ignore) ;; Disable the annoying Emacs bell ring (beep)
-
-(blink-cursor-mode 0) ;; dont blink the cursor
-
-;; Emacs "updates" its ui more often than it needs to, so we slow it down
-;; slightly, from 0.5s:
-(setq idle-update-delay 1)
-
-(setq kill-do-not-save-duplicates t) ;; Eliminate duplicates in the kill ring.
-
-(setq next-line-add-newlines t) ;; C-n insert newlines if the point is at the end of the buffer.
+;; Use a hook so the message doesn't get clobbered by other messages.
+(add-hook 'emacs-startup-hook
+  (lambda ()
+    (message "Emacs ready in %s with %d garbage collections."
+      (format "%.2f seconds"
+        (float-time
+          (time-subtract after-init-time before-init-time)))
+      gcs-done)))
 
 
-;; *********************************-
+;; Display the bare minimum at startup. We don't need all that noise. The
+;; dashboard/empty scratch buffer is good enough.
+(setq inhibit-startup-message t)
+(setq inhibit-startup-echo-area-message user-login-name)
+(setq inhibit-default-init t)
+(setq initial-major-mode 'fundamental-mode)
+(setq initial-scratch-message nil)
+(fset #'display-startup-echo-area-message #'ignore)
+
+;; start with init.el
+(setq initial-buffer-choice "~/dotfiles/emacs.d/init.el")
+;;(setq initial-buffer-choice nil)
+(setq auto-save-list-file-prefix "~/.emacs.d/cache/auto-save-list")
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;; Indentation
+;;; Folders and Files
+
+;;; Define emacs directory
+(defconst emacs-dir (eval-when-compile (file-truename user-emacs-directory)))
+
+;; Define a config folder inside emacs-dir
+(defconst config-dir (eval-when-compile (concat emacs-dir "config/")))
+
+;; Define a config folder inside emacs-dir
+(defconst cache-dir (eval-when-compile (concat emacs-dir "cache/")))
+
+;; Resolve symlinks when opening files, so that any operations are conducted
+;; from the file's true directory (like `find-file').
+(setq find-file-visit-truename t)
+
+;; stop creating those #auto-save# files
+(setq auto-save-default nil)
+
+;; disable emacs's automatic backup~ file
+(setq make-backup-files nil)
+
+;; dont ask confirmation to kill processes
+(setq confirm-kill-processes nil)
+
+(setq vc-follow-symlinks t)
+
+;; Prevent emacs to create lockfiles (.#files#)
+(setq create-lockfiles nil)
+
+
+;; Prevent emacs from writing several files in the config folder
+(setq async-byte-compile-log-file  (concat cache-dir "async-bytecomp.log"))
+(setq bookmark-default-file        (concat config-dir "bookmarks"))
+(setq custom-file                  (concat config-dir "custom.el"))
+(setq url-cache-directory          (concat config-dir "url/"))
+(setq url-configuration-directory  (concat config-dir "url/"))
+
+
+(use-package abbrev
+  :defer 4
+  :ensure nil
+  :config
+  (setq abbrev-file-name (concat config-dir "abbrev.el"))
+  )
+
+
+
+(use-package recentf
+  :ensure nil
+  ;; Loads after 1 second of idle time.
+  :defer 1
+  :init
+  :hook
+  (pre-command . recentf-mode)
+  :config
+  (setq recentf-save-file "~/.emacs.d/config/recentf")
+  (setq recentf-max-menu-items 0)
+  (setq recentf-max-saved-items 300)
+  (setq recentf-filename-handlers '(file-truename))
+  (setq recentf-exclude
+    (list "^/tmp/" "^/ssh:" "\\.?ido\\.last$" "\\.revive$" "/TAGS$"
+      "^/var/folders/.+$"
+      ;; ignore private DOOM temp files (but not all of them)
+      (concat "^" (file-truename user-emacs-directory))))
+  )
+
+(use-package uniquify
+  :ensure nil
+  ;; Less important than recentf.
+  :defer 2
+  )
+
+(use-package server
+  :ensure nil
+  ;; Less important than recentf.
+  :defer 5
+  )
+
+(use-package tramp
+  :defer 5
+  :ensure nil
+  :config
+  (setq tramp-auto-save-directory    (concat config-dir "tramp-auto-save/"))
+  (setq tramp-backup-directory-alist backup-directory-alist)
+  (setq tramp-persistency-file-name  (concat config-dir "tramp-persistency.el"))
+  )
+
+;; **********************************
+;;
+;;; Extra file extensions to support
+
+(push '("/LICENSE\\'" . text-mode) auto-mode-alist)
+(push '("\\.log\\'" . text-mode) auto-mode-alist)
+(push '("\\.env\\'" . sh-mode) auto-mode-alist)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; MINIBUFFER SETTINGS
+
+;; Show current key-sequence in minibuffer, like vim does. Any feedback after
+;; typing is better UX than no feedback at all.
+(setq echo-keystrokes 0.02)
+
+;; Typing yes/no is obnoxious when y/n will do
+(fset #'yes-or-no-p #'y-or-n-p)
+
+;; Expand the minibuffer to fit multi-line text displayed in the echo-area. This
+;; doesn't look too great with direnv, however...
+(setq resize-mini-windows 'grow-only)
+
+;; But don't let the minibuffer grow beyond this size
+(setq max-mini-window-height 0.15)
+
+;; Try really hard to keep the cursor from getting stuck in the read-only prompt
+;; portion of the minibuffer.
+(setq minibuffer-prompt-properties '(read-only t intangible t cursor-intangible t face minibuffer-prompt))
+(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; INDENTATION SETTINS
 
 ;; make indentation commands use space only (never tab character)
 (setq-default indent-tabs-mode nil)
@@ -848,189 +938,99 @@ all hooks after it are ignored.")
 ;; make return key also do indent, globally
 (electric-indent-mode 1)
 
-;; *********************************-
-;;; Startup
-
-;; Display the bare minimum at startup. We don't need all that noise. The
-;; dashboard/empty scratch buffer is good enough.
-(setq inhibit-startup-message t)
-(setq  inhibit-startup-echo-area-message user-login-name)
-(setq  inhibit-default-init t)
-(setq initial-major-mode 'fundamental-mode)
-(setq  initial-scratch-message nil)
-(fset #'display-startup-echo-area-message #'ignore)
-
-;; start with init.el
-(setq initial-buffer-choice "~/dotfiles/emacs.d/init.el")
-;;(setq initial-buffer-choice nil)
-
-;; indicate empty lines in the fringe with --
-(setq-default indicate-empty-lines t)
-
-
-;; **********************************
-;;
-;;; Folders and Files
-
-;;; Define emacs directory
-(defconst emacs-dir (eval-when-compile (file-truename user-emacs-directory)))
-
-;; Define a config folder inside emacs-dir
-(defconst config-dir (eval-when-compile (concat emacs-dir "config/")))
-
-;; Define a config folder inside emacs-dir
-(defconst cache-dir (eval-when-compile (concat emacs-dir "cache/")))
-
-
-;; Resolve symlinks when opening files, so that any operations are conducted
-;; from the file's true directory (like `find-file').
-(setq find-file-visit-truename t)
-(setq vc-follow-symlinks t)
-
-;; Prevent emacs to create lockfiles (.#files#)
-(setq create-lockfiles nil)
-
-;; stop creating those #auto-save# files
-(setq auto-save-list-file-prefix "~/.emacs.d/cache/auto-save-list")
-(setq auto-save-default nil)
-
-;; disable emacs's automatic backup~ file
-(setq make-backup-files nil)
-
-;; dont ask confirmation to kill processes
-(setq confirm-kill-processes nil)
-
-
-
-;; Prevent emacs from writing several files in the config folder
-(setq abbrev-file-name             (concat config-dir "abbrev.el"))
-(setq async-byte-compile-log-file  (concat cache-dir "async-bytecomp.log"))
-(setq bookmark-default-file        (concat config-dir "bookmarks"))
-(setq custom-file                  (concat config-dir "custom.el"))
-(setq tramp-auto-save-directory    (concat config-dir "tramp-auto-save/"))
-(setq tramp-backup-directory-alist backup-directory-alist)
-(setq tramp-persistency-file-name  (concat config-dir "tramp-persistency.el"))
-(setq url-cache-directory          (concat config-dir "url/"))
-(setq url-configuration-directory  (concat config-dir "url/"))
-(setq recentf-save-file "~/.emacs.d/config/recentf")
-
-
-;; **********************************
-;;
-;;; Extra file extensions to support
-
-(push '("/LICENSE\\'" . text-mode) auto-mode-alist)
-(push '("\\.log\\'" . text-mode) auto-mode-alist)
-(push '("\\.env\\'" . sh-mode) auto-mode-alist)
-
-
-;; **********************************
-;;
-;;; Minibuffer settings
-
-;; Show current key-sequence in minibuffer, like vim does. Any feedback after
-;; typing is better UX than no feedback at all.
-(setq echo-keystrokes 0.02)
-
-;; Typing yes/no is obnoxious when y/n will do
-(fset #'yes-or-no-p #'y-or-n-p)
-
-;; Expand the minibuffer to fit multi-line text displayed in the echo-area. This
-;; doesn't look too great with direnv, however...
-(setq resize-mini-windows 'grow-only)
-
-;; But don't let the minibuffer grow beyond this size
-(setq max-mini-window-height 0.15)
-
-;; Try really hard to keep the cursor from getting stuck in the read-only prompt
-;; portion of the minibuffer.
-(setq minibuffer-prompt-properties '(read-only t intangible t cursor-intangible t face minibuffer-prompt))
-(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
-
-
-;; ##################################################
-;;
-;;; EMACS SESSION AND STATE
-;;
-;; ##################################################
-
-;; *********************************-
-;;
-;; Save Place
-
-;; remember where the cursor was when opening files
-
-(use-package saveplace
-  :ensure nil
-  :init
-  (eval-when-compile
-    (save-place-mode 1))
-  (setq-default save-place t)
-  ;; dont clutter the emacs folder. save somewhere else
-  (setq save-place-file "~/.emacs.d/config/places")
-  )
-
-
-;; ##################################################
-;;
-;;; GC magic hack (used in doom-emacs)
-
-
-(use-package gcmh
-  :demand t
-  :config
-  (gcmh-mode 1)
-  )
-
-;; ##################################################
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; Evil
 
 (use-package evil
   :demand t
   :config
-  (evil-mode 1)
-  ;; change cursor color according to mode
-  (setq evil-emacs-state-cursor '("#ff0000" box))
-  (setq evil-motion-state-cursor '("#FFFFFF" box))
-  (setq evil-normal-state-cursor '("#00ff00" box))
-  (setq evil-visual-state-cursor '("#abcdef" box))
-  (setq evil-insert-state-cursor '("#e2f00f" bar))
-  (setq evil-replace-state-cursor '("#ff0000" hbar))
-  (setq evil-operator-state-cursor '("#ff0000" hollow))
-  ;; evil in modeline
-  (setq evil-mode-line-format '(before . mode-line-front-space)) ;; move evil tag to beginning of modeline
+  (eval-when-compile
+    (evil-mode 1)
+    ;; change cursor color according to mode
+    (setq evil-emacs-state-cursor '("#ff0000" box))
+    (setq evil-motion-state-cursor '("#FFFFFF" box))
+    (setq evil-normal-state-cursor '("#00ff00" box))
+    (setq evil-visual-state-cursor '("#abcdef" box))
+    (setq evil-insert-state-cursor '("#e2f00f" bar))
+    (setq evil-replace-state-cursor '("#ff0000" hbar))
+    (setq evil-operator-state-cursor '("#ff0000" hollow))
+    ;; evil in modeline
+    (setq evil-mode-line-format '(before . mode-line-front-space)) ;; move evil tag to beginning of modeline
   ;;; FOR SOME REASON WHEN I MAP KEYS IN :bind EVIL DOENST LOAD ON STARTUP
-  (define-key evil-normal-state-map (kbd "SPC q") 'evil-quit)
-  ;; ("SPC q" . kill-buffer-and-window) ;; check if evil quit does this
-  (define-key evil-normal-state-map (kbd "SPC w") 'save-buffer)
-  (define-key evil-normal-state-map (kbd "SPC d") 'delete-frame)
-  (define-key evil-normal-state-map (kbd "SPC k") 'kill-current-buffer)
-  (define-key evil-normal-state-map (kbd "SPC 0") 'delete-window)
-  (define-key evil-normal-state-map (kbd "SPC -") 'split-window-bellow)
-  (define-key evil-normal-state-map (kbd "SPC |") 'split-window-right)
-  (define-key evil-normal-state-map (kbd "SPC u") 'undo-tree-visualize)
-  (define-key evil-normal-state-map (kbd "SPC o") 'other-window)
+    (define-key evil-normal-state-map (kbd "SPC q") 'evil-quit)
+    ;; ("SPC q" . kill-buffer-and-window) ;; check if evil quit does this
+    (define-key evil-normal-state-map (kbd "SPC w") 'save-buffer)
+    (define-key evil-normal-state-map (kbd "SPC d") 'delete-frame)
+    (define-key evil-normal-state-map (kbd "SPC k") 'kill-current-buffer)
+    (define-key evil-normal-state-map (kbd "SPC 0") 'delete-window)
+    (define-key evil-normal-state-map (kbd "SPC -") 'split-window-bellow)
+    (define-key evil-normal-state-map (kbd "SPC |") 'split-window-right)
+    (define-key evil-normal-state-map (kbd "SPC u") 'undo-tree-visualize)
+    (define-key evil-normal-state-map (kbd "SPC o") 'other-window)
 
-  ;; ------------------------------------------
-  ;;
+    ;; ------------------------------------------
+    ;;
   ;;; RECOVER SOME USEFUL EMACS NATIVE COMMANDS
-  (define-key evil-insert-state-map (kbd "C-y") 'yank)
-  (define-key evil-insert-state-map (kbd "C-a") 'beginning-of-line)
-  (define-key evil-insert-state-map (kbd "C-e") 'end-of-line)
-  (define-key evil-normal-state-map (kbd "C-y") 'yank)
-  (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
-  (define-key evil-insert-state-map (kbd "C-d") 'delete-char)
-  ;; native find definition
-  (global-set-key (kbd "M-.") 'xref-find-definitions)
-  ;; somehow global-set-key doenst work for normal mode for this binding, so i manually set it
-  (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
+    (define-key evil-insert-state-map (kbd "C-y") 'yank)
+    (define-key evil-insert-state-map (kbd "C-a") 'beginning-of-line)
+    (define-key evil-insert-state-map (kbd "C-e") 'end-of-line)
+    (define-key evil-normal-state-map (kbd "C-y") 'yank)
+    (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
+    (define-key evil-insert-state-map (kbd "C-d") 'delete-char)
+    ;; native find definition
+    (global-set-key (kbd "M-.") 'xref-find-definitions)
+    ;; somehow global-set-key doenst work for normal mode for this binding, so i manually set it
+    (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
 
-  (global-set-key (kbd "C-S-H") 'evil-window-left)
-  (global-set-key (kbd "C-S-L") 'evil-window-right)
-  (global-set-key (kbd "C-S-K") 'evil-window-up)
-  (global-set-key (kbd "C-S-J") 'evil-window-down)
+    (global-set-key (kbd "C-S-H") 'evil-window-left)
+    (global-set-key (kbd "C-S-L") 'evil-window-right)
+    (global-set-key (kbd "C-S-K") 'evil-window-up)
+    (global-set-key (kbd "C-S-J") 'evil-window-down)
+    )
+  )
+
+
+;; *********************************
+;; undo tree
+
+(use-package undo-tree
+  ;; Branching & persistent undo
+  :after-call doom-switch-buffer-hook after-find-file
+  :hook
+  ;; There is no hook specifically for switching buffers, but you can use the buffer-list-update-hook . Switching buffers re-orders the buffer list and triggers this hook, so you could use that to run a command that checks the major-mode of the current buffer and takes some action if it is eshell.
+  ;; TODO: check if this gets activated constantly
+  (buffer-list-update . (lambda () (global-undo-tree-mode +1)))
+  (find-file . (lambda () (global-undo-tree-mode +1)))
+  :config
+  (setq undo-tree-visualizer-diff t
+    undo-tree-auto-save-history t
+    undo-tree-enable-undo-in-region t
+    ;; Increase undo-limits by a factor of ten to avoid emacs prematurely
+    ;; truncating the undo history and corrupting the tree. See
+    ;; https://github.com/syl20bnr/spacemacs/issues/12110
+    undo-limit 800000
+    undo-strong-limit 12000000
+    undo-outer-limit 120000000
+    undo-tree-history-directory-alist
+    `(("." . ,(concat cache-dir "undo-tree-hist/")))
+    )
+  ;;(global-undo-tree-mode +1)
+
+  )
+
+
+;; *********************************
+;; so long
+
+;; this package was added to emacs 27
+
+(if (EMACS27+)
+  (global-so-long-mode 1)
+  (use-package so-long
+    :config
+    (global-so-long-mode 1)
+    )
   )
 
 ;; *********************************
@@ -1039,8 +1039,10 @@ all hooks after it are ignored.")
 (use-package evil-commentary
   :after evil
   :diminish
-  :config
-  (evil-commentary-mode)
+  :hook
+  (evil-mode . evil-commentary-mode)
+  ;;:config
+  ;; (evil-commentary-mode)
   )
 
 ;; *********************************
@@ -1090,7 +1092,7 @@ all hooks after it are ignored.")
   (global-evil-surround-mode 1)
   )
 
-;; **************************************************
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; Ivy
 
@@ -1113,17 +1115,16 @@ all hooks after it are ignored.")
   ("C-x l" . counsel-locate)
   ("C-S-o" . counsel-rhythmbox)
   :config
-  (eval-when-compile
-    (ivy-mode 1)
-    ;; Add recent files and bookmarks to the ivy-switch-buffer
-    (setq ivy-use-virtual-buffers t)
-    ;;Displays the current and total number in the collection in the prompt
-    (setq enable-recursive-minibuffers t)
-    ;; display an arrow on the selected item in the list
-    (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-arrow)
-    ;; enable this if you want `swiper' to use it
-    ;; (setq search-default-mode #'char-fold-to-regexp)
-    (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
+  (ivy-mode 1)
+  ;; Add recent files and bookmarks to the ivy-switch-buffer
+  (setq ivy-use-virtual-buffers t)
+  ;;Displays the current and total number in the collection in the prompt
+  (setq enable-recursive-minibuffers t)
+  ;; display an arrow on the selected item in the list
+  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-arrow)
+  ;; enable this if you want `swiper' to use it
+  ;; (setq search-default-mode #'char-fold-to-regexp)
+  (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
 
   ;; SPC keybindings
   (with-eval-after-load 'evil
@@ -1141,10 +1142,10 @@ all hooks after it are ignored.")
 
 
 ;; *********************************
-;;
 ;;; Counsel
+
 (use-package counsel
-  :demand t
+:demand t
   :after ivy
   :diminish counsel-mode
   :hook
@@ -1154,7 +1155,6 @@ all hooks after it are ignored.")
 ;; ** Counsel integration for Projectile
 
 (use-package counsel-projectile
-  :demand t
   :after ivy counsel projectile
   :config
   (eval-when-compile
@@ -1162,23 +1162,23 @@ all hooks after it are ignored.")
   )
 
 ;; *********************************
-;;
 ;; Enhance M-x
+
 ;; Enhancement for `execute-extended-command'. Auto detects and uses ivy or ido, if installed
 (use-package amx
-  :demand t
   :after ivy
   :init
   (setq amx-save-file "~/.emacs.d/config/amx-items")
   :config
-  (amx-mode)
+  (eval-when-compile
+    (amx-mode))
   )
 
 ;; *********************************
-;;
 ;; ivy-rich
 
 (use-package ivy-rich
+  :after ivy
   :preface
   ;; use all-the-icons for `ivy-switch-buffer'
   (defun ivy-rich-switch-buffer-icon (candidate)
@@ -1189,9 +1189,11 @@ all hooks after it are ignored.")
           (all-the-icons-icon-for-mode 'fundamental-mode)
           icon))))
   :init
+  (setq ivy-rich--original-display-transformers-list nil)  ;; needs to be set otherwise (ivy-rich-set-display-transformer) does not get called
+
   ;; To abbreviate paths using abbreviate-file-name (e.g. replace “/home/username” with “~”)
   (setq ivy-rich-path-style 'abbrev)
-  ;; customizing functions
+
   (setq ivy-rich--display-transformers-list
     '(ivy-switch-buffer
        (:columns
@@ -1239,15 +1241,13 @@ all hooks after it are ignored.")
          (lambda (cand) (get-buffer cand)))
        )
     )
-  :config
   ;; ivy-rich-mode needs to be called after `ivy-rich--display-transformers-list' is changed
-  (eval-when-compile
-    (ivy-rich-mode 1))
+  :config
+  (ivy-rich-mode 1)
   )
 
 ;; *********************************
-;;
-;; ** ivy-posframe
+;; ivy-posframe
 
 ;; Requires: Emacs >= 26
 
@@ -1301,7 +1301,6 @@ all hooks after it are ignored.")
   )
 
 ;; *********************************
-;;
 ;; all the icons for ivy
 
 (use-package all-the-icons-ivy
@@ -1320,9 +1319,8 @@ all hooks after it are ignored.")
   )
 
 ;; *********************************
-;;
-;;
 ;;; avy
+
 (use-package avy
   :bind
   ("M-g j" . avy-goto-char-2)
@@ -1350,6 +1348,45 @@ all hooks after it are ignored.")
   (setq avy-highlight-first t) ;; When non-nil highlight the first decision char with avy-lead-face-0. Do this even when the char is terminating.
   (setq avy-all-windows nil) ;; use only the selected window
   )
+
+;; better jumper (using to see if its good, doom-emacs uses it)
+
+(use-package better-jumper
+  :preface
+  ;; REVIEW Suppress byte-compiler warning spawning a *Compile-Log* buffer at
+  ;; startup. This can be removed once gilbertw1/better-jumper#2 is merged.
+  (defvar better-jumper-local-mode nil)
+  :init
+  (global-set-key [remap evil-jump-forward]  #'better-jumper-jump-forward)
+  (global-set-key [remap evil-jump-backward] #'better-jumper-jump-backward)
+  (global-set-key [remap xref-pop-marker-stack] #'better-jumper-jump-backward)
+  :config
+  (add-hook pre-command-hook 'better-jumper-mode)
+  ;;(better-jumper-mode +1)
+  (add-hook 'better-jumper-post-jump-hook #'recenter)
+  )
+
+;; *********************************-
+;; Save Place
+
+;; remember where the cursor was when opening files
+
+;; savehist / saveplace
+(use-package saveplace
+  :ensure nil
+  :hook
+  (pre-command . save-place-mode)
+  (pre-command . savehist-mode)
+  :init
+  (setq-default save-place t)
+  ;; dont clutter the emacs folder. save somewhere else
+  (setq save-place-file "~/.emacs.d/config/places")
+  (setq savehist-file (concat cache-dir "savehist")
+    savehist-save-minibuffer-history t
+    savehist-autosave-interval nil ; save on kill only
+    savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
+  )
+
 
 ;; **************************************************
 ;;
@@ -1717,6 +1754,23 @@ Version 2016-07-17"
 ;;
 ;; CODE NAVIGATION
 
+
+;; *********************************
+;;; Ctrl + mouse click jump to definition
+
+(defun my-find-func-mouse (event)
+  "Support Control + Mouse click (EVENT) to go to definition."
+  (interactive "e")
+  (let ((fn  (save-excursion
+               (goto-char (posn-point (event-end event)))
+               (function-called-at-point))))
+    (unless (fboundp fn) (error "No function here"))
+    (find-function-do-it fn nil 'switch-to-buffer-other-window)))
+
+(global-set-key [C-down-mouse-1] nil)
+(global-set-key [C-mouse-1] #'my-find-func-mouse)
+
+
 ;; *********************************
 ;; dumb-jump
 
@@ -1749,24 +1803,30 @@ Version 2016-07-17"
 ;;
 ;;; PACKAGE WHITESPACE
 
-;; Highlight trailing whitespace
-(setq-default show-trailing-whitespace t)
+(use-package whitespace
+  :defer 2
+  :config
+  ;; Highlight trailing whitespace
+  (setq-default show-trailing-whitespace t)
 
-;; Set the whitespace highlight color
-(set-face-background 'trailing-whitespace "#f44545")
+  ;; Set the whitespace highlight color
+  (set-face-background 'trailing-whitespace "#f44545")
 
-;; Delete trailing whitespace on save
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
+  ;; Delete trailing whitespace on save
+  (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 
-(setq whitespace-line-column nil
-  whitespace-style
-  '(face indentation tabs tab-mark spaces space-mark newline newline-mark
-     trailing lines-tail)
-  whitespace-display-mappings
-  '((tab-mark ?\t [?› ?\t])
-     (newline-mark ?\n [?¬ ?\n])
-     (space-mark ?\  [?·] [?.])))
+  (setq whitespace-line-column nil
+    whitespace-style
+    '(face indentation tabs tab-mark spaces space-mark newline newline-mark
+       trailing lines-tail)
+    whitespace-display-mappings
+    '((tab-mark ?\t [?› ?\t])
+       (newline-mark ?\n [?¬ ?\n])
+       (space-mark ?\  [?·] [?.])))
+
+
+  )
 
 
 
@@ -1777,20 +1837,24 @@ Version 2016-07-17"
 ;; set default font
 
 ;; Find the first font in the list and use it
-(require 'cl)
+(require 'cl) ;; this is deprecated in emacs27
+(require 'cl-lib)
+(require 'cl-seq) ;; for the cl-find-if function
 (defun font-candidate (&rest fonts)
   "Return existing font which first match."
-  (find-if (lambda (f) (find-font (font-spec :name f))) fonts))
+  (cl-find-if (lambda (f) (find-font (font-spec :name f))) fonts))
 
 ;; define list of fonts to be used in the above function
 ;; the first one found will be used
-(set-face-attribute 'default nil :font (font-candidate '
-                                         "Hack-11:weight=normal"
-                                         "Droid Sans Mono-11:weight=normal"
-                                         "Consolas-10:weight=normal"
-                                         "DejaVu Sans Mono-11:weight=normal"
-                                         "Ubuntu Mono-10:weight=normal"
-                                         ))
+(add-to-list 'default-frame-alist '(font . "Hack-10.5"))
+
+;; (set-face-attribute 'default nil :font (font-candidate '
+;;                                          "Hack-11:weight=normal"
+;;                                          "Droid Sans Mono-11:weight=normal"
+;;                                          "Consolas-10:weight=normal"
+;;                                          "DejaVu Sans Mono-11:weight=normal"
+;;                                          "Ubuntu Mono-10:weight=normal"
+;;                                          ))
 
 
 ;; *********************************
@@ -1817,7 +1881,6 @@ Version 2016-07-17"
 ;;;  Projectile
 
 (use-package projectile
-  :demand t
   :diminish projectile-mode
   :bind
   (:map projectile-mode-map
@@ -2010,7 +2073,7 @@ Version 2016-07-17"
 
 
 ;; *********************************
-;;; ** Yasnippets
+;;; Yasnippets
 
 (use-package yasnippet
   :diminish yas-minor-mode
@@ -2095,6 +2158,7 @@ Version 2016-07-17"
 ;; helpfull
 
 (use-package helpful
+  :defer 3
   :config
   (global-set-key (kbd "C-h f") #'helpful-callable)
   (global-set-key (kbd "C-h v") #'helpful-variable)
@@ -2257,14 +2321,16 @@ Adapted from `describe-function-or-variable'."
 
 (use-package autorevert
   :ensure nil
-  ;; :hook
+  :defer 3
+  :hook
+  ;; await until first input to activate it
+  (pre-command . auto-revert-mode)
   ;; revert buffers when their files/state have changed
-  ;;(focus-in . revert-buffer)
-  ;;(after-save . revert-buffer)
-  ;;(switch-buffer . revert-buffer)
-  ;;(switch-window . revert-buffer)
+  ;; (focus-in . revert-buffer)
+  ;; (after-save . revert-buffer)
+  ;; (switch-buffer . revert-buffer)
+  ;; (switch-window . revert-buffer)
   :config
-  (global-auto-revert-mode)
   (setq auto-revert-verbose t) ; let us know when it happens
   (setq auto-revert-use-notify nil)
   (setq auto-revert-stop-on-user-input nil)
@@ -2313,6 +2379,15 @@ Adapted from `describe-function-or-variable'."
 
 
 
+;; *********************************
+;; vi tilde fringe
+
+(use-package vi-tilde-fringe
+  :diminish
+  :config
+  (prog-mode . vi-tilde-fringe-mode)
+  (text-mode . vi-tilde-fringe-mode)
+  )
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -2369,7 +2444,61 @@ Adapted from `describe-function-or-variable'."
 
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; UI RELATED PACKAGES
 
+;; *********************************
+;; Centaur tabs
+
+(use-package centaur-tabs
+  :disabled
+  :if (version<= "27.1" emacs-version)
+  :after evil
+  :hook
+  (window-setup . centaur-tabs-mode)
+  :bind
+  ("C-<prior>" . centaur-tabs-backward)
+  ("C-<next>" . centaur-tabs-forward)
+  ("C-S-<tab>" . centaur-tabs-backward)
+  ("C-<tab>" . centaur-tabs-forward)
+  ;; ("C-x p" . centaur-tabs-counsel-switch-group)
+  (:map evil-normal-state-map
+    ("g t" . centaur-tabs-forward)
+    ("g T" . centaur-tabs-backward))
+  :init
+  (setq centaur-tabs-set-bar 'under) ;; display an underline over the selected tab:
+  (setq x-underline-at-descent-line t)
+  (setq centaur-tabs-set-modified-marker t) ;; display a marker indicating that a buffer has been modified (atom-style)
+  (setq centaur-tabs-modified-marker " ● ")
+  (setq centaur-tabs-close-button " × ")
+  (setq centaur-tabs-cycle-scope 'tabs) ;; dont change tabs groups, cicle through
+  (setq centaur-tabs-height 24)
+  (setq centaur-tabs-set-icons t) ;; use icons from all the icons
+  (setq centaur-tabs-show-navigation-buttons t) ;; display cool navigations buttons
+  :config
+  ;; (centaur-tabs-mode t)
+  (centaur-tabs-headline-match)
+  (centaur-tabs-group-by-projectile-project)
+  (when (member "Arial" (font-family-list))
+    (centaur-tabs-change-fonts "Arial" 130)))
+
+
+
+;; *********************************
+;; Solaire mode
+
+(use-package solaire-mode
+  :disabled
+  :hook
+  ((change-major-mode after-revert ediff-prepare-buffer) . turn-on-solaire-mode)
+  (minibuffer-setup . solaire-mode-in-minibuffer)
+  :config
+  (eval-when-compile
+    (solaire-global-mode +1)
+    ;;(solaire-mode-swap-bg)
+    )
+  )
 
 
 ;; **************************************
@@ -2403,26 +2532,9 @@ Adapted from `describe-function-or-variable'."
 (use-package restart-emacs)
 
 
-;; *********************************
-;; editorconfig
-
-(use-package editorconfig
-  :diminish
-  :hook
-  (typescript-mode . editorconfig-mode)
-  (js2-mode . editorconfig-mode)
-  (web-mode . editorconfig-mode)
-  (css-mode . editorconfig-mode)
-  (scss-mode . editorconfig-mode)
-  )
-
-
-
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; WEB DEVELOPMENT
+;; WEB DEVELOPMENT MAJOR MODES
 
 ;; *********************************
 ;;
@@ -2553,6 +2665,24 @@ Adapted from `describe-function-or-variable'."
   )
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; WEB DEVELOPMENT MINOR MODES
+
+
+;; *********************************
+;; editorconfig
+
+(use-package editorconfig
+  :diminish
+  :hook
+  (typescript-mode . editorconfig-mode)
+  (js2-mode . editorconfig-mode)
+  (web-mode . editorconfig-mode)
+  (css-mode . editorconfig-mode)
+  (scss-mode . editorconfig-mode)
+  )
+
 
 ;; *********************************
 ;;
@@ -2636,6 +2766,10 @@ Adapted from `describe-function-or-variable'."
   )
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; VERSION CONTROL
+
 ;; *********************************
 ;; magit
 
@@ -2695,7 +2829,8 @@ Adapted from `describe-function-or-variable'."
   )
 
 
-;; ** diffview
+;; *********************************
+;; diffview
 ;; View diffs side by side
 
 (use-package diffview)
@@ -2730,9 +2865,10 @@ Adapted from `describe-function-or-variable'."
 
 ;; *********************************
 ;;
-;; ** diff-hl (highlights uncommited diffs in bar aside from the line numbers)
+;; diff-hl (highlights uncommited diffs in the fringe)
 
 (use-package diff-hl
+  :defer 1
   :custom-face
   ;; Better looking colours for diff indicators
   (diff-hl-change ((t (:foreground ,(face-background 'highlight)))))
@@ -2744,28 +2880,30 @@ Adapted from `describe-function-or-variable'."
   (dired-mode . diff-hl-mode)
   (magit-post-refresh . diff-hl-magit-post-refresh)
   :config
-  (global-diff-hl-mode)
-  (diff-hl-flydiff-mode) ;; highlighting changes on the fly
-  ;; (diff-hl-margin-mode) ;; use the margin instead of the fringe.
-  ;; Set fringe style
-  (setq-default fringes-outside-margins t)
+  (eval-when-compile
+    (global-diff-hl-mode)
+    (diff-hl-flydiff-mode) ;; highlighting changes on the fly
+    ;; (diff-hl-margin-mode) ;; use the margin instead of the fringe.
+    ;; Set fringe style
+    (setq-default fringes-outside-margins t)
 
-  (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
+    (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
 
-  (unless (display-graphic-p)
-    (setq diff-hl-margin-symbols-alist
-      '((insert . " ") (delete . " ") (change . " ")
-         (unknown . " ") (ignored . " ")))
-    ;; Fall back to the display margin since the fringe is unavailable in tty
-    (diff-hl-margin-mode 1)
-    ;; Avoid restoring `diff-hl-margin-mode'
-    (with-eval-after-load 'desktop
-      (add-to-list 'desktop-minor-mode-table
-        '(diff-hl-margin-mode nil))))
+    (unless (display-graphic-p)
+      (setq diff-hl-margin-symbols-alist
+        '((insert . " ") (delete . " ") (change . " ")
+           (unknown . " ") (ignored . " ")))
+      ;; Fall back to the display margin since the fringe is unavailable in tty
+      (diff-hl-margin-mode 1)
+      ;; Avoid restoring `diff-hl-margin-mode'
+      (with-eval-after-load 'desktop
+        (add-to-list 'desktop-minor-mode-table
+          '(diff-hl-margin-mode nil))))
 
-  ;; Integration with magit
-  (with-eval-after-load 'magit
-    (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
+    ;; Integration with magit
+    (with-eval-after-load 'magit
+      (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
+    )
   )
 
 ;; Mode for .gitignore files.
@@ -2773,376 +2911,56 @@ Adapted from `describe-function-or-variable'."
 (use-package gitconfig-mode)
 (use-package gitattributes-mode)
 
-;; ##################################################
-;;
-;; SIMULATE VSCODE FUNCTIONS
-;;
-;; ##################################################
 
-
-
-;; *********************************
-;;; Ctrl + mouse click jump to definition
-
-(defun my-find-func-mouse (event)
-  "Support Control + Mouse click (EVENT) to go to definition."
-  (interactive "e")
-  (let ((fn  (save-excursion
-               (goto-char (posn-point (event-end event)))
-               (function-called-at-point))))
-    (unless (fboundp fn) (error "No function here"))
-    (find-function-do-it fn nil 'switch-to-buffer-other-window)))
-
-(global-set-key [C-down-mouse-1] nil)
-(global-set-key [C-mouse-1] #'my-find-func-mouse)
-
-
-
-
-
-;; ========================================
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; UI -> Modeline
+
+(use-package doom-modeline
+  :hook
+  (window-setup . doom-modeline-mode)
+  ;; :init
+  ;; (doom-modeline-mode 1)
+  )
 
 ;; **************************************
 ;; hide-mode-line-mode
 
-(add-hook 'Man-mode-hook #'hide-mode-line-mode)
-(add-hook 'treemacs-mode-hook #'hide-mode-line-mode)
-(add-hook 'completion-list-mode-hook #'hide-mode-line-mode)
-
-;; **************************************
-;; Modified or Read Only
-
-
-;; This snippet displays a chain icon when the current file is saved, a broken chain when it is modified and a pad lock when the file is read only.
-
-;; (defun custom-modeline-modified
-;;   ((let* ((config-alist
-;;             '(("*" all-the-icons-faicon-family all-the-icons-faicon "chain-broken" :height 1.2 :v-adjust -0.0)
-;;               ("-" all-the-icons-faicon-family all-the-icons-faicon "link" :height 1.2 :v-adjust -0.0)
-;;               ("%" all-the-icons-octicon-family all-the-icons-octicon "lock" :height 1.2 :v-adjust 0.1)))
-;;            (result (cdr (assoc (format-mode-line "%*") config-alist))))
-;;       (propertize (apply (cadr result) (cddr result))
-;;                   'face `(:family ,(funcall (car result)))))))
-
-
-;; **************************************
-;; Modeline Appearance
-
-(set-face-attribute 'mode-line nil
-  :background "#353644"
-  :foreground "white"
-  :box '(:line-width 5 :color "#353644")
-  :overline nil
-  :underline nil)
-
-(set-face-attribute 'mode-line-inactive nil
-  :background "#565063"
-  :foreground "white"
-  :box '(:line-width 5 :color "#565063")
-  :overline nil
-  :underline nil)
-
-;; **************************************
-;; Mode Icon
-
-(defun custom-modeline-mode-icon ()
-  "Display the major mode icon."
-  (format " %s"
-    (propertize icon
-      'help-echo (format "Major-mode: `%s`" major-mode)
-      'face `(:height 1.2 :family ,(all-the-icons-icon-family-for-buffer)))))
-
-
-;; *********************************
-;;; Region Marking
-
-(defun custom-modeline-region-info ()
-  "This snippet displays useful information on the current marked region, i.e. number of lines and characters marked."
-  (when mark-active
-    (let ((words (count-lines (region-beginning) (region-end)))
-           (chars (count-words (region-end) (region-beginning))))
-      (concat
-        (propertize (format "   %s" (all-the-icons-octicon "pencil") words chars)
-          'face `(:family ,(all-the-icons-octicon-family))
-          'display '(raise -0.0))
-        (propertize (format " (%s, %s)" words chars)
-          'face `(:height 0.9))))))
-
-;; *********************************
-;;; Version control icons
-
-(defun -custom-modeline-github-vc ()
-  "Custom icon for git / github repositories."
-  (let ((branch (mapconcat 'concat (cdr (split-string vc-mode "[:-]")) "-")))
-    (concat
-      (propertize (format " %s" (all-the-icons-alltheicon "git")) 'face `(:height 1.2) 'display '(raise -0.1))
-      " · "
-      (propertize (format "%s" (all-the-icons-octicon "git-branch"))
-        'face `(:height 1.3 :family ,(all-the-icons-octicon-family))
-        'display '(raise -0.1))
-      (propertize (format " %s" branch) 'face `(:height 0.9)))))
-
-(defun -custom-modeline-svn-vc ()
-  "Custom icon for svn repositories."
-  (let ((revision (cadr (split-string vc-mode "-"))))
-    (concat
-      (propertize (format " %s" (all-the-icons-faicon "cloud")) 'face `(:height 1.2) 'display '(raise -0.1))
-      (propertize (format " · %s" revision) 'face `(:height 0.9)))))
-
-(defun custom-modeline-icon-vc ()
-  "Display a vc icon according to the type of vc system (git || svn)."
-  (when vc-mode
-    (cond
-      ((string-match "Git[:-]" vc-mode) (-custom-modeline-github-vc))
-      ((string-match "SVN-" vc-mode) (-custom-modeline-svn-vc))
-      (t (format "%s" vc-mode)))))
-
-;; *********************************
-;;; Flycheck icons for modeline
-
-(defun custom-modeline-flycheck-status ()
-  "Display flycheck report on the modeline."
-  (let* ((text (pcase flycheck-last-status-change
-                 (`finished (if flycheck-current-errors
-                              (let ((count (let-alist (flycheck-count-errors flycheck-current-errors)
-                                             (+ (or .warning 0) (or .error 0)))))
-                                (format "✖ %s Issue%s" count (unless (eq 1 count) "s")))
-                              "✔ No Issues"))
-                 (`running     "⟲ Running")
-                 (`no-checker  "⚠ No Checker")
-                 (`not-checked "✖ Disabled")
-                 (`errored     "⚠ Error")
-                 (`interrupted "⛔ Interrupted")
-                 (`suspicious  ""))))
-    (propertize text
-      'help-echo "Show Flycheck Errors"
-      'mouse-face '(:box 1)
-      'local-map (make-mode-line-mouse-map
-                   'mouse-1 (lambda () (interactive) (flycheck-list-errors))))))
-
-;; *********************************
-;;; Time with clock icon
-
-(defun custom-modeline-time ()
-  "Display a clock icon with the current time."
-  (let* ((hour (string-to-number (format-time-string "%I")))
-          (icon (all-the-icons-wicon (format "time-%s" hour) :height 1.3 :v-adjust 0.0)))
-    (concat
-      (propertize (format-time-string " %H:%M ") 'face `(:height 0.9))
-      (propertize (format "%s " icon) 'face `(:height 1.0 :family ,(all-the-icons-wicon-family)) 'display '(raise -0.0)))))
-
-;; *********************************
-;;; LSP info in the modelin
-
-(defun custom-lsp-mode-line ()
-  "Construct the mode line text."
-  (if-let (workspaces (lsp-workspaces))
-    (concat "LSP" (string-join (--map (format "[%s]" (lsp--workspace-print it))
-                                 workspaces)))
-    (concat "LSP" (propertize "[Disconnected]" 'face 'warning))))
-
-;; *********************************
-;;
-;;; My personal modeline
-
-(setq-default mode-line-format
-  (list
-    ;; evil status
-    evil-mode-line-tag
-    '(:eval (propertize (if (eq 'emacs evil-state) "  " "  ")
-              'face font-lock-builtin-face))
-
-
-    ;; major mode icon
-    "%2 "
-    "|"
-    '(:eval (custom-modeline-mode-icon))
-
-    ;; Buffer modified status
-    "%2 "
-    ;; '(:eval   (custom-modeline-modified))
-
-    ;; Display a broken chain if buffer is modified
-    '(:eval
-       (when (eql (buffer-modified-p) t)
-         ;; propertize adds metadata to text, so you can add colours and formatting, amongst other things
-         (propertize (all-the-icons-faicon "chain-broken")
-           'face `(:family ,(all-the-icons-faicon-family)
-                    :height 1.2))))
-    ;; Display a lock if buffer is readonly
-    '(:eval
-       (when (eql buffer-read-only t)
-         (propertize (all-the-icons-faicon "lock")
-           'face `(:family ,(all-the-icons-faicon-family)
-                    :height 1.2))))
-
-    ;; the buffer name; the file name as a tool tip
-    ;; if buffer is modified, change the background and foreground colors
-    '(:eval (propertize "%b "
-              'face
-              (let ((face (buffer-modified-p)))
-                (if face 'font-lock-warning-face
-                  'font-lock-type-face))
-              'help-echo (buffer-file-name))
-       (when (buffer-modified-p)
-         (propertize " " 'face 'font-lock-warning-face))
-
-       (when buffer-read-only
-         (propertize "" 'face 'font-lock-warning-face))
-       )
-
-    "("
-    (propertize "%02I" 'face 'font-lock-constant-face) ;; size of file
-    ")"
-
-    ;; line and column
-    " "
-    (propertize "%02l" 'face 'font-lock-keyword-face) ;; line number
-    ":"
-    (propertize "%c" 'face 'font-lock-keyword-face) ;; column number
-    " "
-    (propertize "%p" 'face 'font-lock-constant-face) ;; % of buffer above top of window
-
-
-    ;; marked region info (lines selected, word count)
-    '(:eval   (custom-modeline-region-info))
-
-
-    ;; projectile
-    " | "
-    '(:eval (when (bound-and-true-p projectile-mode)
-              (projectile-mode-line-function)))
-
-    ;; nyan cat
-    ;; "%2 "
-    ;; '(:eval (when (bound-and-true-p nyan-mode)
-    ;;           (nyan-create)))
-
-
-    ;; party parrot
-    ;; "%2 "
-    ;; '(:eval (when (bound-and-true-p parrot-mode)
-    ;;           (parrot-create)))
-
-    ;; ;; spaces to align right
-    ;; '(:eval (propertize
-    ;;           " " 'display
-    ;;           `((space :align-to (- (+ right right-fringe right-margin)
-    ;;                                ,(+ 60 (string-width mode-name))))))) ;; the bigger the number, less space is added
-
-
-
-    ;; ;; spaces to align right
-    ;; '(:eval (propertize
-    ;; " " 'display
-    ;; `((space :align-to (- (+ right right-fringe right-margin)
-    ;; 			,(+ (string-width org-mode-line-string) (+ 3 (string-width mode-name)))
-    ;; 			)))))
-
-
-    ;; the current major mode
-    ;; '(:eval   (custom-modeline-mode-icon))
-    (propertize "%m" 'face 'font-lock-string-face)
-
-    ;; lsp status
-    '(:eval (when (bound-and-true-p lsp-mode)
-              " | "
-              (custom-lsp-mode-line)))
-
-    ;; day and time
-    ;; '(:eval (propertize (format-time-string " %b %d %H:%M ")
-    ;; 			'face 'font-lock-builtin-face))
-    "|"
-    '(:eval
-       (custom-modeline-time))
-
-    ;; version control
-    "|"
-    '(:eval
-       (custom-modeline-icon-vc))
-    ;; '(:eval (propertize (substring vc-mode 5)
-    ;; 			'face 'font-lock-comment-face))
-
-    ;; flycheck status
-    '(:eval (when (bound-and-true-p flycheck-mode)
-              "   | "
-              (custom-modeline-flycheck-status)))
-
-    )
+(use-package hide-mode-line
+  :hook
+  (Man-mode-hook . hide-mode-line-mode)
+  (completion-list-mode-hook . hide-mode-line-mode)
   )
 
 
-;; Diplay file size on the modeline
-(size-indication-mode t)
+;; **************************************
+;; my personal modeline
 
-;; ** anzu
-
-;; anzu.el is an Emacs port of anzu.vim. anzu.el provides a minor mode which displays current match and total matches information in the mode-line in various search modes.
-
-(use-package anzu
-  :bind
-  (:map isearch-mode-map
-    ([remap isearch-query-replace] . anzu-isearch-query-replace)
-    ([remap isearch-query-replace-regexp] . anzu-isearch-query-replace-regexp))
-  :custom-face
-  (anzu-mode-line ((nil (:foreground "yellow" :weight bold))))
+(use-package tau-modeline
+  :ensure nil
   :init
-  (setq anzu-mode-lighter "")
-  (setq anzu-deactivate-region t)
-  (setq anzu-search-threshold 1000)
-  (setq anzu-replace-threshold 50)
-  (setq anzu-replace-to-string-separator " => ")
-  :config
-  (eval-when-compile
-    (global-anzu-mode +1)
-    (define-key isearch-mode-map [remap isearch-query-replace]  #'anzu-isearch-query-replace)
-    (define-key isearch-mode-map [remap isearch-query-replace-regexp] #'anzu-isearch-query-replace-regexp))
+  (doom-modeline-mode 1)
   )
 
-;; Minions
+;; ##################################################
+;;; Emacs startup profiler
 
-;; Group all minor modes in a single menu in the modeline
-
-(use-package minions
-  :config
-  (minions-mode 1)
-  )
-
-;; *********************************
-;;
-;; parrot-mode
-
-(use-package parrot
-  ;; :hook
-  ;; (parrot-click . parrot-start-animation)
-  ;; (after-save . parrot-start-animation)
-  ;; (self-insert . parrot-start-animation)
-  ;; (parrot-click-hook . flyspell-buffer)
-  :config
-  ;; To see the party parrot in the modeline, turn on parrot mode:
-  (parrot-mode)
-  (parrot-set-parrot-type 'default)
-  ;; (setq parrot-num-rotations nil) ;; new! make parrot rotate forever
-  ;; (setq parrot-animate-parrot t) ;; suposedly animates parrot, same as variable above
-  ;;/Rotation function keybindings for evil users
-  (define-key evil-normal-state-map (kbd "[r") 'parrot-rotate-prev-word-at-point)
-  (define-key evil-normal-state-map (kbd "]r") 'parrot-rotate-next-word-at-point)
-  )
+(use-package esup
+  ;; To use MELPA Stable use ":pin mepla-stable",
+  :pin melpa
+  ;; :commands is Only needed for functions without an autoload comment (;;;###autoload).
+  :commands (esup))
 
 
-;; *********************************
-;;
-;; nyan-mode
+;; trying this in the last part of the config
 
-(use-package nyan-mode
-  ;; :if window-system
+(use-package gcmh
+  :demand t
   :init
-  (setq nyan-cat-face-number 4)
-  (setq nyan-animate-nyancat t)
-  (setq nyan-wavy-trail t)
+  ;; (setq gcmh-verbose             t
+  ;;       gcmh-lows-cons-threshold #x800000
+  ;;       gcmh-high-cons-threshold most-positive-fixnum
+  ;;       gcmh-idle-delay          3600)
   :config
-  (nyan-mode)
-  (nyan-start-animation)
+  (gcmh-mode 1)
   )
