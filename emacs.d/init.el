@@ -994,9 +994,8 @@ all hooks after it are ignored.")
 ;; *********************************
 ;; undo tree
 
+;; Branching & persistent undo
 (use-package undo-tree
-  ;; Branching & persistent undo
-  :after-call doom-switch-buffer-hook after-find-file
   :hook
   ;; There is no hook specifically for switching buffers, but you can use the buffer-list-update-hook . Switching buffers re-orders the buffer list and triggers this hook, so you could use that to run a command that checks the major-mode of the current buffer and takes some action if it is eshell.
   ;; TODO: check if this gets activated constantly
@@ -1025,7 +1024,7 @@ all hooks after it are ignored.")
 
 ;; this package was added to emacs 27
 
-(if (EMACS27+)
+(if EMACS27+
   (global-so-long-mode 1)
   (use-package so-long
     :config
