@@ -245,8 +245,7 @@ endtry
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " Cursor Settings
-set inccommand=split
-set relativenumber
+set inccommand=split " show live results for some commands (like :s) in a split window
 set scrolloff=1000           " Always show N lines above/below the cursor
 
 " change cursor shape according to mode
@@ -311,13 +310,14 @@ set guifont=Hack\ Nerd\ Font\ 15
 set noshowmode " Hide insertStatus (like --INSERT--) fromthe statsline
 
 set belloff=all  " No annoying sound on errors
-set visualbell                       " Use visual bell (no beeping)
+set visualbell   " Use visual bell (no beeping)
 set t_vb=
 
-set timeoutlen=500 " pThe time in milliseconds that is waited for a key code or mapped key sequence to complete.
+set timeoutlen=500 " The time in milliseconds that is waited for a key code or mapped key sequence to complete.
 
 set foldcolumn=1 " Add a bit extra margin to the left
 set number                  " Show line numbers
+set relativenumber     " show line numbers relative to current line
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""

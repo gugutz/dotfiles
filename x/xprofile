@@ -3,6 +3,18 @@
 
 # The xprofile file is similar in style to xinitrc.
 
+
+######################################################
+# KEYBOARD MODIFICTIONS
+
+# keyboard repeat delay and rate
+xset r rate 300 50
+
+# to reset to default (25 per sec, 600 ms delay):
+# xset r rate
+
+# ------------------------------
+
 # make caps behave like esc and control
 # this can also be made in bashrc, but will only work for each bash session
 # The trailing & puts the xcape command into the background so that it doesn't block your session. The setxkbmap makes its change immediately.
@@ -15,11 +27,37 @@
 # # make CapsLock behave like Ctrl:
 # setxkbmap -option ctrl:nocaps
 
-# # make short-pressed Ctrl behave like Escape:
+# ------------------------------
+# # make short-pressed Ctrl behave like Escape: (needs xcape)
 # xcape -e 'Control_L=Escape'
 
+# ------------------------------
 # binds caps to escape for the duration of the session
-# setxkbmap -option caps:escape 
+# setxkbmap -option caps:escape
 
+# ------------------------------
 # swap caps lock and escape
-#setxkbmap -option caps:swapescape 
+# setxkbmap -option caps:swapescape
+
+######################################################
+# mouse acceleration
+
+# To get the current values, use:
+# xset q | grep -A 1 Pointer
+
+# To set new values, type:
+# xset m acceleration threshold
+
+# where acceleration defines how many times faster the cursor will move than the default speed.
+# threshold is the velocity required for acceleration to become effective, usually measured in device units per 10ms.
+# acceleration can be a fraction, so:
+# to slow down the mouse you can use 1/2, 1/3, 1/4, ...
+# to make it faster you can use 2/1, 3/1, 4/1, ...
+
+# Threshold defines the point at which acceleration should occur in pixels per 10 ms. If threshold is zero, e.g. if you use:
+
+# xset m 3/2 0
+# as suggested in the man page, then acceleration is treated as "the exponent of a more natural and continuous formula."
+
+# To get the default settings back:
+# xset m default

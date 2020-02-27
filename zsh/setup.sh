@@ -13,7 +13,6 @@ fi
 ln -s $DOTFILES/zsh/zshrc ~/.zshrc
 
 
-
 echo "## installing zsh shell"
 sudo pacman -Sq --noconfirm --needed zsh
 
@@ -41,6 +40,16 @@ fi
 
 echo "###############################"
 echo "## OH-MY-ZSH Plugins"
+
+echo "Vim-Mode"
+SYNTAX_HIGHLIGHTING=~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+if [ ! -d "$SYNTAX_HIGHLIGHTING" ]; then
+    echo "## installing zsh sintax highlighting plugin"
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+else
+    echo "Plugin Auto Suggestions already installed in $SYNTAX_HIGHLIGHTING"
+fi
+
 
 echo "Syntax Highlighting"
 SYNTAX_HIGHLIGHTING=~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting

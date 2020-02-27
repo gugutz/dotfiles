@@ -3,6 +3,10 @@
 # ~/.xinitrc
 #
 
+# from the arch wiki:
+# ~/.xinitrc is handy to run programs depending on X and set environment variables on X server startup. If it is present in a user's home directory, startx and xinit execute it. Otherwise startx will run the default /etc/X11/xinit/xinitrc.
+
+
 # Sourcing xprofile from a session started with xinit
 #
 # The xprofile files are natively sourced by the following display managers:

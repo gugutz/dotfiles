@@ -1,3 +1,13 @@
+! Xresources is a user-level configuration dotfile, typically located at ~/.Xresources. It can be used to set X resources, which are configuration parameters for X client applications.
+
+! Among other things they can be used to:
+
+! configure terminal preferences (e.g. terminal colors)
+! set DPI, anti-aliasing, hinting and other X font settings
+! change the Xcursor theme
+! theme XScreenSaver
+! configure low-level X applications like: xorg-xclock, xpdf, rxvt-unicode
+
 Xft.dpi:       96
 Xft.antialias: true
 Xft.hinting:   true

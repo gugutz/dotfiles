@@ -1,6 +1,5 @@
 ;;; Package --- Summary  -*- lexical-binding: t; -*-
 
-
 ;;; Commentary:
 ;; Emacs init file responsible for either loading a pre-compiled configuration file
 ;; or tangling and loading a literate org configuration file.
@@ -58,7 +57,7 @@ DEBUG envvar will enable this at startup.")
 
 (setq gc-cons-threshold most-positive-fixnum ;; 2^61 bytes
   gc-cons-percentage 0.6
-garbage-collection-messages t)
+  garbage-collection-messages t)
 
 ;; reset gc after emacs loads
 
@@ -407,13 +406,12 @@ garbage-collection-messages t)
 
 (use-package eyebrowse
   :config
-  (eval-when-compile
-    (eyebrowse-mode t)
-    (setq eyebrowse-new-workspace t)
-    (define-key eyebrowse-mode-map (kbd "M-1") 'eyebrowse-switch-to-window-config-1)
-    (define-key eyebrowse-mode-map (kbd "M-2") 'eyebrowse-switch-to-window-config-2)
-    (define-key eyebrowse-mode-map (kbd "M-3") 'eyebrowse-switch-to-window-config-3)
-    (define-key eyebrowse-mode-map (kbd "M-4") 'eyebrowse-switch-to-window-config-4))
+  (eyebrowse-mode t)
+  (setq eyebrowse-new-workspace t)
+  (define-key eyebrowse-mode-map (kbd "M-1") 'eyebrowse-switch-to-window-config-1)
+  (define-key eyebrowse-mode-map (kbd "M-2") 'eyebrowse-switch-to-window-config-2)
+  (define-key eyebrowse-mode-map (kbd "M-3") 'eyebrowse-switch-to-window-config-3)
+  (define-key eyebrowse-mode-map (kbd "M-4") 'eyebrowse-switch-to-window-config-4)
   )
 
 ;; *********************************
@@ -513,8 +511,7 @@ garbage-collection-messages t)
   (setq show-paren-when-point-inside-paren t)
   (setq show-paren-when-point-in-periphery t)
   :config
-  (eval-when-compile
-    (show-paren-mode +1))
+  (show-paren-mode +1)
   )
 
 
@@ -791,13 +788,13 @@ all hooks after it are ignored.")
 ;;; Folders and Files
 
 ;;; Define emacs directory
-(defconst emacs-dir (eval-when-compile (file-truename user-emacs-directory)))
+(defconst emacs-dir (file-truename user-emacs-directory))
 
 ;; Define a config folder inside emacs-dir
-(defconst config-dir (eval-when-compile (concat emacs-dir "config/")))
+(defconst config-dir (concat emacs-dir "config/"))
 
 ;; Define a config folder inside emacs-dir
-(defconst cache-dir (eval-when-compile (concat emacs-dir "cache/")))
+(defconst cache-dir (concat emacs-dir "cache/"))
 
 ;; Resolve symlinks when opening files, so that any operations are conducted
 ;; from the file's true directory (like `find-file').
@@ -945,49 +942,47 @@ all hooks after it are ignored.")
 (use-package evil
   :demand t
   :config
-  (eval-when-compile
-    (evil-mode 1)
-    ;; change cursor color according to mode
-    (setq evil-emacs-state-cursor '("#ff0000" box))
-    (setq evil-motion-state-cursor '("#FFFFFF" box))
-    (setq evil-normal-state-cursor '("#00ff00" box))
-    (setq evil-visual-state-cursor '("#abcdef" box))
-    (setq evil-insert-state-cursor '("#e2f00f" bar))
-    (setq evil-replace-state-cursor '("#ff0000" hbar))
-    (setq evil-operator-state-cursor '("#ff0000" hollow))
-    ;; evil in modeline
-    (setq evil-mode-line-format '(before . mode-line-front-space)) ;; move evil tag to beginning of modeline
+  (evil-mode 1)
+  ;; change cursor color according to mode
+  (setq evil-emacs-state-cursor '("#ff0000" box))
+  (setq evil-motion-state-cursor '("#FFFFFF" box))
+  (setq evil-normal-state-cursor '("#00ff00" box))
+  (setq evil-visual-state-cursor '("#abcdef" box))
+  (setq evil-insert-state-cursor '("#e2f00f" bar))
+  (setq evil-replace-state-cursor '("#ff0000" hbar))
+  (setq evil-operator-state-cursor '("#ff0000" hollow))
+  ;; evil in modeline
+  (setq evil-mode-line-format '(before . mode-line-front-space)) ;; move evil tag to beginning of modeline
   ;;; FOR SOME REASON WHEN I MAP KEYS IN :bind EVIL DOENST LOAD ON STARTUP
-    (define-key evil-normal-state-map (kbd "SPC q") 'evil-quit)
-    ;; ("SPC q" . kill-buffer-and-window) ;; check if evil quit does this
-    (define-key evil-normal-state-map (kbd "SPC w") 'save-buffer)
-    (define-key evil-normal-state-map (kbd "SPC d") 'delete-frame)
-    (define-key evil-normal-state-map (kbd "SPC k") 'kill-current-buffer)
-    (define-key evil-normal-state-map (kbd "SPC 0") 'delete-window)
-    (define-key evil-normal-state-map (kbd "SPC -") 'split-window-bellow)
-    (define-key evil-normal-state-map (kbd "SPC |") 'split-window-right)
-    (define-key evil-normal-state-map (kbd "SPC u") 'undo-tree-visualize)
-    (define-key evil-normal-state-map (kbd "SPC o") 'other-window)
+  (define-key evil-normal-state-map (kbd "SPC q") 'evil-quit)
+  ;; ("SPC q" . kill-buffer-and-window) ;; check if evil quit does this
+  (define-key evil-normal-state-map (kbd "SPC w") 'save-buffer)
+  (define-key evil-normal-state-map (kbd "SPC d") 'delete-frame)
+  (define-key evil-normal-state-map (kbd "SPC k") 'kill-current-buffer)
+  (define-key evil-normal-state-map (kbd "SPC 0") 'delete-window)
+  (define-key evil-normal-state-map (kbd "SPC -") 'split-window-bellow)
+  (define-key evil-normal-state-map (kbd "SPC |") 'split-window-right)
+  (define-key evil-normal-state-map (kbd "SPC u") 'undo-tree-visualize)
+  (define-key evil-normal-state-map (kbd "SPC o") 'other-window)
 
-    ;; ------------------------------------------
-    ;;
+  ;; ------------------------------------------
+  ;;
   ;;; RECOVER SOME USEFUL EMACS NATIVE COMMANDS
-    (define-key evil-insert-state-map (kbd "C-y") 'yank)
-    (define-key evil-insert-state-map (kbd "C-a") 'beginning-of-line)
-    (define-key evil-insert-state-map (kbd "C-e") 'end-of-line)
-    (define-key evil-normal-state-map (kbd "C-y") 'yank)
-    (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
-    (define-key evil-insert-state-map (kbd "C-d") 'delete-char)
-    ;; native find definition
-    (global-set-key (kbd "M-.") 'xref-find-definitions)
-    ;; somehow global-set-key doenst work for normal mode for this binding, so i manually set it
-    (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
+  (define-key evil-insert-state-map (kbd "C-y") 'yank)
+  (define-key evil-insert-state-map (kbd "C-a") 'beginning-of-line)
+  (define-key evil-insert-state-map (kbd "C-e") 'end-of-line)
+  (define-key evil-normal-state-map (kbd "C-y") 'yank)
+  (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
+  (define-key evil-insert-state-map (kbd "C-d") 'delete-char)
+  ;; native find definition
+  (global-set-key (kbd "M-.") 'xref-find-definitions)
+  ;; somehow global-set-key doenst work for normal mode for this binding, so i manually set it
+  (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
 
-    (global-set-key (kbd "C-S-H") 'evil-window-left)
-    (global-set-key (kbd "C-S-L") 'evil-window-right)
-    (global-set-key (kbd "C-S-K") 'evil-window-up)
-    (global-set-key (kbd "C-S-J") 'evil-window-down)
-    )
+  (global-set-key (kbd "C-S-H") 'evil-window-left)
+  (global-set-key (kbd "C-S-L") 'evil-window-right)
+  (global-set-key (kbd "C-S-K") 'evil-window-up)
+  (global-set-key (kbd "C-S-J") 'evil-window-down)
   )
 
 
@@ -1144,7 +1139,7 @@ all hooks after it are ignored.")
 ;;; Counsel
 
 (use-package counsel
-:demand t
+  :demand t
   :after ivy
   :diminish counsel-mode
   :hook
@@ -1360,7 +1355,7 @@ all hooks after it are ignored.")
   (global-set-key [remap evil-jump-backward] #'better-jumper-jump-backward)
   (global-set-key [remap xref-pop-marker-stack] #'better-jumper-jump-backward)
   :config
-  (add-hook pre-command-hook 'better-jumper-mode)
+  (add-hook 'pre-command-hook 'better-jumper-mode)
   ;;(better-jumper-mode +1)
   (add-hook 'better-jumper-post-jump-hook #'recenter)
   )
@@ -1377,7 +1372,6 @@ all hooks after it are ignored.")
   (pre-command . save-place-mode)
   (pre-command . savehist-mode)
   :init
-  (setq-default save-place t)
   ;; dont clutter the emacs folder. save somewhere else
   (setq save-place-file "~/.emacs.d/config/places")
   (setq savehist-file (concat cache-dir "savehist")
@@ -1500,36 +1494,38 @@ default, on Linux, this is '$SHELL -ic /usr/bin/env'. Variables in
 
 (use-package treemacs-evil
   :after treemacs evil
+  :demand t
+  :config
+  (evil-define-key 'treemacs treemacs-mode-map (kbd "h") #'treemacs-TAB-action)
+  (evil-define-key 'treemacs treemacs-mode-map (kbd "l") #'treemacs-TAB-action)
   )
 
 (use-package treemacs-projectile
   :after treemacs projectile
   )
 
-;; (use-package treemacs-icons-dired
-;;   :after treemacs dired
-;;   :config (treemacs-icons-dired-mode))
+(use-package treemacs-magit
+  :after treemacs magit
+  )
 
-;; (use-package treemacs-magit
-;;   :after treemacs magit
-;;   )
-
-;; (use-package treemacs-persp
-;;   :after treemacs persp-mode
-;;   :config (treemacs-set-scope-type 'Perspectives))
+;; make treemacs have unique buffers for different workspaces (like for eyebrowse window setups)
+(use-package treemacs-persp
+  :after treemacs persp-mode
+  :config (treemacs-set-scope-type 'Perspectives)
+  )
 
 
-;; *********************************
+  ;; *********************************
 ;;; Ranger
 
-(use-package ranger
-  :bind
-  ("C-x C-j" . ranger)
-  (:map evil-normal-state-map
-    ("SPC f r" . ranger))
-  :config
-  (setq ranger-show-hidden t) ;; show hidden files
-  )
+  (use-package ranger
+    :bind
+    ("C-x C-j" . ranger)
+    (:map evil-normal-state-map
+      ("SPC f r" . ranger))
+    :config
+    (setq ranger-show-hidden t) ;; show hidden files
+    )
 
 ;; **************************************************
 ;;; Dired
@@ -1914,7 +1910,6 @@ Version 2016-07-17"
 ;;; Company
 
 (use-package company
-  :demand t
   :bind
   (:map company-active-map
     ("C-p" . company-select-previous)
@@ -1936,7 +1931,7 @@ Version 2016-07-17"
   (bind-key [remap completion-at-point] #'company-complete company-mode-map)
   ;; show tooltip even for single candidates
   (setq company-frontends '(company-pseudo-tooltip-frontend
-			    company-echo-metadata-frontend))
+			                       company-echo-metadata-frontend))
   )
 
 ;; *********************************
@@ -2451,7 +2446,6 @@ Adapted from `describe-function-or-variable'."
 ;; Centaur tabs
 
 (use-package centaur-tabs
-  :disabled
   :if (version<= "27.1" emacs-version)
   :after evil
   :hook
@@ -2488,7 +2482,6 @@ Adapted from `describe-function-or-variable'."
 ;; Solaire mode
 
 (use-package solaire-mode
-  :disabled
   :hook
   ((change-major-mode after-revert ediff-prepare-buffer) . turn-on-solaire-mode)
   (minibuffer-setup . solaire-mode-in-minibuffer)
@@ -2541,8 +2534,8 @@ Adapted from `describe-function-or-variable'."
 
 (use-package typescript-mode
   :mode
-  (("\\.ts\\'" . typescript-mode)
-    ("\\.tsx\\'" . typescript-mode))
+  ("\\.ts\\'" . typescript-mode)
+  ("\\.tsx\\'" . typescript-mode)
   )
 
 ;; *********************************
@@ -2917,9 +2910,9 @@ Adapted from `describe-function-or-variable'."
 
 (use-package doom-modeline
   :hook
-  (window-setup . doom-modeline-mode)
-  ;; :init
-  ;; (doom-modeline-mode 1)
+  (after-init . doom-modeline-mode)
+  :init
+  (doom-modeline-mode 1)
   )
 
 ;; **************************************
@@ -2927,19 +2920,18 @@ Adapted from `describe-function-or-variable'."
 
 (use-package hide-mode-line
   :hook
-  (Man-mode-hook . hide-mode-line-mode)
-  (completion-list-mode-hook . hide-mode-line-mode)
+  (Man-mode . hide-mode-line-mode)
+  (completion-list-mode . hide-mode-line-mode)
+  (treemacs-mode . hide-mode-line-mode)
   )
 
 
 ;; **************************************
 ;; my personal modeline
 
-(use-package tau-modeline
-  :ensure nil
-  :init
-  (doom-modeline-mode 1)
-  )
+;; (use-package tau-modeline
+;; :ensure nil
+;; )
 
 ;; ##################################################
 ;;; Emacs startup profiler

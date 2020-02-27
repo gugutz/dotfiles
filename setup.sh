@@ -94,6 +94,10 @@ yay -S --noconfirm --needed hollywood 1>/dev/null
  echo "## installing mapscii map visualizer"
  sudo snap install mapscii
 
+
+ echo "### install gitflow"
+ yay -S --noconfirm --needed gitflow-avh
+
  echo "%{green}############################################################"
  echo "## Configuring terminal (st)"
  echo "############################################################${reset_color}"

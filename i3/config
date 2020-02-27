@@ -168,10 +168,8 @@ set $mod Mod4
 set $alt Mod1
 
 # bind single mod key press to morc_menu, simulating a "Start Menu" like in some DEs
-bindcode --release 133 exec rofi -show run # use xev to find the keycode of your mod key
-
-
-
+# unfortunatelly this prevents me from moving floating windows with the mod key
+# bindcode --release 133 exec rofi -show run # use xev to find the keycode of your mod key
 
 # set main mod key (super aka win key)
 floating_modifier $mod
@@ -500,18 +498,16 @@ bindsym $alt+Print exec scrot ~/img/screenshots/last-scrot.png -s -e 'mv $f /tmp
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
-    font pango:Hack Nerd Font Mono 11
     i3bar_command i3bar
     # status_command i3status
-    status_command i3blocks -c ~/dotfiles/i3/i3blocks.conf
+    status_command i3blocks
     position bottom
     separator_symbol "|"
-
     tray_output $primary_monitor
-
     bindsym button4 nop
     bindsym button5 nop
-    # font xft:URWGothic-Book 11
+    font xft:URWGothic-Book 11
+    font pango:Hack Nerd Font Mono 11
     strip_workspace_numbers no
 
     colors {
@@ -520,7 +516,8 @@ bar {
         statusline #F9FAF9
         separator  #454947
 
-        #                    border  backgr. text
+        # workspace colors
+        # property         border  backgr. text
         focused_workspace  #F9FAF9 #16a085 #292F34
         active_workspace   #595B5B #353836 #FDF6E3
         inactive_workspace #595B5B #222D31 #EEE8D5
@@ -528,7 +525,7 @@ bar {
         urgent_workspace   #16a085 #FDF6E3 #E5201D
 
 
-        # My previouw theme
+        # My previous theme
         # separator #268bd2
         # background #000000
         # statusline #839496
@@ -918,9 +915,24 @@ for_window [class="Timeset-gui"] floating enable border normal
 for_window [class="(?i)virtualbox"] floating enable border normal
 for_window [class="Xfburn"] floating enable
 
+
+
+
 # added apps
 for_window [title="Authy"] floating enable border pixel 1
 
 # set 'App' window_class as floating windows
 # this makes my java build and runs float on top of the idea, and not divide the screen with another window
 for_window [instance="App"] floating enable
+
+
+################################################
+# i3blocks specific settings
+###############################################
+
+# for the key indicators to work
+bindsym --release Caps_Lock exec pkill -SIGRTMIN+11 i3blocks
+bindsym --release Num_Lock  exec pkill -SIGRTMIN+11 i3blocks
+
+# gsimplecal - calender used on my i3blocks config
+for_window [class="(?i)gsimplecal"] floating enable, move position mouse, move down $height px

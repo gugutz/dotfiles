@@ -1,3 +1,4 @@
+
 #########################################
 # If you come from bash you might have to change your $PATH.
 # check if exporting this line in .profile is okay
@@ -5,53 +6,95 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # load all my env vars first
-[[ -f $HOME/dotfiles/envvars ]] && source $HOME/dotfiles/envvars
-
-
-
-#########################################
-# set theme
-ZSH_THEME="robbyrussell"
-
-
-#########################################
-# plugins can be found in ~/.oh-my-zsh/plugins/*
-# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
-plugins=(
-    # native oh-my-zsh plugins
-    git
-    colorize #cat with syntax highlight
-    cp # copy with progress bar
-    npm
-    ruby
-    docker
-    docker-compose
-    fzf
-    tmux
-    tmuxinator
-    # custom (installed) plugins
-    zsh-syntax-highlighting
-    zsh-autosuggestions
-    you-should-use
-    k
-    )
-
-#########################################
-# oh-my-zsh
-source $ZSH/oh-my-zsh.sh
-
-#########################################
-# pure prompt
-
-# add pure prompt to zsh path
-fpath+=("$HOME/.zsh/pure")
-# # start prompt plugin
-autoload -U promptinit; promptinit
-prompt pure > /dev/null
+if [[ -f $HOME/dotfiles/envvars ]]; then
+    source $HOME/dotfiles/envvars
+else
+    echo "envvars file not found"
+fi
 
 #########################################
 # my aliases
 [[ -e $HOME/dotfiles/aliases ]] && source $HOME/dotfiles/aliases
+
+#########################################
+# zplug boostrap
+
+# auto install if not installed
+# You can customize where you put it but it's generally recommended that you put in $HOME/.zplug
+if [[ ! -d ~/.zplug ]];then
+    git clone https://github.com/b4b4r07/zplug ~/.zplug
+fi
+source ~/.zplug/init.zsh
+
+# if plugins are not installed, install them
+# Actually install plugins, prompt user input
+if ! zplug check --verbose; then
+    printf "Install zplug plugins? [y/N]: "
+    if read -q; then
+        echo; zplug install
+    fi
+fi
+
+# vim mode
+zplug "softmoth/zsh-vim-mode", from:github
+
+# Async for zsh, used by pure
+zplug "mafredri/zsh-async", from:github, defer:0
+
+# Load completion library for those sweet [tab] squares
+zplug "lib/completion", from:oh-my-zsh
+
+# Syntax highlighting for commands, load last
+zplug "zsh-users/zsh-syntax-highlighting", from:github, defer:3
+
+# Theme!
+zplug "sindresorhus/pure", use:pure.zsh, from:github, as:theme
+
+zplug load
+
+#########################################
+# THEME AND UI
+
+# set theme
+# Theme: PowerLevel10K
+
+echo "## PowerLevel10K theme"
+POWERLEVEL10K_DIR=~/.zsh/themes/powerlevel10k
+if [ ! -d "$POWERLEVEL10K_DIR" ]; then
+    echo "## installing PowerLevel10K theme for zsh"
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $POWERLEVEL10K_DIR
+    # npm install --global pure-prompt
+else
+    source $POWERLEVEL10K_DIR/powerlevel10k.zsh-theme
+    echo "## PowerLevel10K theme already installed and sourced"
+fi
+
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+
+# pure prompt
+
+# add pure prompt to zsh path
+#fpath+=("$HOME/.zsh/pure")
+
+# # start prompt plugin
+#autoload -U promptinit; promptinit
+#prompt pure > /dev/null
+
+#########################################
+# PLUGINS SETTINGS
+
+# vim mode plugin settings
+
+MODE_CURSOR_VICMD="green block"
+MODE_CURSOR_VIINS="#20d08a blinking bar"
+MODE_CURSOR_SEARCH="#ff00ff steady underline"
+
 
 #########################################
 # ZSH settings
@@ -169,10 +212,27 @@ bindkey -v
 # change cursor shape according to vi mode
 # since zsh doenst use readline's inputrc file, but its own ZLE instaed, this has to be here
 
-zle-line-init() {
-    zle -K viins # initiate `vi insert` as keymap (can be removed if `bindkey -V` has been set elsewhere)
-    echo -ne "\e[5 q"
+function zle-keymap-select zle-line-init
+{
+    # change cursor shape in iTerm2
+    case $KEYMAP in
+        vicmd)      print -n -- "\E]50;CursorShape=0\C-G";;  # block cursor
+        viins|main) print -n -- "\E]50;CursorShape=1\C-G";;  # line cursor
+    esac
+
+    zle reset-prompt
+    zle -R
 }
+
+function zle-line-finish
+{
+    print -n -- "\E]50;CursorShape=0\C-G"  # block cursor
+}
+
+zle -N zle-line-init
+zle -N zle-line-finish
+zle -N zle-keymap-select
+
 #########################################
 #
 # My Binding and Macros
@@ -187,3 +247,6 @@ bindkey '^N' history-search-forward
 bindkey '\e[A' history-search-backward
 bindkey '\e[B' history-search-forward
 # The others should work already
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
