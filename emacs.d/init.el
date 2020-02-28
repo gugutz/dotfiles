@@ -53,6 +53,13 @@ DEBUG envvar will enable this at startup.")
 
 ;; source: https://raw.githubusercontent.com/gilbertw1/emacs-literate-starter/master/emacs.org
 
+;; trying this in the last part of the config
+
+;; (add-to-list 'load-path "~/dotfiles/emacs.d/packages/gcmh")
+;; (require 'gcmh)
+;; (gcmh-mode 1)
+
+
 ;; defer GC on startup
 
 (setq gc-cons-threshold most-positive-fixnum ;; 2^61 bytes
@@ -197,6 +204,9 @@ DEBUG envvar will enable this at startup.")
 ;; spells of inaccurate fontification immediately after scrolling.
 (setq fast-but-imprecise-scrolling t)
 
+;; defer fontification while there is input pending.
+(setq jit-lock-defer-time 0)
+
 ;; Resizing the Emacs frame can be a terribly expensive part of changing the
 ;; font. By inhibiting this, we halve startup times, particularly when we use
 ;; fonts that are larger than the system default (which would resize the frame).
@@ -272,6 +282,9 @@ DEBUG envvar will enable this at startup.")
 ;;
 ;;; SCROLLING SETTINGS
 
+;; trying to solve emacs garbage collecting and redisplaying a lot while fast scrolling
+(setq redisplay-dont-pause t)
+
 (setq hscroll-margin 2
   hscroll-step 1
   ;; Emacs spends too much effort recentering the screen if you scroll the
@@ -284,10 +297,14 @@ DEBUG envvar will enable this at startup.")
   scroll-preserve-screen-position t
   ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll'
   ;; for tall lines.
-  auto-window-vscroll nil
-  ;; mouse
-  mouse-wheel-scroll-amount '(5 ((shift) . 2))
-  mouse-wheel-progressive-speed nil)  ; don't accelerate scrolling
+  auto-window-vscroll nil)
+
+
+;; mouse
+(setq mouse-wheel-progressive-speed nil)  ; don't accelerate scrolling
+(setq mouse-wheel-scroll-amount '(3 ((control) . 6))) ;; hold Control for 5 lines at a time
+(setq mouse-wheel-scroll-amount '(5 ((shift) . 2)))
+
 
 ;; Remove hscroll-margin in shells, otherwise it causes jumpiness
 (add-hook 'eshell-mode-hook (lambda () (hscroll-margin 0)))
@@ -941,6 +958,12 @@ all hooks after it are ignored.")
 
 (use-package evil
   :demand t
+  :preface
+  (defun comment-line-and-move-up (current-line)
+    "By default `comment-line' moves one line down. This function move the point back to the original location."
+    (interactive)
+    (comment-line)
+    (previous-line))
   :config
   (evil-mode 1)
   ;; change cursor color according to mode
@@ -979,6 +1002,9 @@ all hooks after it are ignored.")
   ;; somehow global-set-key doenst work for normal mode for this binding, so i manually set it
   (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
 
+  ;;; simulate evil-commentary
+  (define-key evil-normal-state-map (kbd "g c c") 'comment-line-and-move-up)
+  (define-key evil-visual-state-map (kbd "g c") 'comment-or-uncomment-region)
   (global-set-key (kbd "C-S-H") 'evil-window-left)
   (global-set-key (kbd "C-S-L") 'evil-window-right)
   (global-set-key (kbd "C-S-K") 'evil-window-up)
@@ -1172,7 +1198,10 @@ all hooks after it are ignored.")
 ;; ivy-rich
 
 (use-package ivy-rich
-  :after ivy
+  :demand t
+  :hook
+  (ivy-mode . ivy-rich-mode)
+  (counsel-mode . ivy-rich-mode)
   :preface
   ;; use all-the-icons for `ivy-switch-buffer'
   (defun ivy-rich-switch-buffer-icon (candidate)
@@ -1183,12 +1212,10 @@ all hooks after it are ignored.")
           (all-the-icons-icon-for-mode 'fundamental-mode)
           icon))))
   :init
-  (setq ivy-rich--original-display-transformers-list nil)  ;; needs to be set otherwise (ivy-rich-set-display-transformer) does not get called
-
   ;; To abbreviate paths using abbreviate-file-name (e.g. replace “/home/username” with “~”)
   (setq ivy-rich-path-style 'abbrev)
 
-  (setq ivy-rich--display-transformers-list
+  (setq ivy-rich-display-transformers-list
     '(ivy-switch-buffer
        (:columns
          ((ivy-rich-switch-buffer-icon (:width 2))
@@ -1236,7 +1263,7 @@ all hooks after it are ignored.")
        )
     )
   ;; ivy-rich-mode needs to be called after `ivy-rich--display-transformers-list' is changed
-  :config
+  :init
   (ivy-rich-mode 1)
   )
 
@@ -2755,6 +2782,7 @@ Adapted from `describe-function-or-variable'."
 (use-package vimrc-mode
   :mode
   ("\\.vim\\(rc\\)?\\'" . vimrc-mode)
+  ("\\vim\\(rc\\)?\\'" . vimrc-mode)
   )
 
 
@@ -2942,8 +2970,6 @@ Adapted from `describe-function-or-variable'."
   ;; :commands is Only needed for functions without an autoload comment (;;;###autoload).
   :commands (esup))
 
-
-;; trying this in the last part of the config
 
 (use-package gcmh
   :demand t

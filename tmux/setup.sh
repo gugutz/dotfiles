@@ -46,3 +46,6 @@ if [ ! -d ~/.config/tmuxinator ]; then
     mv -v  ~/.config/tmuxinator ~/.config/tmuxinator-bkp
 fi
 ln -s ~/dotfiles/tmuxinator ~/.config/tmuxinator
+
+# install the plugins
+~/.tmux/plugins/tpm/scripts/install_plugins.sh

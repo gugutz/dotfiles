@@ -28,7 +28,8 @@
 #command=$SCRIPT_DIR/$BLOCK_NAME
 
 # tive que modificar assim duplicando o block name, nao sei pq
-#command=/usr/lib/i3blocks/$BLOCK_NAME/$BLOCK_NAME
+# command=/usr/lib/i3blocks/$BLOCK_NAME/$BLOCK_NAME
+# o repo clonado é o unico que funciona o numlock no [keyindicator]
 command=~/.config/i3blocks/$BLOCK_NAME/$BLOCK_NAME
 separator_block_width=15
 markup=none

@@ -498,10 +498,10 @@ bindsym $alt+Print exec scrot ~/img/screenshots/last-scrot.png -s -e 'mv $f /tmp
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
+  position top
     i3bar_command i3bar
     # status_command i3status
     status_command i3blocks
-    position bottom
     separator_symbol "|"
     tray_output $primary_monitor
     bindsym button4 nop
