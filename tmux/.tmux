@@ -1,1 +1,0 @@
-/home/tau/dotfiles/tmux

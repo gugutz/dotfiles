@@ -498,7 +498,7 @@ bindsym $alt+Print exec scrot ~/img/screenshots/last-scrot.png -s -e 'mv $f /tmp
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
-  position top
+    position bottom
     i3bar_command i3bar
     # status_command i3status
     status_command i3blocks

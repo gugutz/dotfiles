@@ -83,5 +83,6 @@ alias gplod='git pull origin develop'
 alias glg='git log'
 
 alias whichterm='ps -o 'cmd=' -p $(ps -o 'ppid=' -p $$)'
-alias whichterm='ps -p $$ -o args'
+alias whichterm2='ps -p $$ -o args'
 alias findxprops="xprop _NET_WM_PID WM_CLASS"
+alias whichdisplaymanager="'grep '/usr/s\?bin' /etc/systemd/system/display-manager.service"

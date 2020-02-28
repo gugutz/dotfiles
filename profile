@@ -1,3 +1,6 @@
+# Observations about profile:
+# When you open a new terminal session, bash is run as an interactive non-login shell. Because .profile is run only for a non-interactive login shell, starting a terminal session does not run it.
+
 ###########################################
 # MY PERSONAL .PROFILE
 ###########################################

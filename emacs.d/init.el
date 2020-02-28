@@ -47,7 +47,7 @@ DEBUG envvar will enable this at startup.")
   )
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;; Garbage Collection GC Settings
 
@@ -105,7 +105,7 @@ DEBUG envvar will enable this at startup.")
     (setq file-name-handler-alist tau--file-name-handler-alist)))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; BOOTSTRAP PACKAGE MANAGEMENT
 
@@ -183,7 +183,7 @@ DEBUG envvar will enable this at startup.")
   )
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; Optimizations from doom emacs
 
@@ -243,7 +243,7 @@ DEBUG envvar will enable this at startup.")
       (tty-run-terminal-initialization (selected-frame) nil t))))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; EMACS CORE EDITOR SETTINGS
 
@@ -258,7 +258,12 @@ DEBUG envvar will enable this at startup.")
 
 (setq next-line-add-newlines t) ;; C-n insert newlines if the point is at the end of the buffer.
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; **************************************
+;; package image
+
+(setq image-animate-loop t)
+
+;;****************************************************************
 ;;
 ;;; UI SETTINGS AND APPEARANCE
 
@@ -278,7 +283,7 @@ DEBUG envvar will enable this at startup.")
 ;;  Load the theme
 (load-theme my-theme t)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; SCROLLING SETTINGS
 
@@ -311,7 +316,7 @@ DEBUG envvar will enable this at startup.")
 (add-hook 'term-mode-hook (lambda () (hscroll-margin 0)))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; CURSOR SETTINGS
 
@@ -328,7 +333,7 @@ DEBUG envvar will enable this at startup.")
 (setq x-stretch-cursor nil)
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; FRINGES
 
@@ -345,7 +350,7 @@ DEBUG envvar will enable this at startup.")
 (setq-default indicate-empty-lines t)
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; Window and Frames
 
@@ -558,10 +563,6 @@ DEBUG envvar will enable this at startup.")
   :hook
   (prog-mode . hes-mode)
   )
-;; **************************************
-;; package image
-
-(setq image-animate-loop t)
 
 ;; **************************************
 ;;; package rainbow-delimiters
@@ -606,7 +607,7 @@ DEBUG envvar will enable this at startup.")
   )
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; Buffers settings
 
@@ -633,7 +634,7 @@ DEBUG envvar will enable this at startup.")
 (global-set-key [f5] '(lambda () (interactive) (revert-buffer nil t nil)))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; Minibuffer
 
@@ -735,7 +736,7 @@ DEBUG envvar will enable this at startup.")
 
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; Run all types of escapes when pressing C-g or ESC
 (defvar doom-escape-hook nil
@@ -766,12 +767,12 @@ all hooks after it are ignored.")
 
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; Emacs settings
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; Startup
 
@@ -800,7 +801,7 @@ all hooks after it are ignored.")
 (setq auto-save-list-file-prefix "~/.emacs.d/cache/auto-save-list")
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; Folders and Files
 
@@ -898,7 +899,7 @@ all hooks after it are ignored.")
 (push '("\\.env\\'" . sh-mode) auto-mode-alist)
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; MINIBUFFER SETTINGS
 
@@ -923,7 +924,7 @@ all hooks after it are ignored.")
 
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; INDENTATION SETTINS
 
@@ -952,7 +953,7 @@ all hooks after it are ignored.")
 ;; make return key also do indent, globally
 (electric-indent-mode 1)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; Evil
 
@@ -1112,7 +1113,7 @@ all hooks after it are ignored.")
   (global-evil-surround-mode 1)
   )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; Ivy
 
@@ -1409,89 +1410,16 @@ all hooks after it are ignored.")
 
 
 ;; **************************************************
-;;
-;; (use-package exec-path-from-shell
-;;   :demand t
-;;   :config
-;;   (exec-path-from-shell-initialize)
-;;   )
+;; exec path from shell
+
+(use-package exec-path-from-shell
+  :defer 2
+  :config
+  (exec-path-from-shell-initialize)
+  )
 
 ;; Attempt to get env vars without exec-path-from-shell, since its very slow
 
-;;
-;; Helpers
-
-(defvar tau-env-ignored-vars
-  '("^DBUS_SESSION_BUS_ADDRESS$"
-     "^GPG_AGENT_INFO$"
-     "^GPG_TTY$"
-     "^HOME$"
-     "^PS1$"
-     "^PWD$"
-     "^R?PROMPT$"
-     "^SSH_AGENT_PID$"
-     "^SSH_AUTH_SOCK$"
-     "^TERM$"
-     ;; Doom envvars
-     "^DEBUG$"
-     "^INSECURE$"
-     "^YES$"
-     "^__")
-  "Environment variables to not save in `doom-env-file'.
-Each string is a regexp, matched against variable names to omit from
-`doom-env-file'.")
-
-(defun tau-cli-reload-env-file (&optional force-p env-file)
-  "Generates `doom-env-file', if it doesn't exist (or if FORCE-P).
-This scrapes the variables from your shell environment by running
-`doom-env-executable' through `shell-file-name' with `doom-env-switches'. By
-default, on Linux, this is '$SHELL -ic /usr/bin/env'. Variables in
-`doom-env-ignored-vars' are removed."
-  (let ((env-file (if env-file
-                    (expand-file-name env-file)
-                    doom-env-file)))
-    (when (or force-p (not (file-exists-p env-file)))
-      (with-temp-file env-file
-        (print! (start "%s envvars file at %S")
-          (if (file-exists-p env-file)
-            "Regenerating"
-            "Generating")
-          (path env-file))
-        (let ((process-environment doom--initial-process-environment))
-          (print! (info "Scraping shell environment"))
-          (print-group!
-            (when tau-is-interactive-mode
-              (user-error "'doom env' must be run on the command line, not an interactive session"))
-            (goto-char (point-min))
-            (insert
-              (concat
-                "# -*- mode: sh -*-\n"
-                (format "# Generated from a %s shell environent\n" shell-file-name)
-                "# ---------------------------------------------------------------------------\n"
-                "# This file was auto-generated by `doom env'. It contains a list of environment\n"
-                "# variables scraped from your default shell (excluding variables blacklisted\n"
-                "# in doom-env-ignored-vars).\n"
-                "#\n"
-                (if (file-equal-p env-file tau-env-file)
-                  (concat "# It is NOT safe to edit this file. Changes will be overwritten next time you\n"
-                    "# run 'doom sync'. To create a safe-to-edit envvar file use:\n#\n"
-                    "#   doom env -o ~/.doom.d/myenv\n#\n"
-                    "# And load it with (doom-load-envvars-file \"~/.doom.d/myenv\").\n")
-                  (concat "# This file is safe to edit by hand, but needs to be loaded manually with:\n#\n"
-                    "#   (doom-load-envvars-file \"path/to/this/file\")\n#\n"
-                    "# Use 'doom env -o path/to/this/file' to regenerate it."))
-                "# ---------------------------------------------------------------------------\n\n"))
-            ;; We assume that this noninteractive session was spawned from the
-            ;; user's interactive shell, therefore we just dump
-            ;; `process-environment' to a file.
-            (dolist (env process-environment)
-              (if (cl-find-if (doom-rpartial #'string-match-p (car (split-string env "=")))
-                    tau-env-ignored-vars)
-                (print! (info "Ignoring %s") env)
-                (insert env "\n")))
-            (print! (success "Successfully generated %S")
-              (path env-file))
-            t))))))
 
 ;; *********************************
 ;; goto-line-preview
@@ -1501,7 +1429,7 @@ default, on Linux, this is '$SHELL -ic /usr/bin/env'. Variables in
   ;; (global-set-key [remap goto-line] 'goto-line-preview)
   )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; FILE / DIRECTORY NAVIGATION
 
@@ -1542,17 +1470,17 @@ default, on Linux, this is '$SHELL -ic /usr/bin/env'. Variables in
   )
 
 
-  ;; *********************************
+;; *********************************
 ;;; Ranger
 
-  (use-package ranger
-    :bind
-    ("C-x C-j" . ranger)
-    (:map evil-normal-state-map
-      ("SPC f r" . ranger))
-    :config
-    (setq ranger-show-hidden t) ;; show hidden files
-    )
+(use-package ranger
+  :bind
+  ("C-x C-j" . ranger)
+  (:map evil-normal-state-map
+    ("SPC f r" . ranger))
+  :config
+  (setq ranger-show-hidden t) ;; show hidden files
+  )
 
 ;; **************************************************
 ;;; Dired
@@ -1578,7 +1506,7 @@ default, on Linux, this is '$SHELL -ic /usr/bin/env'. Variables in
 
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; TEXT MANIPULATION
 
@@ -1772,7 +1700,7 @@ Version 2016-07-17"
           (message "Directory path copied: 「%s」" (file-name-directory -fpath))
           (file-name-directory -fpath))))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;; CODE NAVIGATION
 
@@ -1821,7 +1749,7 @@ Version 2016-07-17"
     (require 'helm-source nil t))
   )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; PACKAGE WHITESPACE
 
@@ -1852,7 +1780,7 @@ Version 2016-07-17"
 
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;; ** FONTS AND ICONS
 
@@ -1895,7 +1823,7 @@ Version 2016-07-17"
 
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;; PROJECTS
 
@@ -1929,7 +1857,7 @@ Version 2016-07-17"
   )
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;; AUTOCOMPLETE
 
@@ -2171,7 +2099,7 @@ Version 2016-07-17"
   )
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; HELP SYSTEM AND GUIDANCE
 
@@ -2281,7 +2209,7 @@ Adapted from `describe-function-or-variable'."
           :margin t)))))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;; PACKAGES
 
@@ -2411,7 +2339,7 @@ Adapted from `describe-function-or-variable'."
   )
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; Terminal and Shell Related Settings
 
@@ -2465,7 +2393,7 @@ Adapted from `describe-function-or-variable'."
 
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;; UI RELATED PACKAGES
 
@@ -2551,7 +2479,7 @@ Adapted from `describe-function-or-variable'."
 (use-package restart-emacs)
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;; WEB DEVELOPMENT MAJOR MODES
 
@@ -2684,7 +2612,7 @@ Adapted from `describe-function-or-variable'."
   )
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;; WEB DEVELOPMENT MINOR MODES
 
@@ -2732,7 +2660,7 @@ Adapted from `describe-function-or-variable'."
   (setq emmet-expand-jsx-className? nil) ;; use emmet with JSX markup
   )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;; LANGUAGES SETUP
 
@@ -2786,7 +2714,7 @@ Adapted from `describe-function-or-variable'."
   )
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; VERSION CONTROL
 
@@ -2932,7 +2860,7 @@ Adapted from `describe-function-or-variable'."
 (use-package gitattributes-mode)
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;****************************************************************
 ;;
 ;;; UI -> Modeline
 

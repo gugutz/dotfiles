@@ -5,12 +5,6 @@
 # if not, uncomment it
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
-# load all my env vars first
-if [[ -f $HOME/dotfiles/envvars ]]; then
-    source $HOME/dotfiles/envvars
-else
-    echo "envvars file not found"
-fi
 
 #########################################
 # my aliases
@@ -36,7 +30,7 @@ if ! zplug check --verbose; then
 fi
 
 # vim mode
-zplug "softmoth/zsh-vim-mode", from:github
+ zplug "softmoth/zsh-vim-mode", from:github
 
 # Async for zsh, used by pure
 zplug "mafredri/zsh-async", from:github, defer:0
@@ -58,7 +52,6 @@ zplug load
 # set theme
 # Theme: PowerLevel10K
 
-echo "## PowerLevel10K theme"
 POWERLEVEL10K_DIR=~/.zsh/themes/powerlevel10k
 if [ ! -d "$POWERLEVEL10K_DIR" ]; then
     echo "## installing PowerLevel10K theme for zsh"
@@ -66,8 +59,10 @@ if [ ! -d "$POWERLEVEL10K_DIR" ]; then
     # npm install --global pure-prompt
 else
     source $POWERLEVEL10K_DIR/powerlevel10k.zsh-theme
-    echo "## PowerLevel10K theme already installed and sourced"
 fi
+
+# p10k config. To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
@@ -98,6 +93,10 @@ MODE_CURSOR_SEARCH="#ff00ff steady underline"
 
 #########################################
 # ZSH settings
+
+# wait only 10ms for key sequences
+KEYTIMEOUT=1
+
 
 # enable command auto-correction.
 ENABLE_CORRECTION="true"
@@ -247,6 +246,3 @@ bindkey '^N' history-search-forward
 bindkey '\e[A' history-search-backward
 bindkey '\e[B' history-search-forward
 # The others should work already
-
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
