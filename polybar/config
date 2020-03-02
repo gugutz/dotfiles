@@ -66,7 +66,9 @@ powermenu-close = #FF4500
 ; $ xrandr -q | grep " connected" | cut -d ' ' -f1
 ;monitor = ${env:MONITOR:}
 ;monitor = ${env:MONITOR:eDP1}
-monitor = DVI-I-2
+monitor = ${env:MONITOR:DVI-I-2}
+monitor-fallback = ${env:MONITOR:DP1}
+;monitor = DVI-I-2
 width = 100%
 height = 18
 #offset-x = 1%
@@ -74,8 +76,8 @@ height = 18
 
 fixed-center = true
 wm-restack = i3
-; this is required for i3 on polybar
-override-redirect = true
+; this is required for i3 on polybar, but it i enable this, the top bar somehow lets the windows overflow it
+;override-redirect = true
 
 background = ${colors.background}
 foreground = ${colors.foreground}
@@ -313,10 +315,6 @@ reverse-scroll = false
 fuzzy-match = true
 
 
-; Additional formatting
-
-; ws-icon-[0-9]+ = label;icon
-; NOTE: The label needs to match the name of the i3 workspace
 ; ws-icon-[0-9]+ = label;icon
 ; NOTE: The label needs to match the name of the i3 workspace
 ws-icon-0 = edit;
@@ -330,11 +328,7 @@ ws-icon-7 = music;
 ws-icon-8 = msg;
 ws-icon-9 = mail;
 ws-icon-default = ♟
-; ws-icon-0 = 1;♚
-; ws-icon-1 = 2;♛
-; ws-icon-2 = 3;♜
-; ws-icon-3 = 4;♝
-; ws-icon-4 = 5;♞
+;ws-icon-default = "  "
 ; NOTE: You cannot skip icons, e.g. to get a ws-icon-6
 ; you must also define a ws-icon-5.
 ; NOTE: Icon will be available as the %icon% token inside label-*
@@ -412,109 +406,6 @@ label-urgent-padding = 2
 ;label-separator-padding = 2
 ;label-separator-foreground = #ffb52a
 
-
-
-###############################################################################
-
-[module/bspwm]
-type = internal/bspwm
-
-; Only show workspaces defined on the same output as the bar
-; NOTE: The bspwm and XRandR monitor names must match, which they do by default.
-; Default: true
-pin-workspaces = true
-
-; Output mode flags after focused state label
-; Default: false
-inline-mode = false
-
-; Create click handler used to focus workspace
-; Default: true
-enable-click = true
-
-; Create scroll handlers used to cycle workspaces
-; Default: true
-enable-scroll = false
-
-; Set the scroll cycle direction
-; Default: true
-reverse-scroll = false
-
-; Use fuzzy (partial) matching on labels when assigning
-; icons to workspaces
-; Example: code;♚ will apply the icon to all workspaces
-; containing 'code' in the label
-; Default: false
-fuzzy-match = true
-
-; ws-icon-[0-9]+ = label;icon
-; Note that the label needs to correspond with the bspwm workspace name
-;ws-icon-0 = code;♚
-;ws-icon-1 = office;♛
-;ws-icon-2 = graphics;♜
-;ws-icon-3 = mail;♝
-;ws-icon-4 = web;♞
-ws-icon-default = "  "
-
-; Available tags:
-;   <label-monitor>
-;   <label-state> - gets replaced with <label-(focused|urgent|occupied|empty)>
-;   <label-mode> - gets replaced with <label-(monocle|tiled|fullscreen|floating|locked|sticky|private)>
-; Default: <label-state>
-format = <label-state> <label-mode>
-
-; Available tokens:
-;   %name%
-; Default: %name%
-label-monitor = %name%
-
-; If any values for label-dimmed-N are defined, the workspace/mode
-; colors will get overridden with those values if the monitor is out of focus
-; To only override workspaces in a specific state, use:
-;   label-dimmed-focused
-;   label-dimmed-occupied
-;   label-dimmed-urgent
-;   label-dimmed-empty
-label-dimmed-focused-foreground = ${colors.bspwm-dimmed}
-label-dimmed-focused-underline = ${colors.bspwm-dimmed}
-label-dimmed-focused-background = ${self.label-focused-background}
-
-; Available tokens:
-;   %name%
-;   %icon%
-;   %index%
-; Default: %icon%  %name%
-label-focused = %icon%
-label-focused-foreground = ${colors.bspwm}
-label-focused-background = ${colors.bspwm-background}
-label-focused-underline = ${colors.bspwm}
-
-; Available tokens:
-;   %name%
-;   %icon%
-;   %index%
-; Default: %icon%  %name%
-label-occupied = %icon%
-label-occupied-underline = ${colors.empty}
-
-; Available tokens:
-;   %name%
-;   %icon%
-;   %index%
-; Default: %icon%  %name%
-label-urgent = %icon%
-label-urgent-foreground = ${colors.bspwm-alert}
-label-urgent-background = ${colors.bspwm-background}
-label-urgent-underline = ${colors.bspwm-alert}
-
-; Available tokens:
-;   %name%
-;   %icon%
-;   %index%
-; Default: %icon%  %name%
-label-empty = %icon%
-label-empty-foreground = ${colors.empty}
-
 ; The following labels will be used to indicate the layout/mode
 ; for the focused workspace. Requires <label-mode>
 ;
@@ -531,6 +422,7 @@ label-empty-foreground = ${colors.empty}
 ;label-sticky-foreground = #fba922
 ;label-private = 
 ;label-private-foreground = #bd2c40
+
 
 ##############################################################################
 

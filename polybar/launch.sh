@@ -18,58 +18,64 @@ home_secondary_monitor=DVI-I-1
 work_primary_monitor=eDPI1
 work_secondary_monitor=DP1
 
-# (
-# flock 200
+(
+    flock 200
 
-# Terminate already running bar instances
-killall -q polybar
+    # Terminate already running bar instances
+    killall -q polybar
 
-# Wait until the processes have been shut down
-while pgrep -u $UID -x polybar > /dev/null; do sleep 0.5; done
+    # Wait until the processes have been shut down
+    while pgrep -u $UID -x polybar > /dev/null; do sleep 0.5; done
 
-# get a list of all currently connected monitors
-outputs=$(xrandr --query | grep " connected" | cut -d" " -f1)
-#tray_output=eDP1
+    # get a list of all currently connected monitors
+    outputs=$(xrandr --query | grep " connected" | cut -d" " -f1)
+    #tray_output=eDP1
 
-for monitor in $outputs; do
+    for monitor in $outputs; do
 
-    export MONITOR=$monitor
-    export TRAY_POSITION=none
+        export MONITOR=$monitor
+        export TRAY_POSITION=none
 
-    if [[ $monitor == home_primary_monitor ]] || [[ $monitor == $work_secondary_monitor ]]; then
-        tray_output=$monitor
-    elif [[ $monitor == work_primary_monitor ]]; then
-        # if only the work primary (notebook screen) monitor is connected, then output the tray to it
-        tray_output=$monitor
-    fi
+        if [[ $monitor == home_primary_monitor ]] || [[ $monitor == $work_secondary_monitor ]]; then
+            tray_output=$monitor
+        elif [[ $monitor == work_primary_monitor ]]; then
+            # if only the work primary (notebook screen) monitor is connected, then output the tray to it
+            tray_output=$monitor
+        fi
 
 
-    # define tray position
-    if [[ $monitor == $tray_output ]]; then
-        TRAY_POSITION=right
-    fi
+        # define tray position
+        if [[ $monitor == $tray_output ]]; then
+            TRAY_POSITION=right
+        fi
 
-    # render different bars for different monitors
-	  if [ $monitor == $home_primary_monitor ] || [ $monitor == $work_secondary_monitor ]
-	  then
-        # if home primary or work secondary (the big monitors) are connected, load the main bars on them
-        echo "main monitor detected. loading main bars for it."
-        MONITOR=$monitor polybar --reload gugutz_top --quiet &
-        MONITOR=$monitor polybar --reload gugutz_bottom --quiet &
-	  elif [ $monitor == $home_secondary_monitor ] || [$monitor == $work_primary_monitor]
-    then
-        # if second monitors are connected, load different bars for them
-        echo "second monitor is connected. loading different bars for it."
-        MONITOR=$monitor polybar --reload second_monitor_bar_top --quiet &
-        MONITOR=$monitor polybar --reload second_monitor_bar_bottom --quiet &
-    else
-        # for any other case, just load the main top and bottom bars
-        echo "only one monitor detected."
-        MONITOR=$monitor polybar --reload gugutz_top --quiet &
-        MONITOR=$monitor polybar --reload gugutz_bottom --quiet &
-    fi
-done
-# ) 200>/var/tmp/polybar-launch.lock
+        # render different bars for different monitors
+	      if [ $monitor == $home_primary_monitor ] || [ $monitor == $work_secondary_monitor ]
+	      then
+            # if home primary or work secondary (the big monitors) are connected, load the main bars on them
+            echo "main monitor detected. loading main bars for it."
+            MONITOR=$monitor polybar --reload gugutz_top --quiet & </dev/null >/var/tmp/polybar-$m.log 2>&1 200>&- &
+            disown
+            MONITOR=$monitor polybar --reload gugutz_bottom --quiet & </dev/null >/var/tmp/polybar-$m.log 2>&1 200>&- &
+            disown
+	      elif [ $monitor == $home_secondary_monitor ] || [$monitor == $work_primary_monitor]
+        then
+            # if second monitors are connected, load different bars for them
+            echo "second monitor is connected. loading different bars for it."
+            MONITOR=$monitor polybar --reload second_monitor_bar_top --quiet & </dev/null >/var/tmp/polybar-$m.log 2>&1 200>&- &
+            disown
+            MONITOR=$monitor polybar --reload second_monitor_bar_bottom --quiet & </dev/null >/var/tmp/polybar-$m.log 2>&1 200>&- &
+            disown
+        else
+            # for any other case, just load the main top and bottom bars
+            echo "only one monitor detected."
+            MONITOR=$monitor polybar --reload gugutz_top --quiet & </dev/null >/var/tmp/polybar-$m.log 2>&1 200>&- &
+            disown
+            MONITOR=$monitor polybar --reload gugutz_bottom --quiet & </dev/null >/var/tmp/polybar-$m.log 2>&1 200>&- &
+            disown
+        fi
+    done
+) 200>/var/tmp/polybar-launch.lock
 
 
 
