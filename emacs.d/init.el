@@ -1,8 +1,7 @@
 ;;; Package --- Summary  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
-;; Emacs init file responsible for either loading a pre-compiled configuration file
-;; or tangling and loading a literate org configuration file.
+;; Personal and highly customized configuration, with optmization based on doom-emacs and other stuff i found on the internet
 
 ;;; Code:
 
@@ -10,29 +9,12 @@
   (error "Detected Emacs %s. This emacs config only supports Emacs 26.1 and higher"
     emacs-version))
 
+;; some usefull constants used throughout the config
 (defconst EMACS27+   (> emacs-major-version 26))
 (defconst IS-MAC     (eq system-type 'darwin))
 (defconst IS-LINUX   (eq system-type 'gnu/linux))
 (defconst IS-WINDOWS (memq system-type '(cygwin windows-nt ms-dos)))
 (defconst IS-BSD     (or IS-MAC (eq system-type 'berkeley-unix)))
-
-
-;;
-;;; Global variables
-
-(defvar tau-init-p nil
-  "Non-nil if Doom has been initialized.")
-
-(defvar tau-init-time nil
-  "The time it took, in seconds, for Doom Emacs to initialize.")
-
-(defvar tau-is-debug-mode (or (getenv "DEBUG") init-file-debug)
-  "If non-nil, Doom will log more.
-Use `doom/toggle-debug-mode' to toggle it. The --debug-init flag and setting the
-DEBUG envvar will enable this at startup.")
-
-(defvar tau-is-interactive-mode (not noninteractive)
-  "If non-nil, Emacs is in interactive mode.")
 
 
 ;; Don't attempt to find/apply special file handlers to files loaded during startup.
@@ -53,12 +35,11 @@ DEBUG envvar will enable this at startup.")
 
 ;; source: https://raw.githubusercontent.com/gilbertw1/emacs-literate-starter/master/emacs.org
 
-;; trying this in the last part of the config
-
 ;; (add-to-list 'load-path "~/dotfiles/emacs.d/packages/gcmh")
 ;; (require 'gcmh)
 ;; (gcmh-mode 1)
 
+;;------------------------------------------
 
 ;; defer GC on startup
 
@@ -73,17 +54,19 @@ DEBUG envvar will enable this at startup.")
     (setq gc-cons-threshold 16777216 ; 16mb
       gc-cons-percentage 0.1)))
 
+;;------------------------------------------
 
-;;
-;; It may also be wise to raise gc-cons-threshold while the minibuffer is active, so the GC doesn’t slow down expensive commands (or completion frameworks, like helm and ivy). Here is how Doom does it:
+;; raise gc-cons-threshold while the minibuffer is active, so the GC doesn’t slow down expensive commands (or completion frameworks, like helm and ivy).
 
 ;; store emacs original gc value in a variable
 (defvar tau-gc-cons-threshold gc-cons-threshold)
 
 (defun tau-defer-garbage-collection-h ()
+  "Set gc consing treshold to the higher possible value."
   (setq gc-cons-threshold most-positive-fixnum))
 
 (defun tau-restore-garbage-collection-h ()
+  "Set gc consing treshold to the higher possible value."
   ;; Defer it so that commands launched immediately after will enjoy the
   ;; benefits.
   (run-at-time
@@ -91,6 +74,8 @@ DEBUG envvar will enable this at startup.")
 
 (add-hook 'minibuffer-setup-hook #'tau-defer-garbage-collection-h)
 (add-hook 'minibuffer-exit-hook #'tau-restore-garbage-collection-h)
+
+;;------------------------------------------
 
 ;; Unset file-name-handler-alist temporarily.
 ;; Every file opened and loaded by Emacs will run through this list to check for a proper handler for the file, but during startup, it won’t need any of them.
@@ -222,15 +207,6 @@ DEBUG envvar will enable this at startup.")
 (unless IS-LINUX (setq command-line-x-option-alist nil))
 
 
-;; Adopt a sneaky garbage collection strategy of waiting until idle time to
-;; collect; staving off the collector while the user is working.
-(when tau-is-interactive-mode
-  (add-hook 'pre-command-hook (lambda () (gcmh-mode +1)))
-  (with-eval-after-load 'gcmh
-    (setq gcmh-idle-delay 10
-      gcmh-verbose nil ;; this was using doom-debug-mode, which appeared to be only nil
-      gcmh-high-cons-threshold 16777216) ; 16mb
-    (add-hook 'focus-out-hook #'gcmh-idle-garbage-collect)))
 
 ;; HACK `tty-run-terminal-initialization' is *tremendously* slow for some
 ;;      reason. Disabling it completely could have many side-effects, so we
@@ -288,7 +264,7 @@ DEBUG envvar will enable this at startup.")
 ;;; SCROLLING SETTINGS
 
 ;; trying to solve emacs garbage collecting and redisplaying a lot while fast scrolling
-(setq redisplay-dont-pause t)
+;;(setq redisplay-dont-pause t)
 
 (setq hscroll-margin 2
   hscroll-step 1
@@ -697,9 +673,6 @@ DEBUG envvar will enable this at startup.")
   (prog-mode . rainbow-blocks-mode)
   )
 
-
-
-
 ;; *********************************
 ;; ** Highlight TODO
 
@@ -959,22 +932,16 @@ all hooks after it are ignored.")
 
 (use-package evil
   :demand t
-  :preface
-  (defun comment-line-and-move-up (current-line)
-    "By default `comment-line' moves one line down. This function move the point back to the original location."
-    (interactive)
-    (comment-line)
-    (previous-line))
   :config
   (evil-mode 1)
   ;; change cursor color according to mode
-  (setq evil-emacs-state-cursor '("#ff0000" box))
-  (setq evil-motion-state-cursor '("#FFFFFF" box))
-  (setq evil-normal-state-cursor '("#00ff00" box))
-  (setq evil-visual-state-cursor '("#abcdef" box))
-  (setq evil-insert-state-cursor '("#e2f00f" bar))
-  (setq evil-replace-state-cursor '("#ff0000" hbar))
-  (setq evil-operator-state-cursor '("#ff0000" hollow))
+  ;; (setq evil-emacs-state-cursor '("#ff0000" box))
+  ;; (setq evil-motion-state-cursor '("#FFFFFF" box))
+  ;; (setq evil-normal-state-cursor '("#00ff00" box))
+  ;; (setq evil-visual-state-cursor '("#abcdef" box))
+  ;; (setq evil-insert-state-cursor '("#e2f00f" bar))
+  ;; (setq evil-replace-state-cursor '("#ff0000" hbar))
+  ;; (setq evil-operator-state-cursor '("#ff0000" hollow))
   ;; evil in modeline
   (setq evil-mode-line-format '(before . mode-line-front-space)) ;; move evil tag to beginning of modeline
   ;;; FOR SOME REASON WHEN I MAP KEYS IN :bind EVIL DOENST LOAD ON STARTUP
@@ -1004,8 +971,8 @@ all hooks after it are ignored.")
   (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
 
   ;;; simulate evil-commentary
-  (define-key evil-normal-state-map (kbd "g c c") 'comment-line-and-move-up)
-  (define-key evil-visual-state-map (kbd "g c") 'comment-or-uncomment-region)
+  ;; (define-key evil-normal-state-map (kbd "g c c") 'comment-line-and-move-up)
+  ;; (define-key evil-visual-state-map (kbd "g c") 'comment-or-uncomment-region)
   (global-set-key (kbd "C-S-H") 'evil-window-left)
   (global-set-key (kbd "C-S-L") 'evil-window-right)
   (global-set-key (kbd "C-S-K") 'evil-window-up)
@@ -1062,13 +1029,12 @@ all hooks after it are ignored.")
   :diminish
   :hook
   (evil-mode . evil-commentary-mode)
-  ;;:config
-  ;; (evil-commentary-mode)
   )
 
 ;; *********************************
 ;; evil-surround
 (use-package evil-matchit
+  :disabled
   :after evil
   :config
   (global-evil-matchit-mode 1)
@@ -1078,6 +1044,7 @@ all hooks after it are ignored.")
 ;; evil-surround
 
 (use-package evil-surround
+  :disabled
   :preface
   (defun evil-surround-prog-mode-hook-setup ()
     "Add more pairs to prog mode"
@@ -1274,6 +1241,7 @@ all hooks after it are ignored.")
 ;; Requires: Emacs >= 26
 
 (use-package ivy-posframe
+  :disabled
   :after ivy
   :diminish ivy-posframe-mode
   :custom-face
@@ -1512,6 +1480,19 @@ all hooks after it are ignored.")
 
 
 ;; *********************************
+;;; Comment line or region
+
+(defun comment-line-and-move-up (&optional current-line)
+  "By default `comment-line' moves one line down. This function move the point back to the original location."
+  (interactive)
+  (if (region-active-p)
+    (comment-or-uncomment-region)
+    )
+  ;; else
+  (comment-line)
+  (previous-line))
+
+;; *********************************
 ;;; Duplicate line
 
 (defun duplicate-line ()
@@ -1525,8 +1506,21 @@ all hooks after it are ignored.")
     (yank)
     (move-to-column col)))
 
+(defun duplicate-line-up ()
+  "Duplicate current line."
+  (interactive)
+  (let ((col (current-column)))
+    (move-beginning-of-line 1)
+    (kill-line)
+    (yank)
+    (previous-line)
+    (yank)
+    (move-to-column col)))
+
 (global-set-key [(meta shift d)] 'duplicate-line)
+(global-set-key [(meta shift j)] 'duplicate-line)
 (global-set-key [(control shift d)] 'duplicate-line)
+(global-set-key [(control shift k)] 'duplicate-line-up)
 
 
 
@@ -1586,24 +1580,64 @@ all hooks after it are ignored.")
 ;; *********************************
 ;; electric pair mode
 
-(use-package electric-pair-mode
-  :ensure nil
+;; (use-package electric-pair-mode
+;;   :ensure nil
+;;   :diminish
+;;   :hook
+;;   (prog-mode . electric-pair-mode)
+;;   :config
+;;   (add-hook 'prog-mode-hook
+;;     (lambda ()
+;;       (define-key prog-mode-map "\"" 'electric-pair)
+;;       (define-key prog-mode-map "\'" 'electric-pair)
+;;       (define-key prog-mode-map "(" 'electric-pair)
+;;       (define-key prog-mode-map "[" 'electric-pair)
+;;       (define-key prog-mode-map "{" 'electric-pair)))
+;;   (add-hook 'web-mode-hook
+;;     (lambda ()
+;;       (define-key web-mode-map "<" 'electric-pair)))
+;;   )
+
+;; *********************************
+;; smartparens
+
+(use-package smartparens
+  :demand t
+  :defer t
   :diminish
   :hook
-  (prog-mode . electric-pair-mode)
+  (prog-mode . smartparens-mode)
   :config
-  (add-hook 'prog-mode-hook
-    (lambda ()
-      (define-key prog-mode-map "\"" 'electric-pair)
-      (define-key prog-mode-map "\'" 'electric-pair)
-      (define-key prog-mode-map "(" 'electric-pair)
-      (define-key prog-mode-map "[" 'electric-pair)
-      (define-key prog-mode-map "{" 'electric-pair)))
-  (add-hook 'web-mode-hook
-    (lambda ()
-      (define-key web-mode-map "<" 'electric-pair)))
-  )
+  ;; (smartparens-global-mode +1)
+  ;; Load default smartparens rules for various languages
+  (require 'smartparens-config)
+  (sp-pair "<" ">" :actions '(wrap))
 
+  ;; Overlays are too distracting and not terribly helpful. show-parens does
+  ;; this for us already (and is faster), so...
+  (setq sp-highlight-pair-overlay nil)
+  (setq sp-highlight-wrap-overlay nil)
+  (setq sp-highlight-wrap-tag-overlay nil)
+  (with-eval-after-load 'evil
+    ;; But if someone does want overlays enabled, evil users will be stricken
+    ;; with an off-by-one issue where smartparens assumes you're outside the
+    ;; pair when you're really at the last character in insert mode. We must
+    ;; correct this vile injustice.
+    (setq sp-show-pair-from-inside t)
+    ;; ...and stay highlighted until we've truly escaped the pair!
+    (setq sp-cancel-autoskip-on-backward-movement nil))
+
+  ;; dont try to escape quotes in strings
+  (setq sp-escape-quotes-after-insert nil)
+
+  (add-hook 'minibuffer-setup-hook
+    (defun init-smartparens-in-minibuffer-maybe-h ()
+      "Enable `smartparens-mode' in the minibuffer, during `eval-expression',
+`pp-eval-expression' or `evil-ex'."
+      (when (memq this-command '(eval-expression pp-eval-expression evil-ex))
+        (smartparens-mode))))
+
+  )
 
 ;; *********************************
 ;; open file path at point
@@ -1672,7 +1706,8 @@ Version 2019-01-16"
 
 
 (global-set-key (kbd "C-c C-x C-f") #'open-file-path-at-point)
-(define-key evil-normal-state-map (kbd "SPC f p") #'open-file-path-at-point)
+(with-eval-after-load 'evil
+(define-key evil-normal-state-map (kbd "SPC f p") #'open-file-path-at-point))
 
 ;; *********************************
 ;; copy file path
@@ -1838,10 +1873,6 @@ Version 2016-07-17"
     ("C-c p" . projectile-command-map)
     ("M-S-O p" . counsel-projectile-switch-project)
     )
-  (:map evil-normal-state-map
-    ("SPC p s" . projectile-switch-project)
-    ("SPC p a g" . projectile-ag)
-    ("SPC p r g" . projectile-ripgrep))
   :init
   (setq projectile-completion-system 'ivy)
   (setq projectile-mode-line-prefix "Project -> ")
@@ -1852,6 +1883,10 @@ Version 2016-07-17"
   ;; when this issue is fixed remove this
   (setq projectile-git-submodule-command "")
   :config
+  (with-eval-after-load 'evil
+    (define-key evil-normal-state-map (kbd "SPC p s") 'projectile-switch-project)
+    (define-key evil-normal-state-map (kbd "SPC p a g") 'projectile-ag)
+    (define-key evil-normal-state-map (kbd "SPC p r g") 'projectile-ripgrep))
   (eval-when-compile
     (projectile-mode +1))
   )
@@ -1929,17 +1964,6 @@ Version 2016-07-17"
   (sh-mode . lsp)
   (conf-mode . lsp)
   :bind
-  (:map evil-normal-state-map
-    ("SPC l p f r" . lsp-ui-peek-find-references)
-    ("SPC l p f d" . lsp-ui-peek-find-definitions)
-    ("SPC l p f i" . lsp-ui-peek-find-implementation)
-    ("SPC l g d" . lsp-goto-type-definition)
-    ("SPC l d" . lsp-find-definition)
-    ("SPC l g i" . lsp-goto-implementation)
-    ("SPC l i" . lsp-find-implementation)
-    ("SPC l m"   . lsp-ui-imenu)
-    ("SPC l f"   . lsp-execute-code-action)
-    ("SPC l s"   . lsp-ui-sideline-mode))
   (:map lsp-mode-map
     ;; ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
     ;; ([remap xref-find-references] . lsp-ui-peek-find-references)
@@ -1954,6 +1978,18 @@ Version 2016-07-17"
     ("C-c l m"   . lsp-ui-imenu)
     ("C-c l s"   . lsp-ui-sideline-mode))
   :config
+  (with-eval-after-load 'evil
+    (define-key evil-normal-state-map (kbd "SPC l p f r") 'lsp-ui-peek-find-references)
+    (define-key evil-normal-state-map (kbd "SPC l p f d") 'lsp-ui-peek-find-definitions)
+    (define-key evil-normal-state-map (kbd "SPC l p f i") 'lsp-ui-peek-find-implementation)
+
+    (define-key evil-normal-state-map (kbd "SPC l g d")  'lsp-goto-type-definition)
+    (define-key evil-normal-state-map (kbd "SPC l d")  'lsp-find-definition)
+    (define-key evil-normal-state-map (kbd "SPC l g i")  'lsp-goto-implementation)
+    (define-key evil-normal-state-map (kbd "SPC l i") 'lsp-find-implementation)
+    (define-key evil-normal-state-map (kbd "SPC l m") 'lsp-ui-imenu)
+    (define-key evil-normal-state-map (kbd "SPC l f") 'lsp-execute-code-action)
+    (define-key evil-normal-state-map (kbd "SPC l s") 'lsp-ui-sideline-mode))
   ;; general
   (setq lsp-auto-configure t) ;; auto-configure `lsp-ui' and `company-lsp'
   (setq lsp-enable-indentation nil) ;; NOTE: indentation with lsp is super slow on emacs 26. try again no future versions
@@ -1979,6 +2015,7 @@ Version 2016-07-17"
 ;;; lsp ui
 
 (use-package lsp-ui
+  :disabled
   :after lsp-mode
   :hook
   (lsp-mode . lsp-ui-mode)
@@ -2137,6 +2174,7 @@ Version 2016-07-17"
 ;; paradox
 
 (use-package paradox
+  :disabled
   :config
   (paradox-enable)
   )
@@ -2220,6 +2258,7 @@ Adapted from `describe-function-or-variable'."
 ;; ansi-color
 
 (use-package ansi-color
+  :disabled
   :ensure nil
   :preface
   (defun tau-colorize-compilation-buffer ()
@@ -2270,15 +2309,28 @@ Adapted from `describe-function-or-variable'."
 
 (use-package autorevert
   :ensure nil
-  :defer 3
+  :defer 2
+  :preface
+  (defun revert-buffer-no-confirm ()
+    "Revert buffer without confirmation."
+    (interactive) (revert-buffer t t))
+
+  (defun revert-buffer-maybe (&optional force-reverting)
+    "Interactive call to revert-buffer. Ignoring the auto-save
+ file and not requesting for confirmation. When the current buffer
+ is modified, the command refuses to revert it, unless you specify
+ the optional argument: force-reverting to true."
+    (interactive "P")
+    ;;(message "force-reverting value is %s" force-reverting)
+    (if (or force-reverting (not (buffer-modified-p)))
+      (revert-buffer :ignore-auto :noconfirm)
+      (error "The buffer has been modified")))
   :hook
-  ;; await until first input to activate it
-  (pre-command . auto-revert-mode)
   ;; revert buffers when their files/state have changed
-  ;; (focus-in . revert-buffer)
-  ;; (after-save . revert-buffer)
-  ;; (switch-buffer . revert-buffer)
-  ;; (switch-window . revert-buffer)
+  (focus-in . revert-buffer-maybe)
+  ;;(after-save . revert-buffer-maybe)
+  (switch-buffer . revert-buffer-maybe)
+  (switch-window . revert-buffer-maybe)
   :config
   (setq auto-revert-verbose t) ; let us know when it happens
   (setq auto-revert-use-notify nil)
@@ -2332,6 +2384,7 @@ Adapted from `describe-function-or-variable'."
 ;; vi tilde fringe
 
 (use-package vi-tilde-fringe
+  :disabled
   :diminish
   :config
   (prog-mode . vi-tilde-fringe-mode)
@@ -2368,7 +2421,8 @@ Adapted from `describe-function-or-variable'."
   :bind
   ("C-c s" . shell-pop)
   :config
-  (define-key evil-normal-state-map (kbd "SPC !") 'shell-pop)
+  (with-eval-after-load 'evil
+  (define-key evil-normal-state-map (kbd "SPC !") 'shell-pop))
   )
 
 ;; Execute selected line or marked region as command in system shell
@@ -2402,7 +2456,6 @@ Adapted from `describe-function-or-variable'."
 
 (use-package centaur-tabs
   :if (version<= "27.1" emacs-version)
-  :after evil
   :hook
   (window-setup . centaur-tabs-mode)
   :bind
@@ -2411,10 +2464,7 @@ Adapted from `describe-function-or-variable'."
   ("C-S-<tab>" . centaur-tabs-backward)
   ("C-<tab>" . centaur-tabs-forward)
   ;; ("C-x p" . centaur-tabs-counsel-switch-group)
-  (:map evil-normal-state-map
-    ("g t" . centaur-tabs-forward)
-    ("g T" . centaur-tabs-backward))
-  :init
+  :config
   (setq centaur-tabs-set-bar 'under) ;; display an underline over the selected tab:
   (setq x-underline-at-descent-line t)
   (setq centaur-tabs-set-modified-marker t) ;; display a marker indicating that a buffer has been modified (atom-style)
@@ -2424,12 +2474,15 @@ Adapted from `describe-function-or-variable'."
   (setq centaur-tabs-height 24)
   (setq centaur-tabs-set-icons t) ;; use icons from all the icons
   (setq centaur-tabs-show-navigation-buttons t) ;; display cool navigations buttons
-  :config
-  ;; (centaur-tabs-mode t)
   (centaur-tabs-headline-match)
   (centaur-tabs-group-by-projectile-project)
-  (when (member "Arial" (font-family-list))
-    (centaur-tabs-change-fonts "Arial" 130)))
+  ;; (when (member "Arial" (font-family-list))
+  ;;   (centaur-tabs-change-fonts "Arial" 130))
+
+  (with-eval-after-load 'evil
+    (define-key evil-normal-state-map (kbd "g t") 'centaur-tabs-forward)
+    (define-key evil-normal-state-map (kbd "SPC !") 'centaur-tabs-backward))
+  )
 
 
 
@@ -2472,11 +2525,6 @@ Adapted from `describe-function-or-variable'."
   (define-key goto-address-highlight-keymap (kbd "RET") #'goto-address-at-point)
   )
 
-
-;; *********************************
-;; restart emacs
-
-(use-package restart-emacs)
 
 
 ;;****************************************************************
@@ -2543,7 +2591,8 @@ Adapted from `describe-function-or-variable'."
   (interactive)
   (find-file (angular--counterpart-name (buffer-file-name))))
 (global-set-key (kbd "C-x a c") #'angular-open-counterpart)
-(define-key evil-normal-state-map (kbd "SPC a c") #'angular-open-counterpart)
+(with-eval-after-load 'evil
+(define-key evil-normal-state-map (kbd "SPC a c") #'angular-open-counterpart))
 
 
 ;; *********************************
@@ -2551,9 +2600,6 @@ Adapted from `describe-function-or-variable'."
 ;; Web-Mode
 
 (use-package web-mode
-  :custom-face
-  (css-selector ((t (:inherit default :foreground "#66CCFF"))))
-  (font-lock-comment-face ((t (:foreground "#828282"))))
   :mode
   ("\\.component.html\\'" . web-mode)
   ("\\.phtml\\'" . web-mode)
@@ -2669,7 +2715,6 @@ Adapted from `describe-function-or-variable'."
 
 
 (use-package go-mode
-  :commands emacs-lisp-mode
   :mode
   ("\\.go$" . go-mode)
   :config
@@ -2694,6 +2739,14 @@ Adapted from `describe-function-or-variable'."
   (setq-default lisp-indent-offset 2)
   )
 
+
+;; *********************************
+;; lisp mode
+
+(use-package haskell-mode
+  :mode
+  ("\\.hs\\'")
+  )
 
 
 ;; *********************************
@@ -2722,6 +2775,7 @@ Adapted from `describe-function-or-variable'."
 ;; magit
 
 (use-package magit
+  :defer 2
   :bind
   ("M-g s" . magit-status)
   ("M-g f" . magit-find-file)
@@ -2734,6 +2788,10 @@ Adapted from `describe-function-or-variable'."
     ("SPC m b" . magit-blame)
     ("SPC m s" . magit-status))
   :config
+  (with-eval-after-load 'evil
+    (define-key evil-normal-state-map (kbd "SPC m b") 'magit-blame)
+    (define-key evil-normal-state-map (kbd "SPC m s") 'magit-status))
+
   (add-hook 'after-save-hook 'magit-after-save-refresh-status t)
 
   ;; integrate with vc-msg
@@ -2807,8 +2865,9 @@ Adapted from `describe-function-or-variable'."
 (use-package git-timemachine
   :bind
   ("C-c g t" . git-timemachine-toggle)
-  (:map evil-normal-state-map
-    ("SPC g t" . git-timemachine-toggle))
+  :config
+  (with-eval-after-load 'evil
+    (define-key evil-normal-state-map (kbd "SPC g t") 'git-timemachine-toggle))
   )
 
 ;; *********************************
@@ -2864,12 +2923,12 @@ Adapted from `describe-function-or-variable'."
 ;;
 ;;; UI -> Modeline
 
-(use-package doom-modeline
-  :hook
-  (after-init . doom-modeline-mode)
-  :init
-  (doom-modeline-mode 1)
-  )
+;; (use-package doom-modeline
+;;   :hook
+;;   (after-init . doom-modeline-mode)
+;;   :init
+;;   (doom-modeline-mode 1)
+;;   )
 
 ;; **************************************
 ;; hide-mode-line-mode
@@ -2899,13 +2958,13 @@ Adapted from `describe-function-or-variable'."
   :commands (esup))
 
 
-(use-package gcmh
-  :demand t
-  :init
-  ;; (setq gcmh-verbose             t
-  ;;       gcmh-lows-cons-threshold #x800000
-  ;;       gcmh-high-cons-threshold most-positive-fixnum
-  ;;       gcmh-idle-delay          3600)
-  :config
-  (gcmh-mode 1)
-  )
+;; (use-package gcmh
+;;   :demand t
+;;   :init
+;;   ;; (setq gcmh-verbose             t
+;;   ;;       gcmh-lows-cons-threshold #x800000
+;;   ;;       gcmh-high-cons-threshold most-positive-fixnum
+;;   ;;       gcmh-idle-delay          3600)
+;;   :config
+;;   (gcmh-mode 1)
+;;   )

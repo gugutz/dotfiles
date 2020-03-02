@@ -3,13 +3,8 @@
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " Auto install vim-plug and Plugins
-if has('nvim')
-  let vimplug_exists=expand('~/.config/nvim/autoload/plug.vim')
-  let vimplug_location=expand('~/.config/nvim/plugged')
-else
-  let vimplug_exists=expand('~/./vim/autoload/plug.vim')
-  let vimplug_location=expand('~/.vim/plugged')
-endif
+let vimplug_exists=expand('~/./vim/autoload/plug.vim')
+let vimplug_plugins_dir=expand('~/.vim/plugged')
 
 if !filereadable(vimplug_exists)
   if !executable("curl")
@@ -28,15 +23,16 @@ endif
 " Plugins
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-call plug#begin(expand(vimplug_location))
-" call plug#begin('~/.vim/plugged')
+call plug#begin(vimplug_plugins_dir)
 
 " Autocomplete
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-
+" Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" if has('nvim')
+"   :Plug 'neovim/nvim-lsp'
+" endif
 
 " Linting
-" Plug 'w0rp/ale'                          " ALE Asynchronous ESLinter for several languages
+" Plug 'w0rp/ale'
 
 " Snippets
 Plug 'honza/vim-snippets'
@@ -117,7 +113,6 @@ endif
 " Plug 'ctrlp/ctrlp.vim'                 " Tabular align texts that grow
 Plug 'gabesoft/vim-ags' " ag, rg support
 
-Plug 'tpope/vim-sensible'
 Plug 'tpope/vim-eunuch' " Vim sugar for the UNIX shell commands, like :Delete to delete buffer and file at same time, SudoWrite, etc...
 Plug 'ntpeters/vim-better-whitespace' " Highlight trailing whitespace
 Plug 'sheerun/vim-polyglot' " Syntax highliht, indent and filetype plugin support for several languages
@@ -209,7 +204,12 @@ set sidescroll=1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" terminal and shell configuration
 
-set shell=/bin/zsh
+if exists('$SHELL')
+  set shell=$SHELL
+else
+  set shell=/bin/sh
+endif
+
 set termguicolors
 let $LANG='en'  " Avoid garbled characters in Chinese language windows OS
 set langmenu=en
@@ -271,7 +271,7 @@ set smarttab                " Enable smart-tabs
 "" Buffer settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-set autoread " Set to auto read when a file is changed from the outside
+set autoread " auto load files changes (like from outside)
 set hidden " Enable hidden buffers. Coc Observation about this: TextEdit might fail if hidden is not set.
 set hid  " A buffer becomes hidden when it is abandoned
 set switchbuf=useopen  " don't duplicate an existing open buffer
@@ -287,13 +287,13 @@ map <leader>te :tabedit <c-r>=expand("%:p:h")<cr>/
 
 
 " Close the current buffer
-map <leader>bd :Bclose<cr>:tabclose<cr>gT
+map <leader>bc :Bclose<cr>:tabclose<cr>gT
 
 " Close all the buffers
 map <leader>ba :bufdo bd<cr>
 
-map <leader>l :bnext<cr>
-map <leader>h :bprevious<cr>
+map <leader>bn :bnext<cr>
+map <leader>bp :bprevious<cr>
 
 " Switch CWD to the directory of the open buffer
 map <leader>cd :cd %:p:h<cr>:pwd<cr>
@@ -310,6 +310,7 @@ endtry
 " Cursor Settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+" Substitute live preview in a split window
 set inccommand=split " show live results for some commands (like :s) in a split window
 set scrolloff=1000           " Always show N lines above/below the cursor
 
@@ -359,13 +360,22 @@ set ruler                      " Show row and column ruler information
 set undolevels=1500            " Number of undo levels
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"#########################################################################
+"
 " UI related settings
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"
+"#########################################################################
 
 syntax on
 
-"" Colorscheme Section
+set cursorline              " Highlight cursor line
+
+set t_Co=256
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Colorscheme Section
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 if empty($DISPLAY)
   colorscheme default
 else
@@ -376,34 +386,10 @@ else
   hi Normal guibg=none
 endif
 set background=dark
-set cursorline              " Highlight cursor line
 
-set t_Co=256
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" Set extra options when running in GUI mode
-if has("gui_running")
-  if has("gui_mac") || has("gui_macvim")
-    set guifont=Menlo:h12
-    set transparency=7
-  else
-    let g:CSApprox_loaded = 1
-    " IndentLine
-    let g:indentLine_enabled = 1
-    let g:indentLine_concealcursor = 0
-    let g:indentLine_char = '┆'
-    let g:indentLine_faster = 1
-  endif
-  set guioptions-=T
-  set guioptions-=e
-  set guifont=Monospace\ 10
-  set t_Co=256
-  set guitablabel=%M\ %t
-endif
-
-" Set vim font (using NerdFont pached Hack for devicons plugin)
-set guifont=DroidSansMono\ Nerd\ Font\ 11
-set guifont=Hack\ Nerd\ Font\ 15
-
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 set noshowmode " Hide insertStatus (like --INSERT--) fromthe statsline
 
@@ -424,19 +410,26 @@ set relativenumber     " show line numbers relative to current line
 " Mouse related settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-set mouse=a                 " Enable mouse. see :help mouse for info.
+" Enable mouse. see :help mouse for info.
+set mouse=a
+
+" settings to fix the mouse issue on alacritty terminal
 if has('nvim')
-  " set ttymouse=sgr  " settings to fix the mouse issue on alacritty terminal
+  " set ttymouse=sgr
 endif
 
 " set ttymouse=xterm2
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set virtualedit=insert,block,onemore " Permite mover o cursor onde não há texto
+" Permite mover o cursor onde não há texto
+set virtualedit=insert,block,onemore
 
-set showmatch               " Highlight matching pairs
-set matchtime=2  " How many tenths of a second to blink when matching brackets
+" Highlight matching pairs
+set showmatch
+
+" How many tenths of a second to blink when matching brackets
+set matchtime=2
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PUM - pseudo-transparent popup menu
@@ -450,9 +443,19 @@ set pumheight=10
 " SYNTAX HIGHLIGHTING
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-filetype on  " enables native filetype syntax highlighting base on file type
+" enables native filetype syntax highlighting base on file type
+filetype on
+
 filetype plugin on
-syntax enable  " enable syntax highlighting
+
+if has('autocmd')
+  filetype plugin indent on
+endif
+
+" enable syntax highlighting
+if has('syntax') && !exists('g:syntax_on')
+  syntax enable
+endif
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -480,10 +483,10 @@ set softtabstop=4           " Number of spaces per Tab
 set history=10000  " Sets how many lines of history VIM has to remember
 
 "" Persistent Undo
-if !isdirectory($HOME."/.config/nvim/undo-dir")
-  call mkdir($HOME."/.config/nvim/undo-dir", "", 0700)
+if !isdirectory($HOME."/.config/vim/undo-dir")
+  call mkdir($HOME."/.config/vim/undo-dir", "", 0700)
 endif
-set undodir=~/.config/nvim/undo-dir
+set undodir=~/.config/vim/undo-dir
 set undofile
 
 
@@ -497,6 +500,9 @@ nmap <leader>w :w!<cr>
 
 " Fast quitting
 nmap <leader>q :q!<cr>
+
+"" Quick exit insert mode with jk
+inoremap jk <ESC>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Which key
@@ -528,8 +534,6 @@ nnoremap cfs :so %<CR>
 " Remap 0 to go to the first non-blank character in the beggining of the line instead of first whitespace
 map 0 ^
 
-" Return to last edit position when opening files (You want this!)
-au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -545,6 +549,15 @@ set list listchars=trail:·,tab:>·
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " TEXT EDITING SETTINGS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" Return to last edit position when opening files (You want this!)
+au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+" Restore last cursor position and marks on open
+au BufReadPost *
+      \ if line("'\"") > 1 && line("'\"") <= line("$") && &ft !~# 'commit'
+      \ |   exe "normal! g`\""
+      \ | endif
+
 
 "" Text Wrap
 set wrap " Wrap lines
@@ -595,27 +608,6 @@ map <silent> <leader><cr> :noh<cr>
 " Super useful! From an idea by Michael Naumann
 vnoremap <silent> * :<C-u>call VisualSelection('', '')<CR>/<C-R>=@/<CR><CR>
 vnoremap <silent> # :<C-u>call VisualSelection('', '')<CR>?<C-R>=@/<CR><CR>
-
-" FZF settings
-
-" Mapping selecting mappings
-nmap <leader><tab> <plug>(fzf-maps-n)
-xmap <leader><tab> <plug>(fzf-maps-x)
-omap <leader><tab> <plug>(fzf-maps-o)
-
-map <leader>ff :Files<cr>
-
-" Insert mode completion
-imap <c-x><c-k> <plug>(fzf-complete-word)
-imap <c-x><c-f> <plug>(fzf-complete-path)
-imap <c-x><c-j> <plug>(fzf-complete-file-ag)
-imap <c-x><c-l> <plug>(fzf-complete-line)
-
-" Advanced customization using Vim function
-inoremap <expr> <c-x><c-k> fzf#vim#complete#word({'left': '15%'})
-
-" Replace the default dictionary completion with fzf-based fuzzy completion
-inoremap <expr> <c-x><c-k> fzf#vim#complete('cat /usr/share/dict/words')
 
 " Search mappings: These will make it so that going to the next one in a
 " search will center on the line it's found in.
@@ -749,15 +741,15 @@ let g:airline_skip_empty_sections = 1
 " enable/disable coc integration >
 let g:airline#extensions#coc#enabled = 1
 " change error symbol: >
-let airline#extensions#coc#error_symbol = 'E:'
+" let airline#extensions#coc#error_symbol = 'E:'
 " change warning symbol: >
 let airline#extensions#coc#warning_symbol = 'W:'
 " change error format: >
 let airline#extensions#coc#stl_format_err = '%E{[%e(#%fe)]}'
 " change warning format: >
 let airline#extensions#coc#stl_format_warn = '%W{[%w(#%fw)]}'
-let g:airline_section_error = '%{airline#util#wrap(airline#extensions#coc#get_error(),0)}'
-let g:airline_section_warning = '%{airline#util#wrap(airline#extensions#coc#get_warning(),0)}'
+" let g:airline_section_error = '%{airline#util#wrap(airline#extensions#coc#get_error(),0)}'
+" let g:airline_section_warning = '%{airline#util#wrap(airline#extensions#coc#get_warning(),0)}'
 
 " --------------------
 
@@ -797,8 +789,8 @@ else
   let g:airline_symbols.linenr = ''
 endif
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " TMUX & VIM STUFF
 
 " set title of tmux window to currently open file in vim
@@ -811,294 +803,269 @@ autocmd VimLeave * call system("tmux setw automatic-rename")
 autocmd BufEnter * let &titlestring = ' ' . expand("%:t")
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"#########################################################################
+"
 " PLUGINS SETTINGS
+"
+"#########################################################################
 
-" Disable folding on Vim Markdown
-let g:vim_markdown_folding_disabled = 1
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" fzf.vim
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" RUBY MINITEST SETTINGS (i_ctrl+x_ctrl+u for minitest method completion)
-set completefunc=syntaxcomplete#Complete
-
-
-" AGs (silver searcher, ripgrep supoort)
-
-" use ripgrep instead of the_silver_searcher
-let g:ags_agexe = 'rg'
-
-let g:ags_agargs = {
-      \ '--column'         : ['', ''],
-      \ '--line-number'    : ['', ''],
-      \ '--context'        : ['g:ags_agcontext', '-C'],
-      \ '--max-count'      : ['g:ags_agmaxcount', ''],
-      \ '--heading'        : ['',''],
-      \ '--smart-case'     : ['','-S'],
-      \ '--color'          : ['always',''],
-      \ '--colors'         : [['match:fg:green', 'match:bg:black', 'match:style:nobold', 'path:fg:red', 'path:style:bold', 'line:fg:black', 'line:style:bold'] ,''],
-      \ }
-
-" Search for the word under cursor
-nnoremap <Leader>s :Ags<Space><C-R>=expand('<cword>')<CR><CR>
-" Search for the visually selected text
-vnoremap <Leader>s y:Ags<Space><C-R>='"' . escape(@", '"*?()[]{}.') . '"'<CR><CR>
-" Run Ags
-nnoremap <Leader>a :Ags<Space>
-" Quit Ags
-nnoremap <Leader><Leader>a :AgsQuit<CR>
-
-
-" ALE LINTER SETTINGS
-
-" show linting errors on a separate window
-" let g:ale_open_list = 1
-" let g:ale_list_window_size = 5
-let g:ale_sign_error = '>>'
-let g:ale_sign_warning = '--'
-
-" Show X lines of errors (default: 10)
-let g:ale_list_window_size = 10
-
-" ale
-let g:ale_linters = {}
-
-
-" ale
-:call extend(g:ale_linters, {
-      \"go": ['golint', 'go vet'], })
-
-" TSLint settings
-
-" auto lint when saving typescript files
-" autocmd BufWritePost *.ts,*.tsx call tslint#run('a', win_getid())
-
-
-"############################################
-""""""""""""""""""""""""""""""
-" blamer - gitlens implementation for vim
-let g:blamer_enabled = 0
-
-let g:blamer_delay = 500
-let g:blamer_show_in_visual_modes = 0
-let g:blamer_prefix = ' > '
-
-" Template for the blame message
-" Available options: <author>, <author-mail>, <author-time>, <committer>, <committer-mail>, <committer-time>, <summary>, <commit-short>, <commit-long>.
-let g:blamer_template = '<committer>, <committer-time> • <summary>'
-
-" The color of the blame message.
-" highlight Blamer guifg=lightgrey
-
-
-""""""""""""""""""""""""""""""
-" nvim blame line - another gitlens like implementation
-
-nnoremap <silent> <leader>gb :ToggleBlameLine<CR>
-
-" Use autocmd to enable on startup:
-" autocmd BufEnter * EnableBlameLine
-
-" Options
-" Show blame info below the statusline instead of using virtual text
-let g:blameLineUseVirtualText = 0
-
-" Specify the highlight group used for the virtual text ('Comment' by default)
-let g:blameLineVirtualTextHighlight = 'Question'
-
-" Add a prefix to the virtual text (empty by default)
-let g:blameLineVirtualTextPrefix = '// '
-
-" Customize format for git blame (Default format: '%an | %ar | %s')
-let g:blameLineGitFormat = '%an - %s'
-" Refer to 'git-show --format=' man pages for format options)
-
-"############################################
-" SNIPPETS
-
-" UltSnips Snippets settings
-" Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
-" let g:UltiSnipsExpandTrigger="<S-tab>"
-" let g:UltiSnipsJumpForwardTrigger="<c-b>"
-" let g:UltiSnipsJumpBackwardTrigger="<c-z>"
-
-" If you want :UltiSnipsEdit to split your window.
-" let g:UltiSnipsEditSplit="vertical"
-
-
-"############################################
-" COC Settings
-" settings taken from: https://github.com/neoclide/coc.nvim#example-vim-configuration
-
-
-" Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
-" delays and poor user experience.
-set updatetime=300
-
-" Always show the signcolumn, otherwise it would shift the text each time
-" diagnostics appear/become resolved.
-set signcolumn=yes
-
-" to get the correct comment highlighting for jsonc
-autocmd FileType json syntax match Comment +\/\/.\+$+
-
-" Use <c-space> to trigger completion.
-inoremap <silent><expr> <c-space> coc#refresh()
-
-
-" Use tab for trigger completion with characters ahead and navigate.
-" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
-" other plugin before putting this into your config.
-inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
-
-" Use <Tab> and <S-Tab> to navigate the completion list:
-
-inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-
-
-" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
-" position. Coc only does snippet and additional edit on confirm.
-if has('patch8.1.1068')
-  " Use `complete_info` if your (Neo)Vim version supports it.
-  inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
-else
-  imap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+" copied from juneguns dotfiles. dunno what it sdoes
+if has('nvim') || has('gui_running')
+  let $FZF_DEFAULT_OPTS .= ' --inline-info'
 endif
 
-" To make <cr> select the first completion item and confirm the completion when no item has been selected:
-inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm() : "\<C-g>u\<CR>"
+" fzf on a floating window
+" Border style (rounded / sharp / horizontal)
+let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.6, 'highlight': 'Todo', 'border': 'sharp' } }
+" let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.6 } }
+
+let $FZF_DEFAULT_COMMAND =  "find * -path '*/\.*' -prune -o -path 'node_modules/**' -prune -o -path 'target/**' -prune -o -path 'dist/**' -prune -o  -type f -print -o -type l -print 2> /dev/null"
+
+map <leader>ff :Files<cr>
+
+let g:fzf_colors =
+\ { 'fg':      ['fg', 'Normal'],
+  \ 'bg':      ['bg', 'Normal'],
+  \ 'hl':      ['fg', 'Comment'],
+  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':     ['fg', 'Statement'],
+  \ 'info':    ['fg', 'PreProc'],
+  \ 'border':  ['fg', 'Ignore'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
+
+" Terminal buffer options for fzf
+autocmd! FileType fzf
+autocmd  FileType fzf set noshowmode noruler nonu
+
+" Hide statusline on fzf terminal buffers for a cleaner look
+if has('nvim') && !exists('g:fzf_layout')
+  autocmd! FileType fzf
+  autocmd  FileType fzf set laststatus=0 noshowmode noruler
+    \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
+endif
+
+" Mapping selecting mappings
+nmap <leader><tab> <plug>(fzf-maps-n)
+xmap <leader><tab> <plug>(fzf-maps-x)
+omap <leader><tab> <plug>(fzf-maps-o)
+
+" copied this from fzf creator dotfile. check what it does
+nnoremap <silent> <expr> <Leader><Leader> (expand('%') =~ 'NERD_tree' ? "\<c-w>\<c-w>" : '').":Files\<cr>"
+
+" Insert mode completion
+imap <c-x><c-k> <plug>(fzf-complete-word)
+imap <c-x><c-f> <plug>(fzf-complete-path)
+imap <c-x><c-j> <plug>(fzf-complete-file-ag)
+imap <c-x><c-l> <plug>(fzf-complete-line)
+
+" Advanced customization using Vim function
+inoremap <expr> <c-x><c-k> fzf#vim#complete#word({'left': '15%'})
+
+" Replace the default dictionary completion with fzf-based fuzzy completion
+inoremap <expr> <c-x><c-k> fzf#vim#complete('cat /usr/share/dict/words')
+
+" The Silver Searcher
+if executable('ag')
+  let $FZF_DEFAULT_COMMAND = 'ag --hidden --ignore .git -g ""'
+  set grepprg=ag\ --nogroup\ --nocolor
+endif
+
+" ripgrep
+if executable('rg')
+  let $FZF_DEFAULT_COMMAND = 'rg --files --hidden --follow --glob "!.git/*"'
+  set grepprg=rg\ --vimgrep
+  command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed-strings --ignore-case --hidden --follow --glob "!.git/*" --color "always" '.shellescape(<q-args>).'| tr -d "\017"', 1, <bang>0)
+endif
+
+cnoremap <C-P> <C-R>=expand("%:p:h") . "/" <CR>
+nnoremap <silent> <leader>b :Buffers<CR>
+nnoremap <silent> <leader>e :FZF -m<CR>
+"Recovery commands from history through FZF
+nmap <leader>y :History:<CR>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" COC
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has_key(plugs, "coc.nvim")
+  " Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
+  " delays and poor user experience.
+  set updatetime=300
+
+  " Always show the signcolumn, otherwise it would shift the text each time
+  " diagnostics appear/become resolved.
+  set signcolumn=yes
+
+  " to get the correct comment highlighting for jsonc
+  autocmd FileType json syntax match Comment +\/\/.\+$+
+
+  " Use <c-space> to trigger completion.
+  inoremap <silent><expr> <c-space> coc#refresh()
 
 
-" Remap keys for gotos
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
+  " Use tab for trigger completion with characters ahead and navigate.
+  " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+  " other plugin before putting this into your config.
+  inoremap <silent><expr> <TAB>
+        \ pumvisible() ? "\<C-n>" :
+        \ <SID>check_back_space() ? "\<TAB>" :
+        \ coc#refresh()
+  inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-" Use K to show documentation in preview window.
-nnoremap <silent> K :call <SID>show_documentation()<CR>
+  function! s:check_back_space() abort
+    let col = col('.') - 1
+    return !col || getline('.')[col - 1]  =~# '\s'
+  endfunction
 
-function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
+  " Use <Tab> and <S-Tab> to navigate the completion list:
+
+  inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+  inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+
+
+  " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
+  " position. Coc only does snippet and additional edit on confirm.
+  if has('patch8.1.1068')
+    " Use `complete_info` if your (Neo)Vim version supports it.
+    inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
   else
-    call CocAction('doHover')
+    imap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
   endif
-endfunction
 
-" Highlight the symbol and its references when holding the cursor.
-autocmd CursorHold * silent call CocActionAsync('highlight')
-
-" Symbol renaming.
-nmap <leader>rn <Plug>(coc-rename)
+  " To make <cr> select the first completion item and confirm the completion when no item has been selected:
+  inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm() : "\<C-g>u\<CR>"
 
 
-" Formatting selected code.
-xmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
+  " Remap keys for gotos
+  nmap <silent> gd <Plug>(coc-definition)
+  nmap <silent> gy <Plug>(coc-type-definition)
+  nmap <silent> gi <Plug>(coc-implementation)
+  nmap <silent> gr <Plug>(coc-references)
 
-augroup mygroup
-  autocmd!
-  " Setup formatexpr specified filetype(s).
-  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
-  " Update signature help on jump placeholder.
-  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-augroup end
+  " Use K to show documentation in preview window.
+  nnoremap <silent> K :call <SID>show_documentation()<CR>
 
+  function! s:show_documentation()
+    if (index(['vim','help'], &filetype) >= 0)
+      execute 'h '.expand('<cword>')
+    else
+      call CocAction('doHover')
+    endif
+  endfunction
 
-" Applying codeAction to the selected region.
-" Example: `<leader>aap` for current paragraph
-xmap <leader>a  <Plug>(coc-codeaction-selected)
-nmap <leader>a  <Plug>(coc-codeaction-selected)
+  " Highlight the symbol and its references when holding the cursor.
+  autocmd CursorHold * silent call CocActionAsync('highlight')
 
-" Remap keys for applying codeAction to the current line.
-nmap <leader>ac  <Plug>(coc-codeaction)
-" Apply AutoFix to problem on the current line.
-nmap <leader>qf  <Plug>(coc-fix-current)
-
-
-" Introduce function text object
-" NOTE: Requires 'textDocument.documentSymbol' support from the language server.
-xmap if <Plug>(coc-funcobj-i)
-xmap af <Plug>(coc-funcobj-a)
-omap if <Plug>(coc-funcobj-i)
-omap af <Plug>(coc-funcobj-a)
-
-" Use <TAB> for selections ranges.
-" NOTE: Requires 'textDocument/selectionRange' support from the language server.
-" coc-tsserver, coc-python are the examples of servers that support it.
-nmap <silent> <TAB> <Plug>(coc-range-select)
-xmap <silent> <TAB> <Plug>(coc-range-select)
+  " Symbol renaming.
+  nmap <leader>rn <Plug>(coc-rename)
 
 
-" Add `:Format` command to format current buffer.
-command! -nargs=0 Format :call CocAction('format')
+  " Formatting selected code.
+  xmap <leader>f  <Plug>(coc-format-selected)
+  nmap <leader>f  <Plug>(coc-format-selected)
+
+  augroup mygroup
+    autocmd!
+    " Setup formatexpr specified filetype(s).
+    autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+    " Update signature help on jump placeholder.
+    autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+  augroup end
 
 
-" Add `:Fold` command to fold current buffer.
-command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+  " Applying codeAction to the selected region.
+  " Example: `<leader>aap` for current paragraph
+  xmap <leader>a  <Plug>(coc-codeaction-selected)
+  nmap <leader>a  <Plug>(coc-codeaction-selected)
 
-" Add `:OR` command for organize imports of the current buffer.
-command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
-
-" Add (Neo)Vim's native statusline support.
-" NOTE: Please see `:h coc-status` for integrations with external plugins that
-" provide custom statusline: lightline.vim, vim-airline.
-set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
-
-
-" Mappings using CoCList:
-" Show all diagnostics.
-nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
-" Manage extensions.
-nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
-" Show commands.
-nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
-" Find symbol of current document.
-nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
-" Search workspace symbols.
-nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
-" Do default action for next item.
-nnoremap <silent> <space>j  :<C-u>CocNext<CR>
-" Do default action for previous item.
-nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
-" Resume latest coc list.
-nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
+  " Remap keys for applying codeAction to the current line.
+  nmap <leader>ac  <Plug>(coc-codeaction)
+  " Apply AutoFix to problem on the current line.
+  nmap <leader>qf  <Plug>(coc-fix-current)
 
 
-" Extensions
-let g:coc_global_extensions = [
-      \ 'coc-git',
-      \ 'coc-highlight',
-      \ 'coc-marketplace',
-      \ 'coc-pairs',
-      \ 'coc-html',
-      \ 'coc-css',
-      \ 'coc-json',
-      \ 'coc-java',
-      \ 'coc-rls',
-      \ 'coc-tsserver',
-      \ 'coc-yaml',
-      \ 'coc-vimlsp',
-      \ 'coc-prettier',
-      \ 'coc-snippets',
-      \ 'coc-project',
-      \ 'coc-actions',
-      \ 'coc-tsserver',
-      \ 'coc-tslint-plugin',
-      \ 'coc-eslint',
-      \ 'coc-json',
-      \ ]
+  " Introduce function text object
+  " NOTE: Requires 'textDocument.documentSymbol' support from the language server.
+  xmap if <Plug>(coc-funcobj-i)
+  xmap af <Plug>(coc-funcobj-a)
+  omap if <Plug>(coc-funcobj-i)
+  omap af <Plug>(coc-funcobj-a)
+
+  " Use <TAB> for selections ranges.
+  " NOTE: Requires 'textDocument/selectionRange' support from the language server.
+  " coc-tsserver, coc-python are the examples of servers that support it.
+  nmap <silent> <TAB> <Plug>(coc-range-select)
+  xmap <silent> <TAB> <Plug>(coc-range-select)
 
 
+  " Add `:Format` command to format current buffer.
+  command! -nargs=0 Format :call CocAction('format')
+
+
+  " Add `:Fold` command to fold current buffer.
+  command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+
+  " Add `:OR` command for organize imports of the current buffer.
+  command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
+
+  " Add (Neo)Vim's native statusline support.
+  " NOTE: Please see `:h coc-status` for integrations with external plugins that
+  " provide custom statusline: lightline.vim, vim-airline.
+  set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+
+
+  " Mappings using CoCList:
+  " Show all diagnostics.
+  nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
+  " Manage extensions.
+  nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
+  " Show commands.
+  nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
+  " Find symbol of current document.
+  nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
+  " Search workspace symbols.
+  nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
+  " Do default action for next item.
+  nnoremap <silent> <space>j  :<C-u>CocNext<CR>
+  " Do default action for previous item.
+  nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
+  " Resume latest coc list.
+  nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
+
+
+  " Extensions
+  let g:coc_global_extensions = [
+        \ 'coc-git',
+        \ 'coc-highlight',
+        \ 'coc-marketplace',
+        \ 'coc-pairs',
+        \ 'coc-html',
+        \ 'coc-css',
+        \ 'coc-json',
+        \ 'coc-java',
+        \ 'coc-rls',
+        \ 'coc-tsserver',
+        \ 'coc-yaml',
+        \ 'coc-vimlsp',
+        \ 'coc-prettier',
+        \ 'coc-snippets',
+        \ 'coc-project',
+        \ 'coc-actions',
+        \ 'coc-tsserver',
+        \ 'coc-tslint-plugin',
+        \ 'coc-eslint',
+        \ 'coc-json',
+        \ ]
+
+endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " NERDTREE SETTINGS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1107,10 +1074,8 @@ let g:coc_global_extensions = [
 map <leader>e :NERDTreeToggle<CR>
 " nnoremap <silent> <F8> :NERDTreeToggle<CR>
 map <F8> :NERDTreeToggle<CR>
-nnoremap <silent> <F2> :NERDTreeFind<CR>
-
 " Toogle NERDTree on currently open file
-nnoremap <silent> <Leader>v :NERDTreeFind<CR>
+nnoremap <silent> <S+F8> :NERDTreeFind<CR>
 
 
 " Open NerdTree on Vim startup and move cursor to edit buffer instead of leaving it on nerdtree window w
@@ -1155,12 +1120,121 @@ let g:NERDTreeMapOpenInTabSilent = '<RightMouse>'
 let g:NERDTreeWinSize = 35
 
 
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ranger settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 command! Ranger FloatermNew ranger
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ultisnips
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" PS:tab conflicts with YouCompleteMe
+let g:UltiSnipsExpandTrigger="<tab>"
+
+let g:UltiSnipsJumpForwardTrigger="<tab>"
+let g:UltiSnipsJumpBackwardTrigger="<c-b>"
+
+" If you want :UltiSnipsEdit to split your window.
+let g:UltiSnipsEditSplit="vertical"
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" AGs (silver searcher, ripgrep supoort)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" use ripgrep instead of the_silver_searcher
+let g:ags_agexe = 'rg'
+
+let g:ags_agargs = {
+      \ '--column'         : ['', ''],
+      \ '--line-number'    : ['', ''],
+      \ '--context'        : ['g:ags_agcontext', '-C'],
+      \ '--max-count'      : ['g:ags_agmaxcount', ''],
+      \ '--heading'        : ['',''],
+      \ '--smart-case'     : ['','-S'],
+      \ '--color'          : ['always',''],
+      \ '--colors'         : [['match:fg:green', 'match:bg:black', 'match:style:nobold', 'path:fg:red', 'path:style:bold', 'line:fg:black', 'line:style:bold'] ,''],
+      \ }
+
+" Search for the word under cursor
+nnoremap <Leader>s :Ags<Space><C-R>=expand('<cword>')<CR><CR>
+" Search for the visually selected text
+vnoremap <Leader>s y:Ags<Space><C-R>='"' . escape(@", '"*?()[]{}.') . '"'<CR><CR>
+" Run Ags
+nnoremap <Leader>a :Ags<Space>
+" Quit Ags
+nnoremap <Leader><Leader>a :AgsQuit<CR>
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Ale
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" show linting errors on a separate window
+" let g:ale_open_list = 1
+" let g:ale_list_window_size = 5
+"
+let g:ale_sign_error = '>>'
+let g:ale_sign_warning = '--'
+
+" Show X lines of errors (default: 10)
+let g:ale_list_window_size = 10
+
+" ale
+let g:ale_linters = {}
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" TsLint
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" auto lint when saving typescript files
+" autocmd BufWritePost *.ts,*.tsx call tslint#run('a', win_getid())
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" blamer - gitlens implementation for vim
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+let g:blamer_enabled = 0
+
+let g:blamer_delay = 500
+let g:blamer_show_in_visual_modes = 0
+let g:blamer_prefix = ' > '
+
+" Template for the blame message
+" Available options: <author>, <author-mail>, <author-time>, <committer>, <committer-mail>, <committer-time>, <summary>, <commit-short>, <commit-long>.
+let g:blamer_template = '<committer>, <committer-time> • <summary>'
+
+" The color of the blame message.
+" highlight Blamer guifg=lightgrey
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" nvim blame line - another gitlens like implementation
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+nnoremap <silent> <leader>gb :ToggleBlameLine<CR>
+
+" Use autocmd to enable on startup:
+" autocmd BufEnter * EnableBlameLine
+
+" Options
+" Show blame info below the statusline instead of using virtual text
+let g:blameLineUseVirtualText = 0
+
+" Specify the highlight group used for the virtual text ('Comment' by default)
+let g:blameLineVirtualTextHighlight = 'Question'
+
+" Add a prefix to the virtual text (empty by default)
+let g:blameLineVirtualTextPrefix = '// '
+
+" Customize format for git blame (Default format: '%an | %ar | %s')
+let g:blameLineGitFormat = '%an - %s'
+" Refer to 'git-show --format=' man pages for format options)
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " EMMET SETTINGS
@@ -1463,35 +1537,6 @@ noremap <Leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
 "" Opens a tab edit command with the path of the currently edited file filled
 noremap <Leader>te :tabe <C-R>=expand("%:p:h") . "/" <CR>
 
-"" fzf.vim
-set wildmode=list:longest,list:full
-set wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__
-let $FZF_DEFAULT_COMMAND =  "find * -path '*/\.*' -prune -o -path 'node_modules/**' -prune -o -path 'target/**' -prune -o -path 'dist/**' -prune -o  -type f -print -o -type l -print 2> /dev/null"
-
-" The Silver Searcher
-if executable('ag')
-  let $FZF_DEFAULT_COMMAND = 'ag --hidden --ignore .git -g ""'
-  set grepprg=ag\ --nogroup\ --nocolor
-endif
-
-" ripgrep
-if executable('rg')
-  let $FZF_DEFAULT_COMMAND = 'rg --files --hidden --follow --glob "!.git/*"'
-  set grepprg=rg\ --vimgrep
-  command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed-strings --ignore-case --hidden --follow --glob "!.git/*" --color "always" '.shellescape(<q-args>).'| tr -d "\017"', 1, <bang>0)
-endif
-
-cnoremap <C-P> <C-R>=expand("%:p:h") . "/" <CR>
-nnoremap <silent> <leader>b :Buffers<CR>
-nnoremap <silent> <leader>e :FZF -m<CR>
-"Recovery commands from history through FZF
-nmap <leader>y :History:<CR>
-
-" snippets
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<tab>"
-let g:UltiSnipsJumpBackwardTrigger="<c-b>"
-let g:UltiSnipsEditSplit="vertical"
 
 
 " Tagbar
@@ -1548,11 +1593,42 @@ vnoremap K :m '<-2<CR>gv=gv
 "" Open current line on GitHub
 nnoremap <Leader>o :.Gbrowse<CR>
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"#########################################################################
+"
 " LANGUAGES SETTINGS
+"
+"#########################################################################
+
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" html
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" for html files, 2 spaces
+autocmd Filetype html setlocal ts=2 sw=2 expandtab
+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" javascript
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+let g:javascript_enable_domhtmlcss = 1
+
+" vim-javascript
+augroup vimrc-javascript
+  autocmd!
+  autocmd FileType javascript setl tabstop=4|setl shiftwidth=4|setl expandtab softtabstop=4
+augroup END
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" typescript
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" typescript
+let g:yats_host_keyword = 1
+
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " elixir
@@ -1569,6 +1645,10 @@ let erlang_show_errors = 1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " go
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" add go vet to ale linters
+:call extend(g:ale_linters, {
+      \"go": ['golint', 'go vet'], })
 
 " vim-go
 " run :GoBuild or :GoTestCompile based on the go file
@@ -1633,33 +1713,23 @@ augroup go
 augroup END
 
 
-
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " haskell
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 let g:haskell_conceal_wide = 1
 let g:haskell_multiline_strings = 1
 let g:necoghc_enable_detailed_browse = 1
 autocmd Filetype haskell setlocal omnifunc=necoghc#omnifunc
-
-
-" html
-" for html files, 2 spaces
-autocmd Filetype html setlocal ts=2 sw=2 expandtab
-
-
-" javascript
-let g:javascript_enable_domhtmlcss = 1
-
-" vim-javascript
-augroup vimrc-javascript
-  autocmd!
-  autocmd FileType javascript setl tabstop=4|setl shiftwidth=4|setl expandtab softtabstop=4
-augroup END
-
-
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " lisp
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ruby
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 let g:rubycomplete_buffer_loading = 1
 let g:rubycomplete_classes_in_global = 1
 let g:rubycomplete_rails = 1
@@ -1706,15 +1776,21 @@ vnoremap <leader>rriv :RRenameInstanceVariable<cr>
 vnoremap <leader>rem  :RExtractMethod<cr>
 
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " rust
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 " Vim racer
 au FileType rust nmap gd <Plug>(rust-def)
 au FileType rust nmap gs <Plug>(rust-def-split)
 au FileType rust nmap gx <Plug>(rust-def-vertical)
 au FileType rust nmap <leader>gd <Plug>(rust-doc)
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" markdown
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" typescript
-let g:yats_host_keyword = 1
+" Disable folding on Vim Markdown
+let g:vim_markdown_folding_disabled = 1
 
 

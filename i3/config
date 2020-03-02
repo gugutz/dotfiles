@@ -1,11 +1,11 @@
-################################################
+###################################################################
 #                                              #
 #         gugutz i3-gaps config file           #
 #          http://github.com/gugutz            #
 #                                              #
-################################################
+###################################################################
 
-################################################
+###################################################################
 # Monitors Setup
 
 set $home_primary_monitor DVI-I-2
@@ -15,8 +15,12 @@ set $work_primary_monitor DP1
 # notebook screen
 set $work_secondary_monitor eDP1
 
-set $primary_monitor $work_primary_monitor
-set $secondary_monitor $work_secondary_monitor
+# home monitors
+set $primary_monitor DVI-I-2
+set $secondary_monitor $DVI-I-1
+# work monitors
+# set $primary_monitor eDP1
+# set $secondary_monitor DP1
 
 # home mirrored layout
 set $home_dual_monitor_mirrored_layout xrandr --output DVI-I-2 --mode 1920x1080 --rotate normal --output DVI-I-1 --mode 1280x1024 --same-as $home_primary_monitor
@@ -32,19 +36,20 @@ set $work_dual_monitor_mirrored_layout xrandr --output eDP1 --mode 1920x1080 --p
 set $work_dual_monitor_extended_layout xrandr --output eDP1 --mode 1920x1080 --pos 1920x0 --rotate normal --output DP1 --primary --mode 1920x1080 --pos 0x0 --rotate normal
 
 # setup monitors
-exec_always --no-startup-id $work_dual_monitor_extended_layout
+exec_always --no-startup-id $home_dual_monitor_extended_layout
 
 # HOME
-bindsym $mod+Control+Shift+1 exec $home_single_monitor_layout
-bindsym $mod+Control+Shift+2 exec $home_dual_monitor_layout
+bindsym $mod+Control+Shift+1 exec $home_single_monitor_layout; exec notify-send 'using home single monitor layout'
+bindsym $mod+Control+Shift+2 exec $home_dual_monitor_mirrored_layout; exec notify-send 'using home single monitor layout'
+bindsym $mod+Control+Shift+3 exec $home_dual_monitor_extended_layout; exec notify-send 'using home dual monitor extended layout'
 
 # WORK
-bindsym $mod+Control+Shift+8 exec $work_single_monitor_layout
-bindsym $mod+Control+Shift+9 exec $work_dual_monitor_mirrored_layout
-bindsym $mod+Control+Shift+0 exec $work_dual_monitor_extended_layout
+bindsym $mod+Control+Shift+8 exec $work_single_monitor_layout; exec notify-send 'using work single monitor layout'
+bindsym $mod+Control+Shift+9 exec $work_dual_monitor_mirrored_layout;  exec notify-send 'using work mirrored monitor layout'
+bindsym $mod+Control+Shift+0 exec $work_dual_monitor_extended_layout;  exec notify-send 'using work dual monitor extended layout'
 
 
-################################################
+###################################################################
 # Terminal Settings
 
 set $terminal alacritty
@@ -109,7 +114,7 @@ set_from_resource $term_color14    color14
 set_from_resource $term_color15    color15
 
 
-################################################
+###################################################################
 # Text Editors
 
 set $editorterm $terminal -e vim
@@ -124,7 +129,7 @@ bindsym $mod+$alt+e exec $editorgui
 # start emacs on terminal mode
 bindsym $mod+$alt+r exec $editorgui -nw
 
-################################################
+###################################################################
 # File Managers
 
 # define default file managers (terminal and gui)
@@ -158,8 +163,9 @@ bindsym $mod+F10 [window_role="pcmanfm-scratchpad"] scratchpad show; [window_rol
 bindsym $mod++Shift+F10 exec --no-startup-id pcmanfm --new-win --role pcmanfm-scratchpad
 
 
-################################################
+###################################################################
 # GENERAL I3 SETTINGS
+####################################################################
 
 # Set mod key (Mod1=<Alt>, Mod4=<Super>)
 set $mod Mod4
@@ -171,19 +177,21 @@ set $alt Mod1
 # unfortunatelly this prevents me from moving floating windows with the mod key
 # bindcode --release 133 exec rofi -show run # use xev to find the keycode of your mod key
 
-# set main mod key (super aka win key)
+# Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
-################################################
+###################################################################
 # BASIC I3 WM CONTROL BINDINGS
+####################################################################
 
 # kill focused window
 bindsym $mod+q        kill
 bindsym $mod+Shift+q  kill
 
 
-#################################################
+####################################################################
 # COMPOSITOR MANAGER AND TRANSPARENCY SETUP
+####################################################################
 
 # start picom composition manager
 exec --no-startup-id picom --xrender-sync-fence
@@ -191,26 +199,35 @@ exec --no-startup-id picom --xrender-sync-fence
 # bindsym $mod+t exec --no-startup-id pkill picom
 bindsym $mod+Ctrl+t exec --no-startup-id picom -b; exec notify-send 'running picom'
 
-################################################
-## sound-section - DO NOT EDIT if you wish to automatically upgrade
+###################################################################
+##  AUDIO RELATED SETTINGS
+###################################################################
+
 ## Alsa -> Pulseaudio later! ##
 
 exec --no-startup-id volumeicon
 bindsym $mod+Ctrl+m exec $terminal -e 'alsamixer'
 
+# Use pactl to adjust volume in PulseAudio.
+set $refresh_i3status killall -SIGUSR1 i3status
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10% && $refresh_i3status
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
+bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
+
+
 # exec --no-startup-id pulseaudio
 # exec --no-startup-id pa-applet
 # bindsym $mod+Ctrl+Shift+m exec pavucontrol
 
-
-################################################
+###################################################################
 # Misc Apps
 
 # Screen brightness controls
 bindsym XF86MonBrightnessUp exec "xbacklight -inc 10; notify-send 'brightness up'"
 bindsym XF86MonBrightnessDown exec "xbacklight -dec 10; notify-send 'brightness down'"
 
-################################################
+###################################################################
 # Start applications
 
 
@@ -223,7 +240,7 @@ bindsym $mod+Ctrl+x --release exec --no-startup-id xkill
 # bindsym $mod+Shift+h exec xdg-open /usr/share/doc/manjaro/i3_help.pdf
 
 
-################################################
+###################################################################
 # GLOBAL VARIABLE SETUP
 
 #power and wm options
@@ -238,25 +255,28 @@ set $browser firefox
 
 
 
-################################################
+###################################################################
 # settings for i3-gaps
-################################################
+###################################################################
 
 # Disable window titlebars entirely
 # this might not be needed in manjaro i3, currently testing
-# for_window [class="^.*"] border pixel 2
+for_window [class="^.*"] border pixel 2
+
+# change gap for all workspaces
+# gaps inner all set 20
 
 # Set inner/outer gaps
 # Set inner/outer gaps
-gaps inner 14
+gaps inner 20
 gaps outer -2
 
 # Smart gaps (gaps used if only more than one container on the workspace)
-smart_gaps on
+#smart_gaps on
 
 # Smart borders (draw borders around container only if it is not the only container on this workspace)
 # on|no_gaps (on=always activate and no_gaps=only activate if the gap size to the edge of the screen is 0)
-smart_borders on
+# smart_borders on
 
 # Press $mod+Shift+g to enter the gap mode. Choose o or i for modifying outer/inner gaps. Press one of + / - (in-/decrement for current workspace) or 0 (remove gaps for current workspace). If you also press Shift with these keys, the change will be global for all workspaces.
 set $mode_gaps Gaps: (o) outer, (i) inner
@@ -296,9 +316,9 @@ mode "$mode_gaps_outer" {
 }
 
 
-################################################
+###################################################################
 # POWER OPTIONS AND WINDOWS MANAGER
-################################################
+###################################################################
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -331,19 +351,16 @@ bindsym $mod+$alt+Control+Shift+F4 exec --no-startup-id $hibernate
 bindsym $mod+$alt+Control+Shift+h	exec --no-startup-id $hibernate
 bindsym $mod+$alt+Control+Shift+r	exec --no-startup-id $reboot
 
-bindsym $mod+Control+Shift+Escape 	exec prompt "Are you sure you want to leave i3?" "i3-msg exit"
-
-# shutdown computer
-# XF86 special key for shutting down
-bindsym $alt+q	        exec prompt "Are you sure you want to shutdown?" "$shutdown"
+bindsym $mod+Escape 	exec prompt "Are you sure you want to leave i3?" "i3-msg exit" # shutdown computer # XF86 special key for shutting down bindsym $alt+q	        exec prompt "Are you sure you want to shutdown?" "$shutdown"
+bindsym $mod+Control+Shift+Escape 	exec prompt "Are you sure you want to leave i3?" "i3-msg exit" # shutdown computer # XF86 special key for shutting down bindsym $alt+q	        exec prompt "Are you sure you want to shutdown?" "$shutdown"
 bindsym XF86PowerOff		exec prompt "Are you sure you want to shutdown?" "$shutdown"
 
 
 
 
-################################################
+###################################################################
 # Autostart applications
-################################################
+###################################################################
 
 # these were in the default manjaro i3 config, not sure what they do yet
 exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
@@ -397,9 +414,9 @@ for_window [class="Clockify"] floating enable
 # terminal -e 'bmenu' && sleep 2 && i3-msg move container to workspace 5
 
 
-################################################
+###################################################################
 # APPEARANCE / UI SETTINGS
-################################################
+###################################################################
 
 # Configure border style <normal|1pixel|pixel xx|none|pixel>
 default_border pixel 1
@@ -418,16 +435,22 @@ bindsym $mod+y border pixel 1
 bindsym $mod+n border normal
 
 #-----------------------------------------------
+
 # Fonts
+
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
-font xft:URWGothic-Book 11
-# font pango:monospace 8
-# font pango:DejaVu Sans Mono 8
-font pango:Hack 9
+font pango:monospace 9
+# font xft:URWGothic-Book 11
+# font pango:Hack 9
+
+# This font is widely installed, provides lots of unicode glyphs, right-to-left
+# text rendering and scalability on retina/hidpi displays (thanks to pango).
+#font pango:DejaVu Sans Mono 8
 
 #-----------------------------------------------
+
 # WALLPAPER SETUP
 
 # use nitrogen to restore latest set wallpapers (for both monitors)
@@ -459,11 +482,19 @@ exec_always --no-startup-id nitrogen --restore &
 # exec_always --no-startup-id ~/dotfiles/i3/scripts/back4.sh 0.03 wallpapers/beautycity.gif
 
 
-################################################
+###################################################################
 # Lock screen and Screensaver
-################################################
+###################################################################
+
+# The combination of xss-lock, nm-applet and pactl is a popular choice, so
+# they are included here as an example. Modify as you see fit.
+
+# xss-lock grabs a logind suspend inhibit lock and will use i3lock to lock the
+# screen before suspend. Use loginctl lock-session to lock your screen.
+exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 
 bindsym $mod+Control+9 exec --no-startup-id blurlock
+
 # auto start blurlock after X minutes
 exec --no-startup-id xautolock -time 5 -locker blurlock
 
@@ -471,9 +502,9 @@ exec --no-startup-id xautolock -time 5 -locker blurlock
 # exec --no-startup-id xscreensaver -no-splash &
 # exec --no-startup-id xautolock -time 8 -locker i3lock -c 000000
 
-################################################
+###################################################################
 # Screenshots Setup
-################################################
+###################################################################
 
 # take scrCloses equivalent do VS Code Ctrl + Deenshot of the entire screen (root window)
 bindsym Print exec ~/dotfiles/i3/scripts/i3-take-screenshot.sh root
@@ -490,69 +521,71 @@ bindsym  $mod+Shift+Print --release exec --no-startup-id import ~/img/screenshot
 # scrot & gimp - select window or rectangle
 bindsym $alt+Print exec scrot ~/img/screenshots/last-scrot.png -s -e 'mv $f /tmp/ && pinta /tmp/$f'
 
+# Polybar
+exec_always --no-startup-id ~/dotfiles/polybar/launch.sh &
 
-################################################
+###################################################################
 # i3 BAR SETTINGS
-################################################
+###################################################################
 
-# Start i3bar to display a workspace bar (plus the system information i3status
-# finds out, if available)
-bar {
-    position bottom
-    i3bar_command i3bar
-    # status_command i3status
-    status_command i3blocks
-    separator_symbol "|"
-    tray_output $primary_monitor
-    bindsym button4 nop
-    bindsym button5 nop
-    font xft:URWGothic-Book 11
-    font pango:Hack Nerd Font Mono 11
-    strip_workspace_numbers no
+# # Start i3bar to display a workspace bar (plus the system information i3status
+# # finds out, if available)
+# bar {
+#     position bottom
+#     i3bar_command i3bar
+#     # status_command i3status
+#     status_command i3blocks
+#     separator_symbol "|"
+#     tray_output $primary_monitor
+#     bindsym button4 nop
+#     bindsym button5 nop
+#     font xft:URWGothic-Book 11
+#     font pango:Hack Nerd Font Mono 11
+#     strip_workspace_numbers no
 
-    colors {
-        # Manjaro I3 default colors
-        background #222D31
-        statusline #F9FAF9
-        separator  #454947
+#     colors {
+#         # Manjaro I3 default colors
+#         background #222D31
+#         statusline #F9FAF9
+#         separator  #454947
 
-        # workspace colors
-        # property         border  backgr. text
-        focused_workspace  #F9FAF9 #16a085 #292F34
-        active_workspace   #595B5B #353836 #FDF6E3
-        inactive_workspace #595B5B #222D31 #EEE8D5
-        binding_mode       #16a085 #2C2C2C #F9FAF9
-        urgent_workspace   #16a085 #FDF6E3 #E5201D
-
-
-        # My previous theme
-        # separator #268bd2
-        # background #000000
-        # statusline #839496
-        # focused_workspace #fdf6e3 #6c71c4 #fdf6e3
-        # active_workspace #fdf6e3 #6c71c4 #fdf6e3
-        # inactive_workspace #002b36 #586e75 #002b36
-        # urgent_workspace #d33682 #d33682 #fdf6e3
-    }
-}
-
-# hide/unhide i3status bar
-bindsym $mod+m bar mode toggle
-
-# Theme colors
-# class                   border  backgr. text    indic.   child_border
-  client.focused          #556064 #556064 #80FFF9 #FDF6E3
-  client.focused_inactive #2F3D44 #2F3D44 #1ABC9C #454948
-  client.unfocused        #2F3D44 #2F3D44 #1ABC9C #454948
-  client.urgent           #CB4B16 #FDF6E3 #1ABC9C #268BD2
-  client.placeholder      #000000 #0c0c0c #ffffff #000000
-
-  client.background       #2B2C2B
+#         # workspace colors
+#         # property         border  backgr. text
+#         focused_workspace  #F9FAF9 #16a085 #292F34
+#         active_workspace   #595B5B #353836 #FDF6E3
+#         inactive_workspace #595B5B #222D31 #EEE8D5
+#         binding_mode       #16a085 #2C2C2C #F9FAF9
+#         urgent_workspace   #16a085 #FDF6E3 #E5201D
 
 
-################################################
+#         # My previous theme
+#         # separator #268bd2
+#         # background #000000
+#         # statusline #839496
+#         # focused_workspace #fdf6e3 #6c71c4 #fdf6e3
+#         # active_workspace #fdf6e3 #6c71c4 #fdf6e3
+#         # inactive_workspace #002b36 #586e75 #002b36
+#         # urgent_workspace #d33682 #d33682 #fdf6e3
+#     }
+# }
+
+# # hide/unhide i3status bar
+# bindsym $mod+m bar mode toggle
+
+# # Theme colors
+# # class                   border  backgr. text    indic.   child_border
+#   client.focused          #556064 #556064 #80FFF9 #FDF6E3
+#   client.focused_inactive #2F3D44 #2F3D44 #1ABC9C #454948
+#   client.unfocused        #2F3D44 #2F3D44 #1ABC9C #454948
+#   client.urgent           #CB4B16 #FDF6E3 #1ABC9C #268BD2
+#   client.placeholder      #000000 #0c0c0c #ffffff #000000
+
+#   client.background       #2B2C2B
+
+
+###################################################################
 # SCRATCHPAD SETTINGS
-################################################
+###################################################################
 
 
 # Runs neofetch on first tmux screen if installed.
@@ -614,9 +647,9 @@ bindsym $mod+F6 [$term_wm_prop="spotify-tui-scratchpad"] scratchpad show;  [$ter
 bindsym $mod+Shift+F6 exec --no-startup-id $terminal $term_wm_set_prop_flag spotify-tui-scratchpad -e spt
 
 
-################################################
+###################################################################
 # APPLICATION KEY BINDINGS
-################################################
+###################################################################
 
 #------------------------------------------------
 # ROFI TASK SWITCHER SETTINGS
@@ -639,8 +672,7 @@ bindsym $mod+d exec rofi -show run -theme config
 #------------------------------------------------
 # DMENU
 
-# bindsym $mod+d                    exec dmenu_run
-bindsym $mod+Shift+d exec --no-startup-id dmenu_recency
+bindsym $mod+Shift+d                    exec dmenu_run -l 20 -F
 
 #------------------------------------------------
 # BMENU - Settings Menu
@@ -680,9 +712,9 @@ bindsym Control+Shift+t 	exec telegram-desktop
 
 
 
-################################################
+###################################################################
 # WINDOW SETTINGS
-################################################
+###################################################################
 
 
 # increase and decrease inner gaps
@@ -765,24 +797,24 @@ bindsym $mod+a focus parent
 # switch to workspace with urgent window automatically
 for_window [urgent=latest] focus
 
-################################################
+###################################################################
 # WORKSPACES SETUP
-################################################
+###################################################################
 
 # set default desktop layout (tiling | stacking | tabbed)
 workspace_layout default
 
 # setting variables to hold the workspaces names
-set $ws1 "1: emacs"
-set $ws2 "2: terminal"
-set $ws3 "3: browser"
-set $ws4 "4: file manager"
-set $ws5 "5: extra"
-set $ws6 "6: extra"
-set $ws7 "7: browser"
-set $ws8 "8: slack"
-set $ws9 "9: telegram/whatsapp"
-set $ws10 "10: terminal"
+set $ws1 "1:edit"
+set $ws2 "2:term"
+set $ws3 "3:browser"
+set $ws4 "4:file"
+set $ws5 "5:extra"
+set $ws6 "6:extra"
+set $ws7 "7:browser"
+set $ws8 "8:music"
+set $ws9 "9:msg"
+set $ws10 "10:mail"
 
 # workspaces layouts
 for_window [workspace=$ws3] layout tabbed
@@ -795,7 +827,7 @@ workspace $ws5 gaps outer 0
 
 
 # Workspaces setup between monitors
-workspace $ws1 output $primary_monitor $secondary_monitor
+workspace $ws1 output $primary_monitor
 workspace $ws2 output $primary_monitor
 workspace $ws3 output $primary_monitor
 workspace $ws4 output $primary_monitor
@@ -843,9 +875,9 @@ bindsym $mod+Shift+b move container to workspace back_and_forth; workspace back_
 
 
 
-################################################
+###################################################################
 # RESIZE MODE
-################################################
+###################################################################
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
@@ -876,7 +908,7 @@ bindsym $mod+r mode "resize"
 
 
 
-################################################
+###################################################################
 # Open specific applications in floating mode
 ###############################################
 
@@ -916,17 +948,16 @@ for_window [class="(?i)virtualbox"] floating enable border normal
 for_window [class="Xfburn"] floating enable
 
 
-
-
 # added apps
 for_window [title="Authy"] floating enable border pixel 1
+for_window [instance="woeusbgui"] floating enable border pixel 1
 
 # set 'App' window_class as floating windows
 # this makes my java build and runs float on top of the idea, and not divide the screen with another window
 for_window [instance="App"] floating enable
 
 
-################################################
+###################################################################
 # i3blocks specific settings
 ###############################################
 
