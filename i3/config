@@ -657,6 +657,7 @@ bindsym $mod+Shift+F6 exec --no-startup-id $terminal $term_wm_set_prop_flag spot
 # rofi window switcher
 bindsym $mod+Tab \
   exec rofi \
+  -theme slate \
   -show window -terminal st -hide-scrollbar true  \
   -line-margin 0 -lines 20 -eh 1 -width 35 -bw 3 \
   -kb-mode-next      Alt+Tab \
@@ -668,11 +669,11 @@ bindsym $mod+Tab \
 
 # rofi app runner
 # bindsym $mod+d exec rofi -show run -theme extra
-bindsym $mod+d exec rofi -show run -theme config
+bindsym $mod+d exec rofi -show run
 #------------------------------------------------
 # DMENU
 
-bindsym $mod+Shift+d                    exec dmenu_run -l 20 -F
+bindsym $mod+Shift+d exec dmenu_run -l 20 -F
 
 #------------------------------------------------
 # BMENU - Settings Menu
@@ -951,6 +952,7 @@ for_window [class="Xfburn"] floating enable
 # added apps
 for_window [title="Authy"] floating enable border pixel 1
 for_window [instance="woeusbgui"] floating enable border pixel 1
+for_window [instance="blueman-manager"] floating enable border pixel 1
 
 # set 'App' window_class as floating windows
 # this makes my java build and runs float on top of the idea, and not divide the screen with another window

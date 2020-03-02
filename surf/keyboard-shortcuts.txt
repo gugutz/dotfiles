@@ -1,0 +1,20 @@
+Ctrl+g: Go to URL (field on screen's upper left (not the browser window) opens for you to type)
+Ctrl+p: Go to URL in cut and paste clipboard
+Ctrl+y: Put current website URL into cut and paste clipboard
+Ctrl+h: Previous page in history, like back button on other browsers
+Ctrl+l: Undo the last Ctrl+h (go later in history)
+Ctrl+r: Refresh/reload from cache.
+Ctrl+Shift+r: Refresh/reload without cache
+Ctrl+-: Zoom out a little
+Shift+Ctrl++: Zoom in a little
+Shift+Ctrl+q: Normal zoom, and note that this might not be the zoom the browser opened with, if the browser was set to open with a non-normal zoom.
+Ctrl+o: Toggle "view source"
+Ctrl+j: Down a little
+Ctrl+k: Up a little
+Ctrl+Space: Down a lot
+Ctrl+b: Up a lot
+Ctrl+i: Scroll left a little
+Ctrl+u: Scroll right a little
+F11: Toggle fullscreen
+Shift+Ctrl+b: Toggle scrollbars
+Shift+Ctrl+g: Toggle geolocation

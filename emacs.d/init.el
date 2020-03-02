@@ -705,6 +705,7 @@
   (elisp-mode . rainbow-mode)
   (css-mode . rainbow-mode)
   (scss-mode . rainbow-mode)
+  (conf-mode . rainbow-mode)
   )
 
 
@@ -1118,6 +1119,7 @@ all hooks after it are ignored.")
   (with-eval-after-load 'evil
     (define-key evil-normal-state-map (kbd "SPC b") 'counsel-switch-buffer)
     (define-key evil-normal-state-map (kbd "SPC f f") 'counsel-find-file)
+    (define-key evil-normal-state-map (kbd "SPC f z") 'counsel-fzf)
     (define-key evil-normal-state-map (kbd "SPC p f") 'counsel-projectile-find-file)
     (define-key evil-normal-state-map (kbd "SPC a g") 'counsel-ag)
     (define-key evil-normal-state-map (kbd "SPC r g") 'counsel-rg)
@@ -1155,13 +1157,23 @@ all hooks after it are ignored.")
 ;; Enhancement for `execute-extended-command'. Auto detects and uses ivy or ido, if installed
 (use-package amx
   :after ivy
-  :init
-  (setq amx-save-file "~/.emacs.d/config/amx-items")
   :config
-  (eval-when-compile
-    (amx-mode))
+  (setq amx-save-file "~/.emacs.d/config/amx-items")
   )
 
+;; *********************************
+;; fuzzy matching
+
+;; Ivy's `ivy--regex-fuzzy' function uses flx automatically if its installed
+(use-package flx
+  :after ivy
+  :config
+  ;; use fuzzy matching everywhere except for swiper
+  (with-eval-after-load 'ivy
+    (push (cons #'swiper (cdr (assq t ivy-re-builders-alist)))
+      ivy-re-builders-alist)
+    (push (cons t #'ivy--regex-fuzzy) ivy-re-builders-alist))
+  )
 ;; *********************************
 ;; ivy-rich
 
@@ -1241,7 +1253,6 @@ all hooks after it are ignored.")
 ;; Requires: Emacs >= 26
 
 (use-package ivy-posframe
-  :disabled
   :after ivy
   :diminish ivy-posframe-mode
   :custom-face
@@ -1707,7 +1718,7 @@ Version 2019-01-16"
 
 (global-set-key (kbd "C-c C-x C-f") #'open-file-path-at-point)
 (with-eval-after-load 'evil
-(define-key evil-normal-state-map (kbd "SPC f p") #'open-file-path-at-point))
+  (define-key evil-normal-state-map (kbd "SPC f p") #'open-file-path-at-point))
 
 ;; *********************************
 ;; copy file path
@@ -2422,7 +2433,7 @@ Adapted from `describe-function-or-variable'."
   ("C-c s" . shell-pop)
   :config
   (with-eval-after-load 'evil
-  (define-key evil-normal-state-map (kbd "SPC !") 'shell-pop))
+    (define-key evil-normal-state-map (kbd "SPC !") 'shell-pop))
   )
 
 ;; Execute selected line or marked region as command in system shell
@@ -2592,7 +2603,7 @@ Adapted from `describe-function-or-variable'."
   (find-file (angular--counterpart-name (buffer-file-name))))
 (global-set-key (kbd "C-x a c") #'angular-open-counterpart)
 (with-eval-after-load 'evil
-(define-key evil-normal-state-map (kbd "SPC a c") #'angular-open-counterpart))
+  (define-key evil-normal-state-map (kbd "SPC a c") #'angular-open-counterpart))
 
 
 ;; *********************************
@@ -2632,7 +2643,9 @@ Adapted from `describe-function-or-variable'."
 ;; CSS
 
 (use-package css-mode
-  :mode "\\.css\\'"
+  :mode
+  ("\\.css\\'" . css-mode)
+  ("\\.rasi\\'" . css-mode) ;; support for rofi new config format
   :preface
   :hook
   (css-mode . emmet-mode)
@@ -2660,7 +2673,7 @@ Adapted from `describe-function-or-variable'."
 
 ;;****************************************************************
 ;;
-;; WEB DEVELOPMENT MINOR MODES
+;; WEB DEVELOPMENT TOOLS
 
 
 ;; *********************************
@@ -2679,7 +2692,7 @@ Adapted from `describe-function-or-variable'."
 
 ;; *********************************
 ;;
-;; ** PrettierJS
+;; PrettierJS
 
 (use-package prettier-js
   :hook
@@ -2692,7 +2705,7 @@ Adapted from `describe-function-or-variable'."
   )
 
 ;; *********************************
-;; ** Emmet
+;; Emmet
 
 (use-package emmet-mode
   :commands emmet-mode
@@ -2708,10 +2721,24 @@ Adapted from `describe-function-or-variable'."
 
 ;;****************************************************************
 ;;
+;; BACKEND TOOLS
+
+;; *********************************
+;; Docker
+
+(use-package dockerfile-mode
+  :mode
+  ("\\Dockerfile\\'" . dockerfile-mode)
+  )
+
+(use-package docker-compose-mode)
+
+;;****************************************************************
+;;
 ;; LANGUAGES SETUP
 
 ;; *********************************
-;; go mode
+;; go (golang) mode
 
 
 (use-package go-mode
@@ -2878,7 +2905,7 @@ Adapted from `describe-function-or-variable'."
   :defer 1
   :custom-face
   ;; Better looking colours for diff indicators
-  (diff-hl-change ((t (:foreground ,(face-background 'highlight)))))
+  ;;(diff-hl-change ((t (:foreground ,(face-background 'highlight)))))
   (diff-hl-change ((t (:background "#007ad3" :foreground "#ffffff"))))
   (diff-hl-insert ((t (:background "#00ff00" :foreground "#000000"))))
   (diff-hl-delete ((t (:background "#ff3300" :foreground "#ffffff"))))

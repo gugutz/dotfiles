@@ -23,6 +23,7 @@
 ; #RRGGBB ~ RGB
 ; #AARRGGBB ~ RGBA
 
+primary = #3f3f3f
 background = #24292E
 foreground = #FFFFFF
 border = ${self.background}
@@ -64,11 +65,8 @@ powermenu-close = #FF4500
 ; Use the following command to list available outputs:
 ; If unspecified, the application will pick the first one it finds.
 ; $ xrandr -q | grep " connected" | cut -d ' ' -f1
-;monitor = ${env:MONITOR:}
-;monitor = ${env:MONITOR:eDP1}
 monitor = ${env:MONITOR:DVI-I-2}
 monitor-fallback = ${env:MONITOR:DP1}
-;monitor = DVI-I-2
 width = 100%
 height = 18
 #offset-x = 1%
@@ -94,12 +92,12 @@ padding-right = 1
 module-margin-left = 2
 module-margin-right = 2
 
-;font-0 = "Monospace:size=10.5;2"
-font-0 = "DejaVu Sans:size=10;2"
-font-1 = "Hack:size=10;2"
-font-2 = "font\-logos:size=10"
-font-3 = "FontAwesome:size=12;2"
-font-4 = "MaterialIcons:size=10;2"
+font-0 = "DejaVu Sans Mono Nerd Font:size=10;2"
+font-1 = "Monospace:size=10.5;2"
+font-2 = "Hack Nerd Font:size=10;2"
+font-3 = "font\-logos:size=10"
+font-4 = "FontAwesome:size=12;2"
+font-5 = "MaterialIcons:size=10;2"
 
 modules-left = user i3
 modules-right = openweathermap-detailed xbacklight bbswitch_show memory cpu temperature bluetooth wireless-network uptime battery powermenu
@@ -149,17 +147,17 @@ bottom = true
 module-margin-left = 2
 module-margin-right = 2
 
-font-0 = "Monospace:size=10.5;2"
-font-1 = "DejaVu Sans:size=11;2"
+font-0 = "DejaVu Sans Mono Nerd Font:size=11;2"
+font-1 = "Monospace:size=10.5;2"
 font-2 = "FontAwesome:size=11;2"
 font-3 = "MaterialIcons:size=11;2"
 font-4 = "Weather Icons:size=11;2"
 font-5 = "Noto Sans CJK JP:size=11;2"
 
 ;modules-left = spotify mocp
-modules-left = spotify mpd
+modules-left = spotify mpd mocp
 modules-center = xwindow
-modules-right = volume wired-network calendar clock
+modules-right = alsa volume wired-network calendar clock
 
 
 ###############################################################################
@@ -205,7 +203,7 @@ font-4 = "FontAwesome:size=12;2"
 font-5 = "MaterialIcons:size=10;2"
 
 modules-left = i3
-modules-right = xbacklight bbswitch_show temperature bluetooth wireless-network calendar clock battery
+modules-right = bluetooth wireless-network calendar clock battery
 
 ; i3 related settings
 scroll-up = i3wm-wsnext
@@ -341,7 +339,7 @@ format = <label-state> <label-mode>
 ; Available tokens:
 ;   %mode%
 ; Default: %mode%
-label-mode = %mode%
+label-mode = %icon% %mode%
 label-mode-padding = 2
 label-mode-foreground = #000
 ;label-mode-background = #e60053
@@ -354,10 +352,10 @@ label-mode-background = ${colors.primary}
 ;   %index%
 ;   %output%
 ; Default: %icon%  %name%
-label-focused = %index%
+label-focused = %icon% %index%
 label-focused-foreground = #ffffff
 ;label-focused-background = #3f3f3f
-label-focused-background = ${colors.background-alt}
+label-focused-background = ${colors.background}
 label-focused-underline= ${colors.primary}
 ;label-focused-underline = #fba922
 ;label-focused-padding = 4
@@ -370,7 +368,7 @@ label-focused-padding = 2
 ;   %index%
 ;   %output%
 ; Default: %icon%  %name%
-label-unfocused = %index%
+label-unfocused = %icon% %index%
 label-unfocused-padding = 2
 
 ; visible = Active workspace on unfocused monitor
@@ -380,7 +378,7 @@ label-unfocused-padding = 2
 ;   %index%
 ;   %output%
 ; Default: %icon%  %name%
-label-visible = %index%
+label-visible = %icon% %index%
 label-visible-background = ${self.label-focused-background}
 label-visible-underline = ${self.label-focused-underline}
 ;label-visible-underline = #555555
@@ -432,6 +430,8 @@ interval = 5
 format-foreground = ${colors.bluetooth}
 format-underline = ${self.format-foreground}
 exec = ~/.config/polybar/scripts/bluetooth.sh
+click-left = blueman-manager &
+click-right = blueman-assistant &
 
 ###############################################################################
 
@@ -567,7 +567,11 @@ label = %percentage_used%%
 
 [module/wireless-network]
 type = internal/network
-interface = wlan0
+; interface = wlan0
+
+; qualirede wifi interface
+interface = wlp3s0
+
 interval = 3.0
 
 format-connected = <label-connected>
@@ -584,11 +588,18 @@ format-disconnected = <label-disconnected>
 format-disconnected-underline = ${self.format-connected-underline}
 format-disconnected-suffix-foreground = ${self.format-disconnected-underline}
 
+;click-left = nm-applet &
+click-left = nm-connection-editor &
+
+
 ###############################################################################
 
 [module/wired-network]
 type = internal/network
-interface = eth0
+;interface = eth0
+
+; qualirede interface
+interface = enp2s0
 interval = 3.0
 
 format-connected = <label-connected>
@@ -638,7 +649,7 @@ click-left = gsimplecal &
 #########################################################
 
 [module/volume]
-type = internal/pulseaudio
+type = internal/volume
 
 format-volume = <label-volume> <bar-volume>
 label-volume = 
@@ -660,6 +671,157 @@ bar-volume-fill-font = 1
 bar-volume-empty = ""
 bar-volume-empty-font = 1
 bar-volume-empty-foreground = ${colors.empty}
+
+##########################################################
+
+[module/pulseaudio]
+type = internal/pulseaudio
+
+; Sink to be used, if it exists (find using `pacmd list-sinks`, name field)
+; If not, uses default sink
+sink = alsa_output.pci-0000_12_00.3.analog-stereo
+
+; Use PA_VOLUME_UI_MAX (~153%) if true, or PA_VOLUME_NORM (100%) if false
+; Default: true
+use-ui-max = true
+
+; Interval for volume increase/decrease (in percent points)
+; Default: 5
+interval = 5
+Additional formatting
+; Available tags:
+;   <label-volume> (default)
+;   <ramp-volume>
+;   <bar-volume>
+format-volume = <ramp-volume> <label-volume>
+
+; Available tags:
+;   <label-muted> (default)
+;   <ramp-volume>
+;   <bar-volume>
+;format-muted = <label-muted>
+
+; Available tokens:
+;   %percentage% (default)
+;   %decibels% (unreleased)
+;label-volume = %percentage%%
+
+; Available tokens:
+;   %percentage% (default)
+;   %decibels% (unreleased)
+label-muted = 🔇 muted
+label-muted-foreground = #666
+
+; Only applies if <ramp-volume> is used
+ramp-volume-0 = 🔈
+ramp-volume-1 = 🔉
+ramp-volume-2 = 🔊
+
+; Right and Middle click (unreleased)
+click-right = pavucontrol &
+; click-middle =
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;old config
+;type = internal/pulseaudio
+
+;format-volume = <label-volume> <bar-volume>
+;label-volume = 
+;label-volume-foreground = ${colors.volume}
+
+;format-muted-suffix = "  "
+;format-muted-foreground = ${colors.volume}
+;label-muted = " Som Mudo"
+;format-muted-underline = ${colors.volume}
+
+;bar-volume-width = 10
+;bar-volume-foreground-0 = ${colors.volume}
+
+;bar-volume-gradient = false
+;bar-volume-indicator =
+;bar-volume-indicator-font = 0
+;bar-volume-fill = ""
+;bar-volume-fill-font = 1
+;bar-volume-empty = ""
+;bar-volume-empty-font = 1
+;bar-volume-empty-foreground = ${colors.empty}
+
+##########################################################
+
+[module/alsa]
+type = internal/alsa
+
+; Soundcard to be used
+; Usually in the format hw:# where # is the card number
+; You can find the different card numbers in `/proc/asound/cards`
+master-soundcard = default
+speaker-soundcard = default
+headphone-soundcard = default
+
+; Name of the master, speaker and headphone mixers
+; Use the following command to list available mixer controls:
+; $ amixer scontrols | sed -nr "s/.*'([[:alnum:]]+)'.*/\1/p"
+; If master, speaker or headphone-soundcard isn't the default,
+; use `amixer -c # scontrols` instead where # is the number
+; of the master, speaker or headphone soundcard respectively
+;
+; Default: Master
+master-mixer = Master
+
+; Optionally define speaker and headphone mixers
+; Default: none
+speaker-mixer = Speaker
+; Default: none
+headphone-mixer = Headphone
+
+; NOTE: This is required if headphone_mixer is defined
+; Use the following command to list available device controls
+; $ amixer controls | sed -r "/CARD/\!d; s/.*=([0-9]+).*name='([^']+)'.*/printf '%3.0f: %s\n' '\1' '\2'/e" | sort
+; You may also need to use `amixer -c # controls` as above for the mixer names
+; Default: none
+headphone-id = 9
+
+; Use volume mapping (similar to amixer -M and alsamixer), where the increase in volume is linear to the ear
+; Default: false
+mapped = true
+
+; Interval for volume increase/decrease (in percent points)
+; Default: 5
+interval = 5
+Additional formatting
+; Available tags:
+;   <label-volume> (default)
+;   <ramp-volume>
+;   <bar-volume>
+format-volume = <ramp-volume> <label-volume>
+
+; Available tags:
+;   <label-muted> (default)
+;   <ramp-volume>
+;   <bar-volume>
+;format-muted = <label-muted>
+
+; Available tokens:
+;   %percentage% (default)
+;label-volume = %percentage%%
+
+; Available tokens:
+;   %percentage% (default)
+label-muted = 🔇 muted
+label-muted-foreground = #66
+
+; Only applies if <ramp-volume> is used
+ramp-volume-0 = 🔈
+ramp-volume-1 = 🔉
+ramp-volume-2 = 🔊
+
+; If defined, it will replace <ramp-volume> when
+; headphones are plugged in to `headphone_control_numid`
+; If undefined, <ramp-volume> will be used for both
+; Only applies if <ramp-volume> is used
+ramp-headphones-0 = 
+ramp-headphones-1 = 
+
 
 ##########################################################
 
