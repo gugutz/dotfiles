@@ -221,7 +221,8 @@ set langmenu=en
 set wildmenu  " Turn on the Wild menu
 set wildmode=full " command-line completion enhanced mode
 " set wildmode=list:longest  " Make wildmenu behave like bash completion. Finding commands are so easy now.
-set wildoptions+=pum,tagfile
+set wildoptions+=pum
+set wildoptions+=tagfile
 
 set cmdheight=2   " Height of the command bar
 
@@ -260,7 +261,8 @@ let g:session_command_aliases = 1
 " Don't pass messages to |ins-completion-menu|.
 set shortmess+=c
 
-set display+=lastline,msgsep
+set display+=lastline
+set display+=msgsep
 
 set history=10000  " Sets how many lines of history VIM has to remember
 
@@ -311,7 +313,11 @@ endtry
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " Substitute live preview in a split window
-set inccommand=split " show live results for some commands (like :s) in a split window
+
+if has('nvim)
+  set inccommand=split " show live results for some commands (like :s) in a split window
+endif
+
 set scrolloff=1000           " Always show N lines above/below the cursor
 
 " change cursor shape according to mode
@@ -432,10 +438,13 @@ set showmatch
 set matchtime=2
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" PUM - pseudo-transparent popup menu
+" PUM (PopUp Menu)- pseudo-transparent popup menu
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-set pumblend=11
+if has('nvim')
+  set pumblend=11
+endif
+
 set pumheight=10
 
 

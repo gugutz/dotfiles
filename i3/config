@@ -180,14 +180,12 @@ set $alt Mod1
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
-###################################################################
-# BASIC I3 WM CONTROL BINDINGS
-####################################################################
+# reload the configuration file
+bindsym $mod+Shift+c reload
 
-# kill focused window
-bindsym $mod+q        kill
-bindsym $mod+Shift+q  kill
 
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Shift+r restart
 
 ####################################################################
 # COMPOSITOR MANAGER AND TRANSPARENCY SETUP
@@ -198,6 +196,15 @@ exec --no-startup-id picom --xrender-sync-fence
 
 # bindsym $mod+t exec --no-startup-id pkill picom
 bindsym $mod+Ctrl+t exec --no-startup-id picom -b; exec notify-send 'running picom'
+
+###################################################################
+##  DISPLAY RELATED SETTINGS
+###################################################################
+# Misc Apps
+
+# Screen brightness controls
+bindsym XF86MonBrightnessUp exec "xbacklight -inc 10; notify-send 'brightness up'"
+bindsym XF86MonBrightnessDown exec "xbacklight -dec 10; notify-send 'brightness down'"
 
 ###################################################################
 ##  AUDIO RELATED SETTINGS
@@ -216,19 +223,15 @@ bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ to
 bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
 
 
-# exec --no-startup-id pulseaudio
-# exec --no-startup-id pa-applet
-# bindsym $mod+Ctrl+Shift+m exec pavucontrol
+exec --no-startup-id pulseaudio
+exec --no-startup-id pa-applet
+bindsym $mod+Ctrl+Shift+m exec pavucontrol
+
+
 
 ###################################################################
-# Misc Apps
-
-# Screen brightness controls
-bindsym XF86MonBrightnessUp exec "xbacklight -inc 10; notify-send 'brightness up'"
-bindsym XF86MonBrightnessDown exec "xbacklight -dec 10; notify-send 'brightness down'"
-
+## START APPLICATIONS
 ###################################################################
-# Start applications
 
 
 # add ctrl to the bellow binding to i can use the original binding for dmenu
@@ -253,10 +256,8 @@ set $hibernate sudo systemctl suspend
 # define default browser
 set $browser firefox
 
-
-
 ###################################################################
-# settings for i3-gaps
+# GAPS SETTINGS
 ###################################################################
 
 # Disable window titlebars entirely
@@ -282,6 +283,7 @@ gaps outer -2
 set $mode_gaps Gaps: (o) outer, (i) inner
 set $mode_gaps_outer Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)
 set $mode_gaps_inner Inner Gaps: +|-|0 (local), Shift + +|-|0 (global)
+
 bindsym $mod+Shift+g mode "$mode_gaps"
 
 mode "$mode_gaps" {
@@ -320,11 +322,9 @@ mode "$mode_gaps_outer" {
 # POWER OPTIONS AND WINDOWS MANAGER
 ###################################################################
 
-# reload the configuration file
-bindsym $mod+Shift+c reload
+# start xfce power manager tray applet
+exec --no-startup-id xfce4-power-manager
 
-# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
-bindsym $mod+Shift+r restart
 
 # exit i3 (logs you out of your X session)
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
@@ -357,7 +357,6 @@ bindsym XF86PowerOff		exec prompt "Are you sure you want to shutdown?" "$shutdow
 
 
 
-
 ###################################################################
 # Autostart applications
 ###################################################################
@@ -369,8 +368,6 @@ exec --no-startup-id nitrogen --restore; sleep 1; picom -b
 # start NetworkManager tray applet
 exec --no-startup-id nm-applet
 
-# start xfce power manager tray applet
-exec --no-startup-id xfce4-power-manager
 
 # start pamac tray app indicator (show opened apps notifications on tray)
 exec --no-startup-id pamac-tray
@@ -522,7 +519,7 @@ bindsym  $mod+Shift+Print --release exec --no-startup-id import ~/img/screenshot
 bindsym $alt+Print exec scrot ~/img/screenshots/last-scrot.png -s -e 'mv $f /tmp/ && pinta /tmp/$f'
 
 # Polybar
-exec_always --no-startup-id ~/dotfiles/polybar/launch-orig.sh &
+exec_always --no-startup-id ~/dotfiles/polybar/launch.sh &
 
 ###################################################################
 # i3 BAR SETTINGS
@@ -648,7 +645,7 @@ bindsym $mod+Shift+F6 exec --no-startup-id $terminal $term_wm_set_prop_flag spot
 
 
 ###################################################################
-# APPLICATION KEY BINDINGS
+# APPLICATION LAUNCHERS AND SWITCHERS
 ###################################################################
 
 #------------------------------------------------
@@ -685,9 +682,6 @@ bindsym $mod+Ctrl+b exec terminal -e 'bmenu'
 
 bindsym $mod+Shift+z exec --no-startup-id morc_menu
 
-# # firefox
-# bindsym Control+Shift+f		exec $terminal -e firefox
-
 # htop
 bindsym $mod+p            exec $terminal -e htop
 
@@ -695,28 +689,13 @@ bindsym $mod+p            exec $terminal -e htop
 bindsym $mod+F2 exec $browser
 
 
-
-
-
-
-
-
-# libreoffice
-# this conflicted with emacs/tmux/vim navigation (C-HJKL)
-# bindsym Control+Shift+l	  exec $terminal -e libreoffice
-
-# peek screen gif recorder
-# bindsym Control+Shift+p 	exec $terminal -e peek
-
-# peek screen gif recorder
-bindsym Control+Shift+t 	exec telegram-desktop
-
-
-
 ###################################################################
-# WINDOW SETTINGS
+# WINDOWS SETTINGS
 ###################################################################
 
+# kill focused window
+bindsym $mod+q        kill
+bindsym $mod+Shift+q  kill
 
 # increase and decrease inner gaps
 bindsym Control+plus  gaps inner current plus 5
@@ -760,6 +739,7 @@ bindsym $mod+Shift+h move left
 bindsym $mod+Shift+j move down
 bindsym $mod+Shift+k move up
 bindsym $mod+Shift+l move right
+
 # alternatively, you can use the cursor keys:
 bindsym $mod+Shift+Left move left
 bindsym $mod+Shift+Down move down
@@ -799,7 +779,7 @@ bindsym $mod+a focus parent
 for_window [urgent=latest] focus
 
 ###################################################################
-# WORKSPACES SETUP
+# WORKSPACES SETTINGS
 ###################################################################
 
 # set default desktop layout (tiling | stacking | tabbed)
@@ -821,7 +801,7 @@ set $ws10 "10:mail"
 for_window [workspace=$ws3] layout tabbed
 for_window [workspace=$ws9] layout tabbed
 
-# workspaces settings
+# workspaces gaps settings
 workspace $ws1 gaps outer 1
 workspace $ws3 gaps outer 1
 workspace $ws5 gaps outer 0
@@ -911,7 +891,7 @@ bindsym $mod+r mode "resize"
 
 ###################################################################
 # Open specific applications in floating mode
-###############################################
+###################################################################
 
 bindsym $mod+Control+Shift f exec $terminal -e ~/dotfiles/i3/scripts/find-window-criteria.sh
 
@@ -961,7 +941,7 @@ for_window [instance="App"] floating enable
 
 ###################################################################
 # i3blocks specific settings
-###############################################
+###################################################################
 
 # for the key indicators to work
 bindsym --release Caps_Lock exec pkill -SIGRTMIN+11 i3blocks
