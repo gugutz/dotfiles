@@ -86,3 +86,27 @@ alias whichterm='ps -o 'cmd=' -p $(ps -o 'ppid=' -p $$)'
 alias whichterm2='ps -p $$ -o args'
 alias findxprops="xprop _NET_WM_PID WM_CLASS"
 alias whichdisplaymanager="'grep '/usr/s\?bin' /etc/systemd/system/display-manager.service"
+
+alias list_monitors="xrandr --query | grep " connected" | cut -d" " -f1"
+
+alias biosinfo='sudo dmidecode -t 2'
+
+alias kernelinfo='uname -a'
+alias kernelversion='uname -v'
+alias kernelrelease='uname -r'
+
+
+# list open ports (flags: tcp, udp, listening, ports, name?)
+# use it with sudo to also show PID entries
+alias openports='sudo netstat -tulpn '
+
+alias procinfo='ps aux | grep'
+
+alias starwars='telnet towel.blinkenlights.nl'
+
+# remove readonly limitation on devices (dangerous)
+alias noreadonly='sudo hdparm -r0 /dev/sdb'
+
+
+# pretty print path (separate each entry by lines)
+alias pppath='echo $PATH | tr -s ':' '\n''

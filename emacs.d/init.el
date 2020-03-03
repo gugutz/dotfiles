@@ -35,9 +35,9 @@
 
 ;; source: https://raw.githubusercontent.com/gilbertw1/emacs-literate-starter/master/emacs.org
 
-;; (add-to-list 'load-path "~/dotfiles/emacs.d/packages/gcmh")
-;; (require 'gcmh)
-;; (gcmh-mode 1)
+(add-to-list 'load-path "~/dotfiles/emacs.d/packages/gcmh")
+(require 'gcmh)
+(gcmh-mode 1)
 
 ;;------------------------------------------
 
@@ -956,6 +956,10 @@ all hooks after it are ignored.")
   (define-key evil-normal-state-map (kbd "SPC |") 'split-window-right)
   (define-key evil-normal-state-map (kbd "SPC u") 'undo-tree-visualize)
   (define-key evil-normal-state-map (kbd "SPC o") 'other-window)
+  (define-key evil-normal-state-map (kbd "h") 'backward-char)
+  (define-key evil-normal-state-map (kbd "j") 'next-line)
+  (define-key evil-normal-state-map (kbd "k") 'previous-line)
+  (define-key evil-normal-state-map (kbd "l") 'forward-char)
 
   ;; ------------------------------------------
   ;;
@@ -1283,7 +1287,9 @@ all hooks after it are ignored.")
     (ivy-posframe-mode))
   )
 
+;; disabled to see if ill miss it
 (use-package ivy-explorer
+  :disabled
   :diminish
   :after ivy
   :config
@@ -1392,7 +1398,6 @@ all hooks after it are ignored.")
 ;; exec path from shell
 
 (use-package exec-path-from-shell
-  :defer 2
   :config
   (exec-path-from-shell-initialize)
   )
@@ -2002,7 +2007,7 @@ Version 2016-07-17"
     (define-key evil-normal-state-map (kbd "SPC l f") 'lsp-execute-code-action)
     (define-key evil-normal-state-map (kbd "SPC l s") 'lsp-ui-sideline-mode))
   ;; general
-  (setq lsp-auto-configure t) ;; auto-configure `lsp-ui' and `company-lsp'
+  (setq lsp-auto-configure nil) ;; auto-configure `lsp-ui' and `company-lsp'
   (setq lsp-enable-indentation nil) ;; NOTE: indentation with lsp is super slow on emacs 26. try again no future versions
   (setq lsp-prefer-flymake :none) ;; t: flymake | nil: lsp-ui | :none -> none of them (flycheck)
   (setq lsp-session-file "~/.emacs.d/config/lsp-session-v1") ;; t: flymake | nil: lsp-ui | :none -> none of them (flycheck)
