@@ -110,3 +110,8 @@ alias noreadonly='sudo hdparm -r0 /dev/sdb'
 
 # pretty print path (separate each entry by lines)
 alias pppath='echo $PATH | tr -s ':' '\n''
+
+# find only executables
+alias findexecutable='find / -type f -executable -name'
+# second version with locate, but might be better to be in a function since the argument is in the beginning of the line
+alias find_executable2='locate -b '\gtags' | xargs -ri find {} -prune -type f -executable'
