@@ -3,7 +3,7 @@
 # If you come from bash you might have to change your $PATH.
 # check if exporting this line in .profile is okay
 # if not, uncomment it
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
+export PATH=$PATH
 
 
 #########################################

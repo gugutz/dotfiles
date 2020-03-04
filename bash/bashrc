@@ -2,6 +2,8 @@
 # my bashrc
 #################################################
 
+export PATH=$PATH
+
 # load all my env vars first
 [[ -f $HOME/dotfiles/envvars ]] && . $HOME/dotfiles/envvars
 

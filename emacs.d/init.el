@@ -6,7 +6,7 @@
 ;;; Code:
 
 (when (version< emacs-version "26.1")
-  (error "Detected Emacs %s. This emacs config only supports Emacs 26.1 and higher"
+  (error "Detected Emacs %s.  This Emacs config only supports Emacs 26.1 and higher"
     emacs-version))
 
 ;; some usefull constants used throughout the config
@@ -41,18 +41,26 @@
 
 ;;------------------------------------------
 
-;; defer GC on startup
+;; DEFER GC ON STARTUP
 
+;; saving original gc value
+(defvar original-gc-cons-threshold gc-cons-threshold)
+
+;; defining a new value  for gc
+;; (defvar better-gc-cons-threshold 67108864) ;; 64mb
+(defvar better-gc-cons-threshold 100000000) ;; 100mb
+
+;; increase to defer gc on emacs startup
 (setq gc-cons-threshold most-positive-fixnum ;; 2^61 bytes
   gc-cons-percentage 0.6
   garbage-collection-messages t)
 
-;; reset gc after emacs loads
-
+;; reset gc to 100mb after emacs loads
+;; 100mb is the value recommended by lsp github page
 (add-hook 'emacs-startup-hook
   (lambda ()
-    (setq gc-cons-threshold 16777216 ; 16mb
-      gc-cons-percentage 0.1)))
+    (setq gc-cons-threshold better-gc-cons-threshold) ; 16mb
+    (setq gc-cons-percentage 0.1)))
 
 ;;------------------------------------------
 
@@ -61,19 +69,31 @@
 ;; store emacs original gc value in a variable
 (defvar tau-gc-cons-threshold gc-cons-threshold)
 
-(defun tau-defer-garbage-collection-h ()
+
+(defun gc-minibuffer-setup-hook ()
   "Set gc consing treshold to the higher possible value."
   (setq gc-cons-threshold most-positive-fixnum))
 
-(defun tau-restore-garbage-collection-h ()
+(defun gc-minibuffer-exit-hook ()
   "Set gc consing treshold to the higher possible value."
   ;; Defer it so that commands launched immediately after will enjoy the
   ;; benefits.
   (run-at-time
     1 nil (lambda () (setq gc-cons-threshold tau-gc-cons-threshold))))
 
-(add-hook 'minibuffer-setup-hook #'tau-defer-garbage-collection-h)
-(add-hook 'minibuffer-exit-hook #'tau-restore-garbage-collection-h)
+;; (defun gc-minibuffer-setup-hook ()
+;;   "Set gc consing treshold to the higher possible value."
+;;   (setq gc-cons-threshold most-positive-fixnum))
+
+;; (defun gc-minibuffer-exit-hook ()
+;;   "Set gc consing treshold to the higher possible value."
+;;   ;; Defer it so that commands launched immediately after will enjoy the
+;;   ;; benefits.
+;;   (run-at-time
+;;     1 nil (lambda () (setq gc-cons-threshold tau-gc-cons-threshold))))
+
+(add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
+(add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)
 
 ;;------------------------------------------
 
@@ -150,7 +170,8 @@
     (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
 
   ;; emacs 27 calls package initialize automatically so `package-initilize' is only required on older versions
-  (package-initialize)
+  (unless EMACS27+
+    (package-initialize))
 
   ;; install use-package if not already installed
   (unless (package-installed-p 'use-package)
@@ -158,7 +179,7 @@
     (package-install 'use-package))
   ;; load use-package
   (require 'use-package)
-  (setq use-package-always-defer t
+  (setq use-package-always-defer nil
     use-package-verbose t
     use-package-always-ensure t
     use-package-enable-imenu-support t
@@ -564,7 +585,6 @@
   ;; Show absolute line numbers for narrowed regions makes it easier to tell the
   ;; buffer is narrowed, and where you are, exactly.
   (setq-default display-line-numbers-widen t)
-
   (add-hook 'prog-mode-hook #'display-line-numbers-mode)
   (add-hook 'text-mode-hook #'display-line-numbers-mode)
   (add-hook 'conf-mode-hook #'display-line-numbers-mode)
@@ -575,12 +595,13 @@
 ;; emacs 27 native tabs
 
 (use-package tabbar
-  :disabled
+  :if (> emacs-major-version 26)
   :ensure nil
-  :config
-  (tab-bar-mode +1) ;; per-frame
-  ;; (tab-line-mode +1) ;; per window
+  :hook
+  (window-setup . tab-bar-mode) ;; per-frame
+  ;; (window-setup . tab-line-mode +1) ;; per window
   )
+
 
 
 ;;****************************************************************
@@ -975,9 +996,6 @@ all hooks after it are ignored.")
   ;; somehow global-set-key doenst work for normal mode for this binding, so i manually set it
   (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
 
-  ;;; simulate evil-commentary
-  ;; (define-key evil-normal-state-map (kbd "g c c") 'comment-line-and-move-up)
-  ;; (define-key evil-visual-state-map (kbd "g c") 'comment-or-uncomment-region)
   (global-set-key (kbd "C-S-H") 'evil-window-left)
   (global-set-key (kbd "C-S-L") 'evil-window-right)
   (global-set-key (kbd "C-S-K") 'evil-window-up)
@@ -1030,10 +1048,11 @@ all hooks after it are ignored.")
 ;; evil-commentary
 
 (use-package evil-commentary
-  :after evil
   :diminish
   :hook
   (evil-mode . evil-commentary-mode)
+  :init
+  (evil-commentary-mode)
   )
 
 ;; *********************************
@@ -1113,13 +1132,14 @@ all hooks after it are ignored.")
   (setq ivy-use-virtual-buffers t)
   ;;Displays the current and total number in the collection in the prompt
   (setq enable-recursive-minibuffers t)
-  ;; display an arrow on the selected item in the list
   (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-arrow)
   ;; enable this if you want `swiper' to use it
   ;; (setq search-default-mode #'char-fold-to-regexp)
   (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
 
-  ;; SPC keybindings
+  ;; remove the regex anchor ^ from `counsel-M-x' to match any substring, not only the ones that begin with the input
+  (setq ivy-initial-inputs-alist nil)
+
   (with-eval-after-load 'evil
     (define-key evil-normal-state-map (kbd "SPC b") 'counsel-switch-buffer)
     (define-key evil-normal-state-map (kbd "SPC f f") 'counsel-find-file)
@@ -1128,7 +1148,6 @@ all hooks after it are ignored.")
     (define-key evil-normal-state-map (kbd "SPC a g") 'counsel-ag)
     (define-key evil-normal-state-map (kbd "SPC r g") 'counsel-rg)
     )
-
   ;; Integration with `projectile'
   (with-eval-after-load 'projectile
     (setq projectile-completion-system 'ivy))
@@ -1139,11 +1158,13 @@ all hooks after it are ignored.")
 ;;; Counsel
 
 (use-package counsel
-  :demand t
   :after ivy
   :diminish counsel-mode
   :hook
   (ivy-mode . counsel-mode)
+  :config
+  (with-eval-after-load 'ivy
+    (counsel-mode))
   )
 
 ;; ** Counsel integration for Projectile
@@ -1151,7 +1172,7 @@ all hooks after it are ignored.")
 (use-package counsel-projectile
   :after ivy counsel projectile
   :config
-  (eval-when-compile
+  (with-eval-after-load 'counsel
     (counsel-projectile-mode 1))
   )
 
@@ -1182,9 +1203,7 @@ all hooks after it are ignored.")
 ;; ivy-rich
 
 (use-package ivy-rich
-  :demand t
   :hook
-  (ivy-mode . ivy-rich-mode)
   (counsel-mode . ivy-rich-mode)
   :preface
   ;; use all-the-icons for `ivy-switch-buffer'
@@ -1247,7 +1266,6 @@ all hooks after it are ignored.")
        )
     )
   ;; ivy-rich-mode needs to be called after `ivy-rich--display-transformers-list' is changed
-  :init
   (ivy-rich-mode 1)
   )
 
@@ -1263,7 +1281,9 @@ all hooks after it are ignored.")
   (ivy-posframe ((t (:background "#202020"))))
   (ivy-posframe-border ((t (:background "#9370DB"))))
   (ivy-posframe-cursor ((t (:background "#00ff00"))))
-  :init
+  :hook
+  (ivy-mode . ivy-posframe-mode)
+  :config
   (setq ivy-posframe-parameters '((internal-border-width . 1)))
   (setq ivy-posframe-width 130)
   (setq ivy-posframe-parameters '((alpha . 85)))
@@ -1283,7 +1303,7 @@ all hooks after it are ignored.")
                                      (t      . 20)
                                      ))
   :config
-  (eval-when-compile
+  (with-eval-after-load 'ivy
     (ivy-posframe-mode))
   )
 
@@ -1293,8 +1313,7 @@ all hooks after it are ignored.")
   :diminish
   :after ivy
   :config
-  (eval-when-compile
-    (ivy-explorer-mode 1))
+  (ivy-explorer-mode 1)
   )
 
 ;; *********************************
@@ -1303,8 +1322,7 @@ all hooks after it are ignored.")
 (use-package ivy-prescient
   :after ivy
   :config
-  (eval-when-compile
-    (ivy-prescient-mode))
+  (ivy-prescient-mode)
   )
 
 ;; *********************************
@@ -1321,8 +1339,7 @@ all hooks after it are ignored.")
        counsel-projectile-find-file
        counsel-projectile-find-dir))
   :config
-  (eval-when-compile
-    (all-the-icons-ivy-setup))
+  (all-the-icons-ivy-setup)
   )
 
 ;; *********************************
@@ -1359,6 +1376,7 @@ all hooks after it are ignored.")
 ;; better jumper (using to see if its good, doom-emacs uses it)
 
 (use-package better-jumper
+  :disabled
   :preface
   ;; REVIEW Suppress byte-compiler warning spawning a *Compile-Log* buffer at
   ;; startup. This can be removed once gilbertw1/better-jumper#2 is merged.
@@ -1398,11 +1416,10 @@ all hooks after it are ignored.")
 ;; exec path from shell
 
 (use-package exec-path-from-shell
+  :defer 1
   :config
   (exec-path-from-shell-initialize)
   )
-
-;; Attempt to get env vars without exec-path-from-shell, since its very slow
 
 
 ;; *********************************
@@ -1425,6 +1442,8 @@ all hooks after it are ignored.")
 (use-package treemacs
   :bind
   ("<f8>" . treemacs)
+  :hook
+  (window-setup . treemacs)
   :config
   (setq treemacs-show-cursor nil)
   (setq treemacs-persist-file (expand-file-name "cache/treemacs-persist" user-emacs-directory))
@@ -1618,8 +1637,6 @@ all hooks after it are ignored.")
 ;; smartparens
 
 (use-package smartparens
-  :demand t
-  :defer t
   :diminish
   :hook
   (prog-mode . smartparens-mode)
@@ -1795,9 +1812,6 @@ Version 2016-07-17"
     ("SPC j o" . dumb-jump-go-other-window))
   :custom
   (dumb-jump-selector 'ivy)
-  :config
-  (eval-when-compile
-    (require 'helm-source nil t))
   )
 
 ;;****************************************************************
@@ -1847,7 +1861,7 @@ Version 2016-07-17"
 
 ;; define list of fonts to be used in the above function
 ;; the first one found will be used
-(add-to-list 'default-frame-alist '(font . "Hack-10.5"))
+(add-to-list 'default-frame-alist '(font . "Hack Nerd Font-10.5"))
 
 ;; (set-face-attribute 'default nil :font (font-candidate '
 ;;                                          "Hack-11:weight=normal"
@@ -1903,8 +1917,7 @@ Version 2016-07-17"
     (define-key evil-normal-state-map (kbd "SPC p s") 'projectile-switch-project)
     (define-key evil-normal-state-map (kbd "SPC p a g") 'projectile-ag)
     (define-key evil-normal-state-map (kbd "SPC p r g") 'projectile-ripgrep))
-  (eval-when-compile
-    (projectile-mode +1))
+  (projectile-mode +1)
   )
 
 
@@ -1916,6 +1929,8 @@ Version 2016-07-17"
 ;;; Company
 
 (use-package company
+  :hook
+  (after-init . global-company-mode)
   :bind
   (:map company-active-map
     ("C-p" . company-select-previous)
@@ -1926,34 +1941,88 @@ Version 2016-07-17"
     ("C-p" . company-select-previous)
     ("C-n" . company-select-next))
   :init
+  (setq company-begin-commands '(self-insert-command))
+  (setq company-require-match 'never)
   (setq company-minimum-prefix-length 1)
+  (setq company-backends '(company-capf))
+  (setq company-frontends '(company-pseudo-tooltip-frontend
+			                       company-echo-metadata-frontend))
   (setq company-idle-delay 0.1) ;; decrease delay before autocompletion popup shows
-  (setq company-echo-delay 0) ;; remove annoying blinking
+  (setq company-echo-delay 0.0) ;; remove annoying blinking
   (setq company-selection-wrap-around t) ; loop over candidates
   (setq company-tooltip-align-annotations t) ;; align annotations to the right tooltip border.
   (setq company-tooltip-margin 2) ;; width of margin columns to show around the tooltip
   :config
-  (global-company-mode)
   (bind-key [remap completion-at-point] #'company-complete company-mode-map)
   ;; show tooltip even for single candidates
-  (setq company-frontends '(company-pseudo-tooltip-frontend
-			                       company-echo-metadata-frontend))
   )
 
 ;; *********************************
 ;; company box
 
+;; took the entire thing from M-EMACS
 (use-package company-box
-  :after company
+  :diminish
   :hook
-  ((global-company-mode company-mode) . company-box-mode)
-  )
+  (company-mode . company-box-mode)
+  :config
+  (setq company-box-show-single-candidate t
+    company-box-backends-colors nil
+    company-box-max-candidates 50
+    company-box-icons-alist 'company-box-icons-all-the-icons)
+  company-box-icons-functions
+  (cons #'+company-box-icons--elisp-fn
+    (delq 'company-box-icons--elisp
+      company-box-icons-functions))
+  (setq company-box-icons-lsp
+    `(( 1  . ,(all-the-icons-faicon "file-text-o" :v-adjust -0.0575))     ; Text
+       ( 2  . ,(all-the-icons-faicon "cube" :v-adjust -0.0575))            ; Method
+       ( 3  . ,(all-the-icons-faicon "cube" :v-adjust -0.0575))            ; Function
+       ( 4  . ,(all-the-icons-faicon "cube" :v-adjust -0.0575))            ; Constructor
+       ( 5  . ,(all-the-icons-faicon "tag" :v-adjust -0.0575))             ; Field
+       ( 6  . ,(all-the-icons-faicon "tag" :v-adjust -0.0575))             ; Variable
+       ( 7  . ,(all-the-icons-faicon "cog" :v-adjust -0.0575))             ; Class
+       ( 8  . ,(all-the-icons-faicon "cogs" :v-adjust -0.0575))            ; Interface
+       ( 9  . ,(all-the-icons-alltheicon "less"))                          ; Module
+       (10  . ,(all-the-icons-faicon "wrench" :v-adjust -0.0575))          ; Property
+       (11  . ,(all-the-icons-faicon "tag" :v-adjust -0.0575))             ; Unit
+       (12  . ,(all-the-icons-faicon "tag" :v-adjust -0.0575))             ; Value
+       (13  . ,(all-the-icons-material "content_copy" :v-adjust -0.2))     ; Enum
+       (14  . ,(all-the-icons-faicon "tag" :v-adjust -0.0575))             ; Keyword
+       (15  . ,(all-the-icons-material "content_paste" :v-adjust -0.2))    ; Snippet
+       (16  . ,(all-the-icons-material "palette" :v-adjust -0.2))          ; Color
+       (17  . ,(all-the-icons-faicon "file" :v-adjust -0.0575))            ; File
+       (18  . ,(all-the-icons-faicon "tag" :v-adjust -0.0575))             ; Reference
+       (19  . ,(all-the-icons-faicon "folder" :v-adjust -0.0575))          ; Folder
+       (20  . ,(all-the-icons-faicon "tag" :v-adjust -0.0575))             ; EnumMember
+       (21  . ,(all-the-icons-faicon "tag" :v-adjust -0.0575))             ; Constant
+       (22  . ,(all-the-icons-faicon "cog" :v-adjust -0.0575))             ; Struct
+       (23  . ,(all-the-icons-faicon "bolt" :v-adjust -0.0575))            ; Event
+       (24  . ,(all-the-icons-faicon "tag" :v-adjust -0.0575))             ; Operator
+       (25  . ,(all-the-icons-faicon "cog" :v-adjust -0.0575))             ; TypeParameter
+       ))
+  (defun +company-box-icons--elisp-fn (candidate)
+    (when (derived-mode-p 'emacs-lisp-mode)
+      (let ((sym (intern candidate)))
+        (cond ((fboundp sym)  'ElispFunction)
+          ((boundp sym)   'ElispVariable)
+          ((featurep sym) 'ElispFeature)
+          ((facep sym)    'ElispFace)))))
 
+  (defadvice! +company-remove-scrollbar-a (orig-fn &rest args)
+    "This disables the company-box scrollbar, because:
+https://github.com/sebastiencs/company-box/issues/44"
+    :around #'company-box--update-scrollbar
+    (cl-letf (((symbol-function #'display-buffer-in-side-window)
+                (symbol-function #'ignore)))
+      (apply orig-fn args)))
+  )
 
 ;; *********************************
 ;; company quickHelp
 
 (use-package company-quickhelp
+  :disabled
   :after company
   :bind
   (:map company-active-map
@@ -1970,15 +2039,8 @@ Version 2016-07-17"
 (use-package lsp-mode
   :commands lsp
   :hook
-  (typescript-mode . lsp)
-  (web-mode . lsp)
-  (scss-mode . lsp)
-  (css-mode . lsp)
-  (js2-mode . lsp)
-  (go-mode . lsp)
-  (yaml-mode . lsp)
-  (sh-mode . lsp)
-  (conf-mode . lsp)
+  (lsp-mode . lsp-enable-which-key-integration)
+  (prog-mode . lsp)
   :bind
   (:map lsp-mode-map
     ;; ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
@@ -1994,25 +2056,18 @@ Version 2016-07-17"
     ("C-c l m"   . lsp-ui-imenu)
     ("C-c l s"   . lsp-ui-sideline-mode))
   :config
-  (with-eval-after-load 'evil
-    (define-key evil-normal-state-map (kbd "SPC l p f r") 'lsp-ui-peek-find-references)
-    (define-key evil-normal-state-map (kbd "SPC l p f d") 'lsp-ui-peek-find-definitions)
-    (define-key evil-normal-state-map (kbd "SPC l p f i") 'lsp-ui-peek-find-implementation)
+  ;; perfomance settings from lsp official github page
+  (setq lsp-file-watch-threshold 2000)
+  (setq read-process-output-max (* 1024 1024)) ;; 1mb
+  (setq lsp-prefer-capf t)
+  (setq lsp-idle-delay 0.500)
 
-    (define-key evil-normal-state-map (kbd "SPC l g d")  'lsp-goto-type-definition)
-    (define-key evil-normal-state-map (kbd "SPC l d")  'lsp-find-definition)
-    (define-key evil-normal-state-map (kbd "SPC l g i")  'lsp-goto-implementation)
-    (define-key evil-normal-state-map (kbd "SPC l i") 'lsp-find-implementation)
-    (define-key evil-normal-state-map (kbd "SPC l m") 'lsp-ui-imenu)
-    (define-key evil-normal-state-map (kbd "SPC l f") 'lsp-execute-code-action)
-    (define-key evil-normal-state-map (kbd "SPC l s") 'lsp-ui-sideline-mode))
-  ;; general
-  (setq lsp-auto-configure nil) ;; auto-configure `lsp-ui' and `company-lsp'
-  (setq lsp-enable-indentation nil) ;; NOTE: indentation with lsp is super slow on emacs 26. try again no future versions
-  (setq lsp-prefer-flymake :none) ;; t: flymake | nil: lsp-ui | :none -> none of them (flycheck)
-  (setq lsp-session-file "~/.emacs.d/config/lsp-session-v1") ;; t: flymake | nil: lsp-ui | :none -> none of them (flycheck)
-  ;; angular language server
-  ;; this serves for editing templates only (both inline and external)
+  ;; ---
+  (setq lsp-prefer-flymake :none) ;; use flycheck
+  ;; no littering options
+  (setq lsp-session-file "~/.emacs.d/config/lsp-session-v1")
+  (setq lsp-server-install-dir (concat cache-dir "lsp"))
+  ;; angular templates language server
   (setq lsp-clients-angular-language-server-command
     '("node"
        "/home/tau/.nvm/versions/node/v10.9.0/lib/node_modules/@angular/language-server"
@@ -2021,9 +2076,17 @@ Version 2016-07-17"
        "--tsProbeLocations"
        "/home/tau/.nvm/versions/node/v10.9.0/lib/node_modules"
        "--stdio"))
-  ;; disable angular-ls for specific modes
-  ;; (add-to-list 'lsp-disabled-clients '(web-mode . angular-ls))
-  (setq lsp-server-install-dir (concat cache-dir "lsp"))
+  (with-eval-after-load 'evil
+    (define-key evil-normal-state-map (kbd "SPC l p f r") 'lsp-ui-peek-find-references)
+    (define-key evil-normal-state-map (kbd "SPC l p f d") 'lsp-ui-peek-find-definitions)
+    (define-key evil-normal-state-map (kbd "SPC l p f i") 'lsp-ui-peek-find-implementation)
+    (define-key evil-normal-state-map (kbd "SPC l g d")  'lsp-goto-type-definition)
+    (define-key evil-normal-state-map (kbd "SPC l d")  'lsp-find-definition)
+    (define-key evil-normal-state-map (kbd "SPC l g i")  'lsp-goto-implementation)
+    (define-key evil-normal-state-map (kbd "SPC l i") 'lsp-find-implementation)
+    (define-key evil-normal-state-map (kbd "SPC l m") 'lsp-ui-imenu)
+    (define-key evil-normal-state-map (kbd "SPC l f") 'lsp-execute-code-action)
+    (define-key evil-normal-state-map (kbd "SPC l s") 'lsp-ui-sideline-mode))
   )
 
 
@@ -2031,47 +2094,46 @@ Version 2016-07-17"
 ;;; lsp ui
 
 (use-package lsp-ui
-  :disabled
   :after lsp-mode
   :hook
   (lsp-mode . lsp-ui-mode)
+  ;; :bind (:map lsp-ui-mode-map
+  ;;         ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+  ;;         ([remap xref-find-references] . lsp-ui-peek-find-references)
+  ;;         ("C-c u" . lsp-ui-imenu)
+  ;;         ("M-i" . lsp-ui-doc-focus-frame))
   :config
-  (setq lsp-ui-flycheck-enable t) ;; disable to leave `tslint' as checker for ts files
-  (setq lsp-ui-flycheck-list-position 'right)
-
-  (setq lsp-ui-doc-enable nil)
-  (add-hook 'emacs-lisp-hook
-    (lambda ()
-      (setq lsp-ui-doc-enable t)))
-
+  ;; lsp-ui-doc
+  (setq lsp-ui-doc-header t)
+  (setq lsp-ui-doc-include-signature t)
+  (setq lsp-ui-doc-border (face-foreground 'default))
+  ;; (setq lsp-ui-flycheck-enable t) ;; disable to leave `tslint' as checker for ts files
+  ;; (setq lsp-ui-flycheck-list-position 'right)
+  ;; lsp-ui-sideline
   (setq lsp-ui-sideline-enable nil)
-  (setq lsp-ui-sideline-show-diagnostics t) ;; show diagnostics (flyckeck) messages in sideline
+  (setq lsp-ui-sideline-ignore-duplicate t)
+  (setq lsp-ui-sideline-show-code-actions nil)
+  (setq lsp-ui-sideline-show-diagnostics t)
   (setq lsp-ui-sideline-code-actions-prefix "")
-
-  ;; (setq lsp-ui-imenu-enable t)
-  ;; ;; (setq lsp-ui-imenu-kind-position 'top)
-
-  ;; (setq lsp-ui-peek-enable t)
-  ;; ;; (setq lsp-ui-peek-peek-height 20)
-  ;; ;; (setq lsp-ui-peek-list-width 40)
-
-  ;; ;; lsp-ui doc frame appearance
-  ;; (add-hook 'lsp-ui-doc-frame-hook
-  ;;   (lambda (frame _w)
-  ;;     (set-face-attribute 'default frame :font "Hack 11")))
-
-  ;; ;; Use lsp-ui-doc-webkit only in GUI
-  ;; (if (display-graphic-p)
-  ;;   (setq lsp-ui-doc-use-webkit t))
+  ;; Use lsp-ui-doc-webkit only in GUI
+  (if (display-graphic-p)
+    (setq lsp-ui-doc-use-webkit t))
+  ;; WORKAROUND Hide mode-line of the lsp-ui-imenu buffer
+  ;; https://github.com/emacs-lsp/lsp-ui/issues/243
+  (defadvice lsp-ui-imenu (after hide-lsp-ui-imenu-mode-line activate)
+    (setq mode-line-format nil))
+  ;; Waiting for https://github.com/emacs-lsp/lsp-ui/pull/390
+  (advice-add #'keyboard-quit :before #'lsp-ui-doc-hide)
   )
 
 ;; *********************************
 ;; company-lsp
 
-;; company-lsp is auto inserted into company backends
-
 (use-package company-lsp
-  :after company lsp)
+  :after company lsp
+  :config
+  (setq company-lsp-cache-candidates 'auto)
+  )
 
 
 ;; *********************************
@@ -2083,28 +2145,19 @@ Version 2016-07-17"
   (prog-mode . yas-minor-mode)
   (text-mode . yas-minor-mode)
   :bind
-  ;; ("<tab>" . yas-maybe-expand)
   ("C-<tab>" . yas-maybe-expand)
   (:map yas-minor-mode-map
-    ;; yas-maybe-expand only expands if there are candidates.
-    ;; if not, acts like binding is unbound and run whatever command is bound to that key normally
-    ;; ("<tab>" . yas-maybe-expand)
-    ;; Bind `C-c y' to `yas-expand' ONLY.
     ("C-c y" . yas-expand)
     ("C-SPC" . yas-expand)
     )
   :config
-  ;; add angular snippets folder (code taken from oficial docs page)
   (setq yas-snippet-dirs (append yas-snippet-dirs
                            '("~/dotfiles/emacs.d/snippets/")))
-  (setq yas-verbosity 1)                      ; No need to be so verbose
+  (setq yas-verbosity 1)
   (setq yas-wrap-around-region t)
   (yas-reload-all) ;; tell yasnippet about updates to yas-snippet-dirs
-  ;; disabled global mode in favor or hooks in prog and text modes only
-  ;; (yas-global-mode 1)
   )
 
-;;
 ;; Colection of snippets
 (use-package yasnippet-snippets)
 
@@ -2123,10 +2176,9 @@ Version 2016-07-17"
   :custom
   (flycheck-check-syntax-automatically '(save mode-enabled newline))
   (flycheck-idle-change-delay 1.5)
-  (flycheck-display-errors-delay 1)
+  (flycheck-display-errors-delay 0)
   (flycheck-indication-mode 'left-fringe)
   :config
-  ;; (global-flycheck-mode)
   (setq-default flycheck-temp-prefix ".flycheck")
   )
 
@@ -2135,6 +2187,7 @@ Version 2016-07-17"
 ;; ** flycheck posframe
 
 (use-package flycheck-posframe
+  :if (display-graphic-p)
   :after flycheck
   :hook
   (flycheck-mode . flycheck-posframe-mode)
@@ -2286,11 +2339,9 @@ Adapted from `describe-function-or-variable'."
   :init
   (setq ansi-color-for-comint-mode t)
   :config
-  (eval-when-compile
-    (setq compilation-always-kill t       ; kill compilation process before starting another
-      compilation-ask-about-save nil  ; save all buffers on `compile'
-      compilation-scroll-output 'first-error)
-    )
+  (setq compilation-always-kill t       ; kill compilation process before starting another
+    compilation-ask-about-save nil  ; save all buffers on `compile'
+    compilation-scroll-output 'first-error)
   )
 
 
@@ -2363,7 +2414,6 @@ Adapted from `describe-function-or-variable'."
 ;; aggressive indent
 
 (use-package aggressive-indent
-  :ensure nil
   :hook
   (emacs-lisp-mode . aggressive-indent-mode)
   (prog-mode . aggressive-indent-mode)
@@ -2471,7 +2521,8 @@ Adapted from `describe-function-or-variable'."
 ;; Centaur tabs
 
 (use-package centaur-tabs
-  :if (version<= "27.1" emacs-version)
+  :if (< emacs-major-version 26)
+  ;;:if (version<= "27.1" emacs-version)
   :hook
   (window-setup . centaur-tabs-mode)
   :bind
@@ -2510,10 +2561,8 @@ Adapted from `describe-function-or-variable'."
   ((change-major-mode after-revert ediff-prepare-buffer) . turn-on-solaire-mode)
   (minibuffer-setup . solaire-mode-in-minibuffer)
   :config
-  (eval-when-compile
-    (solaire-global-mode +1)
-    ;;(solaire-mode-swap-bg)
-    )
+  (solaire-global-mode +1)
+  ;;(solaire-mode-swap-bg)
   )
 
 
@@ -2651,12 +2700,6 @@ Adapted from `describe-function-or-variable'."
   :mode
   ("\\.css\\'" . css-mode)
   ("\\.rasi\\'" . css-mode) ;; support for rofi new config format
-  :preface
-  :hook
-  (css-mode . emmet-mode)
-  (css-mode . editorconfig-mode)
-  ;; :init
-  ;; (setq css-indent-offset 2)
   )
 
 
@@ -2692,6 +2735,7 @@ Adapted from `describe-function-or-variable'."
   (web-mode . editorconfig-mode)
   (css-mode . editorconfig-mode)
   (scss-mode . editorconfig-mode)
+  (go-mode . editorconfig-mode)
   )
 
 
@@ -2851,19 +2895,18 @@ Adapted from `describe-function-or-variable'."
   (setq evil-magit-state 'normal)
   (setq evil-magit-use-y-for-yank nil)
   :config
-  (eval-when-compile
-    (evil-magit-init)
-    (evil-define-key evil-magit-state magit-mode-map "<tab>" 'magit-section-toggle)
-    (evil-define-key evil-magit-state magit-mode-map "l" 'magit-log-popup)
-    (evil-define-key evil-magit-state magit-mode-map "j" 'evil-next-visual-line)
-    (evil-define-key evil-magit-state magit-mode-map "k" 'evil-previous-visual-line)
-    ;; (evil-define-key evil-magit-state magit-diff-map "k" 'evil-previous-visual-line)
-    (evil-define-key evil-magit-state magit-staged-section-map "K" 'magit-discard)
-    (evil-define-key evil-magit-state magit-unstaged-section-map "K" 'magit-discard)
-    (evil-define-key evil-magit-state magit-branch-section-map "K" 'magit-branch-delete)
-    (evil-define-key evil-magit-state magit-remote-section-map "K" 'magit-remote-remove)
-    (evil-define-key evil-magit-state magit-stash-section-map "K" 'magit-stash-drop)
-    (evil-define-key evil-magit-state magit-stashes-section-map "K" 'magit-stash-clear))
+  (evil-magit-init)
+  (evil-define-key evil-magit-state magit-mode-map "<tab>" 'magit-section-toggle)
+  (evil-define-key evil-magit-state magit-mode-map "l" 'magit-log-popup)
+  (evil-define-key evil-magit-state magit-mode-map "j" 'evil-next-visual-line)
+  (evil-define-key evil-magit-state magit-mode-map "k" 'evil-previous-visual-line)
+  ;; (evil-define-key evil-magit-state magit-diff-map "k" 'evil-previous-visual-line)
+  (evil-define-key evil-magit-state magit-staged-section-map "K" 'magit-discard)
+  (evil-define-key evil-magit-state magit-unstaged-section-map "K" 'magit-discard)
+  (evil-define-key evil-magit-state magit-branch-section-map "K" 'magit-branch-delete)
+  (evil-define-key evil-magit-state magit-remote-section-map "K" 'magit-remote-remove)
+  (evil-define-key evil-magit-state magit-stash-section-map "K" 'magit-stash-drop)
+  (evil-define-key evil-magit-state magit-stashes-section-map "K" 'magit-stash-clear)
   )
 
 
@@ -2919,30 +2962,27 @@ Adapted from `describe-function-or-variable'."
   (dired-mode . diff-hl-mode)
   (magit-post-refresh . diff-hl-magit-post-refresh)
   :config
-  (eval-when-compile
-    (global-diff-hl-mode)
-    (diff-hl-flydiff-mode) ;; highlighting changes on the fly
-    ;; (diff-hl-margin-mode) ;; use the margin instead of the fringe.
-    ;; Set fringe style
-    (setq-default fringes-outside-margins t)
+  ;;(diff-hl-flydiff-mode) ;; highlighting changes on the fly
+  ;; (diff-hl-margin-mode) ;; use the margin instead of the fringe.
+  ;; Set fringe style
+  (setq-default fringes-outside-margins t)
 
-    (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
+  (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
 
-    (unless (display-graphic-p)
-      (setq diff-hl-margin-symbols-alist
-        '((insert . " ") (delete . " ") (change . " ")
-           (unknown . " ") (ignored . " ")))
-      ;; Fall back to the display margin since the fringe is unavailable in tty
-      (diff-hl-margin-mode 1)
-      ;; Avoid restoring `diff-hl-margin-mode'
-      (with-eval-after-load 'desktop
-        (add-to-list 'desktop-minor-mode-table
-          '(diff-hl-margin-mode nil))))
+  (unless (display-graphic-p)
+    (setq diff-hl-margin-symbols-alist
+      '((insert . " ") (delete . " ") (change . " ")
+         (unknown . " ") (ignored . " ")))
+    ;; Fall back to the display margin since the fringe is unavailable in tty
+    (diff-hl-margin-mode 1)
+    ;; Avoid restoring `diff-hl-margin-mode'
+    (with-eval-after-load 'desktop
+      (add-to-list 'desktop-minor-mode-table
+        '(diff-hl-margin-mode nil))))
 
-    ;; Integration with magit
-    (with-eval-after-load 'magit
-      (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
-    )
+  ;; Integration with magit
+  (with-eval-after-load 'magit
+    (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
   )
 
 ;; Mode for .gitignore files.
