@@ -29,6 +29,7 @@
   )
 
 
+
 ;;****************************************************************
 ;;
 ;; Garbage Collection GC Settings
@@ -985,16 +986,19 @@ all hooks after it are ignored.")
   ;; ------------------------------------------
   ;;
   ;;; RECOVER SOME USEFUL EMACS NATIVE COMMANDS
-  (define-key evil-insert-state-map (kbd "C-y") 'yank)
+  (define-key evil-insert-state-map (kbd "C-p") 'previous-line)
+  (define-key evil-insert-state-map (kbd "C-n") 'next-line)
   (define-key evil-insert-state-map (kbd "C-a") 'beginning-of-line)
   (define-key evil-insert-state-map (kbd "C-e") 'end-of-line)
-  (define-key evil-normal-state-map (kbd "C-y") 'yank)
   (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
+  (define-key evil-insert-state-map (kbd "M-w") 'kill-ring-save)
   (define-key evil-insert-state-map (kbd "C-d") 'delete-char)
+  (define-key evil-normal-state-map (kbd "C-y") 'yank)
+
   ;; native find definition
-  (global-set-key (kbd "M-.") 'xref-find-definitions)
+  ;; (global-set-key (kbd "M-.") 'xref-find-definitions)
   ;; somehow global-set-key doenst work for normal mode for this binding, so i manually set it
-  (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
+  ;; (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
 
   (global-set-key (kbd "C-S-H") 'evil-window-left)
   (global-set-key (kbd "C-S-L") 'evil-window-right)
@@ -1137,8 +1141,8 @@ all hooks after it are ignored.")
   ;; (setq search-default-mode #'char-fold-to-regexp)
   (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
 
-  ;; remove the regex anchor ^ from `counsel-M-x' to match any substring, not only the ones that begin with the input
-  (setq ivy-initial-inputs-alist nil)
+  ;; ;; remove the regex anchor ^ from `counsel-M-x' to match any substring, not only the ones that begin with the input
+  ;; (setq ivy-initial-inputs-alist nil)
 
   (with-eval-after-load 'evil
     (define-key evil-normal-state-map (kbd "SPC b") 'counsel-switch-buffer)
@@ -1158,12 +1162,13 @@ all hooks after it are ignored.")
 ;;; Counsel
 
 (use-package counsel
+  :demand t
   :after ivy
   :diminish counsel-mode
   :hook
   (ivy-mode . counsel-mode)
   :config
-  (with-eval-after-load 'ivy
+  (eval-when-compile
     (counsel-mode))
   )
 
@@ -1172,7 +1177,7 @@ all hooks after it are ignored.")
 (use-package counsel-projectile
   :after ivy counsel projectile
   :config
-  (with-eval-after-load 'counsel
+  (eval-when-compile
     (counsel-projectile-mode 1))
   )
 
@@ -1281,8 +1286,6 @@ all hooks after it are ignored.")
   (ivy-posframe ((t (:background "#202020"))))
   (ivy-posframe-border ((t (:background "#9370DB"))))
   (ivy-posframe-cursor ((t (:background "#00ff00"))))
-  :hook
-  (ivy-mode . ivy-posframe-mode)
   :config
   (setq ivy-posframe-parameters '((internal-border-width . 1)))
   (setq ivy-posframe-width 130)
@@ -1303,7 +1306,7 @@ all hooks after it are ignored.")
                                      (t      . 20)
                                      ))
   :config
-  (with-eval-after-load 'ivy
+  (eval-when-compile
     (ivy-posframe-mode))
   )
 
@@ -1339,7 +1342,8 @@ all hooks after it are ignored.")
        counsel-projectile-find-file
        counsel-projectile-find-dir))
   :config
-  (all-the-icons-ivy-setup)
+  (eval-when-compile
+    (all-the-icons-ivy-setup))
   )
 
 ;; *********************************
@@ -1376,7 +1380,6 @@ all hooks after it are ignored.")
 ;; better jumper (using to see if its good, doom-emacs uses it)
 
 (use-package better-jumper
-  :disabled
   :preface
   ;; REVIEW Suppress byte-compiler warning spawning a *Compile-Log* buffer at
   ;; startup. This can be removed once gilbertw1/better-jumper#2 is merged.
@@ -1896,6 +1899,7 @@ Version 2016-07-17"
 ;;;  Projectile
 
 (use-package projectile
+  :demand t
   :diminish projectile-mode
   :bind
   (:map projectile-mode-map
@@ -2009,13 +2013,6 @@ Version 2016-07-17"
           ((featurep sym) 'ElispFeature)
           ((facep sym)    'ElispFace)))))
 
-  (defadvice! +company-remove-scrollbar-a (orig-fn &rest args)
-    "This disables the company-box scrollbar, because:
-https://github.com/sebastiencs/company-box/issues/44"
-    :around #'company-box--update-scrollbar
-    (cl-letf (((symbol-function #'display-buffer-in-side-window)
-                (symbol-function #'ignore)))
-      (apply orig-fn args)))
   )
 
 ;; *********************************
@@ -2570,6 +2567,7 @@ Adapted from `describe-function-or-variable'."
 ;; all-the-icons
 
 (use-package all-the-icons
+  :demand t ;; this is needed by all packages who use all the icons
   :if window-system
   :commands
   (all-the-icons-octicon
@@ -2700,6 +2698,8 @@ Adapted from `describe-function-or-variable'."
   :mode
   ("\\.css\\'" . css-mode)
   ("\\.rasi\\'" . css-mode) ;; support for rofi new config format
+  :config
+  (setq css-indent-offset 2)
   )
 
 
