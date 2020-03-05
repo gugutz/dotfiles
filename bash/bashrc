@@ -179,6 +179,7 @@ ex ()
 #   exec tmux
 # fi
 
+
 ################################################
 # asdf
 
@@ -262,8 +263,6 @@ cdnvm(){
 # tmuxinator
 [ -s "$HOME/.bin/tmuxinator.bash" ] && . $HOME/.bin/tmuxinator.bash
 
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
-
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
@@ -277,3 +276,116 @@ set -o emacs
 bind '"\ee": vi-editing-mode'
 set -o vi
 bind '"\ee": emacs-editing-mode'
+
+
+
+################################################
+# fzf
+# Source for most functions and bindings:  http://owen.cymru/fzf-ripgrep-navigate-with-bash-faster-than-ever-before/
+
+# Bindings:
+# Ctrl + r - search through bash history with fzf
+# Ctrl + p - edit a file in vim from fzf
+# mv dir/** - expand a directory with (**) and select from fzf
+# Alt + c - change directory from fzf - see the update at the bottom for faster search with bfs.
+# Ctrl + t - insert file from fzf into command
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2> /dev/null'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+# export FZF_ALT_C_COMMAND="bfs -type d -nohidden"
+export FZF_ALT_C_COMMAND="cd ~/; bfs -type d -nohidden | sed s/^\./~/"
+
+export FZF_DEFAULT_OPTS='--bind J:down,K:up --reverse --ansi --multi'
+
+bind -x '"\C-p": vim $(fzf);'
+bind -m vi-insert '"\C-x\C-e": edit-and-execute-command'
+
+# calls the fzf_log functions bellow
+alias log="fzf_log"
+
+
+sf() {
+  if [ "$#" -lt 1 ]; then echo "Supply string to search for!"; return 1; fi
+  printf -v search "%q" "$*"
+  include="tsx,vim,ts,yml,yaml,js,json,php,md,styl,pug,jade,html,config,py,cpp,c,go,hs,rb,conf,fa,lst,graphql"
+  exclude=".config,.git,node_modules,vendor,build/,yarn.lock,*.sty,*.bst,*.coffee,dist"
+  rg_command='rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --color "always" -g "*.{'$include'}" -g "!{'$exclude'}/*"'
+  files=`eval $rg_command $search | fzf --ansi --multi --reverse | awk -F ':' '{print $1":"$2":"$3}'`
+  [[ -n "$files" ]] && ${EDITOR:-vim} $files
+}
+
+sfu() {
+  if [ "$#" -lt 1 ]; then echo "Supply string to search for!"; return 1; fi
+  printf -v search "%q" "$*"
+  include="ts,yml,yaml,js,json,php,md,styl,pug,jade,html,config,py,cpp,c,go,hs,rb,conf,fa,lst"
+  exclude=".config,.git,node_modules,vendor,build,yarn.lock,*.sty,*.bst,*.coffee,dist"
+  rg_command='rg -m1 --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --color "always" -g "*.{'$include'}" -g "!{'$exclude'}/*"'
+  files=`eval $rg_command $search | fzf --ansi --multi --reverse | awk -F ':' '{print $1":"$2":"$3}'`
+  [[ -n "$files" ]] && ${EDITOR:-vim} $files
+}
+
+
+fc() {
+  hash=$(git log --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |  fzf | awk '{print $1}')
+  git checkout $hash
+}
+
+gc() {
+  hash=$(git log --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |  fzf | awk '{print $1}')
+  gopen $hash
+}
+
+fzf_log() {
+  hash=$(git log --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |  fzf | awk '{print $1}')
+  echo $hash | xclip
+  git showtool $hash
+}
+
+tm() {
+  [[ -n "$TMUX" ]] && change="switch-client" || change="attach-session"
+  if [ $1 ]; then
+    tmux $change -t "$1" 2>/dev/null || (tmux new-session -d -s $1 && tmux $change -t "$1"); return
+  fi
+  session=$(tmux list-sessions -F "#{session_name}" 2>/dev/null | fzf --exit-0) &&  tmux $change -t "$session" || echo "No sessions found."
+}
+
+branch() {
+  local branches branch
+  branches=$(git for-each-ref --count=30 --sort=-committerdate refs/heads/ --format="%(refname:short)") &&
+  branch=$(echo "$branches" |
+           fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
+  git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
+}
+
+fvim() {
+  local IFS=$'\n'
+  local files=($(fzf-tmux --query="$1" --multi --select-1 --exit-0))
+  [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
+}
+
+c() {
+  local cols sep google_history open
+  cols=$(( COLUMNS / 3 ))
+  sep='{::}'
+
+  if [ "$(uname)" = "Darwin" ]; then
+    google_history="$HOME/Library/Application Support/Google/Chrome/Default/History"
+    open=open
+  else
+    google_history="$HOME/.config/google-chrome/Profile 1/History"
+    open=xdg-open
+  fi
+  cp -f "$google_history" /tmp/h
+  sqlite3 -separator $sep /tmp/h \
+    "select substr(title, 1, $cols), url
+     from urls order by last_visit_time desc" |
+  awk -F $sep '{printf "%-'$cols's  \x1b[36m%s\x1b[m\n", $1, $2}' |
+  fzf --ansi --multi | sed 's#.*\(https*://\)#\1#' | xargs $open > /dev/null 2> /dev/null
+}
+
+gopen() {
+    project=$(git config --local remote.origin.url | sed s/git@github.com\:// | sed s/\.git//)
+    url="http://github.com/$project/commit/$1"
+    xdg-open $url
+}

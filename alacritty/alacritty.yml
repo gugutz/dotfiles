@@ -99,53 +99,32 @@ scrolling:
 # change the `it` value in terminfo when altering this setting.
 #tabspaces: 8
 
-# Font configuration
-#font:
-  # Normal (roman) font face
-  #normal:
-    # Font family
-    #
-    # Default:
-    #   - (macOS) Menlo
-    #   - (Linux/BSD) monospace
-    #   - (Windows) Consolas
-    #family: monospace
+# Font configuration (changes require restart)
+font:
+  # The normal (roman) font face to use.
+  normal:
+    family: DejaVuSansMono NF
+    style: Regular
 
-    # The `style` can be specified to pick a specific face.
-    #style: Regular
+  # The bold font face
+  bold:
+    family: DejaVuSansMono NF
+    style: Bold
 
-  # Bold font face
-  #bold:
-    # Font family
-    #
-    # If the bold family is not specified, it will fall back to the
-    # value specified for the normal font.
-    #family: monospace
-
-    # The `style` can be specified to pick a specific face.
-    #style: Bold
-
-  # Italic font face
-  #italic:
-    # Font family
-    #
-    # If the italic family is not specified, it will fall back to the
-    # value specified for the normal font.
-    #family: monospace
-
-    # The `style` can be specified to pick a specific face.
-    #style: Italic
+  # The italic font face
+  italic:
+    family: DejaVuSansMono NF
+    style: Italic
 
   # Bold italic font face
-  #bold_italic:
-    # Font family
+  bold_italic:
+    family: DejaVuSansMono NF
+    #family: monospace
     #
     # If the bold italic family is not specified, it will fall back to the
     # value specified for the normal font.
-    #family: monospace
+    style: Bold Italic
 
-    # The `style` can be specified to pick a specific face.
-    #style: Bold Italic
 
   # Point size
   #size: 11.0

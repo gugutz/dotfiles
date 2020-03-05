@@ -995,10 +995,10 @@ all hooks after it are ignored.")
   (define-key evil-insert-state-map (kbd "C-d") 'delete-char)
   (define-key evil-normal-state-map (kbd "C-y") 'yank)
 
-  ;; native find definition
-  ;; (global-set-key (kbd "M-.") 'xref-find-definitions)
+  ;; remap native find definition (evil overrides it with some useless function)
+  (global-set-key (kbd "M-.") 'xref-find-definitions)
   ;; somehow global-set-key doenst work for normal mode for this binding, so i manually set it
-  ;; (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
+  (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
 
   (global-set-key (kbd "C-S-H") 'evil-window-left)
   (global-set-key (kbd "C-S-L") 'evil-window-right)
@@ -1208,8 +1208,9 @@ all hooks after it are ignored.")
 ;; ivy-rich
 
 (use-package ivy-rich
+  :demand t
   :hook
-  (counsel-mode . ivy-rich-mode)
+  (ivy-mode . ivy-rich-mode)
   :preface
   ;; use all-the-icons for `ivy-switch-buffer'
   (defun ivy-rich-switch-buffer-icon (candidate)
@@ -1226,7 +1227,7 @@ all hooks after it are ignored.")
   (setq ivy-rich-display-transformers-list
     '(ivy-switch-buffer
        (:columns
-         ((ivy-rich-switch-buffer-icon (:width 2))
+         ((ivy-rich-switch-buffer-icon (:width 3))
            (ivy-rich-candidate (:width 30))
            (ivy-rich-switch-buffer-size (:width 7))
            (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
@@ -1243,6 +1244,10 @@ all hooks after it are ignored.")
        (:columns
          ((counsel-M-x-transformer (:width 35))
            (ivy-rich-counsel-function-docstring (:width 34 :face font-lock-doc-face))))
+       counsel-projectile-switch-project
+       (:columns
+         ((ivy-rich-counsel-projectile-switch-project-project-name (:width 20 :face success))
+           (ivy-rich-candidate)))
        counsel-describe-function
        (:columns
          ((counsel-describe-function-transformer (:width 35))
@@ -1271,7 +1276,9 @@ all hooks after it are ignored.")
        )
     )
   ;; ivy-rich-mode needs to be called after `ivy-rich--display-transformers-list' is changed
-  (ivy-rich-mode 1)
+  :config
+  (with-eval-after-load 'ivy
+    (ivy-rich-mode 1))
   )
 
 ;; *********************************
@@ -1280,34 +1287,48 @@ all hooks after it are ignored.")
 ;; Requires: Emacs >= 26
 
 (use-package ivy-posframe
-  :after ivy
+  :demand t
+  :after ivy counsel
   :diminish ivy-posframe-mode
   :custom-face
   (ivy-posframe ((t (:background "#202020"))))
   (ivy-posframe-border ((t (:background "#9370DB"))))
   (ivy-posframe-cursor ((t (:background "#00ff00"))))
   :config
-  (setq ivy-posframe-parameters '((internal-border-width . 1)))
-  (setq ivy-posframe-width 130)
-  (setq ivy-posframe-parameters '((alpha . 85)))
-  ;; define the position of the posframe per function
-  (setq ivy-posframe-display-functions-alist
-    '(
-       (counsel-M-x     . nil)
-       (swiper          . nil)
-       (complete-symbol . ivy-posframe-display-at-point)
-       (t               . ivy-posframe-display-at-frame-center)
-       ))
-  ;; custom define height of post frame per function
-  (setq ivy-posframe-height-alist '(
-                                     (find-file . 15)
-                                     (counsel-ag . 15)
-                                     (counsel-projectile-ag . 30)
-                                     (t      . 20)
-                                     ))
-  :config
   (eval-when-compile
-    (ivy-posframe-mode))
+    (setq ivy-posframe-width 130)
+    (setq ivy-posframe-internal-border-width 3)
+    (setq ivy-posframe-parameters
+      '(
+         (left-fringe . 8)
+         (right-fringe . 8)
+         (internal-border-width . 1)
+         (alpha . 85)
+         ))
+    ;; define the position of the posframe per function
+    (setq ivy-posframe-display-functions-alist
+      '(
+         (counsel-M-x     . nil)
+         (swiper          . nil)
+         (complete-symbol . ivy-posframe-display-at-point)
+         (t               . ivy-posframe-display-at-frame-center)
+         ))
+    ;; custom define height of post frame per function
+    (setq ivy-posframe-height-alist
+      '(
+         (find-file . 15)
+         (counsel-find-file . 15)
+         (counsel-projectile-find-file . 15)
+         (switch-buffer . 15)
+         (counsel-switch-buffer . 15)
+         (counsel-ag . 15)
+         (counsel-projectile-ag . 30)
+         (counsel-rg . 15)
+         (counsel-projectile-rg . 30)
+         (t . 20)
+         ))
+    (ivy-posframe-mode 1)
+    )
   )
 
 ;; disabled to see if ill miss it
@@ -1324,8 +1345,8 @@ all hooks after it are ignored.")
 ;; ** ivy-prescient
 (use-package ivy-prescient
   :after ivy
-  :config
-  (ivy-prescient-mode)
+  :hook
+  (ivy-mode . ivy-prescient-mode)
   )
 
 ;; *********************************
@@ -1969,52 +1990,86 @@ Version 2016-07-17"
   :diminish
   :hook
   (company-mode . company-box-mode)
+  :custom
+  (company-box-backends-colors nil)
+  (company-box-show-single-candidate t)
+  (company-box-max-candidates 50)
+  (company-box-doc-delay 0.3)
   :config
-  (setq company-box-show-single-candidate t
-    company-box-backends-colors nil
-    company-box-max-candidates 50
-    company-box-icons-alist 'company-box-icons-all-the-icons)
-  company-box-icons-functions
-  (cons #'+company-box-icons--elisp-fn
-    (delq 'company-box-icons--elisp
-      company-box-icons-functions))
-  (setq company-box-icons-lsp
-    `(( 1  . ,(all-the-icons-faicon "file-text-o" :v-adjust -0.0575))     ; Text
-       ( 2  . ,(all-the-icons-faicon "cube" :v-adjust -0.0575))            ; Method
-       ( 3  . ,(all-the-icons-faicon "cube" :v-adjust -0.0575))            ; Function
-       ( 4  . ,(all-the-icons-faicon "cube" :v-adjust -0.0575))            ; Constructor
-       ( 5  . ,(all-the-icons-faicon "tag" :v-adjust -0.0575))             ; Field
-       ( 6  . ,(all-the-icons-faicon "tag" :v-adjust -0.0575))             ; Variable
-       ( 7  . ,(all-the-icons-faicon "cog" :v-adjust -0.0575))             ; Class
-       ( 8  . ,(all-the-icons-faicon "cogs" :v-adjust -0.0575))            ; Interface
-       ( 9  . ,(all-the-icons-alltheicon "less"))                          ; Module
-       (10  . ,(all-the-icons-faicon "wrench" :v-adjust -0.0575))          ; Property
-       (11  . ,(all-the-icons-faicon "tag" :v-adjust -0.0575))             ; Unit
-       (12  . ,(all-the-icons-faicon "tag" :v-adjust -0.0575))             ; Value
-       (13  . ,(all-the-icons-material "content_copy" :v-adjust -0.2))     ; Enum
-       (14  . ,(all-the-icons-faicon "tag" :v-adjust -0.0575))             ; Keyword
-       (15  . ,(all-the-icons-material "content_paste" :v-adjust -0.2))    ; Snippet
-       (16  . ,(all-the-icons-material "palette" :v-adjust -0.2))          ; Color
-       (17  . ,(all-the-icons-faicon "file" :v-adjust -0.0575))            ; File
-       (18  . ,(all-the-icons-faicon "tag" :v-adjust -0.0575))             ; Reference
-       (19  . ,(all-the-icons-faicon "folder" :v-adjust -0.0575))          ; Folder
-       (20  . ,(all-the-icons-faicon "tag" :v-adjust -0.0575))             ; EnumMember
-       (21  . ,(all-the-icons-faicon "tag" :v-adjust -0.0575))             ; Constant
-       (22  . ,(all-the-icons-faicon "cog" :v-adjust -0.0575))             ; Struct
-       (23  . ,(all-the-icons-faicon "bolt" :v-adjust -0.0575))            ; Event
-       (24  . ,(all-the-icons-faicon "tag" :v-adjust -0.0575))             ; Operator
-       (25  . ,(all-the-icons-faicon "cog" :v-adjust -0.0575))             ; TypeParameter
-       ))
-  (defun +company-box-icons--elisp-fn (candidate)
+  ;; Support `company-common'
+  (defun my-company-box--make-line (candidate)
+    (-let* (((candidate annotation len-c len-a backend) candidate)
+             (color (company-box--get-color backend))
+             ((c-color a-color i-color s-color) (company-box--resolve-colors color))
+             (icon-string (and company-box--with-icons-p (company-box--add-icon candidate)))
+             (candidate-string (concat (propertize (or company-common "") 'face 'company-tooltip-common)
+                                 (substring (propertize candidate 'face 'company-box-candidate) (length company-common) nil)))
+             (align-string (when annotation
+                             (concat " " (and company-tooltip-align-annotations
+                                           (propertize " " 'display `(space :align-to (- right-fringe ,(or len-a 0) 1)))))))
+             (space company-box--space)
+             (icon-p company-box-enable-icon)
+             (annotation-string (and annotation (propertize annotation 'face 'company-box-annotation)))
+             (line (concat (unless (or (and (= space 2) icon-p) (= space 0))
+                             (propertize " " 'display `(space :width ,(if (or (= space 1) (not icon-p)) 1 0.75))))
+                     (company-box--apply-color icon-string i-color)
+                     (company-box--apply-color candidate-string c-color)
+                     align-string
+                     (company-box--apply-color annotation-string a-color)))
+             (len (length line)))
+      (add-text-properties 0 len (list 'company-box--len (+ len-c len-a)
+                                   'company-box--color s-color)
+        line)
+      line))
+  (advice-add #'company-box--make-line :override #'my-company-box--make-line)
+
+  ;; Prettify icons
+  (defun my-company-box-icons--elisp (candidate)
     (when (derived-mode-p 'emacs-lisp-mode)
       (let ((sym (intern candidate)))
-        (cond ((fboundp sym)  'ElispFunction)
-          ((boundp sym)   'ElispVariable)
-          ((featurep sym) 'ElispFeature)
-          ((facep sym)    'ElispFace)))))
+        (cond ((fboundp sym) 'Function)
+          ((featurep sym) 'Module)
+          ((facep sym) 'Color)
+          ((boundp sym) 'Variable)
+          ((symbolp sym) 'Text)
+          (t . nil)))))
+  (advice-add #'company-box-icons--elisp :override #'my-company-box-icons--elisp)
 
+  (when (and *sys/gui*
+          (require 'all-the-icons nil t))
+    (declare-function all-the-icons-faicon 'all-the-icons)
+    (declare-function all-the-icons-material 'all-the-icons)
+    (declare-function all-the-icons-octicon 'all-the-icons)
+    (setq company-box-icons-all-the-icons
+      `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.85 :v-adjust -0.2))
+         (Text . ,(all-the-icons-faicon "text-width" :height 0.8 :v-adjust -0.05))
+         (Method . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+         (Function . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+         (Constructor . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
+         (Field . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
+         (Variable . ,(all-the-icons-octicon "tag" :height 0.8 :v-adjust 0 :face 'all-the-icons-lblue))
+         (Class . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+         (Interface . ,(all-the-icons-material "share" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+         (Module . ,(all-the-icons-material "view_module" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+         (Property . ,(all-the-icons-faicon "wrench" :height 0.8 :v-adjust -0.05))
+         (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.85 :v-adjust -0.2))
+         (Value . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+         (Enum . ,(all-the-icons-material "storage" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+         (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.85 :v-adjust -0.2))
+         (Snippet . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2))
+         (Color . ,(all-the-icons-material "palette" :height 0.85 :v-adjust -0.2))
+         (File . ,(all-the-icons-faicon "file-o" :height 0.85 :v-adjust -0.05))
+         (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.85 :v-adjust -0.2))
+         (Folder . ,(all-the-icons-faicon "folder-open" :height 0.85 :v-adjust -0.05))
+         (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-lblue))
+         (Constant . ,(all-the-icons-faicon "square-o" :height 0.85 :v-adjust -0.05))
+         (Struct . ,(all-the-icons-material "settings_input_component" :height 0.85 :v-adjust -0.2 :face 'all-the-icons-orange))
+         (Event . ,(all-the-icons-faicon "bolt" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-orange))
+         (Operator . ,(all-the-icons-material "control_point" :height 0.85 :v-adjust -0.2))
+         (TypeParameter . ,(all-the-icons-faicon "arrows" :height 0.8 :v-adjust -0.05))
+         (Template . ,(all-the-icons-material "format_align_center" :height 0.85 :v-adjust -0.2)))
+      company-box-icons-alist 'company-box-icons-all-the-icons))
   )
-
 ;; *********************************
 ;; company quickHelp
 
@@ -2103,6 +2158,7 @@ Version 2016-07-17"
   ;; lsp-ui-doc
   (setq lsp-ui-doc-header t)
   (setq lsp-ui-doc-include-signature t)
+  (setq lsp-ui-doc-delay 1.5)
   (setq lsp-ui-doc-border (face-foreground 'default))
   ;; (setq lsp-ui-flycheck-enable t) ;; disable to leave `tslint' as checker for ts files
   ;; (setq lsp-ui-flycheck-list-position 'right)
@@ -2263,7 +2319,7 @@ Version 2016-07-17"
   ;; general improvements to which-key readability
   (set-face-attribute 'which-key-local-map-description-face nil :weight 'bold)
   (which-key-setup-side-window-bottom)
-  (add-hook 'which-key-init-buffer-hook (lambda () (line-spacing 3)))
+  (add-hook 'which-key-init-buffer-hook (lambda () (setq line-spacing 3)))
   (which-key-mode +1)
   )
 

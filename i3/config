@@ -68,7 +68,10 @@ set $term_wm_prop instance
 bindsym $mod+Return exec --no-startup-id $terminal
 
 # emergency binding to i3-sensible-terminal in case of new setup without alacritty
-bindsym $mod+Shift+Return exec --no-startup-id i3-sensible-terminal
+bindsym $mod+Shift+Return exec --no-startup-id st
+
+# emergency binding to i3-sensible-terminal in case of new setup without alacritty
+bindsym $mod+Control+Return exec --no-startup-id i3-sensible-terminal
 
 
 # Terminal scratchpad
@@ -649,6 +652,16 @@ bindsym $mod+Shift+F6 exec --no-startup-id $terminal $term_wm_set_prop_flag spot
 ###################################################################
 
 #------------------------------------------------
+# fzf
+
+bindsym $mod+Shift+f exec ~/dotfiles/fzf/fzf-as-dmenu.sh
+for_window [instance="fzfmenu"] floating enable
+
+# Fuzzy search desktop entries and launch the appropriate application.
+# Display in a floating window. Add this to your i3 config file (this example uses termite, but any terminal emulator that allows setting the window title can be used):
+bindsym $mod+Shift+Control+d exec --no-startup-id st -t fzf-menu -e i3-dmenu-desktop --dmenu=fzf
+for_window [title="fzf-menu"] floating enable
+#------------------------------------------------
 # ROFI TASK SWITCHER SETTINGS
 
 # rofi window switcher
@@ -893,7 +906,7 @@ bindsym $mod+r mode "resize"
 # Open specific applications in floating mode
 ###################################################################
 
-bindsym $mod+Control+Shift f exec $terminal -e ~/dotfiles/i3/scripts/find-window-criteria.sh
+# bindsym $mod+Control+Shift f exec $terminal -e ~/dotfiles/i3/scripts/find-window-criteria.sh
 
 for_window [class="Wine"] floating enable
 for_window [class="Peek"] floating enable

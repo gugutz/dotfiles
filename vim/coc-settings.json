@@ -1,73 +1,75 @@
 {
-  // Trigger mode
-  // options: always (default), trigger and none)
-  "suggest.autoTrigger": "always",
-  // To support completion trigger on insert enter, add
-  "suggest.triggerAfterInsertEnter": true,
-  // To change the completion timeout, use:
-  "suggest.timeout": 500,
-  // To make the completion automatically select the first completed item, use:
-  "suggest.noselect": false,
-  // To make the completion trigger with two input characters, use:
-  "suggest.minTriggerInputLength": 2,
-  // To enable the commit characters feature, use:
-  "suggest.acceptSuggestionOnCommitCharacter": true,
-  // To change the indicator of snippet items, use:
-  "suggest.snippetIndicator": "►",
-  "suggest.echodocSupport": true,
-  // coc settings
-  "coc.preferences.extensionUpdateCheck": "never",
-  // codelens-plugin
-  "diagnostic.virtualText": true,
-  "codeLens.enable": true,
-  // typescript
-  "coc.preferences.formatOnSaveFiletypes": ["typescript", "typescript.tsx", "json", "javascript"],
-  "typescript.implementationsCodeLens.enable": false,
-  "typescript.referencesCodeLens.enable": false,
-  "eslint.run": "onSave",
-  "eslint.enable": false,
-  // tslint
-  "eslint.packageManager": "yarn",
-  "tslint.packageManager": "yarn",
-  "tslint.autoFixOnSave": true,
-  "tslint.jsEnable": false,
-  // prettier
-  "prettier.semi": false,
-  "prettier.singleQuote": true,
-  "prettier.tabWidth": 4,
-  "prettier.disableLanguages": [
-  ],
-  "prettier.tslintIntegration": false,
-  "prettier.eslintIntegration": true,
-  // eslint
-  "eslint.autoFixOnSave": true,
-  // git
-  "git.addGBlameToVirtualText": false, // git blaming like vscode gitlens
-  "git.addedSign.hlGroup": "GitGutterAdd",
-  "git.changedSign.hlGroup": "GitGutterChange",
-  "git.removedSign.hlGroup": "GitGutterDelete",
-  "git.topRemovedSign.hlGroup": "GitGutterDelete",
-  "git.changeRemovedSign.hlGroup": "GitGutterChangeDelete",
-  // ale related
-  "diagnostic.displayByAle": true,
-  // java
-  "java.errors.incompleteClasspath.severity": "ignore",
-  "java.format.settings.url": "/home/seraphybr-fun/.config/coc/extensions/node_modules/redhat.java/eclipse-formatter.xml",
-  "java.trace.server": "verbose",
+	// Trigger mode
+	// options: always (default), trigger and none)
+	"suggest.autoTrigger": "always",
+	// To support completion trigger on insert enter, add
+	"suggest.triggerAfterInsertEnter": true,
+	// To change the completion timeout, use:
+	"suggest.timeout": 500,
+	// To make the completion automatically select the first completed item, use:
+	"suggest.noselect": false,
+	// To make the completion trigger with two input characters, use:
+	"suggest.minTriggerInputLength": 1,
+	// To enable the commit characters feature, use:
+	"suggest.acceptSuggestionOnCommitCharacter": true,
+	// To change the indicator of snippet items, use:
+	"suggest.snippetIndicator": "►",
+	"suggest.echodocSupport": true,
+	"suggest.floatEnable": true,
+	// coc settings
+	"coc.preferences.extensionUpdateCheck": "never",
+	// codelens-plugin
+	"diagnostic.enable": true,
+	"diagnostic.level": "hint",
+	"diagnostic.virtualText": true,
+	"diagnostic.refreshOnInsertMode": true,
+	"diagnostic.messageTarget": "float",
+	"diagnostic.displayByAle": true,
+	"codeLens.enable": true,
+	// typescript
+	"coc.preferences.formatOnSaveFiletypes": ["typescript", "typescript.tsx", "json", "javascript"],
+	"typescript.implementationsCodeLens.enable": false,
+	"typescript.referencesCodeLens.enable": false,
+	"eslint.run": "onSave",
+	"eslint.enable": false,
+	// tslint
+	"eslint.packageManager": "yarn",
+	"tslint.packageManager": "yarn",
+	"tslint.autoFixOnSave": true,
+	"tslint.jsEnable": false,
+	// prettier
+	"prettier.semi": false,
+	"prettier.singleQuote": true,
+	"prettier.tabWidth": 4,
+	"prettier.disableLanguages": [],
+	"prettier.tslintIntegration": false,
+	"prettier.eslintIntegration": true,
+	// eslint
+	"eslint.autoFixOnSave": true,
+	// git
+	"git.addGBlameToVirtualText": false, // git blaming like vscode gitlens
+	"git.addedSign.hlGroup": "GitGutterAdd",
+	"git.changedSign.hlGroup": "GitGutterChange",
+	"git.removedSign.hlGroup": "GitGutterDelete",
+	"git.topRemovedSign.hlGroup": "GitGutterDelete",
+	"git.changeRemovedSign.hlGroup": "GitGutterChangeDelete",
+	// java
+	"java.errors.incompleteClasspath.severity": "ignore",
+	"java.format.settings.url": "/home/seraphybr-fun/.config/coc/extensions/node_modules/redhat.java/eclipse-formatter.xml",
+	"java.trace.server": "verbose",
 
-  "diagnostic.messageTarget": "float",
-  "signature.target": "float",
-  // language servers
-  "languageserver": {
-    "ccls": {
-      "command": "ccls",
-      "filetypes": ["c", "cpp", "objc", "objcpp"],
-      "rootPatterns": [".ccls", "compile_commands.json", ".vim/", ".git/", ".hg/"],
-      "initializationOptions": {
-        "cache": {
-          "directory": "/tmp/ccls"
-        }
-      }
-    }
-  }
+	"signature.target": "float",
+	// language servers
+	"languageserver": {
+		"ccls": {
+			"command": "ccls",
+			"filetypes": ["c", "cpp", "objc", "objcpp"],
+			"rootPatterns": [".ccls", "compile_commands.json", ".vim/", ".git/", ".hg/"],
+			"initializationOptions": {
+				"cache": {
+					"directory": "/tmp/ccls"
+				}
+			}
+		}
+	}
 }
