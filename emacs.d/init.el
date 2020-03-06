@@ -115,9 +115,10 @@
 ;;
 ;;; BOOTSTRAP PACKAGE MANAGEMENT
 
+;; All these optimizations are now only made if EMACS 27 is not being used, since EMACS 27 brought a lot of startup speed improvements
 
-;; New emacs 27 'package-quickstart' feature
-;; package.el precomputes a big autoloads file so that activation of packages can be done much faster. It also causes variables like package-user-dir and package-load-list to be consulted when 'package-quickstart-refresh' is run rather than at startup so you don't need to set them in your early init file.
+;; Precomputes a big autoloads file so that activation of packages can be done much faster.
+;; It also causes variables like package-user-dir and package-load-list to be consulted when 'package-quickstart-refresh' is run rather than at startup so you don't need to set them in your early init file.
 
 (when EMACS27+
   (setq package-quickstart t))
@@ -126,27 +127,28 @@
 ;; We're going to set the =load-path= ourselves and avoid calling =(package-initilize)= (forperformance reasons) so we need to set =package--init-file-ensured= to true to tell =package.el= to not automatically call it on our behalf. Additionally we're setting =package-enable-at-startup= to nil so that packages will not automatically be loaded for us since =use-package= will be handling that.
 
 ;; in ~/.emacs.d/init.el (or ~/.emacs.d/early-init.el in Emacs 27)
-(eval-and-compile
-  (setq load-prefer-newer t
-    package-user-dir (concat user-emacs-directory "elpa/")
-    package-enable-at-startup nil
-    package--init-file-ensured t)
+(unless EMACS27+
+  (eval-and-compile
+    (setq load-prefer-newer t
+      package-user-dir (concat user-emacs-directory "elpa/")
+      package-enable-at-startup t
+      package--init-file-ensured nil)
 
-  (unless (file-directory-p package-user-dir)
-    (make-directory package-user-dir t)))
+    (unless (file-directory-p package-user-dir)
+      (make-directory package-user-dir t)))
+  )
 ;; -------------------------------------
 
 
-;; Manually Set Load Path
-;;
-;; We're going to set the load path ourselves so that we don't have to call =package-initialize= at
-;; runtime and incur a large performance hit. This load-path will actually be faster than the one
-;; created by =package-initialize= because it appends the elpa packages to the end of the load path.
-;; Otherwise any time a builtin package was required it would have to search all of third party paths
-;; first.
+;; Manually Set `load-path' so that we don't have to call `package-initialize' at runtime which is slow.
+;; This load-path will actually be faster than the one created by `package-initialize' because it appends the elpa packages to the end of the load path.
+;; Otherwise any time a builtin package was required it would have to search all of third party paths first.
+;; PS: emacs 27 does this with `package-quickstart' feature
 
-(eval-and-compile
-  (setq load-path (append load-path (directory-files package-user-dir t "^[^.]" t))))
+(unless EMACS27+
+  (eval-and-compile
+    (setq load-path (append load-path (directory-files package-user-dir t "^[^.]" t))))
+  )
 
 ;; -------------------------------------
 
@@ -156,11 +158,9 @@
 
 ;; Using `eval-when-compile' to perform all of the package initialization during compilation so that when byte compiled, all of this time consuming
 ;; code is skipped.
-;; This can be done because the result of byte compiling =use-package= statements results
-;; in the macro being fully expanded at which point =use-package= isn't actually required any longer.
+;; This can be done because the result of byte compiling `use-package' statements results in the macro being fully expanded at which point =use-package= isn't actually required any longer.
 
-;; Since the code is automatically compiled during runtime, if the configuration hasn't already been
-;; previously compiled manually then all of the package initialization will still take place at startup.
+;; Since the code is automatically compiled during runtime, if the configuration hasn't already been previously compiled manually then all of the package initialization will still take place at startup.
 
 (eval-when-compile
   (require 'package)
@@ -178,15 +178,17 @@
   (unless (package-installed-p 'use-package)
     (package-refresh-contents)
     (package-install 'use-package))
+
   ;; load use-package
   (require 'use-package)
-  (setq use-package-always-defer nil
-    use-package-verbose t
-    use-package-always-ensure t
-    use-package-enable-imenu-support t
-    use-package-minimum-reported-time 0
-    use-package-verbose t
-    use-package-compute-statistics t)
+  ;; only always defer if not emacs 27+
+  (unless EMACS27+
+    (setq use-package-always-defer t))
+  (setq use-package-always-ensure t)
+  (setq use-package-enable-imenu-support t)
+  (setq use-package-minimum-reported-time 0)
+  (setq use-package-verbose t)
+  (setq use-package-compute-statistics t)
   )
 
 
@@ -279,7 +281,8 @@
 (setq my-theme 'vscode-dark-plus)
 
 ;;  Load the theme
-(load-theme my-theme t)
+(eval-when-compile
+  (load-theme my-theme t))
 
 ;;****************************************************************
 ;;
@@ -954,7 +957,6 @@ all hooks after it are ignored.")
 ;;; Evil
 
 (use-package evil
-  :demand t
   :config
   (evil-mode 1)
   ;; change cursor color according to mode
@@ -1113,7 +1115,6 @@ all hooks after it are ignored.")
 ;;; Ivy
 
 (use-package ivy
-  :demand t
   :bind
   ("C-s" . swiper)
   ("C-c C-r" . ivy-resume)
@@ -1162,7 +1163,6 @@ all hooks after it are ignored.")
 ;;; Counsel
 
 (use-package counsel
-  :demand t
   :after ivy
   :diminish counsel-mode
   :hook
@@ -1196,6 +1196,7 @@ all hooks after it are ignored.")
 
 ;; Ivy's `ivy--regex-fuzzy' function uses flx automatically if its installed
 (use-package flx
+  :disabled
   :after ivy
   :config
   ;; use fuzzy matching everywhere except for swiper
@@ -1208,7 +1209,6 @@ all hooks after it are ignored.")
 ;; ivy-rich
 
 (use-package ivy-rich
-  :demand t
   :hook
   (ivy-mode . ivy-rich-mode)
   :preface
@@ -1287,7 +1287,6 @@ all hooks after it are ignored.")
 ;; Requires: Emacs >= 26
 
 (use-package ivy-posframe
-  :demand t
   :after ivy counsel
   :diminish ivy-posframe-mode
   :custom-face
@@ -1476,7 +1475,6 @@ all hooks after it are ignored.")
 
 (use-package treemacs-evil
   :after treemacs evil
-  :demand t
   :config
   (evil-define-key 'treemacs treemacs-mode-map (kbd "h") #'treemacs-TAB-action)
   (evil-define-key 'treemacs treemacs-mode-map (kbd "l") #'treemacs-TAB-action)
@@ -1843,6 +1841,7 @@ Version 2016-07-17"
 ;;; PACKAGE WHITESPACE
 
 (use-package whitespace
+  :ensure nil
   :defer 2
   :config
   ;; Highlight trailing whitespace
@@ -1920,7 +1919,6 @@ Version 2016-07-17"
 ;;;  Projectile
 
 (use-package projectile
-  :demand t
   :diminish projectile-mode
   :bind
   (:map projectile-mode-map
@@ -2035,7 +2033,7 @@ Version 2016-07-17"
           (t . nil)))))
   (advice-add #'company-box-icons--elisp :override #'my-company-box-icons--elisp)
 
-  (when (and *sys/gui*
+  (when (and (display-graphic-p)
           (require 'all-the-icons nil t))
     (declare-function all-the-icons-faicon 'all-the-icons)
     (declare-function all-the-icons-material 'all-the-icons)
@@ -2519,6 +2517,7 @@ Adapted from `describe-function-or-variable'."
 ;; shell script mode
 
 (use-package sh-script
+  :ensure nil
   :hook
   (sh-mode . aggressive-indent-mode)
   (sh-mode . rainbow-mode)
@@ -2623,7 +2622,6 @@ Adapted from `describe-function-or-variable'."
 ;; all-the-icons
 
 (use-package all-the-icons
-  :demand t ;; this is needed by all packages who use all the icons
   :if window-system
   :commands
   (all-the-icons-octicon
@@ -2638,6 +2636,7 @@ Adapted from `describe-function-or-variable'."
 ;; goto address
 
 (use-package goto-addr
+  :ensure nil
   :hook (text-mode . goto-address-mode)
   :hook (prog-mode . goto-address-prog-mode)
   :config
@@ -2751,6 +2750,7 @@ Adapted from `describe-function-or-variable'."
 ;; CSS
 
 (use-package css-mode
+  :ensure nil
   :mode
   ("\\.css\\'" . css-mode)
   ("\\.rasi\\'" . css-mode) ;; support for rofi new config format
@@ -3087,7 +3087,6 @@ Adapted from `describe-function-or-variable'."
 
 
 ;; (use-package gcmh
-;;   :demand t
 ;;   :init
 ;;   ;; (setq gcmh-verbose             t
 ;;   ;;       gcmh-lows-cons-threshold #x800000

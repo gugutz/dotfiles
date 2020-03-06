@@ -91,6 +91,10 @@ set cursorline              " Highlight cursor line
 
 let no_buffers_menu=1
 
+set timeoutlen=500 " The time in milliseconds that is waited for a key code or mapped key sequence to complete.
+set ttimeoutlen=50                   " ms to wait for next key in a sequence
+set foldcolumn=1 " Add a bit extra margin to the left
+set relativenumber     " show line numbers relative to current line
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Colorschemes
@@ -100,20 +104,19 @@ let no_buffers_menu=1
 if empty(glob('~/.config/vim/colors/codedark.vim'))
 	silent !curl -fLo ~/.config/vim/colors/codedark.vim --create-dirs
 				\ https://raw.githubusercontent.com/tomasiser/vim-code-dark/master/colors/codedark.vim
-	autocmd VimEnter * source $MYVIMRC
 endif
 
-" Tomorrow Night
-if empty(glob("~/.vim/colors/base16-tomorrow-night.vim"))
-	silent !curl -fLo ~/.vim/colors/base16-tomorrow-night.vim --create-dirs
-				\ https://raw.githubusercontent.com/chriskempson/base16-vim/master/colors/base16-tomorrow-night.vim
-endif
+" " Tomorrow Night
+" if empty(glob("~/.vim/colors/base16-tomorrow-night.vim"))
+" 	silent !curl -fLo ~/.vim/colors/base16-tomorrow-night.vim --create-dirs
+" 				\ https://raw.githubusercontent.com/chriskempson/base16-vim/master/colors/base16-tomorrow-night.vim
+" endif
 
-" Tomorrow Night Eighties
-if empty(glob("~/.vim/colors/base16-tomorrow-night-eighties.vim"))
-	silent !curl -fLo ~/.vim/colors/base16-tomorrow-night-eighties.vim --create-dirs
-				\ https://raw.githubusercontent.com/chriskempson/base16-vim/master/colors/base16-tomorrow-night-eighties.vim
-endif
+" " Tomorrow Night Eighties
+" if empty(glob("~/.vim/colors/base16-tomorrow-night-eighties.vim"))
+" 	silent !curl -fLo ~/.vim/colors/base16-tomorrow-night-eighties.vim --create-dirs
+" 				\ https://raw.githubusercontent.com/chriskempson/base16-vim/master/colors/base16-tomorrow-night-eighties.vim
+" endif
 
 " Tomorrow Night Bright
 " This theme was not moved to the new repository on base16 so i download it from the original location
@@ -122,8 +125,9 @@ if empty(glob("~/.vim/colors/Tomorrow-Night-Bright.vim"))
 				\ https://raw.githubusercontent.com/chriskempson/tomorrow-theme/master/vim/colors/Tomorrow-Night-Bright.vim
 endif
 
-" silent! colorscheme codedark
-autocmd BufEnter * colorscheme codedark
+silent! colorscheme codedark
+  " colorscheme Tomorrow-Night-Bright
+" autocmd BufEnter * colorscheme codedark
 " autocmd BufEnter *.component.html colorscheme Tomorrow-Night-Bright
 
 set mousemodel=popup
@@ -229,12 +233,8 @@ endif
 
 " vim-airline
 let g:airline_theme='codedark'
-let g:airline#extensions#branch#enabled = 1
-let g:airline#extensions#ale#enabled = 1
-let g:airline#extensions#tagbar#enabled = 1
 let g:airline_skip_empty_sections = 1
 
-let g:airline_powerline_fonts = 1                     " needed by devicons
 
 " extensions
 let g:airline#extensions#tabline#enabled = 1       " enable tabline upport
@@ -243,33 +243,34 @@ let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
 let g:airline#extensions#tabline#tab_nr_type = 1   " show tab numbers
 let g:airline#extensions#tabline#show_buffers = 0  " hide buffers
-let g:airline#extensions#tabline#tab_min_count = 2 " hide tabline for one tab
+let g:airline#extensions#tabline#tab_min_count = 1 " show tabline even with only 1 tab
 
-" git branch
+" tagbar
+let g:airline#extensions#tagbar#enabled = 1
+
+" git
 let g:airline#extensions#branch#enabled = 1
 
 " ale status
 let g:airline#extensions#ale#enabled = 1
-let g:airline_skip_empty_sections = 1
-
 
 " enable/disable coc integration >
 let g:airline#extensions#coc#enabled = 1
-" change error symbol: >
 let airline#extensions#coc#error_symbol = 'E:'
-" change warning symbol: >
 let airline#extensions#coc#warning_symbol = 'W:'
-" change error format: >
 let airline#extensions#coc#stl_format_err = '%E{[%e(#%fe)]}'
-" change warning format: >
 let airline#extensions#coc#stl_format_warn = '%W{[%w(#%fw)]}'
-" let g:airline_section_error = '%{airline#util#wrap(airline#extensions#coc#get_error(),0)}'
-" let g:airline_section_warning = '%{airline#util#wrap(airline#extensions#coc#get_warning(),0)}'
 
-
+" symbols
 if !exists('g:airline_symbols')
   let g:airline_symbols = {}
 endif
+
+
+" POWERLINE
+
+" automatically populate the g:airline_symbols dictionary with the powerline symbols.
+let g:airline_powerline_fonts = 1                     " needed by devicons
 
 if !exists('g:airline_powerline_fonts')
   let g:airline#extensions#tabline#left_sep = ' '
@@ -299,8 +300,10 @@ else
   let g:airline_right_alt_sep = ''
   let g:airline_symbols.branch = ''
   let g:airline_symbols.readonly = ''
-  let g:airline_symbols.linenr = ''
+  let g:airline_symbols.linenr = '☰'
+  let g:airline_symbols.maxlinenr = ''
 endif
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Abbreviations
@@ -343,7 +346,6 @@ set ffs=unix,dos,mac   " Use Unix as the standard file type
   set smarttab                         " tab settings aware <Tab> key
   set tabpagemax=50                    " maximum number of tabs open by -p flag
   set tags=./tags;,tags                " filenames to look for the tag command
-  set ttimeoutlen=50                   " ms to wait for next key in a sequence
   set viminfo+=!                       " save global variables across sessions
 
 
@@ -551,6 +553,17 @@ set autoread
 "" My Mappings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+" Examples of how mappings work
+" Source https://vim.fandom.com/wiki/Mapping_keys_in_Vim_-_Tutorial_(Part_1)
+
+" :nmap - Display normal mode maps
+" :imap - Display insert mode maps
+" :vmap - Display visual and select mode maps
+" :smap - Display select mode maps
+" :xmap - Display visual mode maps
+" :cmap - Display command-line mode maps
+" :omap - Display operator pending mode maps
+
 " Fast saving
 nmap <leader>w :w!<cr>
 " :W sudo saves the file
@@ -598,7 +611,7 @@ vmap < <gv
 vmap > >gv
 
 "" Open current line on GitHub
-nnoremap <Leader>o :.Gbrowse<CR>
+nnoremap <leader>go :.Gbrowse<CR>
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -685,12 +698,6 @@ set magic                      " For regular expressions turn magic on
 "#########################################################################
 
 
-set timeoutlen=500 " The time in milliseconds that is waited for a key code or mapped key sequence to complete.
-set ttimeoutlen=0  " ttimeoutlen is used for key code delays
-
-
-set foldcolumn=1 " Add a bit extra margin to the left
-set relativenumber     " show line numbers relative to current line
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -718,6 +725,19 @@ set showmatch
 " How many tenths of a second to blink when matching brackets
 set matchtime=2
 
+" Enables pseudo-transparency for the |popup-menu|
+if has('nvim')
+  set pumblend=0
+endif
+" force the current selected element to be fully opaque:
+:hi PmenuSel blend=0
+
+" Maximum number of items to show in the popup menu
+set pumheight=15
+" popoup menu maximum width (default 15)
+" set pumwidth=
+
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " NERDTREE SETTINGS
@@ -730,8 +750,8 @@ map <f8> :NERDTreeToggle<CR>
 
 
 " Open NerdTree on Vim startup and move cursor to edit buffer instead of leaving it on nerdtree window w
-autocmd VimEnter * NERDTree | wincmd p
-autocmd VimEnter * if argc() == 1 | NERDTree | wincmd p | else | NERDTree | endif
+" autocmd VimEnter * NERDTree | wincmd p
+" autocmd VimEnter * if argc() == 1 | NERDTree | wincmd p | else | NERDTree | endif
 
 
 let NERDTreeShowBookmarks=1 " Show bookmarks table on Nerdtree
@@ -768,12 +788,32 @@ let g:NERDTreeMapOpenInTabSilent = '<RightMouse>'
 let g:NERDTreeWinSize = 35
 
 
-" PUM (PopUp Menu)- pseudo-transparent popup menu
-if has('nvim')
-  set pumblend=11
-endif
 
-set pumheight=10
+" NERDTrees File highlighting
+" Source https://github.com/ryanoasis/vim-devicons/wiki/FAQ-&-Troubleshooting#colors
+function! NERDTreeHighlightFile(extension, fg, bg, guifg, guibg)
+ exec 'autocmd FileType nerdtree highlight ' . a:extension .' ctermbg='. a:bg .' ctermfg='. a:fg .' guibg='. a:guibg .' guifg='. a:guifg
+ exec 'autocmd FileType nerdtree syn match ' . a:extension .' #^\s\+.*'. a:extension .'$#'
+endfunction
+
+call NERDTreeHighlightFile('jade', 'green', 'none', 'green', '#151515')
+call NERDTreeHighlightFile('ini', 'yellow', 'none', 'yellow', '#151515')
+call NERDTreeHighlightFile('md', 'blue', 'none', '#3366FF', '#151515')
+call NERDTreeHighlightFile('yml', 'yellow', 'none', 'yellow', '#151515')
+call NERDTreeHighlightFile('config', 'yellow', 'none', 'yellow', '#151515')
+call NERDTreeHighlightFile('conf', 'yellow', 'none', 'yellow', '#151515')
+call NERDTreeHighlightFile('json', 'yellow', 'none', 'yellow', '#151515')
+call NERDTreeHighlightFile('html', 'yellow', 'none', 'yellow', '#151515')
+call NERDTreeHighlightFile('styl', 'cyan', 'none', 'cyan', '#151515')
+call NERDTreeHighlightFile('css', 'cyan', 'none', 'cyan', '#151515')
+call NERDTreeHighlightFile('coffee', 'Red', 'none', 'red', '#151515')
+call NERDTreeHighlightFile('js', 'Red', 'none', '#ffa500', '#151515')
+call NERDTreeHighlightFile('php', 'Magenta', 'none', '#ff00ff', '#151515')
+call NERDTreeHighlightFile('ds_store', 'Gray', 'none', '#686868', '#151515')
+call NERDTreeHighlightFile('gitconfig', 'Gray', 'none', '#686868', '#151515')
+call NERDTreeHighlightFile('gitignore', 'Gray', 'none', '#686868', '#151515')
+call NERDTreeHighlightFile('bashrc', 'Gray', 'none', '#686868', '#151515')
+call NERDTreeHighlightFile('bashprofile', 'Gray', 'none', '#686868', '#151515')
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1010,11 +1050,11 @@ autocmd BufEnter * let &titlestring = ' ' . expand("%:t")
 " fzf.vim
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" on the resulsts window:
-" ENTER - open in current window
-" CTRL-T -> open in a new tab
-" CTRL-X -> open in horizontal split
-" CTRL-V -> open in vertical splits
+" On the resulsts window:
+" * ENTER - open in current window
+" * CTRL-T -> open in a new tab
+" * CTRL-X -> open in horizontal split
+" * CTRL-V -> open in vertical splits
 
 " Mapping selecting mappings
 nmap <leader><tab> <plug>(fzf-maps-n)
@@ -1033,7 +1073,6 @@ inoremap <expr> <c-x><c-k> fzf#vim#complete#word({'left': '15%'})
 " Replace the default dictionary completion with fzf-based fuzzy completion
 inoremap <expr> <c-x><c-k> fzf#vim#complete('cat /usr/share/dict/words')
 
-nnoremap <silent> <leader>e :FZF -m<CR>
 
 " fzf on a floating window
 " Required:
@@ -1067,7 +1106,6 @@ let g:rg_command = '
   \ -g "*.{js,json,php,md,styl,jade,html,config,py,cpp,c,go,hs,rb,conf}"
   \ -g "!{.git,node_modules,vendor}/*" '
 
-command! -bang -nargs=* F call fzf#vim#grep(g:rg_command .shellescape(<q-args>), 1, <bang>0)
 
 " use ripgrep if available, else try ag
 if executable('rg')
@@ -1081,36 +1119,6 @@ else
 endif
 
 cnoremap <C-P> <C-R>=expand("%:p:h") . "/" <CR>
-nnoremap <silent> <leader>fm :FZF -m<CR>
-
-"----------------------------
-"Recovery commands from history through FZF
-nmap <leader>y :History:<CR>
-
-"----------------------------
-
-"" Custom fzf find files in directory of active buffer
-nnoremap <Leader>dff :<C-U>call ABFiles()<CR>
-
-function! ABFiles()
-    execute 'FZF' expand('%:p:h')
-endfunction
-
-" Find word in project
-nnoremap <leader>pfw :F <C-r><C-w><Cr>
-command! -bang -nargs=* F call fzf#vim#grep(g:rg_command . shellescape(<q-args>), 1, <bang>0)
-command! -bang -nargs=* FU call fzf#vim#grep(g:rg_command . '-m1 ' . shellescape(<q-args>), 1, <bang>0)
-
-" Find file in git project
-nnoremap <leader>gff :GitFiles<Cr>
-
-" nnoremap <expr> <leader>pff ':Files ' . Guess() . "\<lt>CR>"
-nnoremap <leader>prg :ProjectRg <C-r><C-w><Cr>
-command! -bang -nargs=* ProjectRg call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, {'dir': system('git rev-parse --show-toplevel 2> /dev/null')[:-2]}, <bang>0)
-
-nnoremap <leader>pff :ProjectFiles <C-r><C-w><Cr>
-command! -bang -nargs=* ProjectFiles call fzf#vim#files("rg --files --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, {'dir': system('git rev-parse --show-toplevel 2> /dev/null')[:-2]}, <bang>0)
-"----------------------------
 
 
 " Customize fzf colors to match your color scheme
@@ -1130,6 +1138,39 @@ let g:fzf_colors =
   \ 'spinner': ['fg', 'Label'],
   \ 'header':  ['fg', 'Comment'] }
 
+"----------------------------
+" FZF CUSTOM MAPPINGS
+
+"Recovery commands from history through FZF
+nmap <leader>fh :History:<CR>
+
+" seems to search files in current PWD
+nnoremap <silent> <leader>fm :FZF -m<CR>
+nnoremap <silent> <leader>pe :FZF -m<CR>
+
+"" Custom fzf find files in directory of active buffer
+nnoremap <Leader>ff :<C-U>call ABFiles()<CR>
+
+function! ABFiles()
+    execute 'FZF' expand('%:p:h')
+endfunction
+
+
+" Find word in project
+nnoremap <leader>pgf :RipgrepFind <C-r><C-w><Cr>
+command! -bang -nargs=* RipgrepFind call fzf#vim#grep(g:rg_command .shellescape(<q-args>), 1, <bang>0)
+command! -bang -nargs=* FU call fzf#vim#grep(g:rg_command . '-m1 ' . shellescape(<q-args>), 1, <bang>0)
+
+" Grep for word under cursos in project
+nnoremap <leader>pgw :ProjectRg <C-r><C-w><Cr>
+command! -bang -nargs=* ProjectRg call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, {'dir': system('git rev-parse --show-toplevel 2> /dev/null')[:-2]}, <bang>0)
+
+" Find file in git project
+nnoremap <leader>pf :GitFiles<Cr>
+
+" Find file in project (not working)
+nnoremap <leader>pt :ProjectFiles <C-r><C-w><Cr>
+command! -bang -nargs=* ProjectFiles call fzf#vim#files("rg --files --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, {'dir': system('git rev-parse --show-toplevel 2> /dev/null')[:-2]}, <bang>0)
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1204,12 +1245,14 @@ endfunction
 autocmd CursorHold * silent call CocActionAsync('highlight')
 
 " Symbol renaming.
-nmap <leader>rn <Plug>(coc-rename)
+nmap <leader>lrn <Plug>(coc-rename)
+" Coc rename
+nnoremap <leader>prn :call CocActionAsync('rename')<cr>
 
 
 " Formatting selected code.
-xmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
+xmap <leader>lf  <Plug>(coc-format-selected)
+nmap <leader>lf  <Plug>(coc-format-selected)
 
 augroup mygroup
   autocmd!
@@ -1241,8 +1284,11 @@ omap af <Plug>(coc-funcobj-a)
 " Use <TAB> for selections ranges.
 " NOTE: Requires 'textDocument/selectionRange' support from the language server.
 " coc-tsserver, coc-python are the examples of servers that support it.
-nmap <silent> <TAB> <Plug>(coc-range-select)
-xmap <silent> <TAB> <Plug>(coc-range-select)
+"
+" this was also messing with tab (vim interprets as C-i) and i couldt use C-i to jump forward
+"
+" nmap <silent> <TAB> <Plug>(coc-range-select)
+" xmap <silent> <TAB> <Plug>(coc-range-select)
 
 
 " Add `:Format` command to format current buffer.
@@ -1255,29 +1301,25 @@ command! -nargs=? Fold :call     CocAction('fold', <f-args>)
 " Add `:OR` command for organize imports of the current buffer.
 command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
 
-" Add (Neo)Vim's native statusline support.
-" NOTE: Please see `:h coc-status` for integrations with external plugins that
-" provide custom statusline: lightline.vim, vim-airline.
-set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
 
 " Mappings using CoCList:
 " Show all diagnostics.
-nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
+nnoremap <silent> <space>ld  :<C-u>CocList diagnostics<cr>
 " Manage extensions.
-nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
+nnoremap <silent> <space>le  :<C-u>CocList extensions<cr>
 " Show commands.
-nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
+nnoremap <silent> <space>lc  :<C-u>CocList commands<cr>
 " Find symbol of current document.
-nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
+nnoremap <silent> <space>lo  :<C-u>CocList outline<cr>
 " Search workspace symbols.
-nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
+nnoremap <silent> <space>ls  :<C-u>CocList -I symbols<cr>
 " Do default action for next item.
-nnoremap <silent> <space>j  :<C-u>CocNext<CR>
+nnoremap <silent> <space>lj  :<C-u>CocNext<CR>
 " Do default action for previous item.
-nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
+nnoremap <silent> <space>lk  :<C-u>CocPrev<CR>
 " Resume latest coc list.
-nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
+nnoremap <silent> <space>lp  :<C-u>CocListResume<CR>
 
 
 " Extensions
@@ -1306,8 +1348,84 @@ let g:coc_global_extensions = [
       \ ]
 
 
-" Coc rename
-  nnoremap <leader>prn :call CocActionAsync('rename')<cr>
+" Multiple Cursors
+" nmap <silent> <C-d> <Plug>(coc-cursors-word)*
+" xmap <silent> <C-d> y/\V<C-r>=escape(@",'/\')<CR><CR>gN<Plug>(coc-cursors-range)gn
+
+" Or more vscode like behavior:
+nmap <expr> <silent> <C-d> <SID>select_current_word()
+function! s:select_current_word()
+  if !get(g:, 'coc_cursors_activated', 0)
+    return "\<Plug>(coc-cursors-word)"
+  endif
+  return "*\<Plug>(coc-cursors-word):nohlsearch\<CR>"
+endfunc
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" any jump
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" Disabling default any-jump keybindings:
+let g:any_jump_disable_default_keybindings = 1
+
+" Jump to definition under cursore
+nnoremap <leader>j :AnyJump<CR>
+nnoremap <M-.> :AnyJump<CR>
+
+" open previous opened file (after jump)
+nnoremap <leader>jb :AnyJumpBack<CR>
+nnoremap <M-,> :AnyJumpBack<CR>
+
+" open last closed search window again
+nnoremap <leader>jl :AnyJumpLastResults<CR>
+
+" Mappings for popup search window
+" o/ open link p/ preview q/x exit r references b back to first result T group by file a load next N results A load all results L toggle results lists ui style
+
+" Show line numbers in search rusults
+let g:any_jump_list_numbers = 0
+
+" Auto search references
+let g:any_jump_references_enabled = 1
+
+" Auto group results by filename
+let g:any_jump_grouping_enabled = 0
+
+" Amount of preview lines for each search result
+let g:any_jump_preview_lines_count = 5
+
+" Max search results, other results can be opened via [a]
+let g:any_jump_max_search_results = 7
+
+" Prefered search engine: rg or ag
+let g:any_jump_search_prefered_engine = 'rg'
+
+" Search results list styles:
+" - 'filename_first'
+" - 'filename_last'
+let g:any_jump_results_ui_style = 'filename_first'
+
+" Any-jump window size & position options
+let g:any_jump_window_width_ratio  = 0.6
+let g:any_jump_window_height_ratio = 0.6
+let g:any_jump_window_top_offset   = 4
+
+" Disable default any-jump keybindings (default: 0)
+let g:any_jump_disable_default_keybindings = 1
+
+" Remove comments line from search results (default: 1)
+let g:any_jump_remove_comments_from_results = 1
+
+" Cursor keyword selection mode
+"
+" on line:
+" "MyNamespace::MyClass"
+" then cursor is on MyClass word
+"
+" 'word' - will match 'MyClass'
+" 'full' - will match 'MyNamespace::MyClass'
+let g:any_jump_keyword_match_cursor_mode= 'word'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " netrw bindings
@@ -1409,7 +1527,8 @@ map <F5> :Sexplore<CR>
 " let g:ale_list_window_size = 5
 "
 let g:ale_sign_error = '>>'
-let g:ale_sign_warning = '--'
+" let g:ale_sign_warning = '--'
+let g:ale_sign_warning = '⚠'
 
 " Show X lines of errors (default: 10)
 let g:ale_list_window_size = 10
@@ -1490,16 +1609,55 @@ let g:blameLineGitFormat = '%an - %s'
 " navigate to edit points
 inoremap <C->> <c-y>n<CR>
 
+" remap native keybinding <C-y>
+" let g:user_emmet_leader_key='<tab>'
+
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Prettier
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:prettier#config#print_width = 100
+
+" let g:prettier#config#print_width = 100
 let g:prettier#autoformat = 0
-let g:prettier#config#tab_width = 4
+" let g:prettier#config#tab_width = 4
 
 " Format supported files on save
 autocmd BufWritePre *.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.graphql,*.md,*.vue,*.yaml,*.html PrettierAsync
 
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Angular
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" If in a TS file
+" or add the bindings in after/ftplugin/typescript.vim without the autocmd rules
+autocmd FileType javascript,typescript nnoremap <leader>och :edit %<.html<CR>
+autocmd FileType javascript,typescript nnoremap <leader>ocsc :edit %<.css<CR>
+autocmd FileType javascript,typescript nnoremap <leader>ocss :edit %<.scss<CR>
+autocmd FileType javascript,typescript nnoremap <leader>oct :edit %<.test.ts<CR>
+
+" autocmd FileType javascript,typescript nnoremap <buffer> <leader>oct :edit %<.html<CR>
+" autocmd FileType javascript,typescript nnoremap <buffer> <leader>ocs :edit %<.css<CR>
+" autocmd FileType javascript,typescript nnoremap <buffer> <leader>oct :edit %<.test.ts<CR>
+
+" If in a HTML file
+" or  add the bindings in after/ftplugin/html.vim without the autocmd rules
+autocmd FileType html nnoremap <leader>occ :edit %<.ts<CR>
+autocmd FileType html nnoremap <leader>ocsc :edit %<.css<CR>
+autocmd FileType html nnoremap <leader>ocss :edit %<.scss<CR>
+
+" If in a CSS or SASS file
+" or add the bindings in after/ftplugin/css.vim without the autocmd rules
+autocmd FileType css,scss nnoremap <leader>occ :edit %<.ts<CR>
+autocmd FileType css,scss nnoremap <leader>och :edit %<.html<CR>
+
+" With a single mapping, use :help wildmenu to choose which of the counterparts you want to switch to:
+" in $MYVIMRC
+set wildmenu
+set wildcharm=<C-z>
+nnoremap <key> :edit %<.<C-z>
+
+nnoremap <buffer> <C-]> :TernDef<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Matchup
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1532,9 +1690,8 @@ let g:rainbow_conf = {'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'fire
 " VIM COLORIZER SETTINGS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" Make colorizer start when opening or creating files
+" NEVER INSTALL THIS PLUGIN AGAIN, TOOK ME HOURS TO FIGURE IT WAS THIS PLUGIN CAUSING UNBEARABLE LAG
 " APPEARANTLY THIS FUCKER WAS SLOWING THINGS DOWN
-" autocmd BufNewFile,BufRead * ColorHighlight
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1563,39 +1720,33 @@ if exists("g:loaded_webdevicons")
 endif
 
 
-" grep.vim
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" grep
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 nnoremap <silent> <leader>fg :Rgrep<CR>
 let Grep_Default_Options = '-IR'
 let Grep_Skip_Files = '*.log *.db'
 let Grep_Skip_Dirs = '.git node_modules'
 
-" NERDTrees File highlighting
-" Source https://github.com/ryanoasis/vim-devicons/wiki/FAQ-&-Troubleshooting#colors
-function! NERDTreeHighlightFile(extension, fg, bg, guifg, guibg)
- exec 'autocmd FileType nerdtree highlight ' . a:extension .' ctermbg='. a:bg .' ctermfg='. a:fg .' guibg='. a:guibg .' guifg='. a:guifg
- exec 'autocmd FileType nerdtree syn match ' . a:extension .' #^\s\+.*'. a:extension .'$#'
-endfunction
-
-call NERDTreeHighlightFile('jade', 'green', 'none', 'green', '#151515')
-call NERDTreeHighlightFile('ini', 'yellow', 'none', 'yellow', '#151515')
-call NERDTreeHighlightFile('md', 'blue', 'none', '#3366FF', '#151515')
-call NERDTreeHighlightFile('yml', 'yellow', 'none', 'yellow', '#151515')
-call NERDTreeHighlightFile('config', 'yellow', 'none', 'yellow', '#151515')
-call NERDTreeHighlightFile('conf', 'yellow', 'none', 'yellow', '#151515')
-call NERDTreeHighlightFile('json', 'yellow', 'none', 'yellow', '#151515')
-call NERDTreeHighlightFile('html', 'yellow', 'none', 'yellow', '#151515')
-call NERDTreeHighlightFile('styl', 'cyan', 'none', 'cyan', '#151515')
-call NERDTreeHighlightFile('css', 'cyan', 'none', 'cyan', '#151515')
-call NERDTreeHighlightFile('coffee', 'Red', 'none', 'red', '#151515')
-call NERDTreeHighlightFile('js', 'Red', 'none', '#ffa500', '#151515')
-call NERDTreeHighlightFile('php', 'Magenta', 'none', '#ff00ff', '#151515')
-call NERDTreeHighlightFile('ds_store', 'Gray', 'none', '#686868', '#151515')
-call NERDTreeHighlightFile('gitconfig', 'Gray', 'none', '#686868', '#151515')
-call NERDTreeHighlightFile('gitignore', 'Gray', 'none', '#686868', '#151515')
-call NERDTreeHighlightFile('bashrc', 'Gray', 'none', '#686868', '#151515')
-call NERDTreeHighlightFile('bashprofile', 'Gray', 'none', '#686868', '#151515')
-
 autocmd VimEnter * call NERDTreeHighlightFile('jade', 'green', 'none', 'green', '#151515')
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Indent Lines
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+let g:indentLine_char_list = ['|', '¦', '┆', '┊']
+
+" Change indent char color
+let g:indentLine_color_term = 237       " Vim (has to be terminal colors, from 0 to 256)
+let g:indentLine_color_gui = '#A4E57E'  " gvim
+let g:indentLine_color_tty_light = 7    " none X terminal (default: 4)
+let g:indentLine_color_dark = 1         " none X terminal (default: 2)
+
+" Background (Vim, GVim)
+" let g:indentLine_bgcolor_term = 202
+" let g:indentLine_bgcolor_gui = '#FF5F00'
 
 "#########################################################################
 " LANGUAGES SETTINGS
@@ -1805,27 +1956,29 @@ Plug 'jistr/vim-nerdtree-tabs'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 
 
-Plug 'tpope/vim-commentary'              " use with 'gc', equivalent to vscode ctrl+/)
+Plug 'tpope/vim-commentary'           " use with 'gc', equivalent to vscode ctrl+/)
 Plug 'tpope/vim-surround'
-Plug 'tpope/vim-repeat'                  " so that vim-surroud actions will be repeatable with dot command .
+Plug 'tpope/vim-repeat'               " so that vim-surroud actions will be repeatable with dot command .
 Plug 'tpope/vim-rsi'
-Plug 'terryma/vim-multiple-cursors'       " Install vim-multiple-cursors (equivalent to vscode ctrl+d)
-Plug 'unblevable/quick-scope'            " Highlight jump characters
+Plug 'terryma/vim-multiple-cursors'   " Install vim-multiple-cursors (equivalent to vscode ctrl+d)
+Plug 'unblevable/quick-scope'         " Highlight jump characters
 
 " Visual plugins
-Plug 'vim-scripts/CSApprox' " make gvim only colorschemes work on terminal
-Plug 'RRethy/vim-illuminate'             " illuminate other uses of current word under cursor
+Plug 'vim-scripts/CSApprox'           " make gvim only colorschemes work on terminal
+Plug 'RRethy/vim-illuminate'          " illuminate other uses of current word under cursor
 Plug 'sheerun/vim-polyglot'
-" Plug 'nathanaelkane/vim-indent-guides'
 Plug 'Yggdroot/indentLine'
 
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 
-Plug 'mkitt/tabline.vim'                 " Cleaner tabs
-Plug 'chrisbra/Colorizer'                " Show hex codes as colours
-Plug 'luochen1990/rainbow' " Rainbow parenthesis improved
-Plug 'ryanoasis/vim-devicons'            " Icons for dev file types. Has to be loaded after airline
+Plug 'mkitt/tabline.vim'              " Cleaner tabs
+
+                                      " trying colorizer with named colors first, since some terminal apps use it to define colors
+Plug 'ap/vim-css-color'               "show colored hex, rgb(a) hls(a) and named colors (ex: red)
+                                      " Plug 'etdev/vim-hexcolor' "show colored hex, rgb(a) hls(a) BUT NOT named colors (ex: red)
+Plug 'luochen1990/rainbow'            " Rainbow parenthesis improved
+Plug 'ryanoasis/vim-devicons'         " Icons for dev file types. Has to be loaded after airline
 
 Plug 'Shougo/vimproc.vim', {'do': 'make'}
 
@@ -1833,7 +1986,8 @@ Plug 'w0rp/ale'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 
-Plug 'SirVer/ultisnips'
+" ultisnips was remapping C-tab (which vim interprets as C-i) and thus i couldnt jump forward the jump list anylonger
+" Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 
 Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
@@ -1854,7 +2008,7 @@ Plug 'andymass/vim-matchup'
 
 Plug 'terryma/vim-expand-region'
 
-Plug 'valloric/MatchTagAlways'           " Show matching and closing tags
+Plug 'valloric/MatchTagAlways'        " Show matching and closing tags
 
 " FZF
 if isdirectory('~/.fzf')
@@ -1864,9 +2018,12 @@ else
   Plug 'junegunn/fzf.vim'
 endif
 
-Plug 'gabesoft/vim-ags' " ag, rg support
+Plug 'gabesoft/vim-ags'               " ag, rg support
 
-Plug 'tpope/vim-eunuch' " Vim sugar for the UNIX shell commands, like :Delete to delete buffer and file at same time, SudoWrite, etc...
+" Emacs port of dumb-jump
+Plug 'pechorin/any-jump.vim'
+
+Plug 'tpope/vim-eunuch'               " Vim sugar for the UNIX shell commands, like :Delete to delete buffer and file at same time, SudoWrite, etc...
 Plug 'ntpeters/vim-better-whitespace' " Highlight trailing whitespace
 
 Plug 'christoomey/vim-tmux-navigator'
@@ -1876,19 +2033,19 @@ Plug 'junegunn/vim-easy-align'
 " Languages Plugins
 
 " React
-Plug 'mxw/vim-jsx' " JSX syntax colors and indent support. Depends on vim-javascript
-Plug 'xojs/vim-xo' " Install vim-xo for xo linting support
+Plug 'mxw/vim-jsx'                    " JSX syntax colors and indent support. Depends on vim-javascript
+Plug 'xojs/vim-xo'                    " Install vim-xo for xo linting support
 Plug 'prettier/vim-prettier', { 'do': 'npm install' }
 Plug 'editorconfig/editorconfig-vim'
 
 " Javascript and Typescript
 Plug 'pangloss/vim-javascript'
-Plug 'jelera/vim-javascript-syntax' " used in vim-boostrap
+Plug 'jelera/vim-javascript-syntax'   " used in vim-boostrap
 
 " typescript
-Plug 'leafgarland/typescript-vim' " used by vim-boostrap
+Plug 'leafgarland/typescript-vim'     " used by vim-boostrap
 Plug 'HerringtonDarkholme/yats.vim'
-" Plug 'heavenshell/vim-tslint'
+                                      " Plug 'heavenshell/vim-tslint'
 
 " Go
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
@@ -1927,8 +2084,8 @@ Plug 'mattn/emmet-vim'
 
 " Markdown
 Plug 'plasticboy/vim-markdown'
-Plug 'suan/vim-instant-markdown'         " Markdown preview instant-markdown-
-Plug 'godlygeek/tabular'                 " Tabular align texts that grow
+Plug 'suan/vim-instant-markdown'      " Markdown preview instant-markdown-
+Plug 'godlygeek/tabular'              " Tabular align texts that grow
 
 
 call plug#end() " Initialize plugin system
