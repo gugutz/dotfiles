@@ -319,7 +319,9 @@ cnoreabbrev Q q
 cnoreabbrev Qall qall
 
 set ffs=unix,dos,mac   " Use Unix as the standard file type
-set autochdir          " set current directory to recently opened file
+
+" this was preventing the bookmark item to stay as the pwd and me using fzf project search
+" set autochdir          " set current directory to recently opened file
 
 
 
@@ -1592,6 +1594,8 @@ call NERDTreeHighlightFile('gitconfig', 'Gray', 'none', '#686868', '#151515')
 call NERDTreeHighlightFile('gitignore', 'Gray', 'none', '#686868', '#151515')
 call NERDTreeHighlightFile('bashrc', 'Gray', 'none', '#686868', '#151515')
 call NERDTreeHighlightFile('bashprofile', 'Gray', 'none', '#686868', '#151515')
+
+autocmd VimEnter * call NERDTreeHighlightFile('jade', 'green', 'none', 'green', '#151515')
 
 "#########################################################################
 " LANGUAGES SETTINGS
