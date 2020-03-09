@@ -1,41 +1,10 @@
-"*****************************************************************************
-"" Auto install dependencies
-"*****************************************************************************
-
-let vimplug_exists=expand('~/.vim/autoload/plug.vim')
-
-if !filereadable(vimplug_exists)
-  if !executable("curl")
-    echoerr "You have to install curl or first install vim-plug yourself!"
-    execute "q!"
-  endif
-  echo "Installing Vim-Plug..."
-  echo ""
-  silent exec "!\curl -fLo " . vimplug_exists . " --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
-  let g:not_finish_vimplug = "yes"
-
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
-endif
-
-  " Install fzf and rg
-  if !empty(glob("~/.fzf/bin/fzf"))
-    if empty(glob("~/.fzf/bin/rg"))
-        silent !curl -fLo /tmp/rg.tar.gz
-              \ https://github.com/BurntSushi/ripgrep/releases/download/11.0.2/ripgrep-11.0.2-x86_64-unknown-linux-musl.tar.gz
-        silent !tar xzvf /tmp/rg.tar.gz --directory /tmp
-        silent !cp /tmp/ripgrep-0.10.0-x86_64-unknown-linux-musl/rg ~/.fzf/bin/rg
-    endif
-  endif
-
-
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Basic Setup
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " Required:
-" PS: the filetype plugin indent on command is like a combination of these commands:
 " I like to use like this because its more declarative
+" PS: the filetype plugin indent on command is like a combination of these commands:
 " filetype plugin indent on
 filetype on
 filetype plugin on
@@ -72,9 +41,9 @@ set smartcase
 set fileformats=unix,dos,mac
 
 if exists('$SHELL')
-    set shell=$SHELL
+  set shell=$SHELL
 else
-    set shell=/bin/sh
+  set shell=/bin/sh
 endif
 
 
@@ -95,6 +64,24 @@ set timeoutlen=500 " The time in milliseconds that is waited for a key code or m
 set ttimeoutlen=50                   " ms to wait for next key in a sequence
 set foldcolumn=1 " Add a bit extra margin to the left
 set relativenumber     " show line numbers relative to current line
+
+" Enable mouse. see :help mouse for info.
+set mouse=a
+
+" Highlight matching pairs
+set showmatch
+
+" Permite mover o cursor onde não há texto
+set virtualedit=insert,block,onemore
+
+
+" How many tenths of a second to blink when matching brackets
+set matchtime=2
+
+" Maximum number of items to show in the popup menu
+set pumheight=15
+" popoup menu maximum width (default 15)
+" set pumwidth=
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Colorschemes
@@ -128,7 +115,7 @@ endif
 silent! colorscheme codedark
   " colorscheme Tomorrow-Night-Bright
 " autocmd BufEnter * colorscheme codedark
-" autocmd BufEnter *.component.html colorscheme Tomorrow-Night-Bright
+" autocmd BufEnter *.html colorscheme Tomorrow-Night-Bright
 
 set mousemodel=popup
 set t_Co=256
@@ -164,12 +151,6 @@ if &term =~ '256color'
   set t_ut=
 endif
 
-" Substitute live preview in a split window
-if has('nvim')
-  set inccommand=split " show live results for some commands (like :s) in a split window
-endif
-
-
 " change cursor shape according to mode
 autocmd VimEnter * silent exec "! echo -ne '\e[1 q'"
 autocmd VimLeave * silent exec "! echo -ne '\e[5 q'"
@@ -199,13 +180,11 @@ nnoremap n nzzzv
 nnoremap N Nzzzv
 
 " Transparent backgroud
-" highlight Normal ctermbg=NONE guibg=NONE
+highlight! Normal ctermbg=NONE guibg=NONE
+highlight! NonText ctermbg=NONE guibg=NONE guifg=NONE ctermfg=NONE
 
 
 set display+=lastline
-if has('nvim')
-	set display+=msgsep "  minimize scrolling when showing messages
-endif
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -231,78 +210,6 @@ if exists("*fugitive#statusline")
   set statusline+=%{fugitive#statusline()}
 endif
 
-" vim-airline
-let g:airline_theme='codedark'
-let g:airline_skip_empty_sections = 1
-
-
-" extensions
-let g:airline#extensions#tabline#enabled = 1       " enable tabline upport
-let g:airline#extensions#tabline#formatter = 'unique_tail'
-let g:airline#extensions#tabline#left_sep = ' '
-let g:airline#extensions#tabline#left_alt_sep = '|'
-let g:airline#extensions#tabline#tab_nr_type = 1   " show tab numbers
-let g:airline#extensions#tabline#show_buffers = 0  " hide buffers
-let g:airline#extensions#tabline#tab_min_count = 1 " show tabline even with only 1 tab
-
-" tagbar
-let g:airline#extensions#tagbar#enabled = 1
-
-" git
-let g:airline#extensions#branch#enabled = 1
-
-" ale status
-let g:airline#extensions#ale#enabled = 1
-
-" enable/disable coc integration >
-let g:airline#extensions#coc#enabled = 1
-let airline#extensions#coc#error_symbol = 'E:'
-let airline#extensions#coc#warning_symbol = 'W:'
-let airline#extensions#coc#stl_format_err = '%E{[%e(#%fe)]}'
-let airline#extensions#coc#stl_format_warn = '%W{[%w(#%fw)]}'
-
-" symbols
-if !exists('g:airline_symbols')
-  let g:airline_symbols = {}
-endif
-
-
-" POWERLINE
-
-" automatically populate the g:airline_symbols dictionary with the powerline symbols.
-let g:airline_powerline_fonts = 1                     " needed by devicons
-
-if !exists('g:airline_powerline_fonts')
-  let g:airline#extensions#tabline#left_sep = ' '
-  let g:airline#extensions#tabline#left_alt_sep = '|'
-  let g:airline_left_sep          = '▶'
-  let g:airline_left_alt_sep      = '»'
-  let g:airline_right_sep         = '◀'
-  let g:airline_right_alt_sep     = '«'
-  let g:airline#extensions#branch#prefix     = '⤴' "➔, ➥, ⎇
-  let g:airline#extensions#readonly#symbol   = '⊘'
-  let g:airline#extensions#linecolumn#prefix = '¶'
-  let g:airline#extensions#paste#symbol      = 'ρ'
-  let g:airline_symbols.linenr    = '␊'
-  let g:airline_symbols.branch    = '⎇'
-  let g:airline_symbols.paste     = 'ρ'
-  let g:airline_symbols.paste     = 'Þ'
-  let g:airline_symbols.paste     = '∥'
-  let g:airline_symbols.whitespace = 'Ξ'
-else
-  let g:airline#extensions#tabline#left_sep = ''
-  let g:airline#extensions#tabline#left_alt_sep = ''
-
-  " powerline symbols
-  let g:airline_left_sep = ''
-  let g:airline_left_alt_sep = ''
-  let g:airline_right_sep = ''
-  let g:airline_right_alt_sep = ''
-  let g:airline_symbols.branch = ''
-  let g:airline_symbols.readonly = ''
-  let g:airline_symbols.linenr = '☰'
-  let g:airline_symbols.maxlinenr = ''
-endif
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -333,7 +240,6 @@ set ffs=unix,dos,mac   " Use Unix as the standard file type
   set cscopeverbose                    " bservose cscope output
   set complete-=i                      " don't scan current on included files for completion
   set display=lastline                 " display more message text
-  set fillchars=vert:\|,fold:-          " separator characters
   set formatoptions=tcqj               " more intuitive autoformatting
   set fsync                            " call fsync() for robust file saving
   set history=10000                    " longest possible command history
@@ -349,8 +255,6 @@ set ffs=unix,dos,mac   " Use Unix as the standard file type
   set viminfo+=!                       " save global variables across sessions
 
 
-
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" terminal and shell configuration
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -364,6 +268,11 @@ endif
 nnoremap <silent> <leader>sh :terminal<CR> " terminal emulation
 
 
+
+" separators used in the interface, like the windows borders
+set fillchars=vert:\|,fold:-          " separator characters
+
+hi vertsplit guifg=fg guibg=bg
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Functions
@@ -468,10 +377,6 @@ set wildmode=list:longest,list:full
 " set wildmode=full    " command-line completion enhanced mode
 " set wildmode=list:longest  " Make wildmenu behave like bash completion. Finding commands are so easy now.
 
-if has('nvim')
-  set wildoptions+=pum " use popupmenu for wildmode completion
-  set wildoptions+=tagfile
-endif
 set cmdheight=2      " Height of the command bar
 
 " List of files to be ignored in command line completions for file and dir names
@@ -492,6 +397,12 @@ set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.db,*.sqlite
 "" Commands
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "
+
+" Some usefull info on commands
+" -nargs makes the new command be able to take an argument like :Command arg1
+" -bang makes the command be able to interpret a ! like in :Command!
+" The ! right after command is used to tell vim to redefine the command if it already exists, this way when you source your .vimrc you don't have an error message.
+
 " remove trailing whitespaces
 command! FixWhitespace :%s/\s\+$//e
 
@@ -572,15 +483,25 @@ command! W w !sudo tee % > /dev/null
 " Fast quitting
 nmap <leader>q :q!<cr>
 
+" quicly edit/reload configuration file
+nnoremap cvo :e ~/.vimrc<CR>
+nnoremap cvs :so ~/.vimrc<CR>
+nnoremap cno :e ~/.config/nvim/init.vim<CR>
+nnoremap cns :so ~/.config/nvim/init.vim<CR>
+
+
+" Retain visual selection after indenting a block with > or <
+vnoremap > >gv
+vnoremap < <gv
 
 "" Quick exit insert mode with jk
 inoremap jk <ESC>
 
 " Go to beginning and end of lines more easilyt/audo
-  nnoremap H ^
-  nnoremap L $
-  " View git history for file
-  nnoremap <F9> :AgitFile <Cr>
+nnoremap H ^
+nnoremap L $
+" View git history for file
+nnoremap <F9> :AgitFile <Cr>
 
 
 "" Opens an edit command with the path of the currently edited file filled in
@@ -693,129 +614,6 @@ set lazyredraw                 " Don't redraw while executing macros (good perfo
 set magic                      " For regular expressions turn magic on
 
 
-"#########################################################################
-" UI related settings
-"#########################################################################
-
-
-
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Mouse related settings
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" Enable mouse. see :help mouse for info.
-set mouse=a
-
-" settings to fix the mouse issue on alacritty terminal
-if has('nvim')
-  " set ttymouse=sgr
-endif
-
-" set ttymouse=xterm2
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Permite mover o cursor onde não há texto
-set virtualedit=insert,block,onemore
-
-" Highlight matching pairs
-set showmatch
-
-" How many tenths of a second to blink when matching brackets
-set matchtime=2
-
-" Enables pseudo-transparency for the |popup-menu|
-if has('nvim')
-  set pumblend=0
-endif
-" force the current selected element to be fully opaque:
-:hi PmenuSel blend=0
-
-" Maximum number of items to show in the popup menu
-set pumheight=15
-" popoup menu maximum width (default 15)
-" set pumwidth=
-
-
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" NERDTREE SETTINGS
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" Toogle NERDTree
-nnoremap <s-f8>  :NERDTreeFind<CR>
-nnoremap <leader>fe :NERDTreeToggle<CR>
-map <f8> :NERDTreeToggle<CR>
-
-
-" Open NerdTree on Vim startup and move cursor to edit buffer instead of leaving it on nerdtree window w
-" autocmd VimEnter * NERDTree | wincmd p
-" autocmd VimEnter * if argc() == 1 | NERDTree | wincmd p | else | NERDTree | endif
-
-
-let NERDTreeShowBookmarks=1 " Show bookmarks table on Nerdtree
-
-
-" Open NerdTree directly on the file currently being edited
-
-" Sets PWD and the tree root on the currently selected directory
-let g:NERDTreeChDirMode = 2
-
-" Make NERDTree prettier
-let NERDTreeMinimalUI = 1
-let NERDTreeDirArrows = 1
-
-" Automatically close a tab if the only remaining window is NerdTree:
-autocmd BufEnter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-
-" Automatically delete the buffer of the file you just deleted with NerdTree:
-let NERDTreeAutoDeleteBuffer = 1
-
-" close nerd tree on opening file
-let NERDTreeQuitOnOpen = 0
-
-" Automatically delete the buffer of the file you just deleted with NerdTree:
-let NERDTreeAutoDeleteBuffer = 1
-
-"" NERDTree configuration
-let g:NERDTreeChDirMode=2
-let g:NERDTreeIgnore=['\.rbc$', '\~$', '\.pyc$', '\.db$', '\.sqlite$', '__pycache__']
-let g:NERDTreeSortOrder=['^__\.py$', '\/$', '*', '\.swp$', '\.bak$', '\~$']
-let g:NERDTreeShowBookmarks=1
-let g:nerdtree_tabs_focus_on_files=1
-let g:NERDTreeMapOpenInTabSilent = '<RightMouse>'
-let g:NERDTreeWinSize = 35
-
-
-
-" NERDTrees File highlighting
-" Source https://github.com/ryanoasis/vim-devicons/wiki/FAQ-&-Troubleshooting#colors
-function! NERDTreeHighlightFile(extension, fg, bg, guifg, guibg)
- exec 'autocmd FileType nerdtree highlight ' . a:extension .' ctermbg='. a:bg .' ctermfg='. a:fg .' guibg='. a:guibg .' guifg='. a:guifg
- exec 'autocmd FileType nerdtree syn match ' . a:extension .' #^\s\+.*'. a:extension .'$#'
-endfunction
-
-call NERDTreeHighlightFile('jade', 'green', 'none', 'green', '#151515')
-call NERDTreeHighlightFile('ini', 'yellow', 'none', 'yellow', '#151515')
-call NERDTreeHighlightFile('md', 'blue', 'none', '#3366FF', '#151515')
-call NERDTreeHighlightFile('yml', 'yellow', 'none', 'yellow', '#151515')
-call NERDTreeHighlightFile('config', 'yellow', 'none', 'yellow', '#151515')
-call NERDTreeHighlightFile('conf', 'yellow', 'none', 'yellow', '#151515')
-call NERDTreeHighlightFile('json', 'yellow', 'none', 'yellow', '#151515')
-call NERDTreeHighlightFile('html', 'yellow', 'none', 'yellow', '#151515')
-call NERDTreeHighlightFile('styl', 'cyan', 'none', 'cyan', '#151515')
-call NERDTreeHighlightFile('css', 'cyan', 'none', 'cyan', '#151515')
-call NERDTreeHighlightFile('coffee', 'Red', 'none', 'red', '#151515')
-call NERDTreeHighlightFile('js', 'Red', 'none', '#ffa500', '#151515')
-call NERDTreeHighlightFile('php', 'Magenta', 'none', '#ff00ff', '#151515')
-call NERDTreeHighlightFile('ds_store', 'Gray', 'none', '#686868', '#151515')
-call NERDTreeHighlightFile('gitconfig', 'Gray', 'none', '#686868', '#151515')
-call NERDTreeHighlightFile('gitignore', 'Gray', 'none', '#686868', '#151515')
-call NERDTreeHighlightFile('bashrc', 'Gray', 'none', '#686868', '#151515')
-call NERDTreeHighlightFile('bashprofile', 'Gray', 'none', '#686868', '#151515')
-
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " SYNTAX and INDENTATION
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -838,26 +636,6 @@ if !isdirectory($HOME."/.vim/undo-dir")
 endif
 set undodir=~/.config/vim/undo-dir
 set undofile
-
-
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Which key
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" which key activate on leader press
-nnoremap <silent> <leader> :<c-u>WhichKey '<Space>'<CR>
-nnoremap <silent> <localleader> :<c-u>WhichKey ','<CR>
-
-
-" quicly edit/reload configuration file
-nnoremap cfo :e $MYVIMRC<CR>
-nnoremap cfe :e ~/.vimrc<CR>
-nnoremap cfs :so %<CR>
-
-" 0 to go to the first non-blank character in the beggining of the line instead of first whitespace
-map 0 ^
-
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -889,6 +667,9 @@ autocmd BufWinLeave * call clearmatches()
 " TEXT EDITING SETTINGS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+" 0 to go to the first non-blank character in the beggining of the line instead of first whitespace
+map 0 ^
+
 " Return to last edit position when opening files (You want this!)
 " au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 " Restore last cursor position and marks on open
@@ -897,12 +678,9 @@ au BufReadPost *
       \ |   exe "normal! g`\""
       \ | endif
 
-
-
 set showbreak=+++           " Wrap-broken line prefix
 set textwidth=110                    " Line wrap (number of cols)
 set linebreak                     " Break lines at word (requires Wrap lines)
-
 
 " Move text with M-hjkl
 nnoremap <M-j> :m .+1<CR>==
@@ -1011,6 +789,12 @@ au TabLeave * let g:lasttab = tabpagenr()
 " WINDOWS SPLTTING
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+" Setas redimensionam janelas adjacentes
+nnoremap <left> :vertical resize -5<cr>
+nnoremap <right> :vertical resize +5<cr>
+nnoremap <up> :resize -5<cr>
+nnoremap <down> :resize +5<cr>
+
 " Open new split panes to right and bottom, which feels more natural than Vim’s default:
 set splitbelow
 set splitright
@@ -1047,8 +831,371 @@ autocmd VimLeave * call system("tmux setw automatic-rename")
 autocmd BufEnter * let &titlestring = ' ' . expand("%:t")
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" netrw bindings
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+if !has("nvim")
+" rmeove the useless banner
+let g:netrw_banner = 0
+
+" use tree-view (press i to alter view style)
+let g:netrw_liststyle = 3
+
+" open splits to the right
+let g:netrw_altv = 1
+
+" If you’ve set custom wildignores netrw can inherit them by doing this:
+let g:netrw_list_hide = &wildignore
+
+" " Open netrw on vim enter
+" augroup ProjectDrawer
+"   autocmd!
+"   autocmd VimEnter * :Vexplore
+" augroup END
+
+" Change how files are opened
+" 1 - open files in a new horizontal split
+" 2 - open files in a new vertical split
+" 3 - open files in a new tab
+" 4 - open in previous window
+let g:netrw_browse_split = 4
+
+" Netrw width
+let g:netrw_winsize = 25 " that means 25% of the current view (page / window)
+
+
+" Mapping q to close netrw is easily solved:
+autocmd FileType netrw nnoremap q :bd<CR>
+" (Or if you want the split it's in to stay open:)
+autocmd FileType netrw nnoremap q :bp\|bd #<CR>
+
+
+let g:NetrwIsOpen=0
+
+function! ToggleNetrw()
+    if g:NetrwIsOpen
+        let i = bufnr("$")
+        while (i >= 1)
+            if (getbufvar(i, "&filetype") == "netrw")
+                silent exe "bwipeout " . i
+            endif
+            let i-=1
+        endwhile
+        let g:NetrwIsOpen=0
+		else
+        let g:NetrwIsOpen=1
+        silent Lexplore
+    endif
+endfunction
+
+" Add your own mapping. For example:
+noremap <silent> <F4> :call ToggleNetrw()<CR>
+
+
+" supposed improved version of the above toggle netrw function
+" try it out
+" Based on alwc's answer without using global state. This way it doesn't get out of sync when Netrw was open manually first. It will still "glitch" when opening Netrw manully after it was opend with this function. But there is nothing one can do about manual commands I guess.
+
+function! ToggleNetrw2()
+        let i = bufnr("$")
+        let wasOpen = 0
+        while (i >= 1)
+            if (getbufvar(i, "&filetype") == "netrw")
+                silent exe "bwipeout " . i
+                let wasOpen = 1
+            endif
+            let i-=1
+        endwhile
+    if !wasOpen
+        silent Lexplore
+    endif
+endfunction
+map <F8> :call ToggleNetrw2() <CR>
+
+" open in current window
+" map <F3> :Explore<CR>
+" vertical split
+" map <F4> :Vexplore<CR>
+" map <S-F4> :Vexplore<CR>
+" horizontal split
+map <F7> :Sexplore<CR>
+
+
+endif
+
+"############################################################################
+"" NEOVIM config
+
+
+"*****************************************************************************
+"" Auto install dependencies
+"*****************************************************************************
+
+if has('nvim')
+
+let vimplug_exists=expand('~/.vim/autoload/plug.vim')
+
+if !filereadable(vimplug_exists)
+	if !executable("curl")
+		echoerr "You have to install curl or first install vim-plug yourself!"
+		execute "q!"
+	endif
+	echo "Installing Vim-Plug..."
+	echo ""
+	silent exec "!\curl -fLo " . vimplug_exists . " --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+	let g:not_finish_vimplug = "yes"
+
+	autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+
+
+set wildoptions+=pum " use popupmenu for wildmode completion
+set wildoptions+=tagfile
+
+set inccommand=split " show live results for some commands (like :s) in a split window
+set display+=msgsep "  minimize scrolling when showing messages
+
+
+" Enables pseudo-transparency for the |popup-menu|
+highlight PmenuSel blend=0
+" FORCE the current selected element to be fully opaque:
+set pumblend=0
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"" Smart Tab Key
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+vmap <Tab> >
+vmap <S-Tab> <
+
+function! CleverTab()
+    let l:line = strpart( getline('.'), 0, col('.')-1)
+    let l:lastchar = matchstr(getline('.'), '.\%' . col('.') . 'c')
+    " if popup menu is visible, go to next in the list
+    if pumvisible()
+        return "\<C-n>"
+    " if the just consists of spaces, indent
+    elseif l:line =~ '^\s*$'
+        return "\<Tab>"
+    " if the last character is a slash, call file-completion
+    elseif l:lastchar =~ "/"
+        return "\<C-x>\<C-f>"
+    " call omni completion if has omnifunc
+    elseif len(&omnifunc) > 0
+        return "\<C-x>\<C-o>"
+    " call word completion otherwise
+    else
+        return "\<C-n>"
+    endif
+endfunction
+
+" <C-r>=, or Ctrl+R= is used to insert the result of an expression at the cursor.
+inoremap <silent> <Tab> <C-r>=CleverTab()<CR>
+" inoremap <silent> <Tab> call CleverTab()<CR>
+
+
+" function! SmartTab()
+"   let current_position = col(".")
+"   let end_of_line = col("$")
+"   let l:line = strpart( getline('.'), 0, col('.')-1)
+"   let l:lastchar = matchstr(getline('.'), '.\%' . col('.') . 'c')
+
+"   " if popup menu is visible, go to next in the list
+"   pumvisible() ? "\<C-n>" :
+"   " if there is a snippet to expand, then do it
+"   coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+"   " if cursor is not at the end of an word, insert tab character
+"   getline('.')[col - 1]  =~# '\s'  ? "\<TAB>" :
+"   " if everything else fails, try to complete
+"   coc#refresh()
+"   " if the just consists of spaces, insert tab character
+"   l:line =~ '^\s*$' ? "\<Tab>" :
+"   " if the last character is a slash, call file-completion
+"   l:lastchar =~ "/" ? "\<C-x>\<C-f>" :
+"   " call omni completion if has omnifunc
+"   len(&omnifunc) > 0 ? "\<C-x>\<C-o>" :
+"   return ">>"
+" endfunction
+
+" " let g:coc_snippet_next = '<tab>'
+" inoremap <silent> <Tab> call SmartTab()<CR>
+" " inoremap <silent> <Tab> <C-R>=SmartTab()<CR>
+
+function! s:check_back_space() abort
+	let col = col('.') - 1
+	return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"" Abbreviations
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" vim-airline
+let g:airline_theme='codedark'
+let g:airline_skip_empty_sections = 1
+
+
+" extensions
+let g:airline#extensions#tabline#enabled = 1       " enable tabline upport
+let g:airline#extensions#tabline#formatter = 'unique_tail'
+let g:airline#extensions#tabline#left_sep = ' '
+let g:airline#extensions#tabline#left_alt_sep = '|'
+let g:airline#extensions#tabline#tab_nr_type = 1   " show tab numbers
+let g:airline#extensions#tabline#show_buffers = 0  " hide buffers
+let g:airline#extensions#tabline#tab_min_count = 1 " show tabline even with only 1 tab
+
+" tagbar
+let g:airline#extensions#tagbar#enabled = 1
+
+" git
+let g:airline#extensions#branch#enabled = 1
+
+" ale status
+let g:airline#extensions#ale#enabled = 1
+
+" enable/disable coc integration >
+let g:airline#extensions#coc#enabled = 1
+let airline#extensions#coc#error_symbol = 'E:'
+let airline#extensions#coc#warning_symbol = 'W:'
+let airline#extensions#coc#stl_format_err = '%E{[%e(#%fe)]}'
+let airline#extensions#coc#stl_format_warn = '%W{[%w(#%fw)]}'
+
+" symbols
+if !exists('g:airline_symbols')
+	let g:airline_symbols = {}
+endif
+
+
+" POWERLINE
+
+" automatically populate the g:airline_symbols dictionary with the powerline symbols.
+let g:airline_powerline_fonts = 1                     " needed by devicons
+
+if !exists('g:airline_powerline_fonts')
+	let g:airline#extensions#tabline#left_sep = ' '
+	let g:airline#extensions#tabline#left_alt_sep = '|'
+	let g:airline_left_sep          = '▶'
+	let g:airline_left_alt_sep      = '»'
+	let g:airline_right_sep         = '◀'
+	let g:airline_right_alt_sep     = '«'
+	let g:airline#extensions#branch#prefix     = '⤴' "➔, ➥, ⎇
+	let g:airline#extensions#readonly#symbol   = '⊘'
+	let g:airline#extensions#linecolumn#prefix = '¶'
+	let g:airline#extensions#paste#symbol      = 'ρ'
+	let g:airline_symbols.linenr    = '␊'
+	let g:airline_symbols.branch    = '⎇'
+	let g:airline_symbols.paste     = 'ρ'
+	let g:airline_symbols.paste     = 'Þ'
+	let g:airline_symbols.paste     = '∥'
+	let g:airline_symbols.whitespace = 'Ξ'
+else
+	let g:airline#extensions#tabline#left_sep = ''
+	let g:airline#extensions#tabline#left_alt_sep = ''
+
+	" powerline symbols
+	let g:airline_left_sep = ''
+	let g:airline_left_alt_sep = ''
+	let g:airline_right_sep = ''
+	let g:airline_right_alt_sep = ''
+	let g:airline_symbols.branch = ''
+	let g:airline_symbols.readonly = ''
+	let g:airline_symbols.linenr = '☰'
+	let g:airline_symbols.maxlinenr = ''
+endif
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" NERDTREE SETTINGS
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" Toogle NERDTree
+nnoremap <s-f8>  :NERDTreeFind<CR>
+nnoremap <leader>fe :NERDTreeToggle<CR>
+map <f8> :NERDTreeToggle<CR>
+
+
+" Open NerdTree on Vim startup and move cursor to edit buffer instead of leaving it on nerdtree window w
+autocmd VimEnter * NERDTree | wincmd p
+autocmd VimEnter * if argc() == 1 | NERDTree | wincmd p | else | NERDTree | endif
+
+
+let NERDTreeShowBookmarks=1 " Show bookmarks table on Nerdtree
+
+
+" Open NerdTree directly on the file currently being edited
+
+" Sets PWD and the tree root on the currently selected directory
+let g:NERDTreeChDirMode = 2
+
+" Make NERDTree prettier
+let NERDTreeMinimalUI = 1
+let NERDTreeDirArrows = 1
+
+" Automatically close a tab if the only remaining window is NerdTree:
+autocmd BufEnter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+
+" Automatically delete the buffer of the file you just deleted with NerdTree:
+let NERDTreeAutoDeleteBuffer = 1
+
+" close nerd tree on opening file
+let NERDTreeQuitOnOpen = 0
+
+" Automatically delete the buffer of the file you just deleted with NerdTree:
+let NERDTreeAutoDeleteBuffer = 1
+
+"" NERDTree configuration
+let g:NERDTreeChDirMode=2
+let g:NERDTreeIgnore=['\.rbc$', '\~$', '\.pyc$', '\.db$', '\.sqlite$', '__pycache__']
+let g:NERDTreeSortOrder=['^__\.py$', '\/$', '*', '\.swp$', '\.bak$', '\~$']
+let g:NERDTreeShowBookmarks=1
+let g:nerdtree_tabs_focus_on_files=1
+let g:NERDTreeMapOpenInTabSilent = '<RightMouse>'
+let g:NERDTreeWinSize = 35
+
+
+
+" NERDTrees File highlighting
+" Source https://github.com/ryanoasis/vim-devicons/wiki/FAQ-&-Troubleshooting#colors
+function! NERDTreeHighlightFile(extension, fg, bg, guifg, guibg)
+	exec 'autocmd FileType nerdtree highlight ' . a:extension .' ctermbg='. a:bg .' ctermfg='. a:fg .' guibg='. a:guibg .' guifg='. a:guifg
+	exec 'autocmd FileType nerdtree syn match ' . a:extension .' #^\s\+.*'. a:extension .'$#'
+endfunction
+
+call NERDTreeHighlightFile('jade', 'green', 'none', 'green', '#151515')
+call NERDTreeHighlightFile('ini', 'yellow', 'none', 'yellow', '#151515')
+call NERDTreeHighlightFile('md', 'blue', 'none', '#3366FF', '#151515')
+call NERDTreeHighlightFile('yml', 'yellow', 'none', 'yellow', '#151515')
+call NERDTreeHighlightFile('config', 'yellow', 'none', 'yellow', '#151515')
+call NERDTreeHighlightFile('conf', 'yellow', 'none', 'yellow', '#151515')
+call NERDTreeHighlightFile('json', 'yellow', 'none', 'yellow', '#151515')
+call NERDTreeHighlightFile('html', 'yellow', 'none', 'yellow', '#151515')
+call NERDTreeHighlightFile('styl', 'cyan', 'none', 'cyan', '#151515')
+call NERDTreeHighlightFile('css', 'cyan', 'none', 'cyan', '#151515')
+call NERDTreeHighlightFile('coffee', 'Red', 'none', 'red', '#151515')
+call NERDTreeHighlightFile('js', 'Red', 'none', '#ffa500', '#151515')
+call NERDTreeHighlightFile('php', 'Magenta', 'none', '#ff00ff', '#151515')
+call NERDTreeHighlightFile('ds_store', 'Gray', 'none', '#686868', '#151515')
+call NERDTreeHighlightFile('gitconfig', 'Gray', 'none', '#686868', '#151515')
+call NERDTreeHighlightFile('gitignore', 'Gray', 'none', '#686868', '#151515')
+call NERDTreeHighlightFile('bashrc', 'Gray', 'none', '#686868', '#151515')
+call NERDTreeHighlightFile('bashprofile', 'Gray', 'none', '#686868', '#151515')
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " fzf.vim
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" Install fzf and rg
+if !empty(glob("~/.fzf/bin/fzf"))
+	if empty(glob("~/.fzf/bin/rg"))
+		silent !curl -fLo /tmp/rg.tar.gz
+					\ https://github.com/BurntSushi/ripgrep/releases/download/11.0.2/ripgrep-11.0.2-x86_64-unknown-linux-musl.tar.gz
+		silent !tar xzvf /tmp/rg.tar.gz --directory /tmp
+		silent !cp /tmp/ripgrep-0.10.0-x86_64-unknown-linux-musl/rg ~/.fzf/bin/rg
+	endif
+endif
 
 " On the resulsts window:
 " * ENTER - open in current window
@@ -1056,7 +1203,82 @@ autocmd BufEnter * let &titlestring = ' ' . expand("%:t")
 " * CTRL-X -> open in horizontal split
 " * CTRL-V -> open in vertical splits
 
-" Mapping selecting mappings
+" fzf on a floating window
+let g:fzf_layout = { 'window': { 'width': 0.6, 'height': 0.6 } }
+
+" Hide statusline on fzf terminal buffers for a cleaner look
+if has('nvim') && !exists('g:fzf_layout')
+	autocmd! FileType fzf
+	autocmd  FileType fzf set laststatus=0 noshowmode noruler
+				\| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
+endif
+
+
+
+" use ripgrep if available, else try ag
+if executable('rg')
+	let $FZF_DEFAULT_COMMAND = 'rg --files --hidden --follow --glob "!.git/*"'
+	set grepprg=rg\ --vimgrep
+	command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed-strings --ignore-case --hidden --follow --glob "!.git/*" --color "always" '.shellescape(<q-args>).'| tr -d "\017"', 1, <bang>0)
+elseif executable('ag')
+	let $FZF_DEFAULT_COMMAND = 'ag --hidden --ignore .git -g ""'
+	set grepprg=ag\ --nogroup\ --nocolor
+else
+endif
+
+cnoremap <C-P> <C-R>=expand("%:p:h") . "/" <CR>
+
+
+" Customize fzf colors to match your color scheme
+" - fzf#wrap translates this to a set of `--color` options
+let g:fzf_colors =
+			\ { 'fg':      ['fg', 'Normal'],
+			\ 'bg':      ['bg', 'Normal'],
+			\ 'hl':      ['fg', 'Comment'],
+			\ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+			\ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+			\ 'hl+':     ['fg', 'Statement'],
+			\ 'info':    ['fg', 'PreProc'],
+			\ 'border':  ['fg', 'Ignore'],
+			\ 'prompt':  ['fg', 'Conditional'],
+			\ 'pointer': ['fg', 'Exception'],
+			\ 'marker':  ['fg', 'Keyword'],
+			\ 'spinner': ['fg', 'Label'],
+			\ 'header':  ['fg', 'Comment'] }
+
+
+"----------------------------
+" FZF CUSTOM COMMANDS
+
+" Find word in project
+
+" Grep for word under cursor in project but excludes some files and folders, like node_modules
+let g:rg_command = '
+			\ rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --color "always"
+			\ -g "*.{js,json,php,md,styl,jade,html,config,py,cpp,c,go,hs,rb,conf}"
+			\ -g "!{.git,node_modules,vendor}/*" '
+
+command! -bang -nargs=* RipgrepFind call fzf#vim#grep(g:rg_command .shellescape(<q-args>), 1, <bang>0)
+command! -bang -nargs=* FU call fzf#vim#grep(g:rg_command . '-m1 ' . shellescape(<q-args>), 1, <bang>0)
+
+" Grep for word under cursor in project
+command! -bang -nargs=* ProjectRg call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, {'dir': system('git rev-parse --show-toplevel 2> /dev/null')[:-2]}, <bang>0)
+
+"----------------------------
+" FZF CUSTOM MAPPINGS
+
+" Find file in the dir of current buffer
+nnoremap <Leader>ff :<C-U>execute 'FZF' expand('%:p:h')<CR>
+
+" Find files in home directory
+map <leader>hff :Files ~<cr>
+
+" Find files in root of project (PWD)
+map <leader>pf :Files<cr>
+" PS: the :Files command seems to be equivalent to FZF -m
+nnoremap <silent> <leader>pf :FZF -m<CR>
+
+" List all of current mappings
 nmap <leader><tab> <plug>(fzf-maps-n)
 xmap <leader><tab> <plug>(fzf-maps-x)
 omap <leader><tab> <plug>(fzf-maps-o)
@@ -1069,108 +1291,21 @@ imap <c-x><c-l> <plug>(fzf-complete-line)
 
 " Advanced customization using Vim function
 inoremap <expr> <c-x><c-k> fzf#vim#complete#word({'left': '15%'})
-
-" Replace the default dictionary completion with fzf-based fuzzy completion
-inoremap <expr> <c-x><c-k> fzf#vim#complete('cat /usr/share/dict/words')
-
-
-" fzf on a floating window
-" Required:
-" - width [float range [0 ~ 1]]
-" - height [float range [0 ~ 1]]
-"
-" Optional:
-" - xoffset [float default 0.5 range [0 ~ 1]]
-" - yoffset [float default 0.5 range [0 ~ 1]]
-" - highlight [string default 'Comment']: Highlight group for border
-" - border [string default 'rounded']: Border style
-"   - 'rounded' / 'sharp' / 'horizontal' / 'vertical' / 'top' / 'bottom' / 'left' / 'right'
-" let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.6, 'highlight': 'Todo', 'border': 'default' } }
-let g:fzf_layout = { 'window': { 'width': 0.6, 'height': 0.6 } }
-
-
-map <leader>ff :Files<cr>
-map <leader>hff :Files ~<cr>
-
-" Hide statusline on fzf terminal buffers for a cleaner look
-if has('nvim') && !exists('g:fzf_layout')
-  autocmd! FileType fzf
-  autocmd  FileType fzf set laststatus=0 noshowmode noruler
-    \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
-endif
-
-
-" Search text with :F using fzf and rg
-let g:rg_command = '
-  \ rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --color "always"
-  \ -g "*.{js,json,php,md,styl,jade,html,config,py,cpp,c,go,hs,rb,conf}"
-  \ -g "!{.git,node_modules,vendor}/*" '
-
-
-" use ripgrep if available, else try ag
-if executable('rg')
-  let $FZF_DEFAULT_COMMAND = 'rg --files --hidden --follow --glob "!.git/*"'
-  set grepprg=rg\ --vimgrep
-  command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed-strings --ignore-case --hidden --follow --glob "!.git/*" --color "always" '.shellescape(<q-args>).'| tr -d "\017"', 1, <bang>0)
-elseif executable('ag')
-  let $FZF_DEFAULT_COMMAND = 'ag --hidden --ignore .git -g ""'
-  set grepprg=ag\ --nogroup\ --nocolor
-else
-endif
-
-cnoremap <C-P> <C-R>=expand("%:p:h") . "/" <CR>
-
-
-" Customize fzf colors to match your color scheme
-" - fzf#wrap translates this to a set of `--color` options
-let g:fzf_colors =
-\ { 'fg':      ['fg', 'Normal'],
-  \ 'bg':      ['bg', 'Normal'],
-  \ 'hl':      ['fg', 'Comment'],
-  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-  \ 'hl+':     ['fg', 'Statement'],
-  \ 'info':    ['fg', 'PreProc'],
-  \ 'border':  ['fg', 'Ignore'],
-  \ 'prompt':  ['fg', 'Conditional'],
-  \ 'pointer': ['fg', 'Exception'],
-  \ 'marker':  ['fg', 'Keyword'],
-  \ 'spinner': ['fg', 'Label'],
-  \ 'header':  ['fg', 'Comment'] }
-
-"----------------------------
-" FZF CUSTOM MAPPINGS
+" or replace the default dictionary completion with fzf-based fuzzy completion
+" inoremap <expr> <c-x><c-k> fzf#vim#complete('cat /usr/share/dict/words')
 
 "Recovery commands from history through FZF
 nmap <leader>fh :History:<CR>
 
-" seems to search files in current PWD
-nnoremap <silent> <leader>fm :FZF -m<CR>
-nnoremap <silent> <leader>pe :FZF -m<CR>
 
-"" Custom fzf find files in directory of active buffer
-nnoremap <Leader>ff :<C-U>call ABFiles()<CR>
-
-function! ABFiles()
-    execute 'FZF' expand('%:p:h')
-endfunction
-
-
-" Find word in project
 nnoremap <leader>pgf :RipgrepFind <C-r><C-w><Cr>
-command! -bang -nargs=* RipgrepFind call fzf#vim#grep(g:rg_command .shellescape(<q-args>), 1, <bang>0)
-command! -bang -nargs=* FU call fzf#vim#grep(g:rg_command . '-m1 ' . shellescape(<q-args>), 1, <bang>0)
 
-" Grep for word under cursos in project
+" seems to search files in current PWD
+" Search for current word under cursor in project
 nnoremap <leader>pgw :ProjectRg <C-r><C-w><Cr>
-command! -bang -nargs=* ProjectRg call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, {'dir': system('git rev-parse --show-toplevel 2> /dev/null')[:-2]}, <bang>0)
 
 " Find file in git project
-nnoremap <leader>pf :GitFiles<Cr>
-
-" Find file in project (not working)
-nnoremap <leader>pt :ProjectFiles <C-r><C-w><Cr>
-command! -bang -nargs=* ProjectFiles call fzf#vim#files("rg --files --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, {'dir': system('git rev-parse --show-toplevel 2> /dev/null')[:-2]}, <bang>0)
+nnoremap <leader>gf :GitFiles<Cr>
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1192,32 +1327,24 @@ autocmd FileType json syntax match Comment +\/\/.\+$+
 inoremap <silent><expr> <c-space> coc#refresh()
 
 
-" Use tab for trigger completion with characters ahead and navigate.
-" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
-" other plugin before putting this into your config.
-inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
 function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
+	let col = col('.') - 1
+	return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
 " Use <Tab> and <S-Tab> to navigate the completion list:
-inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+" inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+" inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
 
 " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
 " position. Coc only does snippet and additional edit on confirm.
 if has('patch8.1.1068')
-  " Use `complete_info` if your (Neo)Vim version supports it.
-  inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
+	" Use `complete_info` if your (Neo)Vim version supports it.
+	inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
 else
-  imap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+	imap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 endif
 
 " To make <cr> select the first completion item and confirm the completion when no item has been selected:
@@ -1234,12 +1361,13 @@ nmap <silent> lgr <Plug>(coc-references)
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 
 function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  else
-    call CocAction('doHover')
-  endif
+	if (index(['vim','help'], &filetype) >= 0)
+		execute 'h '.expand('<cword>')
+	else
+		call CocAction('doHover')
+	endif
 endfunction
+
 
 " Highlight the symbol and its references when holding the cursor.
 autocmd CursorHold * silent call CocActionAsync('highlight')
@@ -1255,11 +1383,11 @@ xmap <leader>lf  <Plug>(coc-format-selected)
 nmap <leader>lf  <Plug>(coc-format-selected)
 
 augroup mygroup
-  autocmd!
-  " Setup formatexpr specified filetype(s).
-  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
-  " Update signature help on jump placeholder.
-  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+	autocmd!
+	" Setup formatexpr specified filetype(s).
+	autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+	" Update signature help on jump placeholder.
+	autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
 
@@ -1324,28 +1452,28 @@ nnoremap <silent> <space>lp  :<C-u>CocListResume<CR>
 
 " Extensions
 let g:coc_global_extensions = [
-      \ 'coc-git',
-      \ 'coc-highlight',
-      \ 'coc-marketplace',
-      \ 'coc-pairs',
-      \ 'coc-html',
-      \ 'coc-css',
-      \ 'coc-json',
-      \ 'coc-java',
-      \ 'coc-rls',
-      \ 'coc-tsserver',
-      \ 'coc-yaml',
-      \ 'coc-vimlsp',
-      \ 'coc-prettier',
-      \ 'coc-snippets',
-      \ 'coc-project',
-      \ 'coc-actions',
-      \ 'coc-tsserver',
-      \ 'coc-tslint-plugin',
-      \ 'coc-eslint',
-      \ 'coc-json',
-      \ 'coc-go',
-      \ ]
+			\ 'coc-git',
+			\ 'coc-snippets',
+			\ 'coc-highlight',
+			\ 'coc-marketplace',
+			\ 'coc-pairs',
+			\ 'coc-html',
+			\ 'coc-css',
+			\ 'coc-json',
+			\ 'coc-java',
+			\ 'coc-rls',
+			\ 'coc-tsserver',
+			\ 'coc-yaml',
+			\ 'coc-vimlsp',
+			\ 'coc-prettier',
+			\ 'coc-project',
+			\ 'coc-actions',
+			\ 'coc-tsserver',
+			\ 'coc-tslint-plugin',
+			\ 'coc-eslint',
+			\ 'coc-json',
+			\ 'coc-go',
+			\ ]
 
 
 " Multiple Cursors
@@ -1355,10 +1483,10 @@ let g:coc_global_extensions = [
 " Or more vscode like behavior:
 nmap <expr> <silent> <C-d> <SID>select_current_word()
 function! s:select_current_word()
-  if !get(g:, 'coc_cursors_activated', 0)
-    return "\<Plug>(coc-cursors-word)"
-  endif
-  return "*\<Plug>(coc-cursors-word):nohlsearch\<CR>"
+	if !get(g:, 'coc_cursors_activated', 0)
+		return "\<Plug>(coc-cursors-word)"
+	endif
+	return "*\<Plug>(coc-cursors-word):nohlsearch\<CR>"
 endfunc
 
 
@@ -1427,96 +1555,6 @@ let g:any_jump_remove_comments_from_results = 1
 " 'full' - will match 'MyNamespace::MyClass'
 let g:any_jump_keyword_match_cursor_mode= 'word'
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" netrw bindings
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" rmeove the useless banner
-let g:netrw_banner = 0
-
-" use tree-view (press i to alter view style)
-let g:netrw_liststyle = 3
-
-" open splits to the right
-let g:netrw_altv = 1
-
-" If you’ve set custom wildignores netrw can inherit them by doing this:
-let g:netrw_list_hide = &wildignore
-
-" " Open netrw on vim enter
-" augroup ProjectDrawer
-"   autocmd!
-"   autocmd VimEnter * :Vexplore
-" augroup END
-
-" Change how files are opened
-" 1 - open files in a new horizontal split
-" 2 - open files in a new vertical split
-" 3 - open files in a new tab
-" 4 - open in previous window
-let g:netrw_browse_split = 4
-
-" Netrw width
-let g:netrw_winsize = 45 " that means 25% of the current view (page / window)
-
-
-" Mapping q to close netrw is easily solved:
-autocmd FileType netrw nnoremap q :bd<CR>
-" (Or if you want the split it's in to stay open:)
-autocmd FileType netrw nnoremap q :bp\|bd #<CR>
-
-
-let g:NetrwIsOpen=0
-
-function! ToggleNetrw()
-    if g:NetrwIsOpen
-        let i = bufnr("$")
-        while (i >= 1)
-            if (getbufvar(i, "&filetype") == "netrw")
-                silent exe "bwipeout " . i
-            endif
-            let i-=1
-        endwhile
-        let g:NetrwIsOpen=0
-    else
-        let g:NetrwIsOpen=1
-        silent Lexplore
-    endif
-endfunction
-
-" Add your own mapping. For example:
-noremap <silent> <F4> :call ToggleNetrw()<CR>
-
-
-" supposed improved version of the above toggle netrw function
-" try it out
-" Based on alwc's answer without using global state. This way it doesn't get out of sync when Netrw was open manually first. It will still "glitch" when opening Netrw manully after it was opend with this function. But there is nothing one can do about manual commands I guess.
-
-function! ToggleNetrw2()
-        let i = bufnr("$")
-        let wasOpen = 0
-        while (i >= 1)
-            if (getbufvar(i, "&filetype") == "netrw")
-                silent exe "bwipeout " . i
-                let wasOpen = 1
-            endif
-            let i-=1
-        endwhile
-    if !wasOpen
-        silent Lexplore
-    endif
-endfunction
-map <F3> :call ToggleNetrw2() <CR>
-
-" open in current window
-" map <F3> :Explore<CR>
-" vertical split
-" map <F4> :Vexplore<CR>
-" map <S-F4> :Vexplore<CR>
-" horizontal split
-map <F5> :Sexplore<CR>
-
-
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ale
@@ -1537,14 +1575,16 @@ let g:ale_list_window_size = 10
 let g:ale_linters = {}
 
 
+
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Expand Region
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Press + to expand the visual selection and _ to shrink it.
 
 " Customize the key mapping if you don't like the default.
-" map K <Plug>(expand_region_expand)
-" map J <Plug>(expand_region_shrink)
+vmap K <Plug>(expand_region_expand)
+vmap J <Plug>(expand_region_shrink)
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " TsLint
@@ -1636,18 +1676,11 @@ autocmd FileType javascript,typescript nnoremap <leader>ocsc :edit %<.css<CR>
 autocmd FileType javascript,typescript nnoremap <leader>ocss :edit %<.scss<CR>
 autocmd FileType javascript,typescript nnoremap <leader>oct :edit %<.test.ts<CR>
 
-" autocmd FileType javascript,typescript nnoremap <buffer> <leader>oct :edit %<.html<CR>
-" autocmd FileType javascript,typescript nnoremap <buffer> <leader>ocs :edit %<.css<CR>
-" autocmd FileType javascript,typescript nnoremap <buffer> <leader>oct :edit %<.test.ts<CR>
 
-" If in a HTML file
-" or  add the bindings in after/ftplugin/html.vim without the autocmd rules
 autocmd FileType html nnoremap <leader>occ :edit %<.ts<CR>
 autocmd FileType html nnoremap <leader>ocsc :edit %<.css<CR>
 autocmd FileType html nnoremap <leader>ocss :edit %<.scss<CR>
 
-" If in a CSS or SASS file
-" or add the bindings in after/ftplugin/css.vim without the autocmd rules
 autocmd FileType css,scss nnoremap <leader>occ :edit %<.ts<CR>
 autocmd FileType css,scss nnoremap <leader>och :edit %<.html<CR>
 
@@ -1662,12 +1695,12 @@ nnoremap <buffer> <C-]> :TernDef<CR>
 " Matchup
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Customizing the highlighting colors
-:highlight MatchParen ctermbg=blue guibg=lightblue cterm=italic gui=italic
+" :highlight MatchParen ctermbg=blue guibg=lightblue cterm=italic gui=italic
 
 " You may want to put this inside a ColorScheme autocmd so it is preserved after colorscheme changes:
 augroup matchup_matchparen_highlight
-  autocmd!
-  autocmd ColorScheme * highlight MatchParen guifg=red
+	autocmd!
+	autocmd ColorScheme * highlight MatchParen guifg=red
 augroup END
 
 " You can also highlight words differently than parentheses using the MatchWord highlighting group. You might do this if you find the MatchParen style distracting for large blocks.
@@ -1716,7 +1749,7 @@ let g:webdevicons_enable_denite = 1 " Adding the custom source to denite
 
 " solve the issue with NERDTree devicons bugging after sourcing vimrc
 if exists("g:loaded_webdevicons")
-  call webdevicons#refresh()
+	call webdevicons#refresh()
 endif
 
 
@@ -1767,8 +1800,8 @@ let g:javascript_enable_domhtmlcss = 1
 
 " vim-javascript
 augroup vimrc-javascript
-  autocmd!
-  autocmd FileType javascript setl tabstop=4|setl shiftwidth=4|setl expandtab softtabstop=4
+	autocmd!
+	autocmd FileType javascript setl tabstop=4|setl shiftwidth=4|setl expandtab softtabstop=4
 augroup END
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1802,17 +1835,17 @@ autocmd BufWritePre *.go :call CocAction('runCommand', 'editor.action.organizeIm
 
 " add go vet to ale linters
 :call extend(g:ale_linters, {
-      \"go": ['golint', 'go vet'], })
+			\"go": ['golint', 'go vet'], })
 
 " vim-go
 " run :GoBuild or :GoTestCompile based on the go file
 function! s:build_go_files()
-  let l:file = expand('%')
-  if l:file =~# '^\f\+_test\.go$'
-    call go#test#Test(0, 1)
-  elseif l:file =~# '^\f\+\.go$'
-    call go#cmd#Build(0)
-  endif
+	let l:file = expand('%')
+	if l:file =~# '^\f\+_test\.go$'
+		call go#test#Test(0, 1)
+	elseif l:file =~# '^\f\+\.go$'
+		call go#cmd#Build(0)
+	endif
 endfunction
 
 let g:go_list_type = "quickfix"
@@ -1835,34 +1868,34 @@ let g:go_highlight_extra_types = 1
 autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=4 shiftwidth=4 softtabstop=4
 
 augroup completion_preview_close
-  autocmd!
-  if v:version > 703 || v:version == 703 && has('patch598')
-    autocmd CompleteDone * if !&previewwindow && &completeopt =~ 'preview' | silent! pclose | endif
-  endif
+	autocmd!
+	if v:version > 703 || v:version == 703 && has('patch598')
+		autocmd CompleteDone * if !&previewwindow && &completeopt =~ 'preview' | silent! pclose | endif
+	endif
 augroup END
 
 augroup go
 
-  au!
-  au Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
-  au Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
-  au Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
-  au Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
+	au!
+	au Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
+	au Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
+	au Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
+	au Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
 
-  au FileType go nmap <Leader>dd <Plug>(go-def-vertical)
-  au FileType go nmap <Leader>dv <Plug>(go-doc-vertical)
-  au FileType go nmap <Leader>db <Plug>(go-doc-browser)
+	au FileType go nmap <Leader>dd <Plug>(go-def-vertical)
+	au FileType go nmap <Leader>dv <Plug>(go-doc-vertical)
+	au FileType go nmap <Leader>db <Plug>(go-doc-browser)
 
-  au FileType go nmap <leader>r  <Plug>(go-run)
-  au FileType go nmap <leader>t  <Plug>(go-test)
-  au FileType go nmap <Leader>gt <Plug>(go-coverage-toggle)
-  au FileType go nmap <Leader>i <Plug>(go-info)
-  au FileType go nmap <silent> <Leader>l <Plug>(go-metalinter)
-  au FileType go nmap <C-g> :GoDecls<cr>
-  au FileType go nmap <leader>dr :GoDeclsDir<cr>
-  au FileType go imap <C-g> <esc>:<C-u>GoDecls<cr>
-  au FileType go imap <leader>dr <esc>:<C-u>GoDeclsDir<cr>
-  au FileType go nmap <leader>rb :<C-u>call <SID>build_go_files()<CR>
+	au FileType go nmap <leader>r  <Plug>(go-run)
+	au FileType go nmap <leader>t  <Plug>(go-test)
+	au FileType go nmap <Leader>gt <Plug>(go-coverage-toggle)
+	au FileType go nmap <Leader>i <Plug>(go-info)
+	au FileType go nmap <silent> <Leader>l <Plug>(go-metalinter)
+	au FileType go nmap <C-g> :GoDecls<cr>
+	au FileType go nmap <leader>dr :GoDeclsDir<cr>
+	au FileType go imap <C-g> <esc>:<C-u>GoDecls<cr>
+	au FileType go imap <leader>dr <esc>:<C-u>GoDeclsDir<cr>
+	au FileType go nmap <leader>rb :<C-u>call <SID>build_go_files()<CR>
 
 augroup END
 
@@ -1886,21 +1919,21 @@ let g:rubycomplete_classes_in_global = 1
 let g:rubycomplete_rails = 1
 
 augroup vimrc-ruby
-  autocmd!
-  autocmd BufNewFile,BufRead *.rb,*.rbw,*.gemspec setlocal filetype=ruby
-  autocmd FileType ruby set tabstop=2|set shiftwidth=2|set expandtab softtabstop=2
+	autocmd!
+	autocmd BufNewFile,BufRead *.rb,*.rbw,*.gemspec setlocal filetype=ruby
+	autocmd FileType ruby set tabstop=2|set shiftwidth=2|set expandtab softtabstop=2
 augroup END
 
 let g:tagbar_type_ruby = {
-      \ 'kinds' : [
-      \ 'm:modules',
-      \ 'c:classes',
-      \ 'd:describes',
-      \ 'C:contexts',
-      \ 'f:methods',
-      \ 'F:singleton methods'
-      \ ]
-      \ }
+			\ 'kinds' : [
+			\ 'm:modules',
+			\ 'c:classes',
+			\ 'd:describes',
+			\ 'C:contexts',
+			\ 'f:methods',
+			\ 'F:singleton methods'
+			\ ]
+			\ }
 
 " RSpec.vim mappings
 map <Leader>t :call RunCurrentSpecFile()<CR>
@@ -1910,9 +1943,9 @@ map <Leader>a :call RunAllSpecs()<CR>
 
 " For ruby refactory
 if has('nvim')
-  runtime! macros/matchit.vim
+	runtime! macros/matchit.vim
 else
-  packadd! matchit
+	packadd! matchit
 endif
 
 " Ruby refactory
@@ -1945,6 +1978,9 @@ au FileType rust nmap <leader>gd <Plug>(rust-doc)
 let g:vim_markdown_folding_disabled = 1
 
 
+
+
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Plugins
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1954,7 +1990,6 @@ call plug#begin("~/.vim/plugged")
 Plug 'scrooloose/nerdtree'
 Plug 'jistr/vim-nerdtree-tabs'
 Plug 'Xuyuanp/nerdtree-git-plugin'
-
 
 Plug 'tpope/vim-commentary'           " use with 'gc', equivalent to vscode ctrl+/)
 Plug 'tpope/vim-surround'
@@ -1974,9 +2009,9 @@ Plug 'vim-airline/vim-airline-themes'
 
 Plug 'mkitt/tabline.vim'              " Cleaner tabs
 
-                                      " trying colorizer with named colors first, since some terminal apps use it to define colors
-Plug 'ap/vim-css-color'               "show colored hex, rgb(a) hls(a) and named colors (ex: red)
-                                      " Plug 'etdev/vim-hexcolor' "show colored hex, rgb(a) hls(a) BUT NOT named colors (ex: red)
+" trying colorizer with named colors first, since some terminal apps use it to define colors
+Plug 'ap/vim-css-color'               "show colored hex, rgb(a) hls(a) AND named colors (ex: red)
+" Plug 'etdev/vim-hexcolor' "show colored hex, rgb(a) hls(a) BUT NOT named colors (ex: red)
 Plug 'luochen1990/rainbow'            " Rainbow parenthesis improved
 Plug 'ryanoasis/vim-devicons'         " Icons for dev file types. Has to be loaded after airline
 
@@ -1989,8 +2024,6 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 " ultisnips was remapping C-tab (which vim interprets as C-i) and thus i couldnt jump forward the jump list anylonger
 " Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
-
-Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
 
 " Colorscheme
 Plug 'tomasiser/vim-code-dark'
@@ -2012,10 +2045,10 @@ Plug 'valloric/MatchTagAlways'        " Show matching and closing tags
 
 " FZF
 if isdirectory('~/.fzf')
-  Plug '~/.fzf' | Plug 'junegunn/fzf.vim'
+	Plug '~/.fzf' | Plug 'junegunn/fzf.vim'
 else
-  Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
-  Plug 'junegunn/fzf.vim'
+	Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
+	Plug 'junegunn/fzf.vim'
 endif
 
 Plug 'gabesoft/vim-ags'               " ag, rg support
@@ -2045,7 +2078,7 @@ Plug 'jelera/vim-javascript-syntax'   " used in vim-boostrap
 " typescript
 Plug 'leafgarland/typescript-vim'     " used by vim-boostrap
 Plug 'HerringtonDarkholme/yats.vim'
-                                      " Plug 'heavenshell/vim-tslint'
+" Plug 'heavenshell/vim-tslint'
 
 " Go
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
@@ -2090,3 +2123,4 @@ Plug 'godlygeek/tabular'              " Tabular align texts that grow
 
 call plug#end() " Initialize plugin system
 
+endif " end Neovim config part

@@ -3,14 +3,14 @@
 # Any items in the `env` entry below will be added as
 # environment variables. Some entries may override variables
 # set by alacritty itself.
-#env:
+env:
   # TERM variable
   #
   # This value is used to set the `$TERM` environment variable for
   # each instance of Alacritty. If it is not present, alacritty will
   # check the local terminfo database and use `alacritty` if it is
   # available, otherwise `xterm-256color` is used.
-  #TERM: xterm-256color
+  TERM: xterm-256color
 
 window:
   # Window dimensions (changes require restart)
@@ -76,7 +76,7 @@ window:
   #
   # Override the variant of the GTK theme. Commonly supported values are `dark` and `light`.
   # Set this to `None` to use the default theme variant.
-  #gtk_theme_variant: None
+  gtk_theme_variant: dark
 
 scrolling:
   # Maximum number of lines in the scrollback buffer.
@@ -103,22 +103,22 @@ scrolling:
 font:
   # The normal (roman) font face to use.
   normal:
-    family: DejaVuSansMono NF
+    family: Hack Nerd Font Mono
     style: Regular
 
   # The bold font face
   bold:
-    family: DejaVuSansMono NF
+    family: Hack Nerd Font Mono
     style: Bold
 
   # The italic font face
   italic:
-    family: DejaVuSansMono NF
+    family: Hack Nerd Font Mono
     style: Italic
 
   # Bold italic font face
   bold_italic:
-    family: DejaVuSansMono NF
+    family: Hack Nerd Font Mono
     #family: monospace
     #
     # If the bold italic family is not specified, it will fall back to the
@@ -162,6 +162,183 @@ font:
 #draw_bold_text_with_bright_colors: true
 
 # Colors (Tomorrow Night Bright)
+schemes:
+  afterglow: &afterflow
+ # Default colors
+    primary:
+      background: '#2c2c2c'
+      foreground: '#d6d6d6'
+
+      dim_foreground:    '#dbdbdb'
+      bright_foreground: '#d9d9d9'
+      dim_background:    '#202020' # not sure
+      bright_background: '#3a3a3a' # not sure
+
+    # Cursor colors
+    cursor:
+      text:   '#2c2c2c'
+      cursor: '#d9d9d9'
+
+    # Normal colors
+    normal:
+      black:   '#1c1c1c'
+      red:     '#bc5653'
+      green:   '#909d63'
+      yellow:  '#ebc17a'
+      blue:    '#7eaac7'
+      magenta: '#aa6292'
+      cyan:    '#86d3ce'
+      white:   '#cacaca'
+
+    # Bright colors
+    bright:
+      black:   '#636363'
+      red:     '#bc5653'
+      green:   '#909d63'
+      yellow:  '#ebc17a'
+      blue:    '#7eaac7'
+      magenta: '#aa6292'
+      cyan:    '#86d3ce'
+      white:   '#f7f7f7'
+
+    # Dim colors
+    dim:
+      black:   '#232323'
+      red:     '#74423f'
+      green:   '#5e6547'
+      yellow:  '#8b7653'
+      blue:    '#556b79'
+      magenta: '#6e4962'
+      cyan:    '#5c8482'
+      white:   '#828282'
+
+
+  base16_default_dark: &base16_default_dark
+    # Default colors
+    primary:
+      background: '#181818'
+      foreground: '#d8d8d8'
+
+    # Colors the cursor will use if `custom_cursor_colors` is true
+    cursor:
+      text: '#d8d8d8'
+      cursor: '#d8d8d8'
+
+    # Normal colors
+    normal:
+      black:   '#181818'
+      red:     '#ab4642'
+      green:   '#a1b56c'
+      yellow:  '#f7ca88'
+      blue:    '#7cafc2'
+      magenta: '#ba8baf'
+      cyan:    '#86c1b9'
+      white:   '#d8d8d8'
+
+    # Bright colors
+    bright:
+      black:   '#585858'
+      red:     '#ab4642'
+      green:   '#a1b56c'
+      yellow:  '#f7ca88'
+      blue:    '#7cafc2'
+      magenta: '#ba8baf'
+      cyan:    '#86c1b9'
+      white:   '#f8f8f8'
+      primary:
+        #...
+      normal:
+        #...
+      bright:
+        #...
+  darkside: &darkside
+    primary:
+      background: "#222324"
+      foreground: "#BABABA"
+
+    # Normal colors
+    normal:
+      black:    "#000000"
+      red:      "#E8341C"
+      green:    "#68C256"
+      yellow:   "#F2D42C"
+      blue:     "#1C98E8"
+      magenta:  "#8E69C9"
+      cyan:     "#1C98E8"
+      white:    "#BABABA"
+
+    # Bright colors
+    bright:
+      black:    "#666666"
+      red:      "#E05A4F"
+      green:    "#77B869"
+      yellow:   "#EFD64B"
+      blue:     "#387CD3"
+      magenta:  "#957BBE"
+      cyan:     "#3D97E2"
+      white:    "#BABABA"
+
+  # Colors (Dracula)
+  dracula:
+      # Default colors
+      primary:
+        background: '#282a36'
+        foreground: '#f8f8f2'
+      # Normal colors
+      normal:
+        black:   '#000000'
+        red:     '#ff5555'
+        green:   '#50fa7b'
+        yellow:  '#f1fa8c'
+        blue:    '#caa9fa'
+        magenta: '#ff79c6'
+        cyan:    '#8be9fd'
+        white:   '#bfbfbf'
+
+      # Bright colors
+      bright:
+        black:   '#575b70'
+        red:     '#ff6e67'
+        green:   '#5af78e'
+        yellow:  '#f4f99d'
+        blue:    '#caa9fa'
+        magenta: '#ff92d0'
+        cyan:    '#9aedfe'
+        white:   '#e6e6e6'
+  # Colors (Gruvbox dark)
+  gruvbox: &gruvbox
+    # Default colors
+    primary:
+      # hard contrast: background = '#1d2021'
+      background: '#282828'
+      # soft contrast: background = '#32302f'
+      foreground: '#ebdbb2'
+
+    # Normal colors
+    normal:
+      black:   '#282828'
+      red:     '#cc241d'
+      green:   '#98971a'
+      yellow:  '#d79921'
+      blue:    '#458588'
+      magenta: '#b16286'
+      cyan:    '#689d6a'
+      white:   '#a89984'
+
+    # Bright colors
+    bright:
+      black:   '#928374'
+      red:     '#fb4934'
+      green:   '#b8bb26'
+      yellow:  '#fabd2f'
+      blue:    '#83a598'
+      magenta: '#d3869b'
+      cyan:    '#8ec07c'
+      white:   '#ebdbb2'
+
+colors: *base16_default_dark
+
+
 #colors:
   # Default colors
   #primary:
@@ -269,7 +446,7 @@ font:
 #
 # Window opacity as a floating point number from `0.0` to `1.0`.
 # The value `0.0` is completely transparent and `1.0` is opaque.
-#background_opacity: 1.0
+background_opacity: 1.0
 
 #selection:
   #semantic_escape_chars: ",│`|:\"' ()[]{}<>\t"
