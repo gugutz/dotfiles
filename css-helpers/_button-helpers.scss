@@ -1,0 +1,133 @@
+.btn {
+  background-color: white;
+  border-color: #dbdbdb;
+  border-width: 1px;
+  color: #363636;
+  cursor: pointer;
+  justify-content: center;
+  padding-bottom: calc(0.5em - 1px);
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-top: calc(0.5em - 1px);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.btn:hover,
+.btn.btn-hovered {
+  border-color: #b5b5b5;
+  color: #363636;
+}
+
+.btn:focus,
+.btn.btn-focused {
+  border-color: #3273dc;
+  color: #363636;
+}
+
+.btn.btn-success {
+  background-color: #48c774;
+  border-color: transparent;
+  color: #fff;
+}
+
+.btn.btn-success:hover,
+.btn.btn-success.is-hovered {
+  background-color: #3ec46d;
+  border-color: transparent;
+  color: #fff;
+}
+
+.btn.btn-primary {
+  background-color: #00d1b2;
+  border-color: transparent;
+  color: #fff;
+}
+
+.btn.btn-primary:hover,
+.btn.btn-primary.btn-hovered {
+  background-color: #00c4a7;
+  border-color: transparent;
+  color: #fff;
+}
+
+.btn.btn-light {
+  background-color: whitesmoke;
+  border-color: transparent;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.btn.btn-light:hover,
+.btn.btn-light.btn-hovered {
+  background-color: #eeeeee;
+  border-color: transparent;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.btn.btn-danger {
+  background-color: #f14668;
+  border-color: transparent;
+  color: #fff;
+}
+
+.btn.btn-danger:hover,
+.btn.btn-danger.btn-hovered {
+  background-color: #f03a5f;
+  border-color: transparent;
+  color: #fff;
+}
+
+.btn.btn-warning {
+  background-color: #ffdd57;
+  border-color: transparent;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.btn.btn-warning:hover,
+.btn.btn-warning.btn-hovered {
+  background-color: #ffdb4a;
+  border-color: transparent;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+// info button
+.btn.btn-info {
+  background-color: #3298dc;
+  border-color: transparent;
+  color: #fff;
+}
+
+.btn.btn-info:hover,
+.btn.btn-info.btn-hovered {
+  background-color: #2793da;
+  border-color: transparent;
+  color: #fff;
+}
+
+// dark button
+.btn.btn-dark {
+  background-color: #363636;
+  border-color: transparent;
+  color: #fff;
+}
+
+.btn.btn-dark:hover,
+.btn.btn-dark.btn-hovered {
+  background-color: #2f2f2f;
+  border-color: transparent;
+  color: #fff;
+}
+
+// black button
+.button.is-black {
+  background-color: #0a0a0a;
+  border-color: transparent;
+  color: white;
+}
+
+.button.is-black:hover,
+.button.is-black.is-hovered {
+  background-color: #040404;
+  border-color: transparent;
+  color: white;
+}

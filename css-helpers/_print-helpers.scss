@@ -1,0 +1,43 @@
+@page reset-page {
+  size: auto;
+  margin: 0mm;
+}
+@media screen, print {
+  html {
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+@page a4-paper {
+  size: A4;
+  margin: 0mm;
+}
+
+@media print {
+  html {
+    margin: 0;
+    background: #ffffff;
+  }
+  body {
+    width: 21cm;
+    height: 29.7cm;
+    margin: 30mm 45mm 30mm 45mm;
+  }
+}
+
+.screen-only {
+  @media print {
+    display: none;
+  }
+}
+
+.print-only {
+  @media screen {
+    display: none;
+  }
+}

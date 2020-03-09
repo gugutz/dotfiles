@@ -58,11 +58,11 @@ alias cd..='cd ..'
 # cd into dotfiles dir
 alias cddt='cd ~/dotfiles'
 
-# cd into PEP directory
+# cd into different projects directories
 alias cdpep='cd ~/code/qualirede/pep'
-
-# cd into PEP directory
 alias cdpepapi='cd ~/code/qualirede/pep-api'
+alias cdwego='cd ~/code/out/wego'
+alias cdttc='cd ~/code/out/tccExpo'
 # ---------------------------------------------
 
 # git aliases
@@ -83,11 +83,11 @@ alias gplod='git pull origin develop'
 alias glg='git log'
 
 alias whichterm='ps -o 'cmd=' -p $(ps -o 'ppid=' -p $$)'
-alias whichterm2='ps -p $$ -o args'
-alias findxprops="xprop _NET_WM_PID WM_CLASS"
-alias whichdisplaymanager="'grep '/usr/s\?bin' /etc/systemd/system/display-manager.service"
+alias whichshell='ps -p $$ -o args'
+alias descwmprops="xprop _NET_WM_PID WM_CLASS"
+alias whichdm="grep '/usr/s\?bin' /etc/systemd/system/display-manager.service"
 
-alias list_monitors="xrandr --query | grep " connected" | cut -d" " -f1"
+alias listmonitors="xrandr --query | grep ' connected' | cut -d' ' -f1"
 
 alias biosinfo='sudo dmidecode -t 2'
 

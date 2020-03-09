@@ -489,6 +489,11 @@ nnoremap cvs :so ~/.vimrc<CR>
 nnoremap cno :e ~/.config/nvim/init.vim<CR>
 nnoremap cns :so ~/.config/nvim/init.vim<CR>
 
+" Comment line with C-/ like in VSCode
+" for some reason vim ses C-/ as C-_
+nmap <C-_> gcc
+" gv restores the last visual selection made
+vmap <C-_>gcgv
 
 " Retain visual selection after indenting a block with > or <
 vnoremap > >gv
@@ -1393,13 +1398,13 @@ augroup end
 
 " Applying codeAction to the selected region.
 " Example: `<leader>aap` for current paragraph
-xmap <leader>a  <Plug>(coc-codeaction-selected)
-nmap <leader>a  <Plug>(coc-codeaction-selected)
+xmap <leader>la  <Plug>(coc-codeaction-selected)
+nmap <leader>la  <Plug>(coc-codeaction-selected)
 
 " Remap keys for applying codeAction to the current line.
-nmap <leader>ac  <Plug>(coc-codeaction)
+nmap <leader>lfl  <Plug>(coc-codeaction)
 " Apply AutoFix to problem on the current line.
-nmap <leader>qf  <Plug>(coc-fix-current)
+nmap <leader>lql  <Plug>(coc-fix-current)
 
 
 " Introduce function text object
@@ -1643,8 +1648,9 @@ let g:blameLineGitFormat = '%an - %s'
 
 " Use TAB to expand emmet snippets (equivalent to <C-y>,
 " let g:user_emmet_expandabbr_key = '<S-tab>'
+
 " Create another binding for emmet, because the default is not great
-" map <C-Space> <c-y>,
+map <leader>ee <c-y>,
 
 " navigate to edit points
 inoremap <C->> <c-y>n<CR>
@@ -1663,6 +1669,10 @@ let g:prettier#autoformat = 0
 
 " Format supported files on save
 autocmd BufWritePre *.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.graphql,*.md,*.vue,*.yaml,*.html PrettierAsync
+
+" make errors less obstrusive, like dont open an extra window and dont require closing
+let g:prettier#quickfix_enabled=0
+
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -2035,6 +2045,11 @@ Plug 'tpope/vim-git'
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 
+
+" Auto closing of pairs
+Plug 'jiangmiao/auto-pairs'
+" This one sounds great for ruby and vimscript autoclosing
+Plug 'tpope/vim-endwise'
 
 " jump to matching pairs and highlight them (modern replacement for matchit and matchparen)
 Plug 'andymass/vim-matchup'
