@@ -1,1 +1,96 @@
-/home/tau/dotfiles/vim/coc-settings.json
+{
+  // coc general settings
+  "coc.preferences.extensionUpdateCheck": "never",
+  //"coc.preferences.formatOnSaveFiletypes": ["typescript", "typescript.tsx", "json", "javascript"],
+  // -------------------------------------------
+  // completion
+  "suggest.autoTrigger": "always",
+  // To support completion trigger on insert enter (autoTrigger must be 'always' to enable this option)
+  "suggest.triggerAfterInsertEnter": true,
+  // Not make vim select first item on completion start
+  "suggest.noselect": false,
+  "suggest.minTriggerInputLength": 1,
+  // To enable the commit characters feature, use:
+  "suggest.acceptSuggestionOnCommitCharacter": true,
+  //"suggest.snippetIndicator": "►",
+  "suggest.snippetIndicator": "~",
+  "suggest.echodocSupport": true,
+  "suggest.floatEnable": true,
+  // -------------------------------------------
+  // diagnostics
+  "diagnostic.enable": true,
+  "diagnostic.level": "hint",
+  // show diagnostics messages in current line line VSCode.
+  "diagnostic.virtualText": false,
+  //"diagnostic.virtualTextPrefix": ">",
+  "diagnostic.errorSign": "⛌",
+  "diagnostic.infoSign": "🛈",
+  "diagnostic.warningSign": "⚠",
+  "diagnostic.hintSign": "❗",
+  "diagnostic.refreshOnInsertMode": true,
+  "diagnostic.messageTarget": "float",
+  // syntax highlight diagnostics withs their parent buffer
+  "diagnostic.filetypeMap": { "default": "bufferType" },
+  // show all diagnostics of current line if there are none at the current position
+  "diagnostic.checkCurrentLine": true,
+  "diagnostic.messageDelay": 250,
+  // disable coc for display diagnostics and use ale, restart required on change."
+  "diagnostic.displayByAle": false,
+  // -------------------------------------------
+  // signature
+  "signature.target": "float",
+  // -------------------------------------------
+  // codelens
+  //Enable codeLens feature, require neovim with set virtual text feature.
+  "codeLens.enable": true,
+  // -------------------------------------------
+  // refactor
+  "refactor.openCommand": "vsplit",
+  // -------------------------------------------
+  // typescript
+  "typescript.implementationsCodeLens.enable": false,
+  "typescript.referencesCodeLens.enable": false,
+  "eslint.run": "onSave",
+  "eslint.enable": false,
+  // -------------------------------------------
+  // prettier
+  "prettier.disableLanguages": [],
+  "prettier.tslintIntegration": true,
+  "prettier.eslintIntegration": true,
+  // -------------------------------------------
+  // eslint
+  "eslint.autoFixOnSave": false,
+  "eslint.packageManager": "yarn",
+  // -------------------------------------------
+  // tslint
+  "tslint.packageManager": "yarn",
+  "tslint.autoFixOnSave": true,
+  "tslint.jsEnable": false,
+  // -------------------------------------------
+  // git
+  "git.addGBlameToVirtualText": false, // git blaming like vscode gitlens
+  "git.addedSign.hlGroup": "GitGutterAdd",
+  "git.changedSign.hlGroup": "GitGutterChange",
+  "git.removedSign.hlGroup": "GitGutterDelete",
+  "git.topRemovedSign.hlGroup": "GitGutterDelete",
+  "git.changeRemovedSign.hlGroup": "GitGutterChangeDelete",
+  // -------------------------------------------
+  // java
+  "java.errors.incompleteClasspath.severity": "ignore",
+  "java.format.settings.url": "/home/seraphybr-fun/.config/coc/extensions/node_modules/redhat.java/eclipse-formatter.xml",
+  "java.trace.server": "verbose",
+  // -------------------------------------------
+  // language servers
+  "languageserver": {
+    "ccls": {
+      "command": "ccls",
+      "filetypes": ["c", "cpp", "objc", "objcpp"],
+      "rootPatterns": [".ccls", "compile_commands.json", ".vim/", ".git/", ".hg/"],
+      "initializationOptions": {
+        "cache": {
+          "directory": "/tmp/ccls"
+        }
+      }
+    }
+  }
+}

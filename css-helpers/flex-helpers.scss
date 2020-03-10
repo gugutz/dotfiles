@@ -1,0 +1,60 @@
+.flex {
+  display: flex;
+}
+.rows {
+  flex-direction: row;
+}
+.columns {
+  flex-direction: column;
+}
+.row,
+column {
+  flex: 1;
+}
+
+// child positioning
+.align-start {
+  align-items: flex-start;
+}
+.align-end {
+  align-items: flex-end;
+}
+.align-center {
+  align-items: center;
+}
+.align-baseline {
+  align-items: baseline;
+}
+.align-stretch {
+  align-items: stretch;
+}
+
+// self-positioning
+.position-left {
+  justify-content: flex-start;
+}
+.position-right {
+  justify-content: flex-end;
+}
+.position-top {
+  align-self: flex-start;
+}
+.position-bottom {
+  align-self: flex-end;
+}
+.position-center {
+  align-self: center;
+  justify-content: center;
+}
+.vposition-center {
+  align-self: center;
+}
+.hposition-center {
+  justify-content: center;
+}
+.position-stretch {
+  align-self: stretch;
+}
+.position-baseline {
+  align-self: baseline;
+}
