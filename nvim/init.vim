@@ -80,6 +80,7 @@ Plug 'honza/vim-snippets'
 
 " Colorscheme
 Plug 'tomasiser/vim-code-dark'
+Plug 'dunstontc/vim-vscode-theme'
 Plug 'chriskempson/base16-vim'
 
 " Git
@@ -115,7 +116,7 @@ Plug 'junegunn/vim-easy-align'
 " React
 Plug 'mxw/vim-jsx'                    " JSX syntax colors and indent support. Depends on vim-javascript
 Plug 'xojs/vim-xo'                    " Install vim-xo for xo linting support
-Plug 'prettier/vim-prettier', { 'do': 'npm install' }
+" Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
 Plug 'editorconfig/editorconfig-vim'
 
 " Javascript and Typescript
@@ -286,7 +287,9 @@ if empty(glob("~/.vim/colors/Tomorrow-Night-Bright.vim"))
 endif
 
 silent! colorscheme codedark
-  " colorscheme Tomorrow-Night-Bright
+" colorscheme dark_plus
+
+" Load colorscheme based on file extensions
 " autocmd BufEnter * colorscheme codedark
 " autocmd BufEnter *.html colorscheme Tomorrow-Night-Bright
 
@@ -708,6 +711,7 @@ nnoremap cvo :e ~/.vimrc<CR>
 nnoremap cvs :so ~/.vimrc<CR>
 nnoremap cno :e ~/.config/nvim/init.vim<CR>
 nnoremap cns :so ~/.config/nvim/init.vim<CR>
+nnoremap cnco :CocConfig<CR>
 
 " Comment line with C-/ like in VSCode
 " for some reason vim ses C-/ as C-_
@@ -1077,15 +1081,17 @@ set pumblend=0
 
 " vim-airline
 let g:airline_theme='codedark'
+" let g:airline_theme='base16-spacemacs'
+
 let g:airline_skip_empty_sections = 1
 
 
 " extensions
 let g:airline#extensions#tabline#enabled = 1       " enable tabline upport
 let g:airline#extensions#tabline#formatter = 'unique_tail'
-let g:airline#extensions#tabline#left_sep = ' '
+let g:airline#extensions#tabline#left_sep = '▶'
 let g:airline#extensions#tabline#left_alt_sep = '|'
-let g:airline#extensions#tabline#tab_nr_type = 1   " show tab numbers
+let g:airline#extensions#tabline#tab_nr_type = 0   " show tab numbers
 let g:airline#extensions#tabline#show_buffers = 0  " hide buffers
 let g:airline#extensions#tabline#tab_min_count = 1 " show tabline even with only 1 tab
 
@@ -1352,7 +1358,7 @@ nnoremap <leader>gf :GitFiles<Cr>
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" COC
+" COC settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
@@ -1373,14 +1379,12 @@ inoremap <silent><expr> <c-space> coc#refresh()
 " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
 " position. Coc only does snippet and additional edit on confirm.
 if has('patch8.1.1068')
-	" Use `complete_info` if your (Neo)Vim version supports it.
-	inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
+  " Use `complete_info` if your (Neo)Vim version supports it.
+  inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
 else
-	imap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+  imap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 endif
 
-" To make <cr> select the first completion item and confirm the completion when no item has been selected:
-inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm() : "\<C-g>u\<CR>"
 
 
 " Remap keys for gotos
@@ -1513,6 +1517,20 @@ endfunc
 
 " Overide the default multiple cursors range highlight, which is basicly transparent and difficult to see
 hi CocCursorRange guibg=#b16286 guifg=#ebdbb2
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" coc prettier
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+command! -nargs=0 Prettier :call CocAction('runCommand', 'prettier.formatFile')
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" tpope's Endwise
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" disable mapping to not break <CR> confirm selection in coc.nvim (I don't even use them anyways)
+let g:endwise_no_mappings = 1
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " any jump
@@ -1680,20 +1698,42 @@ inoremap <C->> <c-y>n<CR>
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Prettier
+" vim prettier
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" let g:prettier#config#print_width = 100
-let g:prettier#autoformat = 0
-" let g:prettier#config#tab_width = 4
+" PS: using coc-prettier for now because of annoying vim-prettier bug of jumping the cursor to the top of the
+" file when formatting
+
+
+" Enable auto formatting of files that have "@format" or "@prettier" tag
+" let g:prettier#autoformat = 1
+"
+" Allow auto formatting for files without "@format" or "@prettier" tag
+" let g:prettier#autoformat_require_pragma = 0
+
+" Force the prettier command to be async (requires neovim or vim8)
+" let g:prettier#exec_cmd_async = 1
 
 " Format supported files on save
-autocmd BufWritePre *.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.graphql,*.md,*.vue,*.yaml,*.html PrettierAsync
+" autocmd BufWritePre *.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.graphql,*.md,*.vue,*.yaml,*.html PrettierAsync
 
-" make errors less obstrusive, like dont open an extra window and dont require closing
-let g:prettier#quickfix_enabled=0
+" dont open the quickfix window when there are errors
+" let g:prettier#quickfix_enabled=0
+
+" dont focus on the quickfix window when there are errors
+" let g:prettier#quickfix_auto_focus = 0
 
 
+" Prettier parameters
+" let g:prettier#config#print_width = 100
+" let g:prettier#config#tab_width = 4
+" let g:prettier#config#print_width = 'auto'
+" let g:prettier#config#tab_width = 'auto'
+" let g:prettier#config#use_tabs = 'auto'
+" let g:prettier#config#parser = ''
+" let g:prettier#config#config_precedence = 'file-override'
+" let g:prettier#config#prose_wrap = 'preserve'
+" let g:prettier#config#html_whitespace_sensitivity = 'css'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Angular
@@ -1721,11 +1761,13 @@ set wildcharm=<C-z>
 nnoremap <key> :edit %<.<C-z>
 
 nnoremap <buffer> <C-]> :TernDef<CR>
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Matchup
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 " Customizing the highlighting colors
-" :highlight MatchParen ctermbg=blue guibg=lightblue cterm=italic gui=italic
+" highlight MatchParen ctermbg=blue guibg=white cterm=italic gui=italic
 
 " You may want to put this inside a ColorScheme autocmd so it is preserved after colorscheme changes:
 augroup matchup_matchparen_highlight
@@ -1734,11 +1776,11 @@ augroup matchup_matchparen_highlight
 augroup END
 
 " You can also highlight words differently than parentheses using the MatchWord highlighting group. You might do this if you find the MatchParen style distracting for large blocks.
-:highlight MatchWord ctermfg=red guifg=blue cterm=underline gui=underline
+highlight MatchWord ctermfg=red guifg=blue cterm=underline gui=underline
 
 " There are also MatchParenCur and MatchWordCur which allow you to configure the highlight separately for the match under the cursor.
-:highlight MatchParenCur cterm=underline gui=underline
-:highlight MatchWordCur cterm=underline gui=underline
+highlight MatchParenCur cterm=underline gui=underline
+highlight MatchWordCur cterm=underline gui=underline
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Rainbow Parentheses Improved
@@ -1756,14 +1798,12 @@ let g:rainbow_conf = {'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'fire
 " NEVER INSTALL THIS PLUGIN AGAIN, TOOK ME HOURS TO FIGURE IT WAS THIS PLUGIN CAUSING UNBEARABLE LAG
 " APPEARANTLY THIS FUCKER WAS SLOWING THINGS DOWN
 
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " VIM ILLUMINATE SETTINGS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " disable illuminate words on NerdTREE
 let g:Illuminate_ftblacklist = ['nerdtree']
-
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " VIM DEVICONS SETTINGS
@@ -1782,7 +1822,6 @@ if exists("g:loaded_webdevicons")
 	call webdevicons#refresh()
 endif
 
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " grep
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1793,7 +1832,6 @@ let Grep_Skip_Files = '*.log *.db'
 let Grep_Skip_Dirs = '.git node_modules'
 
 autocmd VimEnter * call NERDTreeHighlightFile('jade', 'green', 'none', 'green', '#151515')
-
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Indent Lines

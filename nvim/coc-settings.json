@@ -1,7 +1,8 @@
 {
   // coc general settings
   "coc.preferences.extensionUpdateCheck": "never",
-  //"coc.preferences.formatOnSaveFiletypes": ["typescript", "typescript.tsx", "json", "javascript"],
+  // using coc-prettier with this beucase vim-prettier has that annoying jump cursor to top of the file bug
+  "coc.preferences.formatOnSaveFiletypes": ["html", "typescript", "typescript.tsx", "json", "javascript"],
   // -------------------------------------------
   // completion
   "suggest.autoTrigger": "always",
