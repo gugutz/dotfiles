@@ -36,131 +36,107 @@
 
 ;; source: https://raw.githubusercontent.com/gilbertw1/emacs-literate-starter/master/emacs.org
 
-(add-to-list 'load-path "~/dotfiles/emacs.d/packages/gcmh")
-(require 'gcmh)
-(gcmh-mode 1)
-
-;;------------------------------------------
-
-;; DEFER GC ON STARTUP
-
-;; saving original gc value
-(defvar original-gc-cons-threshold gc-cons-threshold)
-
-;; defining a new value  for gc
-;; (defvar better-gc-cons-threshold 67108864) ;; 64mb
-(defvar better-gc-cons-threshold 100000000) ;; 100mb
+(defvar custom-gc-cons-threshold 402653184)
 
 ;; increase to defer gc on emacs startup
 (setq gc-cons-threshold most-positive-fixnum ;; 2^61 bytes
   gc-cons-percentage 0.6
   garbage-collection-messages t)
 
-;; reset gc to 100mb after emacs loads
+
+;; reset gc after emacs loads
 ;; 100mb is the value recommended by lsp github page
+(eval-and-compile
+  (add-hook 'emacs-startup-hook
+    (setq gc-cons-threshold custom-gc-cons-threshold ;; 400mb
+      gc-cons-percentage 0.6)))
+
+;; automatically GC when emacs is out of focus
+;; source: M-EMACS
 (add-hook 'emacs-startup-hook
   (lambda ()
-    (setq gc-cons-threshold better-gc-cons-threshold) ; 16mb
-    (setq gc-cons-percentage 0.1)))
+    (if (boundp 'after-focus-change-function)
+      (add-function :after after-focus-change-function
+        (lambda ()
+          (unless (frame-focus-state)
+            (garbage-collect))))
+      (add-hook 'after-focus-change-function 'garbage-collect))))
 
-;;------------------------------------------
 
 ;; raise gc-cons-threshold while the minibuffer is active, so the GC doesn’t slow down expensive commands (or completion frameworks, like helm and ivy).
-
-;; store emacs original gc value in a variable
-(defvar tau-gc-cons-threshold gc-cons-threshold)
-
 
 (defun gc-minibuffer-setup-hook ()
   "Set gc consing treshold to the higher possible value."
   (setq gc-cons-threshold most-positive-fixnum))
 
-(defun gc-minibuffer-exit-hook ()
-  "Set gc consing treshold to the higher possible value."
-  ;; Defer it so that commands launched immediately after will enjoy the
-  ;; benefits.
-  (run-at-time
-    1 nil (lambda () (setq gc-cons-threshold tau-gc-cons-threshold))))
-
-;; (defun gc-minibuffer-setup-hook ()
-;;   "Set gc consing treshold to the higher possible value."
-;;   (setq gc-cons-threshold most-positive-fixnum))
-
-;; (defun gc-minibuffer-exit-hook ()
-;;   "Set gc consing treshold to the higher possible value."
-;;   ;; Defer it so that commands launched immediately after will enjoy the
-;;   ;; benefits.
-;;   (run-at-time
-;;     1 nil (lambda () (setq gc-cons-threshold tau-gc-cons-threshold))))
 
 (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
+
+(defun gc-minibuffer-exit-hook ()
+  "Set gc consing treshold to the higher possible value."
+  ;; Defer it so that commands launched immediately after will enjoy the benefits.
+  (run-at-time
+    1 nil (lambda () (setq gc-cons-threshold custom-gc-cons-threshold))))
+
 (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)
+
+;; here is how to multiply gc-cons-treshold
+;; (* better-gc-cons-threshold 2)
 
 ;;------------------------------------------
 
 ;; Unset file-name-handler-alist temporarily.
 ;; Every file opened and loaded by Emacs will run through this list to check for a proper handler for the file, but during startup, it won’t need any of them.
 
-(defvar tau--file-name-handler-alist file-name-handler-alist)
+(defvar original-file-name-handler-alist file-name-handler-alist)
 (setq file-name-handler-alist nil)
 
-
-;; restore it later:
 (add-hook 'emacs-startup-hook
   (lambda ()
-    (setq file-name-handler-alist tau--file-name-handler-alist)))
-
+    (setq file-name-handler-alist original-file-name-handler-alist)))
 
 ;;****************************************************************
 ;;
 ;;; BOOTSTRAP PACKAGE MANAGEMENT
 
-;; All these optimizations are now only made if EMACS 27 is not being used, since EMACS 27 brought a lot of startup speed improvements
 
-;; Precomputes a big autoloads file so that activation of packages can be done much faster.
-;; It also causes variables like package-user-dir and package-load-list to be consulted when 'package-quickstart-refresh' is run rather than at startup so you don't need to set them in your early init file.
-
+;; put all load-paths into one single big file
 (when EMACS27+
   (setq package-quickstart t))
 
 
-;; We're going to set the =load-path= ourselves and avoid calling =(package-initilize)= (forperformance reasons) so we need to set =package--init-file-ensured= to true to tell =package.el= to not automatically call it on our behalf. Additionally we're setting =package-enable-at-startup= to nil so that packages will not automatically be loaded for us since =use-package= will be handling that.
-
 ;; in ~/.emacs.d/init.el (or ~/.emacs.d/early-init.el in Emacs 27)
-(unless EMACS27+
-  (eval-and-compile
-    (setq load-prefer-newer t
-      package-user-dir (concat user-emacs-directory "elpa/")
-      package-enable-at-startup t
-      package--init-file-ensured nil)
+(eval-and-compile
+  (setq load-prefer-newer t
+    package-user-dir (concat user-emacs-directory "elpa/")
+    ;; don't try to mount the load path based on installed packages
+    package-init-file-ensured t
+    ;; don't load packages on startup; use-package will to that
+    package-enable-at-startup nil)
 
-    (unless (file-directory-p package-user-dir)
-      (make-directory package-user-dir t)))
-  )
+  (unless (file-directory-p package-user-dir)
+    (make-directory package-user-dir t)))
 ;; -------------------------------------
 
 
-;; Manually Set `load-path' so that we don't have to call `package-initialize' at runtime which is slow.
+;; Manually Set `load-path'
 ;; This load-path will actually be faster than the one created by `package-initialize' because it appends the elpa packages to the end of the load path.
-;; Otherwise any time a builtin package was required it would have to search all of third party paths first.
-;; PS: emacs 27 does this with `package-quickstart' feature
 
-(unless EMACS27+
-  (eval-and-compile
-    (setq load-path (append load-path (directory-files package-user-dir t "^[^.]" t))))
-  )
+(eval-and-compile
+  (setq load-path (append load-path (directory-files package-user-dir t "^[^.]" t))))
 
 ;; -------------------------------------
 
 ;; Initialize Package Management
 ;;
-;; Require package.el, add melpa and org archives and install and load use-package if not already installed
-
-;; Using `eval-when-compile' to perform all of the package initialization during compilation so that when byte compiled, all of this time consuming
-;; code is skipped.
+;; Using `eval-when-compile' to perform all of the package initialization during compilation so that when byte compiled, all of this time consuming code is skipped.
 ;; This can be done because the result of byte compiling `use-package' statements results in the macro being fully expanded at which point =use-package= isn't actually required any longer.
 
 ;; Since the code is automatically compiled during runtime, if the configuration hasn't already been previously compiled manually then all of the package initialization will still take place at startup.
+
+;; use-package settings
+(setq use-package-always-defer t)
+(setq use-package-verbose t)
 
 (eval-when-compile
   (require 'package)
@@ -171,8 +147,7 @@
     (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
 
   ;; emacs 27 calls package initialize automatically so `package-initilize' is only required on older versions
-  (unless EMACS27+
-    (package-initialize))
+  (package-initialize)
 
   ;; install use-package if not already installed
   (unless (package-installed-p 'use-package)
@@ -181,13 +156,9 @@
 
   ;; load use-package
   (require 'use-package)
-  ;; only always defer if not emacs 27+
-  (unless EMACS27+
-    (setq use-package-always-defer t))
   (setq use-package-always-ensure t)
   (setq use-package-enable-imenu-support t)
   (setq use-package-minimum-reported-time 0)
-  (setq use-package-verbose t)
   (setq use-package-compute-statistics t)
   )
 
@@ -281,8 +252,7 @@
 (setq my-theme 'vscode-dark-plus)
 
 ;;  Load the theme
-(eval-when-compile
-  (load-theme my-theme t))
+(add-hook 'window-setup-hook (lambda () (load-theme my-theme t)))
 
 ;;****************************************************************
 ;;
@@ -479,13 +449,13 @@
   :ensure nil
   :preface
   (defun tau-disable-hl-line-h ()
-	  (when hl-line-mode
-	    (setq-local tau-buffer-hl-line-mode t)
-	    (hl-line-mode -1)))
+    (when hl-line-mode
+      (setq-local tau-buffer-hl-line-mode t)
+      (hl-line-mode -1)))
 
   (defun tau-enable-hl-line-maybe-h ()
-	  (when tau-buffer-hl-line-mode
-	    (hl-line-mode +1)))
+    (when tau-buffer-hl-line-mode
+      (hl-line-mode +1)))
 
   ;; Temporarily disable `hl-line' when selection is active, since it doesn't
   ;; serve much purpose when the selection is so much more visible.
@@ -757,19 +727,8 @@ all hooks after it are ignored.")
 
 (global-set-key [remap keyboard-quit] #'tau/escape)
 
-;; -------------------------------------
-
-;;
-;; OTHER SETTINGS
 
 (use-package diminish)
-
-
-
-;;****************************************************************
-;;
-;;; Emacs settings
-
 
 ;;****************************************************************
 ;;
@@ -841,7 +800,7 @@ all hooks after it are ignored.")
 
 
 (use-package abbrev
-  :defer 4
+  :defer 3
   :ensure nil
   :config
   (setq abbrev-file-name (concat config-dir "abbrev.el"))
@@ -852,7 +811,7 @@ all hooks after it are ignored.")
 (use-package recentf
   :ensure nil
   ;; Loads after 1 second of idle time.
-  :defer 1
+  :defer 2
   :init
   :hook
   (pre-command . recentf-mode)
@@ -957,6 +916,7 @@ all hooks after it are ignored.")
 ;;; Evil
 
 (use-package evil
+  :demand t
   :config
   (evil-mode 1)
   ;; change cursor color according to mode
@@ -1115,6 +1075,7 @@ all hooks after it are ignored.")
 ;;; Ivy
 
 (use-package ivy
+  :demand t
   :bind
   ("C-s" . swiper)
   ("C-c C-r" . ivy-resume)
@@ -1463,6 +1424,7 @@ all hooks after it are ignored.")
 ;;; Treemacs
 
 (use-package treemacs
+  :demand t
   :bind
   ("<f8>" . treemacs)
   :hook
@@ -1474,6 +1436,7 @@ all hooks after it are ignored.")
   )
 
 (use-package treemacs-evil
+  :demand t
   :after treemacs evil
   :config
   (evil-define-key 'treemacs treemacs-mode-map (kbd "h") #'treemacs-TAB-action)
@@ -1969,7 +1932,7 @@ Version 2016-07-17"
   (setq company-minimum-prefix-length 1)
   (setq company-backends '(company-capf))
   (setq company-frontends '(company-pseudo-tooltip-frontend
-			                       company-echo-metadata-frontend))
+                             company-echo-metadata-frontend))
   (setq company-idle-delay 0.1) ;; decrease delay before autocompletion popup shows
   (setq company-echo-delay 0.0) ;; remove annoying blinking
   (setq company-selection-wrap-around t) ; loop over candidates
@@ -2867,7 +2830,7 @@ Adapted from `describe-function-or-variable'."
   (define-key emacs-lisp-mode-map (kbd "C-c C-b") #'eval-buffer)
   (bind-key "RET" 'comment-indent-new-line emacs-lisp-mode-map)
   (bind-key "C-c c" 'compile emacs-lisp-mode-map)
-  (setq lisp-indent-function 'common-lisp-indent-function)
+  ;; (setq lisp-indent-function 'common-lisp-indent-function)
   (setq-default lisp-indent-offset 2)
   )
 

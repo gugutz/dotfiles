@@ -637,26 +637,26 @@ function! SmartTab()
   let l:line = strpart( getline('.'), 0, col('.')-1)
   let l:lastchar = matchstr(getline('.'), '.\%' . col('.') . 'c')
 
+  " if popup menu is visible, go to next in the list
   if pumvisible()
-    " if popup menu is visible, go to next in the list
     return "\<C-n>"
+  " if there is a snippet to expand, do it
   elseif coc#expandableOrJumpable()
-    " if there is a snippet to expand, do it
     return "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>"
+  "if the line consists only of spaces, then insert TAB character"
   elseif l:line =~ '^\s*$'
-    "if the line consists only of spaces, then insert TAB character"
     return "\<Tab>"
+  "if there is a space behind the cursor, theres nothing to do. insert TAB char
   elseif <SID>check_back_space()
-    "if there is a space behind the cursor, theres nothing to do. insert TAB char
     return "\<TAB>"
+  " if the last character is a slash, call file-completion
   elseif l:lastchar =~ "/"
-    " if the last character is a slash, call file-completion
     return "\<C-x>\<C-f>"
-    " call omni completion if has omnifunc
+  " call omni completion if has omnifunc
   elseif len(&omnifunc) > 0
     return "\<C-x>\<C-o>"
+  " call word completion otherwise
   else
-    " call word completion otherwise
     return "\<C-n>"
   endif
 endfunction
