@@ -332,10 +332,8 @@ autocmd VimEnter * silent exec "! echo -ne '\e[1 q'"
 autocmd VimLeave * silent exec "! echo -ne '\e[5 q'"
 
 "" Disable the blinking cursor.
-set guicursor=a:blinkon0
+" set guicursor=a:blinkon0
 
-"" Disable the blinking cursor.
-set gcr=a:blinkon0
 
 "" Fix cursor at center of screen while scrolling
 set scrolloff=1000

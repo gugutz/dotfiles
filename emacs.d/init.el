@@ -252,7 +252,8 @@
 (setq my-theme 'vscode-dark-plus)
 
 ;;  Load the theme
-(add-hook 'window-setup-hook (lambda () (load-theme my-theme t)))
+;; (add-hook 'window-setup-hook (lambda () (load-theme my-theme t)))
+(load-theme my-theme t)
 
 ;;****************************************************************
 ;;
@@ -393,6 +394,22 @@
 ;; ** auto balance windows area
 (global-set-key (kbd "C-M-+") 'balance-windows-area)
 
+
+;; *********************************
+;; Frame transparency toggle
+
+(defun tau/toggle-transparency ()
+  (interactive)
+  (let ((alpha (frame-parameter nil 'alpha)))
+    (set-frame-parameter
+      nil 'alpha
+      (if (eql (cond ((numberp alpha) alpha)
+                 ((numberp (cdr alpha)) (cdr alpha))
+                 ;; Also handle undocumented (<active> <inactive>) form.
+                 ((numberp (cadr alpha)) (cadr alpha)))
+            100)
+        '(85 . 50) '(100 . 100)))))
+(global-set-key (kbd "C-c t") 'tau/toggle-transparency)
 
 ;; *********************************
 ;; Eyebrowse

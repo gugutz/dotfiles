@@ -460,7 +460,7 @@ nnoremap cns :so ~/.config/nvim/init.vim<CR>
 " for some reason vim ses C-/ as C-_
 nmap <C-_> gcc
 " gv restores the last visual selection made
-vmap <C-_>gcgv
+vmap <C-_> gcgv
 
 " Retain visual selection after indenting a block with > or <
 vnoremap > >gv
@@ -569,11 +569,11 @@ set go+=a               " Visual selection automatically copied to the clipboard
 " * If you also want to use Linux's "selection" clipboard, you will also need unnamed.
 
 " Here is a cross-platform value:
-" set clipboard^=unnamed,unnamedplus
+set clipboard^=unnamed,unnamedplus
 
-if has('unnamedplus')
-  set clipboard=unnamed,unnamedplus
-endif
+"   set clipboard=unnamed,unnamedplus
+" if has('unnamedplus')
+" endif
 
 noremap YY "+y<CR>
 noremap <leader>p "+gP<CR>

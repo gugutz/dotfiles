@@ -99,6 +99,9 @@ alias kernelrelease='uname -r'
 # list open ports (flags: tcp, udp, listening, ports, name?)
 # use it with sudo to also show PID entries
 alias openports='sudo netstat -tulpn '
+alias listopenports='ss -tuna | grep LISTEN'
+alias checkports='ss -tuna'
+
 
 alias procinfo='ps aux | grep'
 
@@ -115,3 +118,8 @@ alias pppath='echo $PATH | tr -s ':' '\n''
 alias findexecutable='find / -type f -executable -name'
 # second version with locate, but might be better to be in a function since the argument is in the beginning of the line
 alias find_executable2='locate -b '\gtags' | xargs -ri find {} -prune -type f -executable'
+
+# debug vim errors and write them to file `logfile` inside current dir
+# source https://stackoverflow.com/a/40060390
+alias vimdebug='vim -V20 2>&1 | tee logfile'
+
