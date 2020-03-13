@@ -63,6 +63,7 @@ alias cdpep='cd ~/code/qualirede/pep'
 alias cdpepapi='cd ~/code/qualirede/pep-api'
 alias cdwego='cd ~/code/out/wego'
 alias cdttc='cd ~/code/out/tccExpo'
+alias cdsso='cd ~/code/qualirede/pep-sso'
 # ---------------------------------------------
 
 # git aliases
