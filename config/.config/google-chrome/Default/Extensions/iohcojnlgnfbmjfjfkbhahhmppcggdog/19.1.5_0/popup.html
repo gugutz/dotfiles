@@ -1,0 +1,195 @@
+<!doctype html>
+<html>
+
+  <head>
+
+    <script src="/js/index.js" type="text/javascript"></script>
+    <script src="/js/errors.js" type="text/javascript"></script>
+    <script src="/js/Utils.js" type="text/javascript"></script>
+    <script src="/js/Localizer.js" type="text/javascript"></script>
+    <script src="/js/Prefs.js" type="text/javascript"></script>
+    <script src="/js/Observer.js" type="text/javascript"></script>
+    <script src="/js/Dialogs.js" type="text/javascript"></script>
+
+    <script src="/js/Popup/index.js" type="text/javascript"></script>
+
+    <script src="/js/Server/index.js" type="text/javascript"></script>
+    <script src="/js/Server/Sync.js" type="text/javascript"></script>
+
+    <script src="/js/Driver/index.js" type="text/javascript"></script>
+    <script src="/js/Driver/Speeddial.js" type="text/javascript"></script>
+    <script src="/js/Driver/Bookmarks.js" type="text/javascript"></script>
+
+    <link href="/styles/sync_progress.css" rel="stylesheet" type="text/css">
+    <link href="/styles/Popup/index.css" rel="stylesheet" type="text/css">
+    <link href="/styles/Controls/buttons.css" rel="stylesheet" type="text/css">
+
+
+    <script src="/js/analytics.js" type="text/javascript"></script>
+  </head>
+  <body>
+    <div id="syncMustLoginMessage" hidden="true">
+
+      <div msg="popup_must_login_message" class="message"></div>
+
+      <div class="buttons">
+        <a href="" msg="popup_login" class="login fvdButton main" target="_blank"></a>
+        <a href="" msg="popup_register" class="register fvdButton main" target="_blank"></a>
+      </div>
+
+    </div>
+
+    <div id="loggedContent" class="popupContent" hidden="true">
+
+      <div id="driversList">
+
+        <div class="driver speedDial">
+
+          <div>
+            <div class="active textDesc" msg="popup_speeddial_sync_groups_and_dials"></div>
+            <div class="passive textDesc" msg="popup_speeddial_sync_not_active" ></div>
+            <div class="buttonBlock">
+              <a class="fvdButton main passive"
+              href="https://chrome.google.com/webstore/detail/fvd-speed-dial-3d-wall-sy/llaficoajjainaijghjlofdfmbjpebpa"
+               target="_blank" msg="popup_sd_not_installed_explore"></a>
+              <div class="syncing" msg="popup_syncing"></div>
+              <button id="buttonSyncSpeedDial" class="fvdButton main" msg="popup_sync"></button>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="driver bookmarks">
+
+          <div>
+            <div class="active textDesc" msg="popup_bookmarks_desc"></div>
+            <div class="passive textDesc" msg="popup_bookmarks_passive_desc" ></div>
+            <div class="buttonBlock">
+              <div class="syncing" msg="popup_syncing"></div>
+              <div class="initialization">
+                <span msg="popup_initialization"></span><br>
+                <span id="bookmarksInitializationProgress"></span>
+              </div>
+              <button id="buttonSyncBookmarks" class="fvdButton main" msg="popup_sync"></button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div id="syncingContent" class="popupContent" hidden="true">
+
+      <div class="progressBar"></div>
+
+      <div class="textDesc" msg="popup_sync_in_progress"></div>
+
+      <button id="syncCancelButton" class="fvdButton withLoading">
+        <span msg="popup_cancel_sync" class="text"></span>
+        <div class="image"></div>
+      </button>
+
+    </div>
+
+
+
+    <div id="syncingContent_Bookmarks" class="popupContent simpleSync" hidden="true">
+
+      <div class="progressBar"></div>
+
+      <div class="textDesc" msg="popup_sync_in_progress"></div>
+
+      <button id="syncCancelButtonBookmarks" class="fvdButton withLoading" hidden="true">
+        <span msg="popup_cancel_sync" class="text"></span>
+        <div class="image"></div>
+      </button>
+
+      <div hidden="true" id="bookmarks-older-chrome-message">
+        <div class="inner">
+          <span msg="options_unlimsync_old_chrome_text_1"></span>
+          <span msg="options_unlimsync_old_chrome_please_open"></span>
+          <a href="#" target="_blank" msg="options_unlimsync_old_chrome_more_info"></a>
+        </div>
+      </div>
+
+      <div id="warning-unsorted">
+        <span msg="popup_warning_unsorted"></span>
+        <a href="https://everhelper.me/info/sync-unsorted.php" target="_blank" msg="popup_warning_unsorted_link"></a>
+      </div>
+
+    </div>
+
+    <div id="syncingContent_Speeddial" class="popupContent" hidden="true">
+
+      <!--<div class="progressBar"></div>-->
+
+      <div class="textDesc"></div>
+
+      <div class="syncProgress">
+
+        <div class="progressElements">
+
+          <div id="speedDialProgressState_syncGroups">
+            <span class="label" msg="dlg_sync_progress_groups"></span>
+            <span style="display:none">(<span class="syncedCount" id="syncProgress_syncedCountGroups">0</span> <span msg="dlg_sync_progress_synced"></span>)</span>
+          </div>
+
+          <div id="speedDialProgressState_syncDials">
+            <span class="label" msg="dlg_sync_progress_dials"></span>
+            <span style="display:none">(<span class="syncedCount" id="syncProgress_syncedCountDials">0</span> <span msg="dlg_sync_progress_synced"></span>)</span>
+          </div>
+
+          <div id="speedDialProgressState_applyChanges">
+            <span class="label" msg="dlg_sync_progress_apply_changes"></span>
+          </div>
+
+        </div>
+
+      </div>
+
+      <button id="syncSDCancelButton" class="fvdButton withLoading">
+        <span msg="popup_cancel_sync" class="text"></span>
+        <div class="image"></div>
+      </button>
+
+      <div class="syncAdditinalMessage">
+        <span msg="popup_speeddial_sync_it_can_take"></span>
+      </div>
+
+    </div>
+
+    <div id="applyUpdatesConfirm" class="popupContent" hidden="true">
+
+      <div class="text"></div>
+
+      <button class="fvdButton buttonOk" msg="popup_ok"></button>
+      <button class="fvdButton buttonAbort" msg="popup_abort"></button>
+
+    </div>
+
+    <div class="bottomMenu">
+      <a class="left fvdButton goToEverhelper">
+        <i></i>
+        <span msg="popup_goto_everhelper"></span>
+      </a>
+      <a style="display:none" class="left fvdButton getPro main">
+        <i></i>
+        <span msg="popup_get_pro_button"></span>
+      </a>
+
+      <a id="buttonLogout" class="fvdButton nomargin" href="#" msg="popup_logout"></a>
+      <a id="buttonOpenOptions" class="fvdButton" href="#" msg="popup_options"></a>
+      <a id="buttonReportBug" class="fvdButton" href="#" msg="popup_report_bug"></a>
+      <a id="buttonRateUs" style="display:none" class="fvdButton" target="_blank" href="https://chrome.google.com/webstore/detail/eversync-sync-bookmarks-a/iohcojnlgnfbmjfjfkbhahhmppcggdog/reviews" msg="popup_rate_us"></a>
+    </div>
+
+
+    <div id="manualSyncCompleted">
+      <span msg="dlg_sync_manual_sync_success"></span>
+    </div>
+
+  </body>
+
+</html>

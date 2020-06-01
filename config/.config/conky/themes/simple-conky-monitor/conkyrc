@@ -1,0 +1,93 @@
+# Simple Conky Monitor by Don B. Cilly (donbcilly@gmail)
+# based on Quad Conky colors theme by g10k (admin@patched.biz)
+# 
+# Base settings
+update_interval 1
+total_run_times 0
+net_avg_samples 1
+cpu_avg_samples 1
+
+imlib_cache_size 0
+double_buffer yes
+no_buffers yes
+
+format_human_readable
+
+# Text settings 
+
+use_xft yes
+xftfont Droid Sans:size=8
+override_utf8_locale yes
+text_buffer_size 2048
+
+# Window settings
+
+own_window_class Conky
+own_window yes
+own_window_argb_visual yes
+own_window_argb_value 180
+own_window_transparent yes
+own_window_hints undecorated,below,sticky,skip_taskbar
+
+alignment top_right
+gap_x 20
+gap_y 280
+minimum_size 190 800
+maximum_width 230
+default_bar_size 60 8
+
+# Graphics settings 
+
+draw_shades no
+default_color cccccc
+
+color0 black
+color1 cyan
+color2 white
+color4 cyan
+color5 3884AC
+
+TEXT
+${alignc}${font Droid Sans:style=Bold:size=8}${color5}${offset 2}${execi 6000 echo ${USER}@`hostname`}${color}
+# SYSTEM
+# ${color0}${font Poky:size=15}S${font}
+${color}${goto 32}${voffset 8}Kernel:  ${alignr}${color4}${kernel}${color}
+${goto 32}Uptime: ${alignr}${color4}${uptime}${color}
+$stippled_hr
+${alignc}
+# ${color0}${font Poky:size=16}P${font}
+${alignr}${color0}${voffset -10}${cpugraph cpu1 38,220 f0e47f f0e47f -t}${color}
+${alignr}${color0}${voffset -48}${cpugraph cpu2 38,220 1882a3 1882a3 -t}${color}
+${alignr}${color0}${voffset -48}${cpugraph cpu3 38,220 e55919 e55919 -t}${color}
+${alignr}${color0}${voffset -48}${cpugraph cpu4 38,220 46ea44 46ea44 -t}${color}
+${goto 32}${font Droid Sans:size=6}${color f0e47f}CPU1: ${cpu cpu1}% ${color}${font}
+${goto 32}${voffset -15}${font Droid Sans:style=Bold:size=6}${color 1882a3}                                             CPU2: ${cpu cpu2}% ${color}${font}
+${goto 32}${voffset -4}${font Droid Sans:style=Bold:size=6}${color e55919}CPU3: ${cpu cpu3}% ${color}${font} 
+${goto 32}${voffset -14}${font Droid Sans:style=Bold:size=6}${color 46ea44}                                             CPU4: ${cpu cpu4}% ${color}${font} 
+# NETWORK                                                                                                                                               
+$stippled_hr${font}                                                                                                                                                                                                                              
+# ETH0                                                                                                                                                    
+${voffset -2}
+${font}${color}${goto 32}${voffset -4}Local addr.: ${alignr}${color2}${addr enp3s0}${color}
+${goto 32}Ext. addr.: ${alignr}${color2}${execi 10000 curl -s www.icanhazip.com}${color}
+${goto 32}Up:  ${color e55919}${upspeed enp3s0}${color} ${alignr}Down: ${color 46ea44}${downspeed enp3s0}${color}${font} 
+${alignr}${color0}${downspeedgraph enp3s0 40,220 46ea44 46ea44 -t -l}${color}
+${alignr}${color0}${voffset -53}${upspeedgraph enp3s0 40,2200 e55919 e55919 -t -l}${color}
+#${voffset -12}$stippled_hr
+# RAM/SWAP                                                                                                                                                     
+${alignc}${goto 32}${font Droid Sans:style=Bold:size=7}Ram: ${color5}${memperc}%${color2} used of ${color5}${memmax} ${color2}(${color5}${memfree}${color2} free)
+${goto 32}${alignc}${memgauge 50,150 -t}
+# HD                                                                                                                                                   
+${voffset 4}${font Droid Sans:style=Bold:size=8}$stippled_hr${font}                          
+${goto 32}HDr: ${alignr}${color4}${diskio_read}${color}
+${goto 32}HDw: ${alignr}${color4}${diskio_write}${color}
+${goto 32}${alignr}${diskiograph 28,200 f0e47f 7B1F0C -t}
+${color2}${execpi 30 df -h|grep Size}${color}
+${color5}${execpi 30 df -h|grep sd}${color}
+
+${font sans-serif:size=8}${color yellow}TOP PROCESSES${goto 154}PID${goto 197}CPU%${goto 255}MEM%$color
+${font StyleBats:size=9.9}$color ${font sans-serif:bold:size=8}${top name 1} ${goto 144} ${top pid 1}${goto 197}${top cpu 1}${goto 250}${top mem 1}
+${font StyleBats:size=9.9}$color ${font sans-serif:bold:size=8}${top name 2} ${goto 144} ${top pid 2}${goto 197}${top cpu 2}${goto 250}${top mem 2}
+${font StyleBats:size=9.9}$color ${font sans-serif:bold:size=8}${top name 3} ${goto 144} ${top pid 3}${goto 197}${top cpu 3}${goto 250}${top mem 3}
+${font StyleBats:size=9.9}$color ${font sans-serif:bold:size=8}${top name 4} ${goto 144} ${top pid 4}${goto 197}${top cpu 4}${goto 250}${top mem 4}
+${font StyleBats:size=9.9}$color ${font sans-serif:bold:size=8}${top name 3} ${goto 144} ${top pid 5}${goto 197}${top cpu 5}${goto 250}${top mem 5}

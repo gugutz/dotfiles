@@ -1,0 +1,104 @@
+# Conky/Lua Monitor by Don B. Cilly
+# Base settings
+update_interval 1
+total_run_times 0
+net_avg_samples 1
+cpu_avg_samples 1
+
+imlib_cache_size 0
+double_buffer yes
+no_buffers yes
+
+format_human_readable
+
+# Text settings
+
+use_xft yes
+xftfont ubuntu:size=8
+override_utf8_locale yes
+text_buffer_size 2048
+
+# Window settings
+
+own_window_class Conky
+own_window no
+own_window_argb_visual yes
+own_window_argb_value 180
+own_window_transparent yes
+own_window_hints undecorated,below,sticky,skip_taskbar
+
+alignment tr
+gap_x 20
+gap_y 200
+minimum_size 190 800
+maximum_width 220
+default_bar_size 220 8
+
+# Graphics settings
+
+draw_shades no
+default_color cccccc
+
+color0 black
+color1 cyan
+color2 white
+color4 8de7f4
+color5 3884AC
+
+lua_load ./graph.lua
+lua_draw_hook_pre main_graph
+
+TEXT
+${image ./grid2.png -p 0,102}
+${image ./grid2.png -p 0,246}
+${alignc}${font ubuntu:style=Bold:size=8}${color5}${offset 2}${execi 6000 echo ${USER}@`hostname`}${color}
+# SYSTEM
+${font ubuntu:bold:size=8}${voffset 8}Kernel:  ${alignr}${color 607f96}${execi 6000 inxi -c 0 -Sx | awk '/System:/ {print substr($5,1,9),$6}'}${color}
+Distro:               ${alignr}${color 607f96}${execi 6000 lsb_release -d | awk '/Description:/ {print $2,$3,$4}'}${color}
+${alignr}Up: ${color 607f96}${uptime}${color}
+${voffset -14}KDE:  ${color 607f96}${execi 6000 inxi -c 0 -Sx | awk '/Desktop:/ {print $4,$5,$6}'}${color}
+${voffset -4}$stippled_hr${voffset 78}
+${goto 8}${font ubuntu:size=8}${color 1882a3}C1: ${freq_g 1} G ${cpu cpu1}%${color}${font}
+${goto 148}${voffset -15}${font ubuntu:size=8}${color 42706f}C2: ${freq_g 2} G ${cpu cpu2}% ${color}${font}
+${goto 8}${voffset 4}${font ubuntu:size=8}${color 24d4c2}C3: ${freq_g 3} G ${cpu cpu3}% ${color}${font}
+${goto 148}${voffset -14}${font ubuntu:size=8}${color 3a4ee8}C4: ${freq_g 4} G ${cpu cpu4}% ${color}${font}
+${goto 104}${voffset -20}${font ubuntu:size=8}${color2}${hwmon 1 temp 4}ºC
+# NETWORK
+${voffset -1}$stippled_hr${font}
+# ---- This monitors enp3s0. Replace accordingly (three instances below) if you want to monitor another interface (eth0,wlan0, etc.). ----
+
+${voffset -12}${font}${color}${voffset -4}Local addr.: ${alignr}${color2}${addr enp3s0}${color}
+Ext. addr.: ${alignr}${color2}${execi 10000 curl -s www.icanhazip.com}${color}
+# If your IP address doesn't show, try installing curl :·)
+${voffset 78}${goto 32}${font ubuntu:style=Bold:size=8}Up:  ${font ubuntu:style=Bold:size=10}${voffset -2}${color 3a4ee8}${upspeed enp3s0}${color}
+${voffset -18}${goto 120}${font ubuntu:style=Bold:size=8}Down: ${color 24d4c2}${voffset -2}${font ubuntu:style=Bold:size=10}${downspeed enp3s0}${color}${font}
+# RAM/SWAP
+${voffset -2}${font ubuntu:style=Bold:size=8}$stippled_hr${font}
+${font ubuntu:bold:size=8}${goto 4}${voffset 2}Ram:           used of               (             free)
+${color 7bb2c4}${font ubuntu:bold:size=8}${goto 36}${voffset -13}${execpi 40 free -m | awk '/Mem:/ { printf int(( $2-$7 ) /$2*100) }'}%
+${color 7bb2c4}${font ubuntu:size=8}${goto 108}${voffset -15}${execpi 40 free -m | awk '/Mem:/ {printf("%.2f\n",$2/1024)}'}Gb
+${color 7bb2c4}${font ubuntu:size=8}${goto 153}${voffset -14}${execpi 40 free -m | awk '/Mem:/ {printf("%.2f\n",$7/1024)}'}Gb
+${voffset 4}${color 7bb2c4}${execbar free -m | awk '/Mem:/ { printf ( $2-$7 ) /$2*100 }'}${color}
+# HD read/write
+${voffset -4}$stippled_hr
+HDr: ${alignr}${color5}${diskio_read}${color}
+HDw: ${alignr}${color 24d4c2}${diskio_write}${color}
+# If you don't want the disk bar graph, uncommenting the line below will give you a standard conky one.
+#${alignr}${diskiograph 32,220 b2f47c 3884AC -t}
+
+#HD used
+${font ubuntu:size=7}${voffset 4}${color2}Disk${goto 65}${execpi 30 df -h | awk '/Filesystem/ {print $2,"  "$3,"  "$4," "$5,$6}'}${color}${font}
+${font ubuntu:size=7}${color5}${voffset -4}${execpi 30 df -h|grep sd}${color}${font}
+#
+### Uncomment line below and change sda2 to whatever partition you want to display for a disk use bar ###
+${color5}${execbar df -h | awk '/sdb1/ {print substr($5,1,2)}'}${color}
+${alignr}${color 80a8a4}${execbar nvidia-settings -q GPUUtilization | awk '/Attribute/ {print substr($4,10,2)}'}
+${alignc}${voffset -15} GPU%
+${voffset 4}${font ubuntu:size=8}${color 80a8a4}TOP PROCESSES${goto 154}PID${goto 193}CPU%${goto 255}MEM%$color
+${font ubuntu:size=8}$color ${font ubuntu:bold:size=8}${top name 1} ${goto 140} ${top pid 1}${goto 193}${top cpu 1}${goto 246}${top mem 1}
+${font ubuntu:size=8}$color ${font ubuntu:bold:size=8}${top name 2} ${goto 140} ${top pid 2}${goto 193}${top cpu 2}${goto 246}${top mem 2}
+${font ubuntu:size=8}$color ${font ubuntu:bold:size=8}${top name 3} ${goto 140} ${top pid 3}${goto 193}${top cpu 3}${goto 246}${top mem 3}
+${font ubuntu:size=8}$color ${font ubuntu:bold:size=8}${top name 4} ${goto 140} ${top pid 4}${goto 193}${top cpu 4}${goto 246}${top mem 4}
+${font ubuntu:size=8}$color ${font ubuntu:bold:size=8}${top name 5} ${goto 140} ${top pid 5}${goto 193}${top cpu 5}${goto 246}${top mem 5}
+${font ubuntu:size=8}$color ${font ubuntu:bold:size=8}${top name 6} ${goto 140} ${top pid 6}${goto 193}${top cpu 5}${goto 246}${top mem 6}
+${font ubuntu:size=8}$color ${font ubuntu:bold:size=8}${top name 7} ${goto 140} ${top pid 7}${goto 193}${top cpu 5}${goto 246}${top mem 7}

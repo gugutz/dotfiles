@@ -1,0 +1,276 @@
+#################################################################
+# wm independent hotkeys
+#################################################################
+
+# terminal emulator
+super + Return
+	alacritty
+
+super + shift + Return
+	st
+
+super + ctrl + shift + Return
+	urxvt
+
+# program launcher
+super + d
+	dmenu_run -l 25 -F
+  # dmenu_run -i -nb '#191919' -nf '#fea63c' -sb '#fea63c' -sf '#191919' -fn 'NotoMonoRegular:bold:pixelsize=14'
+
+# program launcher
+super + shift + d
+	rofi -show run
+
+
+# Launch Rofi
+super + shift + d
+rofi -no-lazy-grab -show drun \
+       -display-drun "Applications :" -drun-display-format "{name}" \
+       -hide-scrollbar true \
+       -bw 0 \
+       -lines 10 \
+       -line-padding 10 \
+       -padding 20 \
+       -width 30 \
+       -xoffset 68 -yoffset -70 \
+       -location 7 \
+       -columns 2 \
+       -show-icons -icon-theme "Papirus" \
+       -font "Fantasque Sans Mono 10" \
+       -color-enabled true \
+       -color-window "$BACKGROUND,$BORDER,$SEPARATOR" \
+       -color-normal "$BACKGROUND_ALT,$FOREGROUND,$BACKGROUND_ALT,$HIGHLIGHT_BACKGROUND,$HIGHLIGHT_FOREGROUND" \
+       -color-active "$BACKGROUND,$MAGENTA,$BACKGROUND_ALT,$HIGHLIGHT_BACKGROUND,$HIGHLIGHT_FOREGROUND" \
+       -color-urgent "$BACKGROUND,$YELLOW,$BACKGROUND_ALT,$HIGHLIGHT_BACKGROUND,$HIGHLIGHT_FOREGROUND"
+       -show-icons -icon-theme "Papirus" \
+
+# program launcher
+# super + @space
+	#dmenu_run
+
+#################################################################
+# sxhkd hotkeys
+#################################################################
+
+# make sxhkd reload its configuration files:
+super + Escape
+	pkill -USR1 -x sxhkd
+
+#################################################################
+# bspwm hotkeys
+#################################################################
+
+# quit / restart bspwm
+super + alt + q
+	bspc quit
+
+# quit / restart bspwm
+super + alt + r
+	bspc wm -r
+
+# close and kill windows
+super + {_,shift + }q
+	bspc node -{c,k}
+
+# alternate between the tiled and monocle layout
+super + m
+	bspc desktop -l next
+
+# send the newest marked node to the newest preselected node
+super + y
+	bspc node newest.marked.local -n newest.!automatic.local
+
+# swap the current node and the biggest node
+super + g
+	bspc node -s biggest
+
+#################################################################
+# state/flags
+#################################################################
+
+# set the window state
+super + {t,shift + t,s,f}
+	bspc node -t {tiled,pseudo_tiled,floating,fullscreen}
+
+# set the node flags
+super + ctrl + {m,x,y,z}
+	bspc node -g {marked,locked,sticky,private}
+
+#################################################################
+# focus/swap
+#################################################################
+
+# workspace back and forth
+super + {1-9,0}
+  desktop='^{1-9,10}'; \
+  bspc query -D -d "$desktop.focused" && bspc desktop -f last || bspc desktop -f "$desktop"
+
+# focus the node in the given direction
+super + {h,j,k,l}
+	bspc node -f {west,south,north,east}
+
+# swap windows
+super + shift + {h,j,k,l}
+	bspc node -s {west,south,north,east}
+
+# focus the node for the given path jump
+super + {p,b,comma,period}
+	bspc node -f @{parent,brother,first,second}
+
+# focus the next/previous node in the current desktop
+super + {_,shift + }c
+	bspc node -f {next,prev}.local
+
+# focus the next/previous desktop in the current monitor
+super + bracket{left,right}
+	bspc desktop -f {prev,next}.local
+
+# focus the last node/desktop
+super + {grave,Tab}
+	bspc {node,desktop} -f last
+
+# focus the older or newer node in the focus history
+super + {o,i}
+	bspc wm -h off; \
+	bspc node {older,newer} -f; \
+	bspc wm -h on
+
+# focus or send to the given desktop
+super + {_,shift + }{1-9,0}
+	bspc {desktop -f,node -d} '^{1-9,10}'
+
+#################################################################
+# preselect
+#################################################################
+
+# preselect the direction
+super + ctrl + {h,j,k,l}
+	bspc node -p {west,south,north,east}
+
+# preselect the ratio
+super + ctrl + {1-9}
+	bspc node -o 0.{1-9}
+
+# cancel the preselection for the focused node
+super + ctrl + space
+	bspc node -p cancel
+
+# cancel the preselection for the focused desktop
+super + ctrl + shift + space
+	bspc query -N -d | xargs -I id -n 1 bspc node id -p cancel
+
+#################################################################
+# move/resize
+#################################################################
+
+# expand a window by moving one of its side outward
+super + alt + {h,j,k,l}
+	bspc node -z {left -20 0,bottom 0 20,top 0 -20,right 20 0}
+
+# contract a window by moving one of its side inward
+super + alt + shift + {h,j,k,l}
+	bspc node -z {right -20 0,top 0 20,bottom 0 -20,left 20 0}
+
+# move a floating window
+super + {Left,Down,Up,Right}
+	bspc node -v {-20 0,0 20,0 -20,20 0}
+
+# Balance the size of all nodes in the current desktop
+super + b
+  bspc desktop -B
+
+#################################################################
+# gaps
+#################################################################
+
+# adjust gap size on a focused desktop
+super + ctrl + 0
+  	bspc config -d focused window_gap $((`bspc config -d focused window_gap` 0 ))
+
+# adjust gap size on a focused desktop
+super + {minus,equal}
+  	bspc config -d focused window_gap $((`bspc config -d focused window_gap` {-,+} 5 ))
+
+# Global window gaps
+super + ctrl + button{minus,equal}
+    bspc config window_gap $(( $(bspc config window_gap) {-,+} 2 ))
+
+## super & mouse scroll
+
+# Focused desktop window gap
+super + button{4,5}
+	bspc config -d focused window_gap $((`bspc config -d focused window_gap` {-,+} 5 ))
+
+# Global window gaps
+super + ctrl + button{4,5}
+    bspc config window_gap $(( $(bspc config window_gap) {-,+} 5 ))
+
+#################################################################
+#################################################################
+#
+# MY MODIFICATIONS
+#
+#################################################################
+#################################################################
+
+
+#Pulse Audio Control
+super + alt + a
+     urxvt 'alsa-mixer' -e alsamixer
+
+#Pulse Audio Control
+super + alt + p
+     pavucontrol
+#################################################################
+# SCRIPTS
+#################################################################
+
+# find window criteria
+super + ctrl + f
+  st -e '~/scripts/find-window-criteria.sh'
+#################################################################
+# SCRATCHPADS
+#################################################################
+
+# terminal scratchpad
+super + z
+  ~/.config/bspwm/scratchpad.sh terminal-scratchpad
+
+# ranger scratchpad
+super + r
+  ~/.config/bspwm/scratchpad.sh ranger-scratchpad
+
+# galculator scratchpad
+super + x
+  ~/.config/bspwm/scratchpad.sh Galculator
+
+#################################################################
+# screenshots
+#################################################################
+
+# take screenshot of the active window
+Print
+  import -window root ~/img/screenshots/last-fullscreen-screenshot.png; \
+  notify-send "taken screenshot of the entire screen"
+
+# take screenshot of the active window
+super + Print
+  scrot --focused ~/img/screenshots/last-window-scrot.png; \
+  notify-send "taken screenshot of the currently focused window"
+
+super + shift + Print
+  import ~/img/screenshots/last-selection-screenshot.png; \
+  notify-send "selection screenshot captured!"
+
+# take screenshot in /tmp and open it with pinta
+# not specifying name here because if i do scrot passes the full file path as the name in argument $f to the mv and pinta commands
+super + ctrl + shift + Print
+  scrot -s -e 'mv $f /tmp/ && pinta /tmp/$f'
+
+#################################################################
+# wallpeper, lockscreen and screensavers
+#################################################################
+# lockscreen
+super + alt + 9
+    betterlockscreen -u ~/wallpapers --lock dimblur
+

@@ -1,0 +1,44 @@
+/* tabs */
+
+.tabs{
+	padding: 10px;
+}
+
+.tabs .tabsHead .tabHead{
+	position: relative;
+	border: 1px solid #ccc;
+	padding: 3px;
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;	
+	border-bottom: none;
+	-webkit-transition-duration: 200ms;
+	-webkit-transition-property: box-shadow, background;
+	cursor: pointer;
+	display: inline-block;
+	width: 100px;
+	
+	background: -webkit-linear-gradient( 90deg, #eee, #fff );
+	text-shadow: 1px 1px 0px #fff;
+	text-align: center;
+}
+
+.tabs .tabsHead .tabHead:hover{
+	box-shadow: 0px 0px 8px -3px #000;
+	background: -webkit-linear-gradient( 90deg, #ddd, #fff );
+}
+
+.tabs .tabsHead .tabHead[active="1"]{
+	background: -webkit-linear-gradient(top, #568449, #75ad66);
+	color: #fff;
+	text-shadow: none;
+}
+
+
+.tabs .tabsData{
+	border-top: 1px solid #ccc;
+	background-color: #f9f9f9;
+}
+
+.tabs .tabsData .tabData{
+	position: relative;
+}

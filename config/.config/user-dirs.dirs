@@ -1,0 +1,15 @@
+# ~/.config/user-dirs.dirs
+
+# Creating a full suite of localized default user directories within the $HOME directory can be done automatically by running:
+# $ xdg-user-dirs-update
+# PS: needs xdg-user-dirs to be installed
+
+
+XDG_DESKTOP_DIR="$HOME/desktop"
+XDG_DOWNLOAD_DIR="$HOME/downloads"
+XDG_TEMPLATES_DIR="$HOME/templates"
+XDG_PUBLICSHARE_DIR="$HOME/public"
+XDG_DOCUMENTS_DIR="$HOME/docs"
+XDG_MUSIC_DIR="$HOME/music"
+XDG_PICTURES_DIR="$HOME/img"
+XDG_VIDEOS_DIR="$HOME/vid"

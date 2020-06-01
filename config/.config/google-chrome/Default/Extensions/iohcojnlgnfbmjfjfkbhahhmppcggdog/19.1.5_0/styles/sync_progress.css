@@ -1,0 +1,21 @@
+.syncProgress .progressElements > div{
+	opacity:0.5;
+	-webkit-transition: 200ms opacity;
+	line-height: 18px;
+	padding-left: 20px;
+}
+
+.syncProgress .progressElements > div[state="progress"]{
+	opacity: 1;	
+	background: url( /images/loading.gif ) no-repeat;
+}
+
+.syncProgress .progressElements > div[state="success"]{
+	opacity: 1;
+	background: url( /images/small_green_check.png ) no-repeat;
+}
+
+.syncProgress .progressElements > div[state="fail"]{
+	opacity: 1;
+	background: url( /images/small_red_cross.png ) no-repeat;
+}

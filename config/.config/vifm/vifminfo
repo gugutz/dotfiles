@@ -1,0 +1,110 @@
+# You can edit this file by hand, but it's recommended not to do that.
+
+# Marks:
+'H
+	/home/tau/
+	..
+1585063286
+'b
+	/home/tau/bin/
+	..
+1585063286
+'h
+	/home/tau/
+	..
+1585063286
+'z
+	/home/tau/.config/vifm
+	..
+1585063286
+
+# Bookmarks:
+
+# TUI:
+al
+q0
+v2
+ov
+m-1
+l2
+r2
+
+# Left window history (oldest to newest):
+d/home/tau/dotfiles
+	config
+2
+d/home/tau/dotfiles/config
+	..
+0
+d/home/tau/dotfiles
+	..
+0
+d/home/tau
+	dotfiles
+6
+d/home/tau/dotfiles
+	bash
+1
+d/home/tau/dotfiles/bash
+	..
+0
+d/home/tau/dotfiles
+	config
+2
+d/home/tau
+	1tb
+1
+d/home/tau/1tb
+	games
+6
+d/home/tau/1tb/games
+	game-isos
+6
+d/home/tau/1tb/games/game-isos
+	gba-roms
+4
+d/home/tau/1tb/games/game-isos/gba-roms
+	..
+0
+d/home/tau/1tb/games/game-isos
+	gba-roms
+4
+d/home/tau/1tb/games/game-isos/gba-roms
+	Super Mario Advance 4 - Super Mario Bros 3.gba
+36
+d
+
+# Right window history (oldest to newest):
+D/home/tau/dotfiles
+	..
+0
+D
+
+# Command line history (oldest to newest):
+:help
+:q
+:vicmd
+
+# Search history (oldest to newest):
+
+# Prompt history (oldest to newest):
+p0898 - Pokemon Sapphire (U)(Mugs).gba
+
+# Local filter history (oldest to newest):
+
+# Registers:
+
+# Directory stack (oldest to newest):
+
+# Trash content:
+
+# State:
+f
+i1
+[.1
+[F
+F
+I1
+].1
+]F
+s0

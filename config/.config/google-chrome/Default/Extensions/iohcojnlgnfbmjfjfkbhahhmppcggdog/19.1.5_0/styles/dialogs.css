@@ -1,0 +1,123 @@
+.syncProgressDialog .syncProgressLine{
+	
+	background: url( /images/progressbar.gif ) no-repeat;
+	background-position: center center;
+	height: 30px;
+	text-align: center;
+	font-weight: bold;
+	
+}
+
+.syncProgressDialog .syncProgressLine[state="success"]{
+	background: none;
+	color: green;
+}
+
+.syncProgressDialog .syncProgressLine[state="fail"]{
+	background: none;
+	color: red;
+}
+
+.syncProgressDialog .syncedCount{
+	font-weight: bold;
+}
+
+
+.syncProgressDialog .bottomText{
+	
+	margin-top: 7px;
+	
+	font-style: italic;
+	text-align: center;
+	font-size: 12px;
+	
+}
+
+.syncProgressDialog .redText{
+	margin-top: 15px;
+	color: #aa0000;
+	font-size: 12px;
+}
+
+
+.syncProgressDialog .manualSyncSuccess{
+	
+	padding-left: 38px;
+	background: left center url( /images/alert_blue.png ) no-repeat;
+	
+}
+
+.syncProgressDialog .simpleProgressItems{
+	text-align: center;
+	font-size: 11px;
+	display: none;
+}
+
+.syncProgressDialog .simpleProgressItems[appear="1"]{
+	display: block;
+}
+
+.syncProgressDialog .simpleProgressItems .value{	
+	font-weight: bold;
+}
+
+.bolderWord{
+	font-weight: bold;
+}
+
+div.spacer{
+	height: 10px;
+}
+
+.syncProgressDialog .syncQuotaExceed{
+	text-align: center;
+}
+
+/* alert dialog */
+
+.alertDialog b{
+	font-size: 11px;
+}
+
+.alertDialog.smallText{
+	font-size:11px;
+}
+
+.dialogAlertCheck_checkboxParent{
+	margin-top: 10px;
+}
+
+#dialogAlertCheckTextContainer{
+	padding-left: 55px;
+	min-height: 50px;
+	height: 50px;
+	background: url( /images/alert.png ) no-repeat;
+	display: table;
+}
+
+#dialogAlertCheckTextContainer span{
+	display: table-cell;
+	vertical-align: top;
+}
+
+.dialogAlertCheck_checkboxParent{
+	display: table;
+	font-size: 11px;
+	margin-top: 15px;
+}
+
+.dialogAlertCheck_checkboxParent span {
+	vertical-align: top;
+}
+
+.dialogAlertCheck_checkboxParent input{
+	margin-right: 3px;
+	margin-top: 0px;
+	vertical-align: top;
+}
+
+.why-sync-failed{
+  float:left;
+  margin-top: 5px;
+}
+

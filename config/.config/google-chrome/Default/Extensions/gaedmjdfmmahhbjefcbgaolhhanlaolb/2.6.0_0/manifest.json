@@ -1,0 +1,23 @@
+{
+   "app": {
+      "background": {
+         "scripts": [ "js/vendor.js", "js/background.js" ]
+      }
+   },
+   "app_name": "authy",
+   "default_locale": "en",
+   "description": "Authy: Two-Factor Authentication from your PC",
+   "dflag": false,
+   "icons": {
+      "128": "img/logos/icon128.png",
+      "16": "img/logos/icon16.png",
+      "48": "img/logos/icon48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7ELzoX+LYNM83+1z64U14ZTsr0ZosesvN/ts4TD74LwCOTHwBGjE+lTpQmHITBaIqnq/NhnadMvFEoOXlP+xPysTTVjL0s1NtDDRUAk9C4d0WzCzHjVUB4fSyLrHJ100kzJKoLGlD2gAeV6KJvZjO27/RsuYbLhErvDQ0OwuUkQba9a7sxx7AWq2dH8EWllVWztGhkfRuq1boRl4lmLEkR1WvmnmwSYbec1SK1JVC5S2JGElldUt3uW39AyR8FUPdDASJOcS0WyQxrQcvztibJetfusKDUln28OIOXwVChF3RiiO8HtXVHyJzRMMmnUxWkbaLQqmu8T9qWykNYZ24wIDAQAB",
+   "manifest_version": 2,
+   "name": "Authy",
+   "permissions": [ "http://*.authy.com/*", "http://*.amazonaws.com/*", "http://*.amazonaws.com.cn/*", "https://*/*", "storage", "webview", "clipboardWrite", "unlimitedStorage", "fileSystem", "idle", "notifications", "gcm", "system.network" ],
+   "short_name": "Authy",
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "2.6.0"
+}

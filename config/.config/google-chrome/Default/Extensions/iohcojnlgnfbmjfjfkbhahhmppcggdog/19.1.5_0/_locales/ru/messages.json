@@ -1,0 +1,813 @@
+{
+   "alert_window_action_after_plugin_sync_1": {
+      "message": "Вы не перезапустили Chrome браузер."
+   },
+   "alert_window_action_after_plugin_sync_2": {
+      "message": "Все изменения будут перезаписаны после перезапуска."
+   },
+   "alert_window_action_after_plugin_sync_3": {
+      "message": "Пожалуйста, перезапустите браузер и только после этого делайте новые изменения в ваши закладки!"
+   },
+   "alert_window_action_after_plugin_sync_title": {
+      "message": "Внимание!"
+   },
+   "alert_window_close": {
+      "message": "Есть! Спасибо!"
+   },
+   "alert_window_dont_display_again": {
+      "message": "Не показывать это снова"
+   },
+   "alert_window_download_eversync_desktop": {
+      "message": "Скачать и установить EverSync для компьютера"
+   },
+   "alert_window_large_sync_button_cancel": {
+      "message": "Отменить Синхронизацию"
+   },
+   "alert_window_large_sync_button_proceed_manually": {
+      "message": "Продолжить вручную"
+   },
+   "alert_window_large_sync_text": {
+      "message": "Политика Google API не позволяет производить более чем 100 действий в течении часа. Вы должны произвести синхронизацию вручную."
+   },
+   "alert_window_large_sync_title": {
+      "message": "Огромное предупреждение синхронизации"
+   },
+   "alert_window_must_restart_after_large_sync": {
+      "message": "Важно! Вы должны перезапустить браузер для завершения синхронизации!"
+   },
+   "alert_window_must_restart_after_large_sync_title": {
+      "message": "Важно!"
+   },
+   "alert_window_need_sync_software_text": {
+      "message": "В связи с новыми ограничениями Google Chrome вы должны установить EverSync для вашего компьютера."
+   },
+   "alert_window_need_sync_software_title": {
+      "message": "Внимание!"
+   },
+   "alert_window_remove_unsorted_folder_text": {
+      "message": "несортированные это системная папка которую нельзя переместить"
+   },
+   "alert_window_remove_unsorted_folder_title": {
+      "message": "Процесс запрещен"
+   },
+   "alert_window_sync_timeout_after_action_text": {
+      "message": "Упс, синхронизация будет доступна в течении 10 секунд..."
+   },
+   "alert_window_sync_timeout_after_sync_text": {
+      "message": "Упс, Вы можете синхронизировать только раз в 10 секунд..."
+   },
+   "alert_window_sync_timeout_title": {
+      "message": "Пожалуйста подождите..."
+   },
+   "backups_message": {
+      "message": "Мы рекомендуем использовать серверные бэкапы, потому что они более надежны, чем локальные. Новые версии EverSync будут использовать только серверные бэкапы."
+   },
+   "bg_bookmarks_undifined_parent": {
+      "message": "Неопределенный"
+   },
+   "bg_bookmarks_unsorted_folder_name": {
+      "message": "Неотсортированные закладки"
+   },
+   "blocked_cookies_button": {
+      "message": "Посмотреть инструкцию"
+   },
+   "blocked_cookies_text": {
+      "message": "У Вас включена опция \u003Cb>\"Блокировать сторонние файлы cookie\"\u003C/b>? Необходимо добавить разрешение на использование cookie для нашего сервера."
+   },
+   "blocked_cookies_title": {
+      "message": "Необходимо решить проблему авторизации"
+   },
+   "confirm_change_password_desc": {
+      "message": "Подтверждающий ключ для смены пароли выслан на ваш E-Mail"
+   },
+   "confirm_really_restore_bookmarks_text": {
+      "message": "Это действие перезапишет все ваши текущие закладки, вы хотите продолжить?"
+   },
+   "confirm_really_restore_bookmarks_title": {
+      "message": "Внимание!"
+   },
+   "confirm_really_restore_sd_text": {
+      "message": "Это действие перезапишет все ваши текущие группы и диалы, вы хотите продолжить?"
+   },
+   "confirm_really_restore_sd_title": {
+      "message": "Внимание!"
+   },
+   "confirm_remove_account_text": {
+      "message": "Вы действительно хотите удалить ваш профиль синхронизации вместе со всеми данными?"
+   },
+   "confirm_remove_account_title": {
+      "message": "Удалить профиль?"
+   },
+   "customs_empty_message": {
+      "message": "У Вас нет бэкапов"
+   },
+   "customs_informer_progress": {
+      "message": "Прогресс"
+   },
+   "customs_list_edit": {
+      "message": "Редактировать"
+   },
+   "customs_list_remove": {
+      "message": "Удалить"
+   },
+   "customs_list_restore": {
+      "message": "Восстановить"
+   },
+   "customs_pro_popup_button": {
+      "message": "Перейти на Nimbus Pro"
+   },
+   "customs_pro_popup_message": {
+      "message": "Бэкапы настроек доступны только для премиум пользователей"
+   },
+   "customs_pro_popup_title": {
+      "message": "Nimbus Pro"
+   },
+   "customs_quick_guide_desc": {
+      "message": "Настройте и стилизуйте аддон. Если Вы используете несколько компьютеров, Вы можете создать индивидуальные бэкапы для каждого из них. Установите имена резервных копий, чтобы знать где какой бэкап."
+   },
+   "customs_quick_guide_title": {
+      "message": "Краткая инструкция"
+   },
+   "customs_remove_title": {
+      "message": "Вы хотите удалить этот бэкап?"
+   },
+   "customs_restore_title": {
+      "message": "Вы хотите восстановить этот бэкап?"
+   },
+   "customs_settings_create": {
+      "message": "Создать новый бэкап"
+   },
+   "customs_settings_create_placeholder": {
+      "message": "Введите название бэкапа"
+   },
+   "customs_settings_create_title": {
+      "message": "Создать бэкап"
+   },
+   "customs_settings_done": {
+      "message": "Готово! Аддон будет перезагружен через"
+   },
+   "customs_settings_rename": {
+      "message": "Переименовать"
+   },
+   "customs_settings_rename_title": {
+      "message": "Переименовать бэкап"
+   },
+   "customs_settings_restore": {
+      "message": "Восстановить"
+   },
+   "customs_tips_backup_dials_message": {
+      "message": "Был создан бэкап настроек FVD Speed Dial. Если вы хотите сделать бэкап дилов, то перейдите на вкладку Серверные бэкапы."
+   },
+   "customs_tips_backup_title": {
+      "message": "Подсказка"
+   },
+   "customs_will_backup_list": {
+      "message": "Фоновой картинки, пасскода и оформления (цвет шрифта, количество колонок и т.д)."
+   },
+   "customs_will_backup_message": {
+      "message": "Будет сделан бэкап:"
+   },
+   "dlg_alert_change_password_success_text": {
+      "message": "Пароль успешно изменен!"
+   },
+   "dlg_alert_change_password_success_title": {
+      "message": "Пароль изменен"
+   },
+   "dlg_alert_ok": {
+      "message": "Да"
+   },
+   "dlg_alert_sync_failed_chrome_quota_exceed_text": {
+      "message": "Браузер квота достигнута. Пожалуйста, попробуйте позже."
+   },
+   "dlg_alert_sync_failed_chrome_quota_exceed_title": {
+      "message": "Достигнута квота"
+   },
+   "dlg_alert_sync_failed_text": {
+      "message": "Сервер синхронизации сообщает об ошибке"
+   },
+   "dlg_alert_sync_failed_title": {
+      "message": "Синхронизация неудачна"
+   },
+   "dlg_alert_sync_quota_exceed_already_items": {
+      "message": "Элементы которые уже в базе данных"
+   },
+   "dlg_alert_sync_quota_exceed_fix_it": {
+      "message": "Потребовать дополнительную квоту!"
+   },
+   "dlg_alert_sync_quota_exceed_max_items": {
+      "message": "Максимальное количество разрешенных элементов"
+   },
+   "dlg_alert_sync_quota_exceed_max_items_trashed": {
+      "message": "Максимальное количество разрешенных элементов в корзине"
+   },
+   "dlg_alert_sync_quota_exceed_text": {
+      "message": "Квота синхронизации достигнута"
+   },
+   "dlg_alert_sync_quota_exceed_title": {
+      "message": "Синхронизация неудачна"
+   },
+   "dlg_alert_sync_quota_exceed_upload_attempt": {
+      "message": "Текущая попытка загрузки"
+   },
+   "dlg_alert_warning_full_access_text": {
+      "message": "\u003Cb>Расширение Синхронизации требует ваше разрешение, которое называется \"Доступ на всю информацию на Вашем компьютере \"\u003C/b>\u003Cbr>Это не означает что наше расширение будет иметь доступ ко всем вашим файлам! \u003Cbr>Нам нужен \u003Cb>доступ только для одного файла закладок в файловой среде Chrome.\u003C/b>\u003Cbr>Как только вы получаете разрешение переписать файл(ы), Chrome называет это \"Полный доступ\".\u003Cbr>Пожалуйста, не будьте параноиком из-за этого! Веб-магазин Chrome обрабатывает такие расширения в ручную!!!"
+   },
+   "dlg_alert_warning_full_access_title": {
+      "message": "Внимание!"
+   },
+   "dlg_alert_wrong_login_password_text": {
+      "message": "Неправильный логин или пароль. Пожалуйста, Войдите заново."
+   },
+   "dlg_alert_wrong_login_password_title": {
+      "message": "Неправильный логин или пароль"
+   },
+   "dlg_bookmarks_confirm_overwrite_server_data_text": {
+      "message": "Вы уверены что хотите переписать информацию на сервере?"
+   },
+   "dlg_bookmarks_confirm_overwrite_server_data_title": {
+      "message": "Подтвердите ваш выбор"
+   },
+   "dlg_confirm_abort_sync_text": {
+      "message": "Вы действительно хотите отменить текущий процесс синхронизации?"
+   },
+   "dlg_confirm_abort_sync_title": {
+      "message": "Отменить текущую синхронизацию"
+   },
+   "dlg_confirm_cancel": {
+      "message": "Отменить"
+   },
+   "dlg_confirm_ok": {
+      "message": "Да"
+   },
+   "dlg_speeddial_confirm_overwrite_server_data_text": {
+      "message": "Вы уверены что хотите переписать информацию на сервере?"
+   },
+   "dlg_speeddial_confirm_overwrite_server_data_title": {
+      "message": "Подтвердите ваш выбор"
+   },
+   "dlg_sync_in_progress_before_close": {
+      "message": "Идёт синхронизация... Вы действительно хотите закрыть эту страницу?"
+   },
+   "dlg_sync_manual_sync_in_process": {
+      "message": "Примечание: В связи с Копировать/Записать лимитами Google Chrome мы должны переписать файл закладок в ручную. Ваша информация не будет утеренной."
+   },
+   "dlg_sync_manual_sync_in_process_msg2": {
+      "message": "перезапустить Chrome браузер когда закончится синхронизация."
+   },
+   "dlg_sync_manual_sync_in_process_msg3": {
+      "message": "Если вы не перезапустите его и создадите новые закладки, они будут утеряны когда вы перезапустите браузер."
+   },
+   "dlg_sync_manual_sync_in_process_must": {
+      "message": "должны"
+   },
+   "dlg_sync_manual_sync_in_process_you": {
+      "message": "Вы"
+   },
+   "dlg_sync_manual_sync_success": {
+      "message": "Важно! Ваш файл закладок был переписан! Вы должны перезапустить ваш Chrome браузер для того чтобы изменения вошли в силу и завершить синхронизацию."
+   },
+   "dlg_sync_progress_aborting": {
+      "message": "Отменить..."
+   },
+   "dlg_sync_progress_apply_changes": {
+      "message": "Применить изменения"
+   },
+   "dlg_sync_progress_bottom_text": {
+      "message": "Этот процесс примерно занимает 10-40 секунд. Пожалуйста подождите..."
+   },
+   "dlg_sync_progress_cancel": {
+      "message": "Сихнронизация отменена"
+   },
+   "dlg_sync_progress_close": {
+      "message": "Закрыть"
+   },
+   "dlg_sync_progress_dials": {
+      "message": "Диалы"
+   },
+   "dlg_sync_progress_groups": {
+      "message": "Группы"
+   },
+   "dlg_sync_progress_progress": {
+      "message": "Прогресс:"
+   },
+   "dlg_sync_progress_sync_failed": {
+      "message": "Неудачная синхронизация"
+   },
+   "dlg_sync_progress_sync_success": {
+      "message": "Синхронизация прошла успешно"
+   },
+   "dlg_sync_progress_synced": {
+      "message": "Синхронизировано"
+   },
+   "dlg_sync_progress_title": {
+      "message": "Идет синхронизация..."
+   },
+   "dlg_sync_progress_title_backup": {
+      "message": "Резервное копирование..."
+   },
+   "dlg_sync_progress_title_restore": {
+      "message": "Восстановление..."
+   },
+   "dlg_sync_progress_type_create": {
+      "message": "Создать данные:"
+   },
+   "dlg_sync_progress_type_remove": {
+      "message": "Удалить старые данные:"
+   },
+   "dlg_sync_progress_why_failed": {
+      "message": "Почему?"
+   },
+   "dlg_sync_quota_exceed_text": {
+      "message": "Следуя запретам Google Api вы можете использовать Объединить/Скачать закладки 4 раза в день."
+   },
+   "dlg_sync_quota_exceed_title": {
+      "message": "Достигнута квота на синхронизацию"
+   },
+   "extension_locale": {
+      "description": "Для внутреннего пользования",
+      "message": "ru"
+   },
+   "lang": {
+      "message": "ru"
+   },
+   "local_backups_link": {
+      "message": "Показать локальные бэкапы"
+   },
+   "local_backups_title": {
+      "message": "Локальные бэкапы"
+   },
+   "option_cancel_change_password": {
+      "message": "Отменить"
+   },
+   "option_change_password_confirm_key": {
+      "message": "Подтвердить ключ"
+   },
+   "option_confirm_key_is_wrong": {
+      "message": "Подтверждающий ключ неправильный"
+   },
+   "option_login_email": {
+      "message": "E-mail"
+   },
+   "option_login_password": {
+      "message": "Пароль"
+   },
+   "option_new_password": {
+      "message": "Новый пароль"
+   },
+   "option_new_password_repeat": {
+      "message": "Повторите новый пароль"
+   },
+   "option_old_password": {
+      "message": "Старый пароль"
+   },
+   "option_old_password_is_wrong": {
+      "message": "Старый пароль неправильный"
+   },
+   "options_action_login": {
+      "message": "Войти"
+   },
+   "options_action_register": {
+      "message": "Регистрация"
+   },
+   "options_action_restore_password": {
+      "message": "Восстановить пароль"
+   },
+   "options_backup_online_access": {
+      "message": "Онлайн доступ"
+   },
+   "options_backup_warning_message": {
+      "message": "Важно! Эти резервные копии сохранены в локальной базе данных EverSync. Если вы удалите это расширение, то эти базы данных будут также удалены! Используйте онлайн доступ и онлайн резервные копии."
+   },
+   "options_backups_count_dials": {
+      "message": "Кол."
+   },
+   "options_backups_count_groups": {
+      "message": "Группы"
+   },
+   "options_backups_count_items": {
+      "message": "Кол."
+   },
+   "options_backups_date": {
+      "message": "Дата"
+   },
+   "options_backups_restore": {
+      "message": "Восстанов."
+   },
+   "options_bookmarks_backup_first_line": {
+      "message": "Чтобы ваши закладки не пропали, для уверенности мы автоматически делаем резервную копию всех Ваших закладок."
+   },
+   "options_bookmarks_backup_make": {
+      "message": "Сделать копию закладок"
+   },
+   "options_bookmarks_backup_restore": {
+      "message": "Восстановить закладки"
+   },
+   "options_bookmarks_backup_second_line": {
+      "message": "Все Ваши закладки сохранены на компьютер."
+   },
+   "options_bookmarks_backup_total_bookmarks": {
+      "message": "Всего сохраненных закладок "
+   },
+   "options_bookmarks_in_browser": {
+      "message": "В Браузере:"
+   },
+   "options_bookmarks_watch_video_guide": {
+      "message": "Посмотреть Видео руководство"
+   },
+   "options_button_cancel": {
+      "message": "Отменить"
+   },
+   "options_button_change_password": {
+      "message": "Изменить пароль"
+   },
+   "options_button_change_password_confirm": {
+      "message": "Подтвердить изменение пароля"
+   },
+   "options_button_confirm": {
+      "message": "Подтвердить"
+   },
+   "options_button_login": {
+      "message": "Войти"
+   },
+   "options_button_register": {
+      "message": "Регистрация"
+   },
+   "options_button_restore": {
+      "message": "Востановить"
+   },
+   "options_change_password": {
+      "message": "Изменить пароль"
+   },
+   "options_close_this_page": {
+      "message": "Закрыть эту страницу"
+   },
+   "options_confirm_code": {
+      "message": "Подтвердить код"
+   },
+   "options_confirm_desc": {
+      "message": "Проверьте ваш e-mail для подтверждения регистрации"
+   },
+   "options_default_desc": {
+      "message": "Выберите действие..."
+   },
+   "options_download": {
+      "message": "Скачать"
+   },
+   "options_download_desc": {
+      "message": "Скопировать информацию с Сервера на ваш Компьютер"
+   },
+   "options_ds_chromsync_btn_close": {
+      "message": "Я готов для Синхронизации!"
+   },
+   "options_ds_chromsync_btn_open_settings": {
+      "message": "Открыть настройки Chrome"
+   },
+   "options_ds_chromsync_btn_view_guide": {
+      "message": "Посмотреть Видео руководство"
+   },
+   "options_ds_chromsync_confirm_text": {
+      "message": "Я подтверждаю что закладки выключены."
+   },
+   "options_ds_chromsync_important": {
+      "message": "Важно!"
+   },
+   "options_ds_chromsync_l1": {
+      "message": "Если синхронизация в Chrome включена, пожалуйста прочитайте следующее:"
+   },
+   "options_ds_chromsync_l2": {
+      "message": "Вы должны  \u003Cb>отключить\u003C/b> синхронизацию \"Закладок\" для синхронизации закладок использовать наше дополнениеsync в Chrome браузере."
+   },
+   "options_ds_chromsync_l3": {
+      "message": "Нажмите \"\u003Cb>Открыть настройки Chrome.\u003C/b>\" > \"\u003Cb>Войти\u003C/b>\" секцию открыть \"\u003Cb>Расширенные настройки\u003C/b>\" > уберите галочку \"\u003Cb>Закладки\u003C/b>\"."
+   },
+   "options_ds_chromsync_l4": {
+      "message": "Перезапустить Chrome браузер."
+   },
+   "options_enable_autobackup": {
+      "message": "Включить автоматическое резервное копирование"
+   },
+   "options_enable_autosync": {
+      "message": "Включить автосинк(каждые 60 минут)"
+   },
+   "options_error_account_not_found": {
+      "message": "Профиль не найден"
+   },
+   "options_error_confirm_failed": {
+      "message": "Подтверждение не произошло"
+   },
+   "options_error_email_alredy_registered": {
+      "message": "Этот E-Mail уже зарегистрирован"
+   },
+   "options_error_invalid_email": {
+      "message": "Неправильный формат E-Mail адресса"
+   },
+   "options_error_login_failed": {
+      "message": "E-mail или пароль неправильный"
+   },
+   "options_error_password_too_short": {
+      "message": "Пароль очень короткий (должно быть не меньше 8 символов)"
+   },
+   "options_error_passwords_dont_match": {
+      "message": "Пароли не совпадают"
+   },
+   "options_error_undefined_error": {
+      "message": "Неизвестная ошибка сервера (%number%)"
+   },
+   "options_fix_quota_link": {
+      "message": "Увеличить Лимиты"
+   },
+   "options_fvd_sync": {
+      "message": "EverSync"
+   },
+   "options_get_pro_account": {
+      "message": "Получить Премиум возможности!"
+   },
+   "options_how_to_use": {
+      "message": "Помощь по использованию"
+   },
+   "options_init_sync_desc": {
+      "message": "Вы должны выбрать одно из следующих действий перед тем как начать синхронизацию"
+   },
+   "options_legend_confirm": {
+      "message": "Подтвердить Регистрацию"
+   },
+   "options_legend_login": {
+      "message": "Войти"
+   },
+   "options_legend_register": {
+      "message": "Создать новый профиль"
+   },
+   "options_legend_restore_password": {
+      "message": "Восстановить пароль"
+   },
+   "options_logout": {
+      "message": "Выйти"
+   },
+   "options_manual_sync": {
+      "message": "Ручная Синхронизация"
+   },
+   "options_merge": {
+      "message": "Объединить"
+   },
+   "options_merge_desc": {
+      "message": "Информация с Сервера и Компьютера будут объединены (Примечание: Сервер имеет приоритет выше)."
+   },
+   "options_merge_local_and_server_data": {
+      "message": "Объединить локальную и серверную информацию"
+   },
+   "options_not_found_backups": {
+      "message": "Нету резервных копий"
+   },
+   "options_online": {
+      "message": "в сети"
+   },
+   "options_overwrite_desc": {
+      "message": "Скопировать информацию с вашего Компьютера на Сервер"
+   },
+   "options_overwrite_local_data": {
+      "message": "Заменить локальную информацию"
+   },
+   "options_overwrite_server_data": {
+      "message": "Заменить информацию на сервере"
+   },
+   "options_premium_for_share": {
+      "message": "Получить премиум аккаунт бесплатно!"
+   },
+   "options_quota_archived": {
+      "message": "Заархивировано"
+   },
+   "options_quota_bookmarks": {
+      "message": "Закладки"
+   },
+   "options_quota_items": {
+      "message": "Элементы"
+   },
+   "options_quota_speed_dial": {
+      "message": "Быстрый Набор"
+   },
+   "options_quota_trashed": {
+      "message": "Удаленные"
+   },
+   "options_quota_usage_report": {
+      "message": "Отчет по использованию"
+   },
+   "options_remove_account": {
+      "message": "Удалить профиль"
+   },
+   "options_restore_message_sent": {
+      "message": "Инструкции по восстановлению высланы на ваш E-mail"
+   },
+   "options_sd_backup_first_line": {
+      "message": "Чтобы ваши диалы не пропали, для уверенности мы автоматически делаем резервную копию всех Ваших диалов."
+   },
+   "options_sd_backup_make": {
+      "message": "Сделать копию диалов"
+   },
+   "options_sd_backup_restore": {
+      "message": "Восстановить диалы"
+   },
+   "options_sd_backup_second_line": {
+      "message": "Все ваши диалы сохранены на компьютер."
+   },
+   "options_sd_in_browser": {
+      "message": "В Браузере:"
+   },
+   "options_settings_customs_desc": {
+      "message": "Сделайте бэкап оформления и настроек"
+   },
+   "options_settings_customs_item": {
+      "message": "Бэкап настроек"
+   },
+   "options_settings_customs_title": {
+      "message": "Бэкап всех Ваших настроек и стилей"
+   },
+   "options_sync_account_online": {
+      "message": "Ваш %email% профиль для синхронизации -  "
+   },
+   "options_sync_bookmarks_quota": {
+      "message": "Лимитов на синхронизацию закладок не существует, но из-за Google Api Запретов вы можете использовать Объединить/Скачать закладки 4 раза в день."
+   },
+   "options_tab_account": {
+      "message": "Профиль"
+   },
+   "options_tab_backup_history": {
+      "message": "Бэкапы"
+   },
+   "options_tab_sync": {
+      "message": "SpeedDial"
+   },
+   "options_tab_sync_bookmarks": {
+      "message": "Закладки"
+   },
+   "options_title": {
+      "message": "Опции EverSync"
+   },
+   "options_unlimsync_old_chrome_more_info": {
+      "message": "Узнать больше..."
+   },
+   "options_unlimsync_old_chrome_please_open": {
+      "message": "\u003Cstrong>Пожалуйста, откройте\u003C/strong> "
+   },
+   "options_unlimsync_old_chrome_text_1": {
+      "message": "Теперь вам не надо перезапускать браузер, когда вы синхронизируете большое количество закладок, но для этого вам надо обновится на \u003Cstrong>Chrome 38\u003C/strong>, либо более поздней версии. Ваша текущая версия браузера не поддерживает данные изменения."
+   },
+   "options_unlimsync_old_chrome_text_2": {
+      "message": "\u003Cstrong> и обновите ваш браузер. Спасибо.\u003C/strong>"
+   },
+   "options_upload": {
+      "message": "Загрузить"
+   },
+   "options_why_use_web_ui": {
+      "message": "Зачем мне нужен Веб доступ?"
+   },
+   "options_why_use_webui": {
+      "message": "\u003Cdiv class=\"whyUseWebUi\">\u003Cp>Вы можете синхронизироваться с EverHelper при использовании аддонов EverSync и FVD Speed Dial.\u003C/p>\u003Cp>Некоторые возможности доступны только в веб интерфейсе EverHelper:\u003C/p>\u003Cul>\u003Cli>Создание дополнительных бэкапов\u003C/li>\u003Cli>Создание приватных закладок и дилов\u003C/li>\u003Cli>Импорт закладок из HTML файлов\u003C/li>\u003Cli>Копирование закладок FVD Speed Dial\u003C/li>\u003C/ul>\u003Cp>Кроме того, веб интерфейс дает Вам доступ к Вашим закладкам из любого браузера без необходимости установки аддона!\u003C/p>\u003C/div>"
+   },
+   "popup_abort": {
+      "message": "Отменить"
+   },
+   "popup_alert_sync_already_active": {
+      "message": "Синхронизация происходит на другом устройстве, пожалуйста подождите... База данных будет автоматически разблокирована в течении 5 минут."
+   },
+   "popup_alert_sync_already_active_title": {
+      "message": "Ошибка"
+   },
+   "popup_apply_updates_confirm_text": {
+      "message": "На сервере имеются обновления( %date% ). Хотите применить?"
+   },
+   "popup_auto_title": {
+      "message": "Автоматически"
+   },
+   "popup_bookmarks_desc": {
+      "message": "Синхронизировать закладки"
+   },
+   "popup_bookmarks_passive_desc": {
+      "message": "Синхронизация закладок не активна"
+   },
+   "popup_cancel_sync": {
+      "message": "Отменить синхронизацию"
+   },
+   "popup_conflict_abort_sync": {
+      "message": "Отменить синхронизацию"
+   },
+   "popup_conflict_fvd_sync_cant_tell": {
+      "message": "EverSync не может определить какая из версий этой"
+   },
+   "popup_conflict_local_version": {
+      "message": "Локальная версия"
+   },
+   "popup_conflict_retain_local_version": {
+      "message": "Сохранить локальную версию"
+   },
+   "popup_conflict_retain_server_version": {
+      "message": "Сохранить версию для сервера"
+   },
+   "popup_conflict_select_version": {
+      "message": "Пожалуйста выберите версию которая должна быть оставлена"
+   },
+   "popup_conflict_server_version": {
+      "message": "Серверная версия"
+   },
+   "popup_conflict_should_be_retained": {
+      "message": "должна быть оставлена."
+   },
+   "popup_conflict_title": {
+      "message": "Конфликт в версии содержания"
+   },
+   "popup_conflict_use_this_choice": {
+      "message": "Используйте этот выбор для всех конфликтов Use this choise for all conflicts of this sync"
+   },
+   "popup_get_pro_button": {
+      "message": "Перейти на Pro!"
+   },
+   "popup_goto_everhelper": {
+      "message": "Мой EverHelper"
+   },
+   "popup_initialization": {
+      "message": "Устанавливается"
+   },
+   "popup_login": {
+      "message": "Войти"
+   },
+   "popup_logout": {
+      "message": "Выйти"
+   },
+   "popup_must_login_message": {
+      "message": "Для синхронизации информации вы должны войти в ваш EverSync профиль"
+   },
+   "popup_ok": {
+      "message": "Да"
+   },
+   "popup_options": {
+      "message": "Опции"
+   },
+   "popup_please_resolve_conflict": {
+      "message": "Пожалуйста разрешите конфликт"
+   },
+   "popup_rate_us": {
+      "message": "Оцените Нас"
+   },
+   "popup_register": {
+      "message": "Регистрация"
+   },
+   "popup_report_bug": {
+      "message": "Ошибка!"
+   },
+   "popup_resolve_conflict": {
+      "message": "Разрешить"
+   },
+   "popup_sd_not_installed_explore": {
+      "message": "Установить"
+   },
+   "popup_speeddial_sync_action_download_changes": {
+      "message": "Синхронизация с сервером... Пожалуйста подождите!"
+   },
+   "popup_speeddial_sync_action_special_actions": {
+      "message": "Специальная синхронизация(%progress%)... Пожалуйста подождите!"
+   },
+   "popup_speeddial_sync_action_upload_changes": {
+      "message": "Вносим изменения... Пожалуйста подождите!"
+   },
+   "popup_speeddial_sync_groups_and_dials": {
+      "message": "FVD Speed Dial:  Группы и Диалы"
+   },
+   "popup_speeddial_sync_it_can_take": {
+      "message": "Это может занять до 1 минуты."
+   },
+   "popup_speeddial_sync_not_active": {
+      "message": "Для синхронизации нужен FVD Speed Dial"
+   },
+   "popup_sync": {
+      "message": "Синхронизировать"
+   },
+   "popup_sync_in_progress": {
+      "message": "Идёт синхронизация. Пожалуйста подождите..."
+   },
+   "popup_syncing": {
+      "message": "Синхронизируется"
+   },
+   "popup_undefined_group": {
+      "message": "Неопределенная группа"
+   },
+   "popup_warning_unsorted": {
+      "message": "Важно, если вы синхронизируете закладки между Firefox и Chrome!\u003Cbr>FireFox папка \u003Cstrong>&quot;Другие закладки&quot;\u003C/strong> не синхронизируется в Chrome, но синхронизируется между браузерами Firefox."
+   },
+   "popup_warning_unsorted_link": {
+      "message": "Читать больше &gt;&gt;"
+   },
+   "server_backups_link": {
+      "message": "Показать серверные бэкапы"
+   },
+   "server_backups_title": {
+      "message": "Серверные бэкапы"
+   },
+   "tab_customs": {
+      "message": "Бэкапы настроек"
+   },
+   "tab_local_backups": {
+      "message": "Локальные бэкапы"
+   },
+   "tab_server_backups": {
+      "message": "Серверные бэкапы"
+   }
+}

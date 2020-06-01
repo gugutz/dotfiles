@@ -1,0 +1,12 @@
+# Comments and blank lines are allowed.
+# this uses perl regular expressions
+
+\.git
+\.gitignore
+
+^/README.*
+^/LICENSE.*
+^/COPYING
+
+^setup.sh*
+fzf

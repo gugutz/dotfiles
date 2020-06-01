@@ -1,0 +1,107 @@
+body{
+	font-family: Arial;
+	font-size: 12px;
+	color: #303942;	
+	
+	background: #fff;/*-webkit-linear-gradient( 45deg, #fff, #ccc );*/
+
+	
+}
+
+.alertContent{
+	position: absolute;
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	bottom: 0px;
+	
+	padding: 5px;	
+}
+
+.alertContent .text{
+	font-size: 14px;
+	
+	background: url( /images/alert.png ) no-repeat left center;
+	
+	padding-left: 60px;	
+	
+	display: table;
+}
+
+
+.alertContent .text span{
+	display: table-cell;
+	vertical-align: middle;
+}
+
+.alertContent .buttons{
+	position: absolute;
+	bottom: 10px;
+	right: 0px;
+	left: 0px;
+	text-align: right;	
+}
+
+.alertContent .buttons.padded{
+  padding-bottom: 40px;
+}
+
+.alertContent .buttons.largeMargin{
+	bottom: 10px;
+	right: 5px;
+}
+
+.alertContent .buttons.centered{
+	text-align: center;
+}
+
+.alertContent .buttons a.padded{
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+#specialMessage_restartAfterPluginSync .text{
+	font-weight: bold;
+	margin-top: 30px;
+}
+
+#specialMessage_syncQuotaExceed .limits{
+	margin-top: 15px;
+	margin-left: 5px;
+}
+
+#specialMessage_syncQuotaExceed .limits .uploadAttempt{
+	font-weight: bold;
+}
+
+label.cbParent{
+	display: table;	
+}
+
+label.cbParent.left{
+	position: absolute;
+	left: 5px;
+	bottom: 6px;
+}
+
+
+label.cbParent.right{
+  position: absolute;
+  right: 5px;
+  bottom: 0px;
+}
+
+label.cbParent span{
+	display: table-cell;
+	vertical-align: middle;
+}
+
+body.simple{
+	text-align: center;
+	font-weight: bold;
+	padding-top: 10px;
+}
+
+.weight-normal{
+	font-weight: normal;
+}

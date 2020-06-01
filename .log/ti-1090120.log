@@ -1,0 +1,19 @@
+[17:14:58.689] Global cache location '/home/tau/.cache/typescript/3.8', safe file path '/home/tau/.nvm/versions/node/v12.16.3/lib/node_modules/typescript/lib/typingSafeList.json', types map path /home/tau/.nvm/versions/node/v12.16.3/lib/node_modules/typescript/lib/typesMap.json
+[17:14:58.691] Processing cache location '/home/tau/.cache/typescript/3.8'
+[17:14:58.691] Trying to find '/home/tau/.cache/typescript/3.8/package.json'...
+[17:14:58.695] Loaded content of '/home/tau/.cache/typescript/3.8/package.json': {"private":true,"dependencies":{"types-registry":"^0.1.490"}}
+[17:14:58.695] Loaded content of '/home/tau/.cache/typescript/3.8/package-lock.json'
+[17:14:58.695] Finished processing cache location '/home/tau/.cache/typescript/3.8'
+[17:14:58.695] Process id: 1090129
+[17:14:58.695] NPM location: /home/tau/.nvm/versions/node/v12.16.3/bin/npm (explicit '--npmLocation' not  provided)
+[17:14:58.695] validateDefaultNpmLocation: false
+[17:14:58.696] Npm config file: /home/tau/.cache/typescript/3.8/package.json
+[17:14:58.696] Updating types-registry npm package...
+[17:14:58.696] Exec: /home/tau/.nvm/versions/node/v12.16.3/bin/npm install --ignore-scripts types-registry@latest
+[17:15:2.706]     Succeeded. stdout:
+    + types-registry@0.1.490
+    updated 1 package and audited 1 package in 1.976s
+found 0 vulnerabilities
+
+
+[17:15:2.740] Updated types-registry npm package

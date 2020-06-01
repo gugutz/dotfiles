@@ -1,0 +1,136 @@
+{
+  "editor.fontSize": 15,
+  "editor.fontFamily": "'Hack Nerd Font Mono', ' DejaVu Sans Mono', 'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'",
+  "editor.tabSize": 2,
+  // format on save
+  "editor.formatOnSave": true,
+  // workaround to use keycodes in order to make xmodmap customizations work
+  "keyboard.dispatch": "keyCode",
+  // trim whitepsaces on save
+  "files.trimTrailingWhitespace": true,
+  // show trailing whitespaces
+  "editor.renderWhitespace": "boundary",
+  //
+  // appearance settings
+  "workbench.editor.showTabs": true,
+  // these changes according to vim mode on the fly
+  "workbench.colorCustomizations": {
+    "statusBar.background": "#007ad3",
+    "statusBar.noFolderBackground": "#007ad3",
+    "statusBar.debuggingBackground": "#007ad3",
+    "statusBar.foreground": "#ffffff"
+  },
+  //
+  // typescript
+  "[typescript]": {
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.wordWrap": "on",
+    "editor.renderWhitespace": "all",
+    "editor.acceptSuggestionOnEnter": "off"
+  },
+  // -------------------------------------------
+  // VsCodeVim settings
+  //
+  // use # and * to search forward and backward in visual mode
+  // "vim.vimrc.enable": true,
+  // "vim.vimrc.path": "~/.vimrc",
+  "vim.visualstar": true,
+  "vim.easymotion": true,
+  "vim.sneak": true,
+  "vim.incsearch": true,
+  "vim.useSystemClipboard": true,
+  "vim.useCtrlKeys": true,
+  "vim.hlsearch": true,
+  "vim.leader": "<space>",
+
+  // "vim.leader": ",",
+  "vim.handleKeys": {
+    "<C-a>": false,
+    "<C-f>": false
+  },
+  // vim-airline
+  // warning There are performance implications to using this plugin.
+  // In order to change the status bar, we override the configurations
+  // in your workspace settings.json which results in increased latency
+  // and a constant changing diff in your working directory (see issue#2124).
+  // Change the color of the status bar based on the current mode.
+  // Once enabled, configure "vim.statusBarColors".
+  // Colors can be defined for each mode either as string (background only),
+  // or string[] (background, foreground).
+  "vim.statusBarColorControl": true,
+  "vim.statusBarColors.normal": ["#007ad3", "#ffffff"],
+  "vim.statusBarColors.insert": "#BF616A",
+  "vim.statusBarColors.visual": "#B48EAD",
+  "vim.statusBarColors.visualline": "#B48EAD",
+  "vim.statusBarColors.visualblock": "#A3BE8C",
+  "vim.statusBarColors.replace": "#D08770",
+  "vim.statusBarColors.commandlineinprogress": "#007ACC",
+  "vim.statusBarColors.searchinprogressmode": "#007ACC",
+  "vim.statusBarColors.easymotionmode": "#007ACC",
+  "vim.statusBarColors.easymotioninputmode": "#007ACC",
+  "vim.statusBarColors.surroundinputmode": "#007ACC",
+  //
+  // colorize - plugin to color hex codes
+  "colorize.languages": ["javascript", "json"],
+  // -------------------------------------------
+  // golang settings
+  "go.formatTool": "gofmt",
+  //
+  // json c
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+  // ----------------------------
+  //
+  // vim keybindings
+  // "vim.insertModeKeyBindings": [
+  //   // {
+  //   //   "before": ["ctrl+a"],
+  //   //   "commands": ["cursorHome"]
+  //   // },
+  //   // {
+  //   //   "before": ["ctrl+e"],
+  //   //   "commands": ["cursorEnd"]
+  //   // },
+  //   {
+  //     "before": ["ctrl+y"],
+  //     "commands": ["editor.action.clipboardPasteAction"]
+  //   },
+  //   {
+  //     "before": ["ctrl+k"],
+  //     "commands": ["editor.action.deleteLines"]
+  //   }
+  // ],
+  // "vim.normalModeKeyBindingsNonRecursive": [
+  //   // {
+  //   //   "before": [
+  //   //     ":"
+  //   //   ],
+  //   //   "commands": [
+  //   //     "workbench.action.showCommands"
+  //   //   ]
+  //   // },
+  //   {
+  //     "before": ["leader", "w"],
+  //     "commands": ["workbench.action.files.save"]
+  //   },
+  //   {
+  //     "before": ["leader", "o"],
+  //     "commands": ["workbench.action.quickSwitchWindow"]
+  //   }
+  // ],
+  // // visual mode bindings
+  // "vim.visualModeKeyBindingsNonRecursive": [
+  //   // Bind > and < in visual mode to indent/outdent lines (repeatable)
+  //   {
+  //     "before": [">"],
+  //     "commands": ["editor.action.indentLines"]
+  //   },
+  //   {
+  //     "before": ["<"],
+  //     "commands": ["editor.action.outdentLines"]
+  //   }
+  // ]
+}

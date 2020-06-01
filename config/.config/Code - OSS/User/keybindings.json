@@ -1,0 +1,313 @@
+// Place your key bindings in this file to override the defaults
+// C-1to9 focus editors
+// A-1to9 focus tabs
+[
+  {
+    // make capslock escape with vscodevim
+    "key": "capslock",
+    "command": "extension.vim_escape",
+    "when": "editorTextFocus && vim.active && !inDebugRepl"
+  },
+  //####################################################
+  // Simulate usefull Vim bindings
+  //####################################################
+  // quick save
+  {
+    "key": "space w",
+    "command": "workbench.action.files.save",
+    "when": "editorTextFocus && vim.active && vim.mode != 'Insert'"
+  },
+  // quick quit
+  {
+    "key": "space q",
+    "command": "workbench.action.closeActiveEditor",
+    "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+  },
+  // switch window
+  {
+    "key": "space o",
+    "command": "workbench.action.quickSwitchWindow",
+    "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+  },
+  // space + \ splits window (the \ char needs to be escaped with itself first)
+  {
+    "key": "space \\",
+    "command": "workbench.action.splitEditor",
+    "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+  },
+  // project find files
+  {
+    "key": "space p",
+    "command": "workbench.action.quickOpen",
+    "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+  },
+  // open recent files
+  {
+    "key": "space b",
+    "command": "workbench.action.quickOpen",
+    "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+  },
+  {
+    "key": "space z",
+    "command": "workbench.action.toggleZenMode",
+    "when": "vim.active && vim.mode == 'Normal' && editorTextFocus"
+  },
+  // move lines up and down with vim keys
+  {
+    "key": "alt+k",
+    "command": "editor.action.moveLinesUpAction",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "alt+j",
+    "command": "editor.action.moveLinesDownAction",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  //####################################################
+  // Simulate usefull Emacs bindings
+  //####################################################
+  {
+    "key": "ctrl+a",
+    "command": "cursorHome",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+e",
+    "command": "cursorEnd",
+    "when": "editorTextFocus"
+  },
+  // {
+  //   "key": "ctrl+p",
+  //   "command": "scrollLineUp",
+  //   "when": "!editorTextFocus"
+  // },
+  // {
+  //   "key": "ctrl+n",
+  //   "command": "scrollLineDown",
+  //   "when": "editorTextFocus"
+  // },
+  {
+    "key": "ctrl+p",
+    "command": "scrollLineUp",
+    "when": "editorTextFocus && vim.active && vim.mode == 'Insert'"
+  },
+  {
+    "key": "ctrl+n",
+    "command": "scrollLineDown",
+    "when": "editorTextFocus && vim.active && vim.mode == 'Insert'"
+  },
+  // navigate with C-n and C-p on Quick Open (Ctrl+p) menu
+  {
+    "key": "ctrl+n",
+    "command": "workbench.action.quickOpenSelectNext",
+    "when": "!editorFocus"
+  },
+  {
+    "key": "ctrl+p",
+    "command": "workbench.action.quickOpenSelectPrevious",
+    "when": "!editorFocus"
+  },
+  // Simulate emacs M-x
+  {
+    "key": "alt+x",
+    "command": "workbench.action.showCommands"
+  },
+  // expand-region equivalent
+  {
+    "key": "ctrl+tab",
+    "command": "editor.action.smartSelect.expand",
+    "when": "editorTextFocus"
+  },
+  //  expand-region reverse
+  {
+    "key": "ctrl+shift+tab",
+    "command": "editor.action.smartSelect.shrink",
+    "when": "editorTextFocus"
+  },
+  //
+  //####################################################
+  // Sidebar / File Explorer
+  //####################################################
+  //
+  // readline like navigation in file explorer
+  {
+    "key": "ctrl+p",
+    "command": "list.focusUp",
+    "when": "listFocus && !inputFocus"
+  },
+  {
+    "key": "ctrl+n",
+    "command": "list.focusDown",
+    "when": "listFocus && !inputFocus"
+  },
+  {
+    "key": "ctrl+w",
+    "command": "extension.vim_ctrl+w",
+    "when": "listFocus && !inputFocus"
+  },
+  {
+    "key": "F8",
+    "command": "workbench.view.explorer",
+    "when": "explorerViewletVisible"
+  },
+  {
+    "key": "F8",
+    "command": "workbench.view.explorer",
+    "when": "!explorerViewletVisible"
+  },
+  {
+    "key": "F8",
+    "command": "workbench.action.toggleSidebarVisibility",
+    "when": "listFocus && !inputFocus"
+  },
+  {
+    "key": "o n",
+    "command": "workbench.action.files.openFileInNewWindow",
+    "when": "explorerViewletVisible && filesExplorerFocus && !inputFocus && vim.active && vim.mode != 'Insert'"
+  },
+  //
+  //####################################################
+  // Autocomplete / Intellisense
+  //####################################################
+  //
+  // C-n and C-p to navigate suggestions in autocomplete
+  {
+    "key": "ctrl+p",
+    "command": "selectPrevSuggestion",
+    "when": "editorTextFocus && suggestWidgetMultipleSuggestions && suggestWidgetVisible"
+  },
+  {
+    "key": "ctrl+n",
+    "command": "selectNextSuggestion",
+    "when": "editorTextFocus && suggestWidgetMultipleSuggestions && suggestWidgetVisible"
+  },
+  {
+    "key": "ctrl+j",
+    "command": "workbench.action.quickOpenNavigateNext",
+    "when": "inQuickOpen"
+  },
+  {
+    "key": "ctrl+k",
+    "command": "workbench.action.quickOpenNavigatePrevious",
+    "when": "inQuickOpen"
+  },
+  //
+  //####################################################
+  // CodeActions
+  //####################################################
+  //
+  {
+    "key": "cmd+k f",
+    "command": "editor.action.codeAction",
+    "args": {
+      "kind": "source.fixAll.tslint",
+      "apply": "first"
+    }
+  },
+  //
+  //####################################################
+  // QuickFix
+  //####################################################
+  //
+  // imitate jetBrains Alt+Enter fix shortcut
+  {
+    "key": "alt+enter",
+    "command": "editor.action.quickFix",
+    "when": "editorHasCodeActionsProvider && editorTextFocus && !editorReadonly"
+  },
+  // C-n and C-p to navigate in quickfix list
+  {
+    "key": "ctrl+p",
+    "command": "list.focusUp",
+    // "command": "workbench.action.notebook.cursorUp",
+    "when": "editorTextFocus && quickFixWidgetVisible"
+  },
+  {
+    "key": "ctrl+n",
+    "command": "cursorDown",
+    // "command": "workbench.action.notebook.cursorDown",
+    "when": "editorTextFocus && quickFixWidgetVisible"
+  },
+  //
+  //####################################################
+  // Panes / Editors navigation
+  //####################################################
+  //
+  // vim-like navigation between panes ("Editor Groups" in VSCode)
+  {
+    "key": "ctrl+h",
+    "command": "workbench.action.navigateLeft"
+  },
+  {
+    "key": "ctrl+l",
+    "command": "workbench.action.navigateRight"
+  },
+  {
+    "key": "ctrl+k",
+    "command": "workbench.action.navigateUp"
+  },
+  {
+    "key": "ctrl+j", // overides default togglePanel binding (C-j)
+    "command": "workbench.action.navigateDown"
+  },
+  // toggle region fold
+  {
+    "key": "z f",
+    "command": "editor.toggleFold",
+    "when": "editorTextFocus && foldingEnabled && vim.active && vim.mode != 'Insert'"
+  },
+  {
+    "key": "ctrl+w",
+    "command": "extension.vim_ctrl+w",
+    "when": "editorTextFocus && vim.active && vim.use<C-w> && !inDebugRepl"
+  },
+  //
+  //####################################################
+  // VSCode Terminal bindings
+  //####################################################
+  {
+    "key": "space t",
+    "command": "workbench.action.terminal.toggleTerminal",
+    "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+  },
+  // navigate in terminal with readline bindings
+  {
+    "key": "ctrl+n",
+    "command": "workbench.action.terminal.scrollDown",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+p",
+    "command": "workbench.action.terminal.scrollUp",
+    "when": "terminalFocus"
+  },
+  // {
+  //   "key": "space ç",
+  //   "command": "workbench.action.toggleEditorGroupLayout",
+  //   "when": "vim.active && vim.mode == 'Normal'"
+  // },
+  //
+  //####################################################
+  // UI control bindings
+  //####################################################
+  {
+    "key": "f11",
+    "command": "workbench.action.toggleFullScreen",
+    "when": "vim.active && vim.mode == 'Normal'"
+  },
+  {
+    "key": "ctrl+b",
+    "command": "workbench.action.toggleSidebarVisibility",
+    "when": "vim.active && vim.mode == 'Normal'"
+  },
+  {
+    "key": "ctrl+alt+w",
+    "command": "workbench.action.toggleTabsVisibility",
+    "when": "vim.active && vim.mode != 'Insert'"
+  },
+  {
+    "key": "enter",
+    "command": "list.select",
+    "when": "explorerViewletVisible && filesExplorerFocus"
+  }
+]

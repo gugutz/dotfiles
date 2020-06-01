@@ -1,0 +1,413 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title msg="options_title"></title>
+
+<link rel="stylesheet" href="/styles/Options2/index.css">
+
+<link href="/styles/icons.css" rel="stylesheet" type="text/css">
+<link href="/styles/dialogs.css" rel="stylesheet" type="text/css">
+<link href="/styles/sync_progress.css" rel="stylesheet" type="text/css">
+<link href="/styles/Controls/buttons.css" rel="stylesheet" type="text/css">
+<link href="/styles/Controls/tooltip.css" rel="stylesheet" type="text/css">
+<link href="/styles/Controls/simple-dialog.css" rel="stylesheet" type="text/css">
+
+<script src="/js/_external/jquery-3.3.1.min.js" type="text/javascript"></script>
+
+<script src="/js/index.js" type="text/javascript"></script>
+<script src="/js/Utils.js" type="text/javascript"></script>
+<script src="/js/Prefs.js" type="text/javascript"></script>
+<script src="/js/Localizer.js" type="text/javascript"></script>
+<script src="/js/errors.js" type="text/javascript"></script>
+<script src="/js/Dialogs.js" type="text/javascript"></script>
+<script src="/js/Observer.js" type="text/javascript"></script>
+
+<script src="/js/Options/init.js" type="text/javascript"></script>
+<script src="/js/Options/index.js" type="text/javascript"></script>
+
+<script src="/js/Driver/index.js" type="text/javascript"></script>
+<script src="/js/Driver/Speeddial.js" type="text/javascript"></script>
+<script src="/js/Driver/Bookmarks.js" type="text/javascript"></script>
+
+<script src="/js/Server/index.js" type="text/javascript"></script>
+<script src="/js/Server/Sync.js" type="text/javascript"></script>
+<script src="/js/Server/Connection.js" type="text/javascript"></script>
+
+<script src="/js/Controls/index.js" type="text/javascript"></script>
+<script src="/js/Controls/Tabs.js" type="text/javascript"></script>
+<script src="/js/Controls/Tooltip.js" type="text/javascript"></script>
+<script src="/js/Controls/simple-dialog.js" type="text/javascript"></script>
+
+<script src="/js/Customs/customs-actions.js" type="text/javascript"></script>
+<script src="/js/Customs/customs-ui.js" type="text/javascript"></script>
+<link href="/styles/Customs/customs.css" rel="stylesheet" type="text/css">
+
+<script src="/js/analytics.js" type="text/javascript"></script>
+<script src="/js/tooltip.js" type="text/javascript"></script>
+<script src="/js/premiumforshare.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+<div class="center">
+  <div class="wrapper">
+
+    <!-- header -->
+    <header class="site_header">
+      <h1 class="logo"><img src="/images/Options2/logo.png" alt="EverSync"></h1>
+      <div id="topButtons">
+        <button class="fvdButton how-to-use-button iconic">
+          <i></i>
+          <span msg="options_how_to_use"></span>
+        </button>
+        <div id="premiumForShareButton">
+          <button class="fvdButton green" id="buttonpremiumForShareButton"><i></i><span class="text" msg="options_premium_for_share"></span></button>
+        </div>
+      </div>
+    </header>
+    <!-- /header -->
+
+    <!-- tabs -->
+    <div class="tabs">
+      <div id="tabHeadAccount" class="tab tab_violet tab_account">
+        <div class="tab_bg"><strong msg="options_tab_account"></strong></div>
+      </div>
+      <div id="tabHeadSync" class="tab tab_blue tab_speeddial">
+        <div class="tab_bg"><strong msg="options_tab_sync"></strong></div>
+      </div>
+      <div id="tabHeadSyncBookmarks" class="tab tab_green tab_bookmarks">
+        <div class="tab_bg"><strong msg="options_tab_sync_bookmarks"></strong></div>
+      </div>
+      <div id="tabHeadBackupHistory" class="tab tab_yellow tab_backups">
+        <div class="tab_bg"><strong msg="options_tab_backup_history"></strong></div>
+      </div>
+    </div>
+    <!-- /tabs -->
+
+    <!-- main -->
+    <section class="main">
+
+      <!-- login -->
+      <section id="login_section" class="section_open">
+        <div class="window">
+
+          <div id="whyUseUiContent" msg="options_why_use_webui" hidden="true"></div>
+          <div class="window_link_left" tooltip="whyUseUiContent" id="buttonWhyUseUi" msg="options_why_use_web_ui">Why do i need Web Access?</div>
+
+          <div class="window_link_right get-pro-center-button">
+            <a href="https://everhelper.me/everhelperplans.php" target="_blank">
+              <i></i>
+              <span msg="options_get_pro_account"></span>
+            </a>
+          </div>
+
+          <div id="accountFrameContainer">
+
+            <iframe id="accountFrame"></iframe>
+
+            <div class="loading"></div>
+            <div class="syncing"></div>
+
+          </div>
+
+        </div>
+      </section>
+      <!-- /login -->
+
+      <!-- manual speed -->
+      <section id="manual_speed">
+        <div class="window manualSyncTabContent">
+          <div class="window_title"><span msg="options_manual_sync"></span></div>
+          <!--<div class="window_link_right buttonCloseBottom" msg="options_close_this_page"></div>-->
+          <div class="window_link_center get-pro-center-button">
+            <a href="https://everhelper.me/everhelperplans.php" target="_blank">
+              <i></i>
+              <span msg="options_get_pro_account"></span>
+            </a>
+          </div>
+          <div class="sync">
+
+            <div class="sync_warning" id="initSyncDesc" hidden="true" msg="options_init_sync_desc"></div>
+
+            <div class="enableAutoSync">
+              <label>
+                <input type="checkbox" driver="speeddial">
+                <span msg="options_enable_autosync"></span>
+              </label>
+            </div>
+
+            <div class="sync_choose">
+
+              <div id="syncButtons_Speeddial" class="sync_choose_actions" helpmessageto="sdHelpMessage">
+                <div class="sync_action">
+                  <div class="sync_action_title" msg="options_merge_local_and_server_data"></div>
+                  <button msg_target="title" msg="options_merge_desc" id="buttonMergeLocalAndServerData" class="button" type="button"><span msg="options_merge"></span></button>
+                </div>
+                <div class="sync_action">
+                  <div class="sync_action_title" msg="options_overwrite_server_data"></div>
+                  <button msg_target="title" msg="options_overwrite_desc" id="buttonOverwriteServerData" class="button" type="button"><span msg="options_upload"></span></button>
+                </div>
+                <div class="sync_action">
+                  <div class="sync_action_title" msg="options_overwrite_local_data"></div>
+                  <button msg_target="title" msg="options_download_desc" id="buttonOverwriteLocalData" class="button" type="button"><span msg="options_download"></span></button>
+                </div>
+                <br class="clear">
+              </div>
+
+              <div id="sdHelpMessage" class="sync_choose_text" msg_target="defaulttitle" msg="options_default_desc"></div>
+
+            </div>
+            <div id="backupSDContainer" class="sync_backup">
+              <div class="sync_backup_text">
+
+                <div msg="options_sd_backup_first_line"></div>
+                <div msg="options_sd_backup_second_line"></div>
+
+              </div>
+              <div class="sync_backup_actions">
+                <button class="button" type="button" id="buttonSDBackupRestore"><span msg="options_sd_backup_restore"></span></button>
+                <button class="button" type="button" id="buttonSDBackupMake"><span msg="options_sd_backup_make"></span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- /manual speed -->
+
+      <!-- manual bookmarks -->
+      <section id="manual_bookmarks" class="manualSyncTabContent">
+        <div class="window">
+          <div class="window_title"><span msg="options_manual_sync"></span></div>
+
+          <div class="window_link_left">
+            <a href="https://www.youtube.com/watch?v=B66P_7zqvxE" target="_blank" msg="options_bookmarks_watch_video_guide"></a>
+          </div>
+          <div class="window_link_right get-pro-center-button">
+            <a href="https://everhelper.me/everhelperplans.php" target="_blank">
+              <i></i>
+              <span msg="options_get_pro_account"></span>
+            </a>
+          </div>
+          <!--<div class="window_link_right buttonCloseBottom" msg="options_close_this_page"></div>-->
+
+          <div id="manualSyncCompleted" hidden="true">
+            <div>
+              <span msg="dlg_sync_manual_sync_success"></span>
+            </div>
+          </div>
+
+          <div class="sync">
+
+            <div class="sync_warning" id="initSyncDescBookmarks" hidden="true" msg="options_init_sync_desc"></div>
+
+            <div class="enableAutoSync">
+              <label>
+                <input type="checkbox" driver="bookmarks">
+                <span msg="options_enable_autosync"></span>
+              </label>
+            </div>
+
+            <div class="sync_choose" id="bookmarksSyncTypes">
+              <div class="sync_choose_actions" helpmessageto="bookmarksHelpMessage">
+                <div class="sync_action">
+                  <div class="sync_action_title" msg="options_merge_local_and_server_data"></div>
+                  <button msg_target="title" msg="options_merge_desc" id="buttonMergeLocalAndServerDataBookmarks" class="button" type="button"><span msg="options_merge"></span></button>
+                </div>
+                <div class="sync_action">
+                  <div class="sync_action_title" msg="options_overwrite_server_data"></div>
+                  <button msg_target="title" msg="options_overwrite_desc" id="buttonOverwriteServerDataBookmarks" class="button" type="button"><span msg="options_upload"></span></button>
+                </div>
+                <div class="sync_action">
+                  <div class="sync_action_title" msg="options_overwrite_local_data"></div>
+                  <button msg_target="title" msg="options_download_desc" id="buttonOverwriteLocalDataBookmarks" class="button" type="button"><span msg="options_download"></span></button>
+                </div>
+                <br class="clear">
+              </div>
+              <div class="sync_choose_text" id="bookmarksHelpMessage" msg_target="defaulttitle" msg="options_default_desc"></div>
+
+              <div class="initialization">
+                <div class="progress">
+                  <span msg="popup_initialization"></span><br>
+                  <span id="bookmarksInitializationProgress"></span>
+                </div>
+              </div>
+            </div>
+
+            <div hidden="true" id="bookmarks-older-chrome-message">
+              <div class="inner">
+                <span msg="options_unlimsync_old_chrome_text_1"></span>
+                <span msg="options_unlimsync_old_chrome_please_open"></span>
+                <a href="chrome://chrome/" target="_blank">chrome://chrome/</a>
+                <span msg="options_unlimsync_old_chrome_text_2"></span>
+              </div>
+            </div>
+
+            <div id="backupBookmarksContainer" hidden="true" class="sync_backup">
+              <div class="sync_backup_text">
+
+                <div msg="options_bookmarks_backup_first_line"></div>
+                <div msg="options_bookmarks_backup_second_line"></div>
+
+              </div>
+              <div class="sync_backup_actions">
+                <button class="button" type="button" id="buttonBookmarksBackupRestore"><span msg="options_bookmarks_backup_restore"></span></button>
+                <button class="button" type="button" id="buttonBookmarksBackupMake"><span msg="options_bookmarks_backup_make">Backup Bookmarks</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- /manual bookmarks -->
+
+      <!-- restore -->
+      <section id="restore_section">
+        <ul class="section_top">
+          <li id="serverBackupsLink" msg="tab_server_backups"></li>
+          <li id="customsLink" msg="tab_customs"></li>
+          <li id="localBackupsLink" msg="tab_local_backups"></li>
+          <!--<li id="prevBackupsLink" msg="tab_backups"></li>-->
+        </ul>
+
+        <!-- subsection customs -->
+        <div id="subsectionBackupsCustoms" class="restore_subsection window" hidden=1 name="customs_backup"> <!--Task #2009 -->
+          <div class="window_title"><span msg="options_settings_customs_title"></span></div>
+
+          <div id="customs-block" class="navi-page-block loading" block="navi-settings-customs" mode="none">
+            <div class="navi-body-header">
+                <!--<h1 msg="options_settings_customs_title"></h1>-->
+                <p msg="options_settings_customs_desc"></p>
+            </div>
+            
+            <div class="navi-block" auth="yes">
+                <ul id="customs-list"></ul>
+                
+                <div class="customs-buttons main-label labels-center">
+                    <button id="customs-create-btn" class="button btn-info"><span msg="customs_settings_create"></span></button>
+
+                    <div class="customs-will-backup">
+                        <h5 msg="customs_will_backup_message"></h5>
+                        <span msg="customs_will_backup_list"></span>
+                    </div>
+                </div>
+                
+                <div id="customs-informer" class="hide">
+                    <div class="customs-informer-data">
+                        <span msg="customs_informer_progress"></span>: 
+                        <span class="customs-informer-progress">-- / --</span>
+                    </div>
+                    <button id="customs-reload-btn" class="button btn-success hide"><span><msg msg="customs_settings_done"></msg> <t></t></span></button>
+                </div>
+            </div>
+
+            <div class="navi-block" auth="no">
+                <div class="customs-buttons main-label labels-center full-height">
+                    <!--<button id="customs-login-btn" class="button btn-success"><span msg="options_action_login"></span></button>-->
+                    <button id="customs-premium-btn" class="button btn-success"><span msg="options_get_pro_account"></span></button>
+                </div>
+            </div>
+
+            <div class="navi-bottom">
+                <h4 msg="customs_quick_guide_title"></h4>
+                <p msg="customs_quick_guide_desc"></p>
+            </div>
+        </div>
+        </div>
+
+        <!-- subsection server backups -->
+        <div id="subsectionBackupsServer" class="restore_subsection window" name="online_backup"> <!--Task #2000 -->
+          <div class="window_title"><span msg="server_backups_title"></span></div>
+          <!--
+          <div id="localBackupsLink" class="window_link_right right-10">
+            <span class="subsection_switch" msg="local_backups_link"></span>
+          </div>
+          -->
+          <div class="server_backups_section_wrapper">
+            <iframe id="backupFrame"></iframe>
+            <div class="restore_text"><span msg="backups_message"></span> <!--Task #2000-->
+              <!--<a href="#" id="backupsOnlineAccessLink" msg="options_backup_online_access"></a>-->
+            </div>
+          </div>
+        </div>
+        
+        <!-- subsection local backups -->
+        <div id="subsectionBackupsLocal" class="restore_subsection window" hidden=1 name="local_backup"> <!--Task #2000 -->
+          <div class="window_title"><span msg="local_backups_title"></span></div>
+          <!--
+          <div id="serverBackupsLink" class="window_link_right right-10">
+            <span class="subsection_switch" msg="server_backups_link"></span>
+          </div>
+          -->
+          <div class="restore_section_wrapper">
+            <div class="restore">
+  
+              <div class="enableAutoBackupParent">
+                <label><input id="enableAutoBackup" type="checkbox"><span msg="options_enable_autobackup"></span></label>
+              </div>
+  
+              <!-- restore bookmarks -->
+              <div class="restore_bookmarks" id="bookmarksBackups">
+                <div class="restore_title"><span msg="options_tab_sync_bookmarks"></span></div>
+                <div class="restore_block">
+                  <div class="restore_table">
+                    <div class="restore_table_head">
+                      <span class="restore_date" msg="options_backups_date"></span>
+                      <span class="restore_items" msg="options_backups_count_items"></span>
+                      <span class="restore_action" msg="options_backups_restore"></span>
+                    </div>
+                    <div class="restore_table_content">
+                      <table cellpadding="0" cellspacing="0" border="0" id="backupContent_Bookmarks">
+  
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- /restore bookmarks -->
+  
+              <!-- restore speed dial -->
+              <div class="restore_speeddial" id="sdBackups">
+  
+                <div class="restore_title"><span msg="options_tab_sync"></span></div>
+                <div class="restore_block">
+                  <div class="restore_table">
+  
+                    <div class="contentDisabled"></div>
+  
+                    <div class="restore_table_head">
+  
+                    <span class="restore_date" msg="options_backups_date"></span>
+                    <span msg="options_backups_count_groups" class="restore_groups"></span>
+                    <span class="restore_dials" msg="options_backups_count_dials"></span>
+                    <span class="restore_action" msg="options_backups_restore"></span>
+  
+                    </div>
+                    <div class="restore_table_content">
+                      <table cellpadding="0" cellspacing="0" border="0" id="backupContent_Speeddial">
+  
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- /restore speed dial -->
+  
+              <br class="clear">
+            </div>
+            <div class="restore_text"><span msg="backups_message"></span> <!--Task #2000-->
+              <!--<a href="#" id="backupsOnlineAccessLink" msg="options_backup_online_access"></a>-->
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+      <!-- /restore -->
+
+    </section>
+    <!-- /main -->
+  </div>
+</div>
+
+</body>
+</html>

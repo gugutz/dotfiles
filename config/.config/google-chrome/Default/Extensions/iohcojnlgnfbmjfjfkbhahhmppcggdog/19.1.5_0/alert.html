@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+	
+	<head>
+	  <script src="/js/alert.js" type="text/javascript"></script>
+		<script src="/js/Localizer.js" type="text/javascript"></script>
+		<script src="/js/Observer.js" type="text/javascript"></script>
+		<script src="/js/Prefs.js" type="text/javascript"></script>
+		<script src="/js/Utils.js" type="text/javascript"></script>
+		
+		<script src="/js/Server/index.js" type="text/javascript"></script>
+		<script src="/js/Server/Sync.js" type="text/javascript"></script>
+		
+		<link href="/styles/Alert/index.css" rel="stylesheet" type="text/css">	
+		<link href="/styles/Controls/buttons.css" rel="stylesheet" type="text/css">
+		
+		<title></title>
+	</head>
+	<body>
+		
+		<div class="alertContent" id="alertContentSimple" hidden="true">
+			
+			<div class="text">
+				<span>
+					<div id="simpleText"></div>
+				</span>
+			</div>
+			
+			<div class="buttons centered">
+				
+				<button class="fvdButton main" msg="alert_window_close"></button>
+												
+			</div>
+			
+		</div>
+		
+		<div class="alertContent" id="specialMessage_cannotMovieUnsorted" hidden="true">			
+			<div class="text">
+				<span>
+					<div msg="alert_window_remove_unsorted_folder_text"></div>
+				</span>
+			</div>			
+			<div class="buttons centered">				
+				<button class="fvdButton main" msg="alert_window_close"></button>												
+			</div>			
+		</div>
+		
+    <div class="alertContent" id="specialMessage_needSyncSoftware" hidden="true">      
+      <div class="text">
+        <span>
+          <div msg="alert_window_need_sync_software_text"></div>
+        </span>
+      </div>      
+      <div class="buttons centered padded">        
+        <label class="cbParent right"><input type="checkbox" class="dontDisplayAgain"><span msg="alert_window_dont_display_again"></span></label>
+        <button class="doDownloadAndInstallEversyncDesktop fvdButton main" msg="alert_window_download_eversync_desktop"></button>                       
+      </div>      
+    </div>		
+		
+		<div class="alertContent" id="specialMessage_largeSyncConfirm" hidden="true">
+			
+			<div class="text">
+				<span>
+					<div msg="alert_window_large_sync_text"></div>
+				</span>
+			</div>
+			
+			<div class="buttons">
+				<button class="fvdButton main" msg="alert_window_large_sync_button_proceed_manually"></button>
+				<button class="fvdButton cancel" msg="alert_window_large_sync_button_cancel"></button>				
+			</div>
+			
+		</div>
+		
+		<div class="alertContent" id="specialMessage_syncQuotaExceed" hidden="true">
+			
+			<div class="text">
+				<span>
+					<div msg="dlg_alert_sync_quota_exceed_text"></div>
+				</span>
+			</div>
+			
+			<div class="limits" hidden="true">
+				<div><span msg="dlg_alert_sync_quota_exceed_upload_attempt"></span>: <span class="uploadAttempt"></span></div>
+				<div><span msg="dlg_alert_sync_quota_exceed_already_items"></span>: <span class="alreadyItems"></span></div>				
+				<div><span msg="dlg_alert_sync_quota_exceed_max_items"></span>: <span class="maxItems"></span></div>
+				<div><span msg="dlg_alert_sync_quota_exceed_max_items_trashed"></span>: <span class="maxItemsTrashed"></span></div>
+			</div>
+			
+			<div class="buttons largeMargin centered">
+				<a class="fvdButton main padded" href="#" msg="dlg_alert_sync_quota_exceed_fix_it"></a>	
+			</div>
+			
+		</div>		
+		
+		<div class="alertContent" id="specialMessage_restartAfterPluginSync" hidden="true">
+			
+			<div class="text">
+				<span>
+					<div msg="alert_window_must_restart_after_large_sync"></div>
+				</span>
+			</div>
+			
+			<div class="buttons centered">
+				
+				<button class="fvdButton main" msg="alert_window_close"></button>
+												
+			</div>
+			
+		</div>
+		
+		<div class="alertContent" id="specialMessage_actionAfterPluginSync" hidden="true">
+			
+			<div class="text">
+				<span>
+					<div msg="alert_window_action_after_plugin_sync_1"></div>
+					<div msg="alert_window_action_after_plugin_sync_2"></div>
+					<div msg="alert_window_action_after_plugin_sync_3"></div>										
+				</span>
+			</div>
+			
+			<div class="buttons">
+				
+				<label class="cbParent left"><input type="checkbox" class="dontDisplayAgain"><span msg="alert_window_dont_display_again"></span></label>
+				<button class="fvdButton main" msg="alert_window_close"></button>
+												
+			</div>
+			
+		</div>
+		
+	</body>
+	
+</html>

@@ -1,0 +1,699 @@
+{
+   "alert_window_action_after_plugin_sync_1": {
+      "message": "Ви не перезавантажили браузер Chrome."
+   },
+   "alert_window_action_after_plugin_sync_2": {
+      "message": "Всі зміни будуть перезаписані після перезавантаження."
+   },
+   "alert_window_action_after_plugin_sync_3": {
+      "message": "Будь ласка, перезавантажте браузер та після цього робіть нові зміни в закладки!"
+   },
+   "alert_window_action_after_plugin_sync_title": {
+      "message": "Попередження!"
+   },
+   "alert_window_close": {
+      "message": "Отримав. Дякую!"
+   },
+   "alert_window_dont_display_again": {
+      "message": "Не показувати знову"
+   },
+   "alert_window_download_eversync_desktop": {
+      "message": "Завантажити та встановити на робочий стіл EverSync"
+   },
+   "alert_window_large_sync_button_cancel": {
+      "message": "Скасувати синхронізацію"
+   },
+   "alert_window_large_sync_button_proceed_manually": {
+      "message": "Продовжити вручну"
+   },
+   "alert_window_large_sync_text": {
+      "message": "Політика Google API не дозволяє виробляти більш ніж 100 дій протягом години. Ви повинні зробити синхронізацію вручну."
+   },
+   "alert_window_large_sync_title": {
+      "message": "Великі попередження синхронізації"
+   },
+   "alert_window_must_restart_after_large_sync": {
+      "message": "Важливо! Ви повинні перезапустити браузер для завершення синхронізації!"
+   },
+   "alert_window_must_restart_after_large_sync_title": {
+      "message": "Важливо!"
+   },
+   "alert_window_need_sync_software_text": {
+      "message": "У зв'язку з новими обмеженнями Google Chrome ви повинні встановити EverSync для вашого комп'ютера."
+   },
+   "alert_window_need_sync_software_title": {
+      "message": "Вам доведеться встановити додаткове програмне забезпечення, щоб продовжити"
+   },
+   "alert_window_remove_unsorted_folder_text": {
+      "message": "Несортовані - це системна папка, яку не можна перемістити"
+   },
+   "alert_window_remove_unsorted_folder_title": {
+      "message": "Операція не дозволена"
+   },
+   "alert_window_sync_timeout_after_action_text": {
+      "message": "Упс, синхронізація буде доступна через 10 секунд..."
+   },
+   "alert_window_sync_timeout_after_sync_text": {
+      "message": "Упс, ви можете синхронізувати тільки раз у 10 секунд..."
+   },
+   "alert_window_sync_timeout_title": {
+      "message": "Будь ласка, зачекайте..."
+   },
+   "bg_bookmarks_undifined_parent": {
+      "message": "Не визначено"
+   },
+   "bg_bookmarks_unsorted_folder_name": {
+      "message": "Несортовані закладки"
+   },
+   "confirm_change_password_desc": {
+      "message": "Ключ для підтвердження зміни пароля був відправлений на вашу електронну скриньку"
+   },
+   "confirm_really_restore_bookmarks_text": {
+      "message": "Це дія перезапише ваш поточний набір закладок, продовжити?"
+   },
+   "confirm_really_restore_bookmarks_title": {
+      "message": "Попередження!"
+   },
+   "confirm_really_restore_sd_text": {
+      "message": "Це дія перезапишить всі ваші поточні групи та закладки, ви хочете продовжити?"
+   },
+   "confirm_really_restore_sd_title": {
+      "message": "Попередження!"
+   },
+   "confirm_remove_account_text": {
+      "message": "Ви дійсно хочете вилучити свій обліковий запис синхронізації з усіма його даними?"
+   },
+   "confirm_remove_account_title": {
+      "message": "Видалити обліковий запис?"
+   },
+   "dlg_alert_change_password_success_text": {
+      "message": "Пароль успішно змінено!"
+   },
+   "dlg_alert_change_password_success_title": {
+      "message": "Пароль змінено"
+   },
+   "dlg_alert_ok": {
+      "message": "Гаразд"
+   },
+   "dlg_alert_sync_failed_chrome_quota_exceed_text": {
+      "message": "Досягнуто ліміт браузера. Будь ласка, спробуйте пізніше."
+   },
+   "dlg_alert_sync_failed_chrome_quota_exceed_title": {
+      "message": "Досягнута ліміт"
+   },
+   "dlg_alert_sync_failed_text": {
+      "message": "Сервер синхронізації повідомляє про помилку"
+   },
+   "dlg_alert_sync_failed_title": {
+      "message": "Помилка синхронізації"
+   },
+   "dlg_alert_sync_quota_exceed_already_items": {
+      "message": "Елементи, які вже в базі даних"
+   },
+   "dlg_alert_sync_quota_exceed_fix_it": {
+      "message": "Запит на додатковий ліміт!"
+   },
+   "dlg_alert_sync_quota_exceed_max_items": {
+      "message": "Максимальна кількість дозволених елементів"
+   },
+   "dlg_alert_sync_quota_exceed_max_items_trashed": {
+      "message": "Максимальна кількість дозволених елементів в кошику"
+   },
+   "dlg_alert_sync_quota_exceed_text": {
+      "message": "Ліміт синхронізації досягнуто"
+   },
+   "dlg_alert_sync_quota_exceed_title": {
+      "message": "Помилка синхронізації"
+   },
+   "dlg_alert_sync_quota_exceed_upload_attempt": {
+      "message": "Поточна спроба завантаження"
+   },
+   "dlg_alert_warning_full_access_text": {
+      "message": "\u003Cb>Розширення Синхронізації вимагає вашого дозвілу, який називається \"Доступ до інформації на Вашому комп'ютері\"\u003C/b>\u003Cbr>Це не означає, що наше розширення матиме доступ до всіх ваших файлів! \u003Cbr>Нам потрібний \u003Cb>тільки доступ для одного файлу закладок файловоого середовища Chrome.\u003C/b>\u003Cbr>Як тільки ви отримуєте дозвіл переписати файл(и), Chrome називає це \"Повний доступ\".\u003Cbr>Будь ласка, не будьте параноїком через це! Веб-магазин Chrome обробляє такі розширення вручну!!!"
+   },
+   "dlg_alert_warning_full_access_title": {
+      "message": "Увага!"
+   },
+   "dlg_alert_wrong_login_password_text": {
+      "message": "Неправильне ім'я користувача або пароль. Будь ласка, спробуйте увійти ще раз."
+   },
+   "dlg_alert_wrong_login_password_title": {
+      "message": "Неправильне ім'я користувача або пароль"
+   },
+   "dlg_bookmarks_confirm_overwrite_server_data_text": {
+      "message": "Ви впевнені, що хочете переписати інформацію на сервері?"
+   },
+   "dlg_bookmarks_confirm_overwrite_server_data_title": {
+      "message": "Підтвердіть ваш вибір"
+   },
+   "dlg_confirm_abort_sync_text": {
+      "message": "Ви дійсно хочете перервати поточний процес синхронізації?"
+   },
+   "dlg_confirm_abort_sync_title": {
+      "message": "Перервати поточну синхронізацію"
+   },
+   "dlg_confirm_cancel": {
+      "message": "Скасувати"
+   },
+   "dlg_confirm_ok": {
+      "message": "Гаразд"
+   },
+   "dlg_speeddial_confirm_overwrite_server_data_text": {
+      "message": "Ви впевнені, що хочете переписати інформацію на сервері?"
+   },
+   "dlg_speeddial_confirm_overwrite_server_data_title": {
+      "message": "Підтвердіть ваш вибір"
+   },
+   "dlg_sync_in_progress_before_close": {
+      "message": "Синхронізація ще виконується... Ви дійсно хочете закрити цю сторінку?"
+   },
+   "dlg_sync_manual_sync_in_process": {
+      "message": "Примітка: У зв'язку з Копіюванням/Записанням лімітами Google Chrome ми повинні переписати файл закладок вручну. Ваша інформація не буде втраченою."
+   },
+   "dlg_sync_manual_sync_in_process_msg2": {
+      "message": "перезавантажте браузер Chrome коли закінчиться синхронізація."
+   },
+   "dlg_sync_manual_sync_in_process_msg3": {
+      "message": "Якщо ви не перезавантажите та створите нові закладки, вони будуть втрачені після перезавантаження браузера."
+   },
+   "dlg_sync_manual_sync_in_process_must": {
+      "message": "повинні"
+   },
+   "dlg_sync_manual_sync_in_process_you": {
+      "message": "Ви"
+   },
+   "dlg_sync_manual_sync_success": {
+      "message": "Важливо! Ваш файл закладок був переписаний! Ви повинні перезавантажити ваш браузер Chrome для того, щоб зміни вступили в дію та завершити синхронізацію."
+   },
+   "dlg_sync_progress_aborting": {
+      "message": "Переривання..."
+   },
+   "dlg_sync_progress_apply_changes": {
+      "message": "Застосувати зміни"
+   },
+   "dlg_sync_progress_bottom_text": {
+      "message": "Цей процес займає приблизно 10-40 секунд. Будь ласка, зачекайте..."
+   },
+   "dlg_sync_progress_cancel": {
+      "message": "Скасувати синхронізацію"
+   },
+   "dlg_sync_progress_close": {
+      "message": "Закрити"
+   },
+   "dlg_sync_progress_dials": {
+      "message": "Закладки"
+   },
+   "dlg_sync_progress_groups": {
+      "message": "Групи"
+   },
+   "dlg_sync_progress_progress": {
+      "message": "Перебіг:"
+   },
+   "dlg_sync_progress_sync_failed": {
+      "message": "Помилка синхронізації"
+   },
+   "dlg_sync_progress_sync_success": {
+      "message": "Синхронізація пройшла успішно"
+   },
+   "dlg_sync_progress_synced": {
+      "message": "Синхронізовані"
+   },
+   "dlg_sync_progress_title": {
+      "message": "Синхронізація..."
+   },
+   "dlg_sync_progress_title_backup": {
+      "message": "Створення резервних копій..."
+   },
+   "dlg_sync_progress_title_restore": {
+      "message": "Відновлення..."
+   },
+   "dlg_sync_progress_type_create": {
+      "message": "Створити дані:"
+   },
+   "dlg_sync_progress_type_remove": {
+      "message": "Видалити старі дані:"
+   },
+   "dlg_sync_progress_why_failed": {
+      "message": "Чому?"
+   },
+   "dlg_sync_quota_exceed_text": {
+      "message": "Слідуючи заборонам Google Api ви можете використовувати Об'єднувати/Завантажувати закладки 4 рази на день."
+   },
+   "dlg_sync_quota_exceed_title": {
+      "message": "Досягнуто ліміт на синхронізацію"
+   },
+   "extension_locale": {
+      "description": "For internal usage",
+      "message": "uk"
+   },
+   "option_cancel_change_password": {
+      "message": "Скасувати"
+   },
+   "option_change_password_confirm_key": {
+      "message": "Ключ підтвердження"
+   },
+   "option_confirm_key_is_wrong": {
+      "message": "Неправильний ключ підтвердження"
+   },
+   "option_login_email": {
+      "message": "E-Mail"
+   },
+   "option_login_password": {
+      "message": "Пароль"
+   },
+   "option_new_password": {
+      "message": "Новий пароль"
+   },
+   "option_new_password_repeat": {
+      "message": "Повторіть новий пароль"
+   },
+   "option_old_password": {
+      "message": "Старий пароль"
+   },
+   "option_old_password_is_wrong": {
+      "message": "Неправильний старий пароль"
+   },
+   "options_action_login": {
+      "message": "Увійти"
+   },
+   "options_action_register": {
+      "message": "Реєстрація"
+   },
+   "options_action_restore_password": {
+      "message": "Відновити пароль"
+   },
+   "options_backup_online_access": {
+      "message": "Онлайн доступ"
+   },
+   "options_backup_warning_message": {
+      "message": "Важливо! Резервні копії зберігаються в локальній базі даних EverSync. Якщо ви видалите це розширення, то ці бази даних будуть видалені! Використовуйте онлайн доступ і онлайн резервні копії."
+   },
+   "options_backups_count_dials": {
+      "message": "Закл."
+   },
+   "options_backups_count_groups": {
+      "message": "Групи"
+   },
+   "options_backups_count_items": {
+      "message": "Елем."
+   },
+   "options_backups_date": {
+      "message": "Дата"
+   },
+   "options_backups_restore": {
+      "message": "Відновити"
+   },
+   "options_bookmarks_backup_first_line": {
+      "message": "Ваші закладки не були втрачені, ми автоматично створили резервні копії ваших закладок."
+   },
+   "options_bookmarks_backup_make": {
+      "message": "Резервне копіювання закладок"
+   },
+   "options_bookmarks_backup_restore": {
+      "message": "Відновити закладки"
+   },
+   "options_bookmarks_backup_second_line": {
+      "message": "Усі ваші закладки збережені на вашому комп'ютері."
+   },
+   "options_bookmarks_backup_total_bookmarks": {
+      "message": "Усього збережено закладок"
+   },
+   "options_bookmarks_in_browser": {
+      "message": "У браузері:"
+   },
+   "options_bookmarks_watch_video_guide": {
+      "message": "Переглянути відео керівництво"
+   },
+   "options_button_cancel": {
+      "message": "Скасувати"
+   },
+   "options_button_change_password": {
+      "message": "Змінити пароль"
+   },
+   "options_button_change_password_confirm": {
+      "message": "Підтвердити зміну пароля"
+   },
+   "options_button_confirm": {
+      "message": "Підтвердити"
+   },
+   "options_button_login": {
+      "message": "Увійти"
+   },
+   "options_button_register": {
+      "message": "Реєстрація"
+   },
+   "options_button_restore": {
+      "message": "Відновити"
+   },
+   "options_change_password": {
+      "message": "Змінити пароль"
+   },
+   "options_close_this_page": {
+      "message": "Закрити сторінку"
+   },
+   "options_confirm_code": {
+      "message": "Код підтвердження"
+   },
+   "options_confirm_desc": {
+      "message": "Перевірте свій E-mail, щоб підтвердити реєстрацію"
+   },
+   "options_default_desc": {
+      "message": "Виберіть дію..."
+   },
+   "options_download": {
+      "message": "Завантажити"
+   },
+   "options_download_desc": {
+      "message": "Скопіювати дані з сервера на Ваш комп'ютер"
+   },
+   "options_ds_chromsync_btn_close": {
+      "message": "Я готовий до Синхронізації!"
+   },
+   "options_ds_chromsync_btn_open_settings": {
+      "message": "Відкрити налаштування Chrome"
+   },
+   "options_ds_chromsync_btn_view_guide": {
+      "message": "Переглянути відео керівництво"
+   },
+   "options_ds_chromsync_confirm_text": {
+      "message": "Я підтверджую, що закладки вимкнені."
+   },
+   "options_ds_chromsync_important": {
+      "message": "Важливо!"
+   },
+   "options_ds_chromsync_l1": {
+      "message": "Якщо синхронізація в Chrome увімкнена, будь ласка, прочитайте наступне:"
+   },
+   "options_ds_chromsync_l2": {
+      "message": "Для того, щоб синхронізувати закладки з допомогою нашого розширення потрібно \u003Cb>вимкнути\u003C/b> синхронізацію закладок у веб-переглядачі Chrome."
+   },
+   "options_ds_chromsync_l3": {
+      "message": "Натисніть \"\u003Cb>Відкрити налаштування Chrome.\u003C/b>\" > \"\u003Cb>Увійти\u003C/b>\" відкрити секцію \"\u003Cb>Розширені налаштування\u003C/b>\" > приберіть галочку \"\u003Cb>Закладки\u003C/b>\"."
+   },
+   "options_ds_chromsync_l4": {
+      "message": "Перезавантажити браузер Chrome."
+   },
+   "options_enable_autobackup": {
+      "message": "Увімкнути авто-створення резервних копій"
+   },
+   "options_enable_autosync": {
+      "message": "Увімкнути авто синхронізацію (кожні 60 хвилин)"
+   },
+   "options_error_account_not_found": {
+      "message": "Обліковий запис не знайдено"
+   },
+   "options_error_confirm_failed": {
+      "message": "Підтвердження не вдалося"
+   },
+   "options_error_email_alredy_registered": {
+      "message": "E-Mail вже зареєстрований"
+   },
+   "options_error_invalid_email": {
+      "message": "Неправильний формат адреси E-Mail"
+   },
+   "options_error_login_failed": {
+      "message": "E-mail або пароль невірний"
+   },
+   "options_error_password_too_short": {
+      "message": "Пароль занадто короткий( повинно бути не менше 8 символів )"
+   },
+   "options_error_passwords_dont_match": {
+      "message": "Паролі не співпадають"
+   },
+   "options_error_undefined_error": {
+      "message": "Невідома помилка сервера (%number%)"
+   },
+   "options_fix_quota_link": {
+      "message": "Збільшити ліміти"
+   },
+   "options_fvd_sync": {
+      "message": "EverSync"
+   },
+   "options_get_pro_account": {
+      "message": "Отримати Преміум!"
+   },
+   "options_how_to_use": {
+      "message": "Помощь по использованию"
+   },
+   "options_init_sync_desc": {
+      "message": "Ви повинні вибрати одну з наступних дій перед тим, як почати синхронізацію"
+   },
+   "options_legend_confirm": {
+      "message": "Підтвердіть реєстрацію"
+   },
+   "options_legend_login": {
+      "message": "Увійти"
+   },
+   "options_legend_register": {
+      "message": "Створити новий обліковий запис"
+   },
+   "options_legend_restore_password": {
+      "message": "Відновити пароль"
+   },
+   "options_logout": {
+      "message": "Вийти"
+   },
+   "options_manual_sync": {
+      "message": "Синхронізувати вручну"
+   },
+   "options_merge": {
+      "message": "Об'єднати"
+   },
+   "options_merge_desc": {
+      "message": "Серверні дані та дані на Вашому комп'ютері будуть об'єднані (Серверні дані мають більший пріоритет)."
+   },
+   "options_merge_local_and_server_data": {
+      "message": "Об'єднати локальну і серверну інформацію"
+   },
+   "options_not_found_backups": {
+      "message": "Немає резервних копій"
+   },
+   "options_online": {
+      "message": "у мережі"
+   },
+   "options_overwrite_desc": {
+      "message": "Скопіювати дані з Вашого комп'ютера на сервер"
+   },
+   "options_overwrite_local_data": {
+      "message": "Замінити локальну інформацію"
+   },
+   "options_overwrite_server_data": {
+      "message": "Замінити інформацію на сервері"
+   },
+   "options_premium_for_share": {
+      "message": "Отримати преміум безкоштовно!"
+   },
+   "options_quota_archived": {
+      "message": "Архівні"
+   },
+   "options_quota_bookmarks": {
+      "message": "Закладки"
+   },
+   "options_quota_items": {
+      "message": "Елементи"
+   },
+   "options_quota_speed_dial": {
+      "message": "Speed Dial"
+   },
+   "options_quota_trashed": {
+      "message": "Видалені"
+   },
+   "options_quota_usage_report": {
+      "message": "Звіт про використання"
+   },
+   "options_remove_account": {
+      "message": "Видалити обліковий запис"
+   },
+   "options_restore_message_sent": {
+      "message": "Інструкції по відновленню надіслано на ваш E-mail"
+   },
+   "options_sd_backup_first_line": {
+      "message": "Щоб ваші закладки не були втрачені, для впевненості ми зробимо автоматичну резервну копію всіх ваших закладків."
+   },
+   "options_sd_backup_make": {
+      "message": "Резервне копіювання закладок"
+   },
+   "options_sd_backup_restore": {
+      "message": "Відновити закладки"
+   },
+   "options_sd_backup_second_line": {
+      "message": "Всі ваші закладки збережені на вашому комп'ютері."
+   },
+   "options_sd_in_browser": {
+      "message": "У браузері:"
+   },
+   "options_sync_account_online": {
+      "message": "Ваш обліковий запис для синхронізації %email% є "
+   },
+   "options_sync_bookmarks_quota": {
+      "message": "Лімітів на синхронізацію закладок не існує, але через обмеження Google Api ви можете використати Об'єднати/Заватнажити закладки лише чотири рази на день."
+   },
+   "options_tab_account": {
+      "message": "Обл. запис"
+   },
+   "options_tab_backup_history": {
+      "message": "Рез. копії"
+   },
+   "options_tab_sync": {
+      "message": "SpeedDial"
+   },
+   "options_tab_sync_bookmarks": {
+      "message": "Закладки"
+   },
+   "options_title": {
+      "message": "Опції EverSync"
+   },
+   "options_unlimsync_old_chrome_more_info": {
+      "message": "Дізнатися більше..."
+   },
+   "options_unlimsync_old_chrome_please_open": {
+      "message": "\u003Cstrong>Будь ласка, відкрийте\u003C/strong> "
+   },
+   "options_unlimsync_old_chrome_text_1": {
+      "message": "Тепер вам не треба перезавантажувати браузер, коли ви синхронізуєте велику кількість закладок, але для цього вам треба оновиться до \u003Cstrong>Chrome 38\u003C/strong>, або більш пізньої версії. Ваша поточна версія браузера не підтримує дані зміни."
+   },
+   "options_unlimsync_old_chrome_text_2": {
+      "message": "\u003Cstrong> та оновіть ваш браузер. Дякую.\u003C/strong>"
+   },
+   "options_upload": {
+      "message": "Відвантажити"
+   },
+   "options_why_use_web_ui": {
+      "message": "Для чого мені потрібен Веб доступ?"
+   },
+   "options_why_use_webui": {
+      "message": "\u003Cdiv class=\"whyUseWebUi\">\u003Cp>Чому ж мені взагалі потрібен інтерфейс\u003Ca target=\"_blank\" href=\"http://everhelper.me\" >everhelper.me\u003C/a>якщо весь його \u003Cbr/>функціонал є в розширенні?\u003C/p>\u003Cp>Звичайно ви можете насолоджуватися функціоналом\u003Ca target=\"_blank\" href=\"http://everhelper.me\" >everhelper.me\u003C/a> \u003Cbr/> не підключаючись до Веб інтерфейсу, але він має кілька специфічних \u003Cbr/>функцій, які можуть вам знадобитися. Наприклад, він дозволяє:\u003C/p>\u003Cul>\u003Cli>Створювати додаткові резервні копії\u003C/li>\u003Cli>Створювати особисті закладки \u003C/li>\u003Cli>Імпортувати закладки з HTML файлів\u003C/li>\u003Cli>Копіювати закладки в FVD Speed Dial, а також з нього\u003C/li>\u003C/ul>\u003Cp>Плюс до всього, він дає вам доступ до ваших закладок з будь-якого \u003Cbr/> браузера, навіть того в якому немає встановленої нашої програми!\u003C/p>\u003C/div>"
+   },
+   "popup_abort": {
+      "message": "Перервати"
+   },
+   "popup_alert_sync_already_active": {
+      "message": "Синхронізація виконується на іншому пристрої, будь ласка, почекайте... База даних буде автоматично розблокована через 5 хв."
+   },
+   "popup_alert_sync_already_active_title": {
+      "message": "Помилка"
+   },
+   "popup_apply_updates_confirm_text": {
+      "message": "На сервері доступно оновлення( %date% ). Застосувати?"
+   },
+   "popup_auto_title": {
+      "message": "Автоматично"
+   },
+   "popup_bookmarks_desc": {
+      "message": "Синхронізація закладок"
+   },
+   "popup_bookmarks_passive_desc": {
+      "message": "Синхронізація закладок не активна"
+   },
+   "popup_cancel_sync": {
+      "message": "Скасувати синхронізацію"
+   },
+   "popup_conflict_abort_sync": {
+      "message": "Перервати синхронізацію"
+   },
+   "popup_conflict_fvd_sync_cant_tell": {
+      "message": "EverSync не може визначити, яка з цих версій"
+   },
+   "popup_conflict_local_version": {
+      "message": "Локальна версія"
+   },
+   "popup_conflict_retain_local_version": {
+      "message": "Зберегти локальну версію"
+   },
+   "popup_conflict_retain_server_version": {
+      "message": "Зберегти серверну версію"
+   },
+   "popup_conflict_select_version": {
+      "message": "Будь ласка, виберіть версію, яка буде збережена"
+   },
+   "popup_conflict_server_version": {
+      "message": "Серверна версія"
+   },
+   "popup_conflict_should_be_retained": {
+      "message": "повинна бути збережена."
+   },
+   "popup_conflict_title": {
+      "message": "Конфлікт версій об'єкта"
+   },
+   "popup_conflict_use_this_choice": {
+      "message": "Використовувати вибір для всіх конфліктів"
+   },
+   "popup_get_pro_button": {
+      "message": "Отримати Преміум!"
+   },
+   "popup_goto_everhelper": {
+      "message": "EverHelper"
+   },
+   "popup_initialization": {
+      "message": "Ініціалізація"
+   },
+   "popup_login": {
+      "message": "Увійти"
+   },
+   "popup_logout": {
+      "message": "Вийти"
+   },
+   "popup_must_login_message": {
+      "message": "Для синхронізації даних ви повинні увійти в свій обліковий запис EverSync"
+   },
+   "popup_ok": {
+      "message": "ОК"
+   },
+   "popup_options": {
+      "message": "Параметри"
+   },
+   "popup_please_resolve_conflict": {
+      "message": "Будь ласка вирішить конфлікт"
+   },
+   "popup_rate_us": {
+      "message": "Оцініть"
+   },
+   "popup_register": {
+      "message": "Реєстрація"
+   },
+   "popup_report_bug": {
+      "message": "Помилка!"
+   },
+   "popup_resolve_conflict": {
+      "message": "Вирішити"
+   },
+   "popup_sd_not_installed_explore": {
+      "message": "Встановити"
+   },
+   "popup_speeddial_sync_action_download_changes": {
+      "message": "Синхронізація з сервером... Будь ласка, будьте терплячі!"
+   },
+   "popup_speeddial_sync_action_special_actions": {
+      "message": "Спеціальна синхронізація(%progress%)... Будь ласка, зачекайте!"
+   },
+   "popup_speeddial_sync_action_upload_changes": {
+      "message": "Відправлення змін... Будь ласка, будьте терплячі!"
+   },
+   "popup_speeddial_sync_groups_and_dials": {
+      "message": "FVD Speed Dial: Групи та Закладки"
+   },
+   "popup_speeddial_sync_it_can_take": {
+      "message": "Це може зайняти до 60 секунд."
+   },
+   "popup_speeddial_sync_not_active": {
+      "message": "Для синхронізації потрібен FVD Speed Dial"
+   },
+   "popup_sync": {
+      "message": "Синхронізація"
+   },
+   "popup_sync_in_progress": {
+      "message": "Виконується синхронізація. Будь ласка, зачекайте..."
+   },
+   "popup_syncing": {
+      "message": "Синхронізація"
+   },
+   "popup_undefined_group": {
+      "message": "Невизначена група"
+   },
+   "popup_warning_unsorted": {
+      "message": "Важливо, якщо ви синхронізуєте закладки між Firefox та Chrome!\u003Cbr>Тека \u003Cstrong>&quot;Другие закладки&quot;\u003C/strong> у FireFox не буде синхронізовуватися з браузером Chrome, але вона буде синхронізуватися з EverSync у Firefox."
+   },
+   "popup_warning_unsorted_link": {
+      "message": "Детальніше &gt;&gt;"
+   }
+}
