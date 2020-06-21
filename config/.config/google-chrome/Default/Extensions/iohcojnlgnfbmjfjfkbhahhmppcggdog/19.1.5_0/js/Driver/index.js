@@ -1,2 +1,0 @@
-fvdSynchronizer.Driver = {	
-};

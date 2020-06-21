@@ -38,7 +38,7 @@ right = "%{T3}%{T-}"
 bg = #1F1F1F
 fg = #FFFFFF
 fg-alt = #A9ABB0
-acolor = #757575
+acolor = #5e35b1
 curgent = #e53935
 coccupied = #1e88e5
 primary = #3f3f3f
@@ -163,7 +163,7 @@ font-5 = "Noto Sans CJK JP:size=11;2"
 
 [bar/gugutz_bottom]
 
-modules-left = menu bspwm
+modules-left = menu i3
 modules-center = xwindow
 modules-right = wired-network calendar clock pulseaudio calculator powermenu2
 
@@ -489,7 +489,7 @@ label-mode-background = ${colors.primary}
 ;   %index%
 ;   %output%
 ; Default: %icon%  %name%
-label-focused = %icon% %index% %name% %output%
+label-focused = %icon% %index%
 label-focused-foreground = #ffffff
 label-focused-background = ${colors.bg}
 label-focused-underline= ${colors.primary}
@@ -504,7 +504,7 @@ label-focused-padding = 2
 ;   %index%
 ;   %output%
 ; Default: %icon%  %name%
-label-unfocused = %icon% %index%
+label-unfocused = %icon%
 label-unfocused-padding = 2
 
 ; visible = Active workspace on unfocused monitor
@@ -514,7 +514,7 @@ label-unfocused-padding = 2
 ;   %index%
 ;   %output%
 ; Default: %icon%  %name%
-label-visible = %icon% %index%
+label-visible = %icon%
 label-visible-background = ${self.label-focused-background}
 label-visible-underline = ${self.label-focused-underline}
 ;label-visible-underline = #555555
@@ -528,7 +528,7 @@ label-visible-padding = ${self.label-focused-padding}
 ;   %index%
 ;   %output%
 ; Default: %icon%  %name%
-label-urgent = %index%
+label-urgent = %icon% %index%
 label-urgent-background = ${colors.alert}
 ;label-urgent-foreground = #000000
 ;label-urgent-background = #bd2c40

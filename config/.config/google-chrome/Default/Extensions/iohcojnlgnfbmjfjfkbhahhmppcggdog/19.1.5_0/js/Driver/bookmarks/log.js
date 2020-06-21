@@ -1,1 +1,0 @@
-window._log = new Log();

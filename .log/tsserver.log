@@ -1,12 +1,17 @@
-Info 0    [17:14:58.403] Starting TS Server
-Info 1    [17:14:58.409] Version: 3.8.3
-Info 2    [17:14:58.410] Arguments: /home/tau/.nvm/versions/node/v12.16.3/bin/node /home/tau/.nvm/versions/node/v12.16.3/bin/tsserver --logFile /home/tau/dotfiles/.log/tsserver.log --logVerbosity info --cancellationPipeName /tmp/852008312be0a61c501ae18d14c39e4c/tscancellation*
-Info 3    [17:14:58.410] Platform: linux NodeVersion: 12 CaseSensitive: true
-Info 4    [17:14:58.439] Search path: /home/tau/dotfiles/config/.config/emacs
-Info 5    [17:14:58.443] For info: /home/tau/dotfiles/config/.config/emacs/init.ts :: No config files found.
-Info 6    [17:14:58.454] Starting updateGraphWorker: Project: /dev/null/inferredProject1*
-Info 7    [17:15:2.808] Finishing updateGraphWorker: Project: /dev/null/inferredProject1* Version: 1 structureChanged: true Elapsed: 4354ms
-Info 8    [17:15:2.815] Project '/dev/null/inferredProject1*' (Inferred) 
-Info 9    [17:15:2.815] 	Files (6)
+Info 0    [15:52:17.582] Starting TS Server
+Info 1    [15:52:17.582] Version: 3.8.3
+Info 2    [15:52:17.582] Arguments: /home/tau/.nvm/versions/node/v12.17.0/bin/node /home/tau/.config/emacs/cache/lsp/npm/typescript/bin/tsserver --logFile /home/tau/dotfiles/.log/tsserver.log --logVerbosity info --cancellationPipeName /tmp/2e0c1fc92c21a0d3226dad1906d82441/tscancellation*
+Info 3    [15:52:17.582] Platform: linux NodeVersion: 12 CaseSensitive: true
+Info 4    [15:52:17.732] Search path: /home/tau/dotfiles/config/.config/emacs/cache/lsp/npm/typescript/lib/node_modules/typescript/lib
+Info 5    [15:52:17.735] For info: /home/tau/dotfiles/config/.config/emacs/cache/lsp/npm/typescript/lib/node_modules/typescript/lib/lib.es2015.collection.d.ts :: No config files found.
+Info 6    [15:52:17.744] Starting updateGraphWorker: Project: /dev/null/inferredProject1*
+Info 7    [15:52:17.783] Finishing updateGraphWorker: Project: /dev/null/inferredProject1* Version: 1 structureChanged: true Elapsed: 38ms
+Info 8    [15:52:17.783] Project '/dev/null/inferredProject1*' (Inferred) 
+Info 9    [15:52:17.783] 	Files (1)
 
-Info 10   [17:15:2.815] -----------------------------------------------
+Info 10   [15:52:17.783] -----------------------------------------------
+Info 11   [15:52:20.780] Starting updateGraphWorker: Project: /dev/null/inferredProject1*
+Info 12   [15:52:20.781] Finishing updateGraphWorker: Project: /dev/null/inferredProject1* Version: 2 structureChanged: false Elapsed: 1ms
+Info 13   [15:52:20.782] Structure before ensureProjectForOpenFiles:
+Info 14   [15:52:20.782] Structure after ensureProjectForOpenFiles:
+Info 15   [15:52:20.783] got projects updated in background, updating diagnostics for /home/tau/dotfiles/config/.config/emacs/cache/lsp/npm/typescript/lib/node_modules/typescript/lib/lib.es2015.collection.d.ts

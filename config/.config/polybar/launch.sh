@@ -13,7 +13,7 @@
 # * Preserve polybar output in logfile
 home_primary_monitor=DVI-I-2
 home_secondary_monitor=DVI-I-1
-work_primary_monitor=eDPI1
+work_primary_monitor=eDP1
 work_secondary_monitor=DP1
 outputs=$(xrandr --query | grep " connected" | cut -d" " -f1)
 
@@ -37,40 +37,42 @@ while pgrep -u $UID -x polybar > /dev/null; do sleep 0.5; done
 
 for monitor in $outputs; do
 
-  export MONITOR=$monitor
-  export TRAY_POSITION=none
+    export MONITOR=$monitor
+    export TRAY_POSITION=none
 
-# render different bars for different monitors
-if [[ $monitor == $home_primary_monitor ]] || [[ $monitor == $work_secondary_monitor ]]; then
-  echo "main monitor $monitor detected. loading main bars for it."
-  tray_output=$monitor
-  MONITOR=$monitor polybar $bar_top --reload -l info &
-  MONITOR=$monitor polybar $bar_bottom --reload -l info &
-  echo "Bars launched for primary monitor..."
-fi
-if [[ $monitor == $home_secondary_monitor ]] || [[ $monitor == $work_primary_monitor ]]; then
-  echo "second monitor $monitor is also connected. loading different bars for it."
-  MONITOR=$monitor polybar second_monitor_bar_top --reload -l info &
-  MONITOR=$monitor polybar second_monitor_bar_bottom --reload -l info &
-  # its this fucking else clause that is missing things up
-  # elif [[$monitor == $work_primary_monitor]]; then
-  echo "Bars launched for secondary monitor..."
-fi
-# case for when only the work notebook monitor is detected
-if [[ $monitor == $work_primary_monitor ]] && [[ $outputs != $work_primary_monitor ]]; then
-  echo "only one monitor detected = $monitor"
-  echo "array of monitors $outputs"
-  echo "array of monitors $outputs[0]"
-  echo "array of monitors $outputs[1]"
-  echo "monitor home primary $home_primary_monitor"
-  echo "monitor home secondary $home_secondary_monitor"
-  echo "monitor work primary $work_primary_monitor"
-  echo "monitor work secondary $work_secondary_monitor"
-  tray_output=$monitor
-  MONITOR=$monitor polybar gugutz_top --reload -l info &
-  MONITOR=$monitor polybar gugutz_bottom --reload -l info &
-  echo "Bars launched..."
-fi
+    # render different bars for different monitors
+    if [[ $monitor == $home_primary_monitor ]] || [[ $monitor == $work_secondary_monitor ]]; then
+        # if theres also a second monitor, kill all instances first so there wont be two bars loaded
+        killall polybar
+        echo "main monitor $monitor detected. loading main bars for it."
+        echo "$outputs"
+        tray_output=$monitor
+        MONITOR=$monitor polybar $bar_top --reload -l info &
+        MONITOR=$monitor polybar $bar_bottom --reload -l info &
+        echo "Bars launched for primary monitor..."
+    fi
+    if [[ $monitor == $home_secondary_monitor ]] || [[ $monitor == $work_primary_monitor ]]; then
+        echo "second monitor $monitor is also connected. loading different bars for it."
+        MONITOR=$monitor polybar second_monitor_bar_top --reload -l info &
+        MONITOR=$monitor polybar second_monitor_bar_bottom --reload -l info &
+        # its this fucking else clause that is missing things up
+        # elif [[$monitor == $work_primary_monitor]]; then
+        echo "Bars launched for secondary monitor..."
+        # case for when only the work notebook monitor is detected
+    elif [[ $monitor == $work_primary_monitor ]]; then
+        echo "only one monitor detected = $monitor"
+        echo "array of monitors $outputs"
+        echo "array of monitors $outputs[0]"
+        echo "array of monitors $outputs[1]"
+        echo "monitor home primary $home_primary_monitor"
+        echo "monitor home secondary $home_secondary_monitor"
+        echo "monitor work primary $work_primary_monitor"
+        echo "monitor work secondary $work_secondary_monitor"
+        tray_output=$monitor
+        MONITOR=$monitor polybar gugutz_top --reload -l info &
+        MONITOR=$monitor polybar gugutz_bottom --reload -l info &
+        echo "Bars launched..."
+    fi
 done
 
 # dunstify -u low  "Bars launched"

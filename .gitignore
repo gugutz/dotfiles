@@ -24,6 +24,9 @@ emacs.desktop.lock*
 
 *.elc
 
+# lsp cache
+**/*emacs/cache/lsp*
+
 # auto save
 auto-save-list
 tramp
@@ -103,3 +106,8 @@ emacs.log
 
 # AUCTeX auto folder
 auto/
+
+*google-chrome*
+
+/log
+/.log

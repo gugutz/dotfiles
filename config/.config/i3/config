@@ -21,6 +21,12 @@ set $secondary_monitor DVI-I-1
 # work monitors
 # set $primary_monitor eDP1
 # set $secondary_monitor DP1
+# home monitors
+set $primary_monitor DVI-I-2
+set $secondary_monitor DVI-I-1
+# work monitors
+# set $primary_monitor eDP1
+# set $secondary_monitor DP1
 
 # home mirrored layout
 set $home_dual_monitor_mirrored_layout xrandr --output DVI-I-2 --mode 1920x1080 --rotate normal --output DVI-I-1 --mode 1280x1024 --same-as $home_primary_monitor
@@ -33,10 +39,12 @@ set $work_single_monitor_layout xrandr --output eDP1 --primary --mode 1920x1080 
 # mirrored layout
 set $work_dual_monitor_mirrored_layout xrandr --output eDP1 --mode 1920x1080 --pos 0x0 --rotate normal --output DP1 --primary --mode 1920x1080 --pos 0x0 --rotate normal
 # extended layout
-set $work_dual_monitor_extended_layout xrandr --output eDP1 --mode 1920x1080 --pos 1920x0 --rotate normal --output DP1 --primary --mode 1920x1080 --pos 0x0 --rotate normal
+set $work_dual_monitor_extended_layout xrandr --output eDP1 --mode 1920x1080 --pos 0x0 --rotate normal --output DP1 --primary --mode 1920x1080 --pos 1920x0 --rotate normal --output DP2 --off --output HDMI1 --off --output VIRTUAL1 --off
 
 # setup monitors
 exec_always --no-startup-id $home_dual_monitor_extended_layout
+
+
 
 # HOME
 bindsym $mod+Control+Shift+1 exec $home_single_monitor_layout; exec notify-send 'using home single monitor layout'
@@ -129,6 +137,7 @@ bindsym $mod+$alt+v exec $terminal -e tmux new-session vim
 # start emacs on terminal mode
 bindsym $mod+$alt+e exec $editorgui
 
+
 # start emacs on terminal mode
 bindsym $mod+$alt+r exec $editorgui -nw
 
@@ -138,6 +147,20 @@ bindsym $mod+$alt+r exec $editorgui -nw
 # define default file managers (terminal and gui)
 set $file_manager_gui pcmanfm
 set $file_manager_term ranger
+
+
+# vifm
+
+bindsym $mod+F5 exec $terminal -e vifm
+bindsym $mod+Shift+F5	exec $terminal -e sudo vifm ~ ~
+
+# vifm scratchpad
+exec --no-startup-id $terminal $term_wm_set_prop_flag vifm-scratchpad -e vifm
+for_window [$term_wm_prop="vifm-scratchpad"] move scratchpad
+for_window [$term_wm_prop="vifm-scratchpad"] resize set width 1200 px
+for_window [$term_wm_prop="vifm-scratchpad"] resize set height 1000 px
+bindsym $mod+F9 [$term_wm_prop="vifm-scratchpad"] scratchpad show; [$term_wm_prop="vifm-scratchpad"] move position center
+bindsym $mod+Shift+F9 exec --no-startup-id $terminal $term_wm_set_prop_flag vifm-scratchpad -e vifm
 
 # Ranger
 
@@ -538,7 +561,7 @@ bindsym  $mod+Shift+Print --release exec --no-startup-id import ~/img/screenshot
 bindsym $alt+Print exec scrot ~/img/screenshots/last-scrot.png -s -e 'mv $f /tmp/ && pinta /tmp/$f'
 
 # Polybar
-exec_always --no-startup-id ~/dotfiles/polybar/launch.sh &
+exec_always --no-startup-id ~/.config/polybar/launch.sh &
 
 ###################################################################
 # i3 BAR SETTINGS
@@ -649,8 +672,8 @@ for_window [$term_wm_prop="moc-scratchpad"] move scratchpad
 for_window [$term_wm_prop="moc-scratchpad"] resize set width 900 px
 for_window [$term_wm_prop="moc-scratchpad"] resize set height 700 px
 
-bindsym $mod+F5 [$term_wm_prop="moc-scratchpad"] scratchpad show;  [$term_wm_prop="moc-scratchpad"] move position center
-bindsym $mod+Shift+F5 exec --no-startup-id $terminal -title moc-scratchpad -e moc
+bindsym $mod+F6 [$term_wm_prop="moc-scratchpad"] scratchpad show;  [$term_wm_prop="moc-scratchpad"] move position center
+bindsym $mod+Shift+F6 exec --no-startup-id $terminal -title moc-scratchpad -e moc
 # ----------------------------------------------
 
 # spotify-tui
@@ -659,8 +682,8 @@ for_window [$term_wm_prop="spotify-tui-scratchpad"] move scratchpad
 for_window [$term_wm_prop="spotify-tui-scratchpad"] resize set width 1200 px
 for_window [$term_wm_prop="spotify-tui-scratchpad"] resize set height 800 px
 
-bindsym $mod+F6 [$term_wm_prop="spotify-tui-scratchpad"] scratchpad show;  [$term_wm_prop="spotify-tui-scratchpad"] move position center
-bindsym $mod+Shift+F6 exec --no-startup-id $terminal $term_wm_set_prop_flag spotify-tui-scratchpad -e spt
+bindsym $mod+F7 [$term_wm_prop="spotify-tui-scratchpad"] scratchpad show;  [$term_wm_prop="spotify-tui-scratchpad"] move position center
+bindsym $mod+Shift+F7 exec --no-startup-id $terminal $term_wm_set_prop_flag spotify-tui-scratchpad -e spt
 
 
 ###################################################################
@@ -840,7 +863,7 @@ workspace $ws3 output $primary_monitor
 workspace $ws4 output $primary_monitor
 workspace $ws5 output $primary_monitor
 workspace $ws6 output $primary_monitor
-workspace $ws7 output $secondary_monitor
+workspace $ws7 output $primary_monitor
 workspace $ws8 output $secondary_monitor
 workspace $ws9 output $secondary_monitor
 workspace $ws10 output $secondary_monitor

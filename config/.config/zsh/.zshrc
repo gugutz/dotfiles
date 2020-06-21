@@ -5,8 +5,8 @@
 # if not, uncomment it
 export PATH=$PATH
 
-
-# ZDOTDIR envvar is set with $HOME/.zshenv
+# ZDOTDIR envvar is set with $HOME/.zshenv, but just in case...
+[[ -z "${DEPLOY_ENV}" ]] && ZDOTDIR="$HOME/.config/zsh"
 
 #########################################
 # my aliases
@@ -44,13 +44,14 @@ autoload -U colors && colors
 # Theme: PowerLevel10K
 
 POWERLEVEL10K_DIR=$ZDOTDIR/themes/powerlevel10k
-if [ ! -d "$POWERLEVEL10K_DIR" ]; then
+POWERLEVEL10K=$ZDOTDIR/themes/powerlevel10k/powerlevel10k.zsh-theme
+if [ ! -f "$POWERLEVEL10K" ]; then
     echo "## installing PowerLevel10K theme for zsh"
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $POWERLEVEL10K_DIR
     # npm install --global pure-prompt
 fi
 
-[ -d "$POWERLEVEL10K_DIR" ] && source $POWERLEVEL10K_DIR/powerlevel10k.zsh-theme
+[ -f "$POWERLEVEL10K" ] && source $POWERLEVEL10K
 
 # p10k config. To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ -f $ZDOTDIR/.p10k.zsh ]] && source $ZDOTDIR/.p10k.zsh
@@ -335,8 +336,8 @@ install_plugin () {
 install_plugin zsh-vim-mode softmoth/zsh-vim-mode.git
 source $ZSH_PLUGINS/zsh-vim-mode/zsh-vim-mode.plugin.zsh
 
-install_plugin you-should-use MichaelAquilina/zsh-you-should-use.git
-source $ZSH_PLUGINS/you-should-use/you-should-use.plugin.zsh
+# install_plugin you-should-use MichaelAquilina/zsh-you-should-use.git
+# source $ZSH_PLUGINS/you-should-use/you-should-use.plugin.zsh
 
 install_plugin k supercrabtree/k.git
 source $ZSH_PLUGINS/k/k.sh

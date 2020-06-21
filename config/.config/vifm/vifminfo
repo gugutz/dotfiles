@@ -72,12 +72,45 @@ d/home/tau/1tb/games/game-isos
 d/home/tau/1tb/games/game-isos/gba-roms
 	Super Mario Advance 4 - Super Mario Bros 3.gba
 36
+d/home/tau/1tb
+	..
+0
+d/home/tau
+	1tb
+1
+d/home
+	lost+found
+2
+d/home/tau
+	Pictures
+5
+d/home/tau/Pictures
+	..
+0
+d/home/tau
+	img
+17
+d/home/tau/img
+	photo_2019-04-09_18-22-49.jpg
+5
 d
 
 # Right window history (oldest to newest):
 D/home/tau/dotfiles
 	..
 0
+D/home/tau
+	dotfiles
+14
+D/home/tau/dotfiles
+	..
+0
+D/home/tau
+	img
+17
+D/home/tau/img
+	photo_2019-04-09_18-22-49.jpg
+5
 D
 
 # Command line history (oldest to newest):

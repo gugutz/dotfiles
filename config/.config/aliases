@@ -66,10 +66,12 @@ alias cddt='cd ~/dotfiles'
 
 # cd into different projects directories
 alias cdpep='cd ~/code/qualirede/pep'
+alias cdpepadm='cd ~/code/qualirede/pep-admin'
 alias cdpepapi='cd ~/code/qualirede/pep-api'
-alias cdwego='cd ~/code/freelas/wego'
-alias cdttc='cd ~/code/freelas/tccExpo'
 alias cdsso='cd ~/code/qualirede/pep-sso'
+alias cdres='cd ~/code/qualirede/res'
+
+alias cdwego='cd ~/code/freelas/wego'
 # ---------------------------------------------
 
 # git aliases

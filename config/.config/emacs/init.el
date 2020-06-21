@@ -1,5 +1,6 @@
 ;;; Package --- Summary  -*- lexical-binding: t; -*-
 
+
 ;;; Commentary:
 ;; Personal and highly customized configuration, with optmization based on doom-emacs and other stuff i found on the internet
 
@@ -979,13 +980,13 @@ all hooks after it are ignored.")
   :config
   (evil-mode 1)
   ;; change cursor color according to mode
-  ;; (setq evil-emacs-state-cursor '("#ff0000" box))
-  ;; (setq evil-motion-state-cursor '("#FFFFFF" box))
-  ;; (setq evil-normal-state-cursor '("#00ff00" box))
-  ;; (setq evil-visual-state-cursor '("#abcdef" box))
-  ;; (setq evil-insert-state-cursor '("#e2f00f" bar))
-  ;; (setq evil-replace-state-cursor '("#ff0000" hbar))
-  ;; (setq evil-operator-state-cursor '("#ff0000" hollow))
+  (setq evil-emacs-state-cursor '("#ff0000" box))
+  (setq evil-motion-state-cursor '("#FFFFFF" box))
+  (setq evil-normal-state-cursor '("#00ff00" box))
+  (setq evil-visual-state-cursor '("#abcdef" box))
+  (setq evil-insert-state-cursor '("#e2f00f" bar))
+  (setq evil-replace-state-cursor '("#ff0000" hbar))
+  (setq evil-operator-state-cursor '("#ff0000" hollow))
   ;; evil in modeline
   (setq evil-mode-line-format '(before . mode-line-front-space)) ;; move evil tag to beginning of modeline
   ;;; FOR SOME REASON WHEN I MAP KEYS IN :bind EVIL DOENST LOAD ON STARTUP
@@ -1025,6 +1026,20 @@ all hooks after it are ignored.")
   (global-set-key (kbd "C-S-L") 'evil-window-right)
   (global-set-key (kbd "C-S-K") 'evil-window-up)
   (global-set-key (kbd "C-S-J") 'evil-window-down)
+  )
+
+(use-package vimish-fold
+  :after evil
+  :hook
+  (evil-mode . vimish-mode))
+
+(use-package evil-vimish-fold
+  :hook
+  (vimish-mode . global-evil-vimish-fold-mode)
+  :after vimish-fold
+  :init
+  (setq evil-vimish-fold-mode-lighter " ⮒")
+  (setq evil-vimish-fold-target-modes '(prog-mode conf-mode text-mode))
   )
 
 
@@ -1127,6 +1142,43 @@ all hooks after it are ignored.")
   (org-mode-hook . evil-surround-org-mode-hook-setup)
   :config
   (global-evil-surround-mode 1)
+  )
+
+;; ** evil-goggles
+
+(use-package evil-goggles
+  :ensure t
+  :defer t
+  :custom
+  (evil-goggles-pulse t) ;; default is to pulse when running in a graphic display
+  (evil-goggles-duration 0.200) ;; default is 0.200
+
+  ;; list of all on/off variables, their default value is `t`:
+  (evil-goggles-enable-paste nil) ;; to disable the hint when pasting
+  (evil-goggles-enable-delete t)
+  (evil-goggles-enable-change t)
+  (evil-goggles-enable-indent t)
+  (evil-goggles-enable-yank t)
+  ;;(evil-goggles-enable-join t)
+  ;;(evil-goggles-enable-fill-and-move t)
+  (evil-goggles-enable-paste t)
+  ;;(evil-goggles-enable-shift t)
+  (evil-goggles-enable-surround t)
+  (evil-goggles-enable-commentary t )
+  ;;(evil-goggles-enable-nerd-commenter t)
+  ;;(evil-goggles-enable-replace-with-register t)
+  (evil-goggles-enable-set-marker t)
+  (evil-goggles-enable-undo t)
+  (evil-goggles-enable-redo t)
+  ;;(evil-goggles-enable-record-macro t)
+
+  ;; optionally use diff-mode's faces; as a result, deleted text
+  ;; will be highlighed with `diff-removed` face which is typically
+  ;; some red color (as defined by the color theme)
+  ;; other faces such as `diff-added` will be used for other actions
+  :config
+  (evil-goggles-mode)
+  (evil-goggles-use-diff-faces)
   )
 
 ;;****************************************************************
@@ -1535,12 +1587,22 @@ all hooks after it are ignored.")
 ;; Make dired look like k
 
 (use-package dired-k
+  :hook
+  (dired-mode . dired-k)
   :after dired
   :config
   (setq dired-k-style 'git)
   (setq dired-k-human-readable t)
   (setq dired-dwin-target t)
-  (add-hook 'dired-initial-position-hook #'dired-k)
+  (define-key dired-mode-map (kbd "K") 'dired-k)
+
+  ;; You can use dired-k alternative to revert-buffer
+  (define-key dired-mode-map (kbd "g") 'dired-k)
+
+  ;; always execute dired-k when dired buffer is opened
+  (add-hook 'dired-initial-position-hook 'dired-k)
+
+  (add-hook 'dired-after-readin-hook #'dired-k-no-revert)
   )
 
 ;; **************************************************
@@ -1959,8 +2021,8 @@ all hooks after it are ignored.")
 
 (use-package company
   :demand t
-  ;; :hook
-  ;; (after-init . global-company-mode)
+  :hook
+  (prog-mode . company-mode)
   :bind
   ("C-SPC" . company-indent-or-complete-common)
   (:map company-active-map
@@ -1974,25 +2036,26 @@ all hooks after it are ignored.")
   (:map company-search-map
     ("C-p" . company-select-previous)
     ("C-n" . company-select-next))
-  :init
-  (setq company-begin-commands '(self-insert-command))
-  (setq company-require-match 'never)
-  (setq company-minimum-prefix-length 1)
-  (setq company-backends '(company-capf))
-  (setq company-frontends '(company-pseudo-tooltip-frontend
-                             company-echo-metadata-frontend))
-  (setq company-idle-delay nil) ;; disable idle-delay and relyt on self-insert-command
-  (setq company-echo-delay 0) ;; remove annoying blinking
-  (setq company-selection-wrap-around t) ; loop over candidates
-  (setq company-tooltip-align-annotations t) ;; align annotations to the right tooltip border.
-  (setq company-tooltip-margin 1) ;; width of margin columns to show around the tooltip
+  :custom
+  (company-minimum-prefix-length 1)
+  (company-tooltip-align-annotations t) ;; align annotations to the right tooltip border.
+  (company-begin-commands '(self-insert-command))
+  (company-require-match 'never)
+  (company-backends '(company-capf))
+  (company-frontends '(company-pseudo-tooltip-frontend
+                        company-echo-metadata-frontend))
+  ;; Trigger completion immediately.
+  (company-idle-delay 0.1)
+  (company-echo-delay 0) ;; remove annoying blinking
+  (company-selection-wrap-around t) ; loop over candidates
+  (company-tooltip-margin 1) ;; width of margin columns to show around the tooltip
+  (company--show-numbers 1)
   :config
   (global-company-mode +1)
   (bind-key [remap completion-at-point] #'company-complete company-mode-map)
   ;; show tooltip even for single candidates
   )
 
-(use-package)
 ;; *********************************
 ;; company posframe
 
@@ -2144,11 +2207,11 @@ all hooks after it are ignored.")
   ;; angular templates language server
   (setq lsp-clients-angular-language-server-command
     '("node"
-       "/home/tau/.nvm/versions/node/v12.16.3/lib/node_modules/@angular/language-server"
+       "/home/tau/.nvm/versions/node/v12.17.0/lib/node_modules/@angular/language-server"
        "--ngProbeLocations"
-       "/home/tau/.nvm/versions/node/v12.16.3/lib/node_modules"
+       "/home/tau/.nvm/versions/node/v12.17.0/lib/node_modules"
        "--tsProbeLocations"
-       "/home/tau/.nvm/versions/node/v12.16.3/lib/node_modules"
+       "/home/tau/.nvm/versions/node/v12.17.0/lib/node_modules"
        "--stdio"))
   (with-eval-after-load 'evil
     (define-key evil-normal-state-map (kbd "SPC l p f r") 'lsp-ui-peek-find-references)
@@ -2784,7 +2847,7 @@ all hooks after it are ignored.")
 (global-set-key (kbd "C-x a c") #'angular-open-counterpart)
 
 (with-eval-after-load 'evil
-(define-key evil-normal-state-map (kbd "SPC a c") #'angular-open-counterpart))
+  (define-key evil-normal-state-map (kbd "SPC a c") #'angular-open-counterpart))
 
 (with-eval-after-load 'evil
   (define-key evil-normal-state-map (kbd "SPC a s") #'css-open-counterpart))
@@ -2866,6 +2929,12 @@ all hooks after it are ignored.")
 ;;
 ;; WEB DEVELOPMENT TOOLS
 
+(use-package dotenv-mode
+  :mode
+  (("\\.env\\'" . dotenv-mode)
+    ("\\.env.dev\\'" . dotenv-mode)
+    ("\\.env.prod\\'" . dotenv-mode))
+  )
 
 ;; *********************************
 ;; editorconfig
@@ -2887,15 +2956,31 @@ all hooks after it are ignored.")
 ;; PrettierJS
 
 (use-package prettier-js
+  :preface
+  (defun maybe-use-prettier ()
+    "Enable prettier-js-mode if an rc file is located."
+    (if (locate-dominating-file default-directory ".prettierrc")
+      (prettier-js-mode +1)))
   :hook
-  (typescript-mode . prettier-js-mode)
-  (web-mode . prettier-js-mode)
-  (css-mode . prettier-js-mode)
+  (typescript-mode . maybe-use-prettier)
+  (web-mode . maybe-use-prettier)
+  (css-mode . maybe-use-prettier)
   :custom
   (prettier-js-show-errors 'buffer) ;; options: 'buffer, 'echo or nil
-  :config
   )
 
+;; *********************************
+;;
+;; add node modules path
+
+(use-package add-node-modules-path
+  :hook
+  (typescript-mode . add-node-modules-path)
+  (js2-mode . add-node-modules-path)
+  (web-mode . add-node-modules-path)
+  (css-mode . add-node-modules-path)
+  (scss-mode . add-node-modules-path)
+  )
 ;; *********************************
 ;; Emmet
 
@@ -2905,6 +2990,7 @@ all hooks after it are ignored.")
   (web-mode . emmet-mode)
   (html-mode . emmet-mode)
   (css-mode . emmet-mode)
+  (scss-mode . emmet-mode)
   :config
   ;; (setq emmet-indentation 2)
   (setq emmet-move-cursor-between-quotes t)
@@ -2923,11 +3009,44 @@ all hooks after it are ignored.")
   ("\\Dockerfile\\'" . dockerfile-mode)
   )
 
-(use-package docker-compose-mode)
+(use-package docker-compose-mode
+  :mode
+  ("\\docker-compose.yml\\'" . docker-compose-mode)
+  )
+
+;;****************************************************************
+;;
+;; DATABASE TOOLS
+
+;; *********************************
+;; sql
+
+(use-package sqlup-mode
+  :bind
+  ;; Set a global keyword to use sqlup on a region
+  ("C-c f s" . sqlup-capitalize-keywords-in-region)
+  :config
+  ;; Capitalize keywords in SQL mode
+  (add-hook 'sql-mode-hook 'sqlup-mode)
+  ;; Capitalize keywords in an interactive session (e.g. psql)
+  (add-hook 'sql-interactive-mode-hook 'sqlup-mode)
+  )
+
+;; (use-package sql-upcase
+;;   ;; :bind
+;;   ;; Set a global keyword to use sqlup on a region
+;;   ;; ("C-c f s" . sqlup-capitalize-keywords-in-region)
+;;   :hook
+;;   (sql-mode . sql-upcase-mode)
+;;   (sql-interactive-mode . sql-upcase-mode)
+;;   :config
+;;   (setq sql-upcase-mixed-case t)
+;;   )
 
 ;;****************************************************************
 ;;
 ;; LANGUAGES SETUP
+
 
 ;; *********************************
 ;; go (golang) mode
@@ -3184,6 +3303,285 @@ all hooks after it are ignored.")
   ;; :commands is Only needed for functions without an autoload comment (;;;###autoload).
   :commands (esup)
   )
+
+(use-package mu4e
+  :ensure nil
+  :load-path "/usr/share/emacs/site-lisp/mu4e"
+  :demand t
+  ;; :ensure-system-package (mu isync)
+  :config
+  ;; use mu4e for e-mail in emacs
+  (setq mail-user-agent 'mu4e-user-agent)
+
+  (setq mu4e-drafts-folder "/[gmail].drafts")
+  (setq mu4e-sent-folder   "/[gmail].sent-mail")
+  (setq mu4e-trash-folder  "/[gmail].trash")
+
+  ;; don't save message to Sent Messages, Gmail/IMAP takes care of this
+  (setq mu4e-sent-messages-behavior 'delete)
+
+  ;; setup some handy shortcuts
+  ;; you can quickly switch to your Inbox -- press ``ji''
+  ;; then, when you want archive some messages, move them to
+  ;; the 'All Mail' folder by pressing ``ma''.
+
+  (setq mu4e-maildir-shortcuts
+    '( (:maildir "/inbox"              :key ?i)
+       (:maildir "/[gmail].sent-mail"  :key ?s)
+       (:maildir "/[gmail].trash"      :key ?t)
+       (:maildir "/[gmail].all-mail"   :key ?a)))
+
+  ;; allow for updating mail using 'U' in the main view:
+  (setq mu4e-get-mail-command "offlineimap")
+
+  ;; something about ourselves
+  (setq
+    user-mail-address "gugutz@gmail.com"
+    user-full-name  "Gustavo"
+    mu4e-compose-signature
+    (concat
+      "Gustavo."
+      "http://www.linkedin.com/in/gustavopb\n"))
+
+  ;; sending mail -- replace USERNAME with your gmail username
+  ;; also, make sure the gnutls command line utils are installed
+  ;; package 'gnutls-bin' in Debian/Ubuntu
+
+  (use-package smtpmail
+    :ensure nil
+    :config
+    (setq message-send-mail-function 'smtpmail-send-it
+      starttls-use-gnutls t
+      smtpmail-starttls-credentials '(("smtp.gmail.com" 587 nil nil))
+      smtpmail-auth-credentials
+      '(("smtp.gmail.com" 587 "gugutz@gmail.com" nil))
+      smtpmail-default-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-service 587)
+    )
+
+  ;; don't keep message buffers around
+  (setq message-kill-buffer-on-exit t)
+  )
+
+;; **************************************************
+;; * GPG Encryption
+
+(use-package epa-file
+  :ensure nil
+  :config
+  (epa-file-enable)
+  (setq epa-file-encrypt-to '("gugutz@gmail.com"))
+
+  ;; Control whether or not to pop up the key selection dialog.
+  (setq epa-file-select-keys 0)
+  ;; Cache passphrase for symmetric encryption.
+  (setq epa-file-cache-passphrase-for-symmetric-encryption t)
+  )
+
+;; **************************************************
+
+;; * TEXT MANIPULATION
+
+;;------------------------------
+;;
+;;; Use the system clipboard
+(setq x-select-enable-clipboard t)
+
+;; Helper functions for casing words
+
+
+(defun upcase-backward-word (arg)
+  (interactive "p")
+  (upcase-word (- arg))
+  )
+(global-set-key (kbd "C-M-u")	 'upcase-backward-word)
+
+(defun downcase-backward-word (arg)
+  (interactive "p")
+  (downcase-word (- arg))
+  )
+(global-set-key (kbd "C-M-l")	 'downcase-backward-WORD)
+
+(defun capitalize-backward-word (arg)
+  (interactive "p")
+  (capitalize-word (- arg))
+  )
+;; this replaces native capitlize word!
+(global-set-key (kbd "C-M-c")	 'capitalize-backward-word)
+
+
+;;------------------------------
+;;
+;;; Copy to system clipboard
+
+(defun copy-to-clipboard ()
+  "Make F8 and F9 Copy and Paste to/from OS Clipboard.  Super usefull."
+  (interactive)
+  (if (display-graphic-p)
+    (progn
+      (message "Yanked region to x-clipboard!")
+      (call-interactively 'clipboard-kill-ring-save)
+      )
+    (if (region-active-p)
+      (progn
+        (shell-command-on-region (region-beginning) (region-end) "xsel -i -b")
+        (message "Yanked region to clipboard!")
+        (deactivate-mark))
+      (message "No region active; can't yank to clipboard!")))
+  )
+(global-set-key [f9] 'copy-to-clipboard)
+
+;; ------------------------------
+;;
+;;; Paste
+
+(defun paste-from-clipboard()
+  "Allow to paste from system clipboard."
+  (if (display-graphic-p)
+    (progn
+      (clipboard-yank)
+      (message "graphics active")
+      )
+    (insert (shell-command-to-string "xsel -o -b")) ) )
+
+(global-set-key [f10] 'paste-from-clipboard)
+
+
+;; ------------------------------
+;;
+;; ** restclient
+
+(use-package restclient
+  :ensure t
+  :mode
+  ("\\.rest$\\'" "\\.http$\\'")
+  :config
+  (setq restclient-same-buffer-response t)
+  (progn
+    ;; Add hook to override C-c C-c in this mode to stay in window
+    (add-hook 'restclient-mode-hook
+      '(lambda ()
+         (local-set-key
+           (kbd "C-c C-c")
+           'restclient-http-send-current-stay-in-window))))
+  )
+
+
+;; * ORG-MODE
+
+;; ** org-mode setup
+
+(use-package org
+  :ensure org-plus-contrib
+  :mode ("\\.org$" . org-mode)
+  :defer t
+  :preface
+  (defun setup-org-mode ()
+    (interactive)
+    (message "Trying to setup org-mode for buffer")
+    (color-identifiers-mode)
+    (flycheck-mode 1)
+    (rainbow-mode 1)
+    (diff-hl-mode)
+    (prettify-symbols-mode 1)
+    (org-bullets-mode 1)
+    )
+  :hook
+  (org-mode . setup-org-mode)
+  :bind
+  (:map org-mode-map
+    ("C-c o l" . org-store-link)
+    ("C-c o l" . org-store-link)
+    ("C-c o a" . org-agenda)
+    ("C-c o c" . org-capture)
+    ("C-c o b" . org-switch))
+
+  ;; this map is to delete de bellow commented lambda that does the same thing
+  ;; Resolve issue with Tab not working with ORG only in Normal VI Mode in terminal
+  ;; (something with TAB on terminals being related to C-i...)
+  (:map evil-normal-state-map
+    ("<tab>" . org-cycle))
+  :init
+  ;; general org config variables
+  (setq org-log-done 'time)
+  (setq org-export-backends (quote (ascii html icalendar latex md odt)))
+  (setq org-use-speed-commands t)
+
+  ;; dont display atual width for images inline. set per-file with
+  ;; #+ATTR_HTML: :width 600px :height: auto
+  ;; #+ATTR_ORG: :width 600
+  ;; #+ATTR_LATEX: :width 5in
+  (setq org-image-actual-width nil)
+  (setq org-startup-with-inline-images t)
+
+  ;; make tab behave like it usually do (ie: indent) inside org source blocks
+  (setq org-src-tab-acts-natively t)
+
+  (setq org-confirm-babel-evaluate 'nil)
+  (setq org-todo-keywords
+    '((sequence "TODO" "IN-PROGRESS" "REVIEW" "|" "DONE")))
+  (setq org-agenda-window-setup 'other-window)
+  (setq org-log-done 'time) ;; Show CLOSED tag line in closed TODO items
+  (setq org-log-done 'note) ;; Prompt to leave a note when closing an item
+  (setq org-hide-emphasis-markers nil)
+
+  ;;ox-twbs (exporter to twitter bootstrap html)
+  (setq org-enable-bootstrap-support t)
+  :config
+  ;; make windmove work with org mode
+  (add-hook 'org-shiftup-final-hook 'windmove-up)
+  (add-hook 'org-shiftleft-final-hook 'windmove-left)
+  (add-hook 'org-shiftdown-final-hook 'windmove-down)
+  (add-hook 'org-shiftright-final-hook 'windmove-right)
+
+  ;; org-capture - needs to be in :config because it assumes a variable is already defined: `org-directory'
+  (setq org-default-notes-file (concat org-directory "/notes.org"))
+
+  ;;(add-hook 'org-mode-hook
+  ;;          (lambda ()
+  ;;        (define-key evil-normal-state-map (kbd "TAB") 'org-cycle)))
+
+  (defun org-export-turn-on-syntax-highlight()
+    "Setup variables to turn on syntax highlighting when calling `org-latex-export-to-pdf'"
+    (interactive)
+    (setq org-latex-listings 'minted
+      org-latex-packages-alist '(("" "minted"))
+      org-latex-pdf-process '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f")))
+
+  ;; compile with pdf-latex
+  ;; (setq org-latex-pdf-process
+  ;;     '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
+
+  ;; compile with xelatex to use the Arial font
+  (setq org-latex-pdf-process
+    '("xelatex -interaction nonstopmode %f"
+       "xelatex -interaction nonstopmode %f")) ;; for multiple passes
+
+  (setq org-emphasis-alist '(("*" bold)
+                              ("/" italic)
+                              ("_" underline)
+                              ("=" org-verbatim verbatim)
+                              ("~" org-code verbatim)))
+
+
+  (require 'org-habit)
+  '(org-emphasis-alist
+     (quote
+       (
+         ("!" org-habit-overdue-face)
+         ("%" org-habit-alert-face)
+         ("*" bold)
+         ("/" italic)
+         ("_" underline)
+         ("=" org-verbatim verbatim)
+         ("~" org-code verbatim)
+         ("+" (:strike-through t))
+         )))
+  )
+
+
+
 
 
 (use-package gcmh
