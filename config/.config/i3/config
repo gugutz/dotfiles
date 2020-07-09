@@ -22,11 +22,12 @@ set $secondary_monitor DVI-I-1
 # set $primary_monitor eDP1
 # set $secondary_monitor DP1
 # home monitors
-set $primary_monitor DVI-I-2
+set $primary_monitor eDP1
 set $secondary_monitor DVI-I-1
 # work monitors
 # set $primary_monitor eDP1
 # set $secondary_monitor DP1
+
 
 # home mirrored layout
 set $home_dual_monitor_mirrored_layout xrandr --output DVI-I-2 --mode 1920x1080 --rotate normal --output DVI-I-1 --mode 1280x1024 --same-as $home_primary_monitor
@@ -42,8 +43,7 @@ set $work_dual_monitor_mirrored_layout xrandr --output eDP1 --mode 1920x1080 --p
 set $work_dual_monitor_extended_layout xrandr --output eDP1 --mode 1920x1080 --pos 0x0 --rotate normal --output DP1 --primary --mode 1920x1080 --pos 1920x0 --rotate normal --output DP2 --off --output HDMI1 --off --output VIRTUAL1 --off
 
 # setup monitors
-exec_always --no-startup-id $home_dual_monitor_extended_layout
-
+exec_always --no-startup-id $work_dual_monitor_extended_layout
 
 
 # HOME
@@ -56,6 +56,15 @@ bindsym $mod+Control+Shift+8 exec $work_single_monitor_layout; exec notify-send 
 bindsym $mod+Control+Shift+9 exec $work_dual_monitor_mirrored_layout;  exec notify-send 'using work mirrored monitor layout'
 bindsym $mod+Control+Shift+0 exec $work_dual_monitor_extended_layout;  exec notify-send 'using work dual monitor extended layout'
 
+
+###################################################################
+# Setup keyboard
+
+exec_always setxkbmap -layout br
+exec_always setxkbmap -option caps:swapescape
+exec_always xcape -e 'Control_L=Escape'
+# exec_always setxkbmap -option ctrl:swapcaps     # Swap Left Control and Caps Lock
+# exec_always setxkbmap -option ctrl:nocaps       # Make Caps Lock a Control key
 
 ###################################################################
 # Terminal Settings
@@ -560,12 +569,25 @@ bindsym  $mod+Shift+Print --release exec --no-startup-id import ~/img/screenshot
 # scrot & gimp - select window or rectangle
 bindsym $alt+Print exec scrot ~/img/screenshots/last-scrot.png -s -e 'mv $f /tmp/ && pinta /tmp/$f'
 
+###################################################################
+#
+# STATUS BAR
+#
+###################################################################
+
+
+#######################################################
+# XFCE PANEL
+
+exec --no-startup-id xfce4-panel --disable-wm-check
+#######################################################
+# POLYBAR
+
 # Polybar
 exec_always --no-startup-id ~/.config/polybar/launch.sh &
 
-###################################################################
+#######################################################
 # i3 BAR SETTINGS
-###################################################################
 
 # # Start i3bar to display a workspace bar (plus the system information i3status
 # # finds out, if available)
@@ -578,7 +600,8 @@ exec_always --no-startup-id ~/.config/polybar/launch.sh &
 #     tray_output $primary_monitor
 #     bindsym button4 nop
 #     bindsym button5 nop
-#     font xft:URWGothic-Book 11
+#   # font pango:DejaVu Sans Mono, Icons 8
+#     # font xft:URWGothic-Book 11
 #     font pango:Hack Nerd Font Mono 11
 #     strip_workspace_numbers no
 

@@ -1,1 +1,3 @@
-((magit-commit nil))
+((magit-blame
+   ("-w"))
+  (magit-commit nil))

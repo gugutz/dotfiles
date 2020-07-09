@@ -9391,6 +9391,50 @@ toggle it if ARG is `toggle'; disable the mode otherwise.
 
 
 )
+(let ((load-file-name "/home/tau/.config/emacs/elpa/ivy-explorer-20190909.1921/ivy-explorer-autoloads.el"))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory "/home/tau/.config/emacs/elpa/ivy-explorer-20190909.1921/ivy-explorer-autoloads.el") (car load-path))))
+
+
+
+(defvar ivy-explorer-mode nil "\
+Non-nil if Ivy-Explorer mode is enabled.
+See the `ivy-explorer-mode' command
+for a description of this minor mode.
+Setting this variable directly does not take effect;
+either customize it (see the info node `Easy Customization')
+or call the function `ivy-explorer-mode'.")
+
+(custom-autoload 'ivy-explorer-mode "ivy-explorer" nil)
+
+(autoload 'ivy-explorer-mode "ivy-explorer" "\
+Globally enable `ivy-explorer' for file navigation.
+
+If called interactively, enable Ivy-Explorer mode if ARG is
+positive, and disable it if ARG is zero or negative.  If called
+from Lisp, also enable the mode if ARG is omitted or nil, and
+toggle it if ARG is `toggle'; disable the mode otherwise.
+
+`ivy-explorer-mode' is a global minor mode which changes
+`read-file-name-function' which is used for file completion.
+
+When `ivy-explorer-enable-counsel-explorer' (by default it is),
+`find-file' and `counsel-find-file' will be remapped to
+`counsel-explorer.', too.
+
+See `ivy-explorer-map' for bindings used in the minibuffer.
+
+\(fn &optional ARG)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "ivy-explorer" '("counsel-explorer" "ivy-explorer")))
+
+
+
+
+
+)
 (let ((load-file-name "/home/tau/.config/emacs/elpa/hl-todo-20200103.1239/hl-todo-autoloads.el"))
 
 (add-to-list 'load-path (directory-file-name
@@ -10827,6 +10871,31 @@ Face for quarantines." :group 'haskell)
 
 
 )
+(let ((load-file-name "/home/tau/.config/emacs/elpa/grip-mode-20200312.1136/grip-mode-autoloads.el"))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory "/home/tau/.config/emacs/elpa/grip-mode-20200312.1136/grip-mode-autoloads.el") (car load-path))))
+
+
+
+(autoload 'grip-mode "grip-mode" "\
+Live Markdown preview with grip.
+
+If called interactively, enable Grip mode if ARG is positive, and
+disable it if ARG is zero or negative.  If called from Lisp, also
+enable the mode if ARG is omitted or nil, and toggle it if ARG is
+`toggle'; disable the mode otherwise.
+
+\(fn &optional ARG)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "grip-mode" '("grip-")))
+
+
+
+
+
+)
 (let ((load-file-name "/home/tau/.config/emacs/elpa/goto-line-preview-20190308.736/goto-line-preview-autoloads.el"))
 
 (add-to-list 'load-path (directory-file-name
@@ -11077,6 +11146,43 @@ enable the mode if ARG is omitted or nil, and toggle it if ARG is
 
 
 (if (fboundp 'register-definition-prefixes) (register-definition-prefixes "gcmh" '("gcmh-")))
+
+
+
+
+
+)
+(let ((load-file-name "/home/tau/.config/emacs/elpa/fzf-20180619.145/fzf-autoloads.el"))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory "/home/tau/.config/emacs/elpa/fzf-20180619.145/fzf-autoloads.el") (car load-path))))
+
+
+
+(autoload 'fzf "fzf" "\
+Starts a fzf session." t nil)
+
+(autoload 'fzf-directory "fzf" "\
+Starts a fzf session at the specified directory." t nil)
+
+(autoload 'fzf-git "fzf" "\
+Starts a fzf session at the root of the current git." t nil)
+
+(autoload 'fzf-git-files "fzf" "\
+Starts a fzf session only searching for git tracked files." t nil)
+
+(autoload 'fzf-hg "fzf" "\
+Starts a fzf session at the root of the curreng hg." t nil)
+
+(autoload 'fzf-projectile "fzf" "\
+Starts a fzf session at the root of the projectile project." t nil)
+
+(autoload 'fzf-git-grep "fzf" "\
+Starts a fzf session based on git grep result. The input comes
+   from the prompt or the selected region" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "fzf" '("fzf/")))
 
 
 
@@ -14473,7 +14579,7 @@ Any path found is added to the `exec-path'." t nil)
 )
 (setq package-activated-list
   (append
-    '(yasnippet yasnippet-snippets yaml-mode async with-editor which-key web-mode vimrc-mode s dash f vimish-fold vi-tilde-fringe popup vc-msg bind-key use-package undo-tree typescript-mode epl pkg-info projectile avy ace-window pfuture lv hydra ht treemacs treemacs-projectile persp-mode treemacs-persp transient git-commit magit treemacs-magit goto-chg evil treemacs-evil ivy swiper sqlup-mode sql-indent spinner solaire-mode smartparens shrink-path shell-pop scss-mode rotate restclient ranger rainbow-mode rainbow-delimiters prettier-js prescient powerline posframe parent-mode org-plus-contrib memoize markdown-mode dash-functional lsp-mode lsp-ui loop keyfreq json-snatcher json-reformat json-mode js2-mode ivy-rich ivy-prescient ivy-posframe hl-todo highlight-parentheses highlight-operators highlight-numbers highlight-indent-guides highlight-escape-sequences highlight-defined hide-mode-line elisp-refs helpful haskell-mode goto-line-preview go-mode gitignore-mode gitconfig-mode gitattributes-mode git-timemachine gcmh flycheck flycheck-posframe eyebrowse expand-region exec-path-from-shell evil-vimish-fold evil-mu4e evil-magit evil-goggles evil-commentary esup emmet-mode editorconfig dumb-jump drag-stuff dotenv-mode doom-themes all-the-icons doom-modeline dockerfile-mode docker-compose-mode dired-k diminish diffview diff-hl counsel counsel-projectile company company-posframe company-lsp company-box centaur-tabs better-jumper auto-package-update amx all-the-icons-ivy all-the-icons-dired aggressive-indent add-node-modules-path)
+    '(yasnippet yasnippet-snippets yaml-mode async with-editor which-key web-mode vimrc-mode s dash f vimish-fold vi-tilde-fringe popup vc-msg bind-key use-package undo-tree typescript-mode epl pkg-info projectile avy ace-window pfuture lv hydra ht treemacs treemacs-projectile persp-mode treemacs-persp transient git-commit magit treemacs-magit goto-chg evil treemacs-evil ivy swiper sqlup-mode sql-indent spinner solaire-mode smartparens shrink-path shell-pop scss-mode rotate restclient ranger rainbow-mode rainbow-delimiters prettier-js prescient powerline posframe parent-mode org-plus-contrib memoize markdown-mode dash-functional lsp-mode lsp-ui loop keyfreq json-snatcher json-reformat json-mode js2-mode ivy-rich ivy-prescient ivy-posframe ivy-explorer hl-todo highlight-parentheses highlight-operators highlight-numbers highlight-indent-guides highlight-escape-sequences highlight-defined hide-mode-line elisp-refs helpful haskell-mode grip-mode goto-line-preview go-mode gitignore-mode gitconfig-mode gitattributes-mode git-timemachine gcmh fzf flycheck flycheck-posframe eyebrowse expand-region exec-path-from-shell evil-vimish-fold evil-mu4e evil-magit evil-goggles evil-commentary esup emmet-mode editorconfig dumb-jump drag-stuff dotenv-mode doom-themes all-the-icons doom-modeline dockerfile-mode docker-compose-mode dired-k diminish diffview diff-hl counsel counsel-projectile company company-posframe company-lsp company-box centaur-tabs better-jumper auto-package-update amx all-the-icons-ivy all-the-icons-dired aggressive-indent add-node-modules-path)
     package-activated-list))
 (progn
   (require 'info)

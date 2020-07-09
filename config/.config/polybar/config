@@ -121,8 +121,8 @@ modules-left = user settings filesystem
 # the bluetooth module was preventing the bar from updating when the colorscheme is choosen
 modules-right = openweathermap-detailed memory cpu temperature uptime network colorswitcher powermenu
 
-monitor = ${env:MONITOR:DVI-I-2}
-monitor-fallback = ${env:MONITOR:DP1}
+monitor = ${env:MONITOR:DP1}
+monitor-fallback = ${env:MONITOR:eDP1}
 
 cursor-click = pointer
 
@@ -163,7 +163,7 @@ font-5 = "Noto Sans CJK JP:size=11;2"
 
 [bar/gugutz_bottom]
 
-modules-left = menu i3
+modules-left = menu bspwm
 modules-center = xwindow
 modules-right = wired-network calendar clock pulseaudio calculator powermenu2
 
@@ -230,7 +230,7 @@ monitor = ${env:MONITOR:DVI-I-1}
 monitor-fallback = ${env:MONITOR:eDP1}
 
 fixed-center = true
-wm-restack = i3
+wm-restack = bspwm
 
 enable-ipc = true
 
@@ -270,7 +270,7 @@ monitor-fallback = ${env:MONITOR:eDP1}
 
 radius = 0.0
 fixed-center = true
-wm-restack = i3
+wm-restack = bspwm
 enable-ipc = true
 
 
@@ -772,9 +772,9 @@ type = internal/network
 ;interface = eth0
 
 ; qualirede interface
-; interface = enp2s0
+interface = enp2s0
 ; home interface
-interface = enp3s0
+; interface = enp3s0
 interval = 2.0
 
 format-connected = <ramp-signal> <label-connected>

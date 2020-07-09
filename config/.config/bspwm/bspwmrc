@@ -1,35 +1,49 @@
 #!/bin/sh
 
+##############################################################
+## MONITORS SETUP
 
-# set the monitors layout
-# xrandr --output DVI-I-0 --off --output DVI-I-1 --mode 1280x1024 --pos 0x56 --rotate normal --output DVI-I-2 --primary --mode 1920x1080 --pos 1280x0 --rotate normal --output HDMI-0 --off --output DVI-I-3 --off
-
-# second monitor on the left
-# xrandr --output DVI-I-0 --off --output DVI-I-1 --mode 1280x1024 --pos 0x56 --rotate normal --output DVI-I-2 --primary --mode 1920x1080 --pos 1280x0 --rotate normal --output HDMI-0 --off --output DVI-I-3 --off
-
-# second monitor on the right
-xrandr --output DVI-I-0 --off --output DVI-I-1 --mode 1280x1024 --pos 1920x56 --rotate normal --output DVI-I-2 --primary --mode 1920x1080 --pos 0x0 --rotate normal --output HDMI-0 --off --output DVI-I-3 --off
-
+## auto reload monitor config based on whats connected
+autorandr --change &
 
 # xrandr --output DVI-I-2 --primary --right-of DVI-I-1
 # xrandr --output DVI-I-1 --left-of DVI-I-2 --primary
 
+outputs=$(xrandr --query | grep " connected" | cut -d" " -f1)
+current_monitor_config=$(autorandr --current)
+
+## FIXME: fix this auto workspace setup
 # after last format xrandr inverted the names of monitors, dunno why
-bspc monitor DVI-I-2 -d 1 2 3 4 5 6 7
-bspc monitor DVI-I-1 -d 8 9 10
+# if [[ $(hostname) == 'tau-home-pc' ]]; then
+#     bspc monitor DVI-I-2 -d 1 2 3 4 5 6 7
+#     bspc monitor DVI-I-1 -d 8 9 10
+# elif [[ $(hostname) == 'tau-work-pc' ]] && [[ $current_monitor_config == "work_extended" ]]; then
+#     bspc monitor DP1 -d 1 2 3 4 5 6 7
+#     bspc monitor eDP1 -d 8 9 10
+# elif [[ $(hostname) == 'tau-work-pc' ]] && [[ $current_monitor_config == "work_single" ]]; then
+#     bspc monitor eDP1 -d 1 2 3 4 5 6 7 8 9 10
+# elif [[ $(hostname) == 'tau-work-pc' ]] && [[ $current_monitor_config == "work_mirrored" ]]; then
+#     bspc monitor eDP1 -d 1 2 3 4 5 6 7 8 9 10
+# fi
+
+bspc monitor DP1 -d 1 2 3 4 5 6 7
+bspc monitor eDP1 -d 8 9 10
 
 # maybe this is only needed when the second monitor is on the left. testing it
 # bspc monitor DVI-I-1 -s DVI-I-2
+bspc monitor eDP1 -s DP1
+
+##############################################################
 
 # start key manager
 [[ ! $(pidof -x sxhkd) ]] && sxhkd &
 
 # run function to check for existing instances and avoid duplicates
 function run {
-  if ! pgrep $1 ;
-  then
-    $@&
-  fi
+    if ! pgrep $1 ;
+    then
+        $@&
+    fi
 }
 
 # change the mouse cursor to left pointer
@@ -80,8 +94,8 @@ wal -R
 # pacwall -W
 
 # pscircle \
-#   --output-width=1890 \
-#   --output-height=980 \
+    #   --output-width=1890 \
+    #   --output-height=980 \
 
 # Set random lockscreen image
 betterlockscreen -u ~/wallpapers &
@@ -97,10 +111,12 @@ xautolock -time 5 -locker "betterlockscreen -u ~/wallpapers --lock dimblur --off
 #bspc config border_radius       8
 bspc config border_width         2
 bspc config window_gap           10
+# padding
 bspc config top_padding          30
-bspc config bottom_padding       10
+bspc config bottom_padding       30
 bspc config left_padding         10
 bspc config right_padding        10
+# layouts
 bspc config single_monocle       false
 #bspc config click_to_focus       true
 bspc config split_ratio          0.50
@@ -116,10 +132,11 @@ bspc config pointer_action3 resize_corner
 # bspc config remove_disabled_monitors true
 # bspc config merge_overlapping_monitors true
 
-#BSPWM coloring
+# Window border colors
 bspc config normal_border_color		"#4c566a"
 bspc config active_border_color		"#1e1e1e"
-bspc config focused_border_color	"#5e81ac"
+# bspc config focused_border_color	"#007a3d"
+bspc config focused_border_color	"#007ad3"
 bspc config presel_feedback_color	"#5e81ac"
 bspc config urgent_border_color 	"#dd2727"
 
@@ -217,7 +234,7 @@ term_wm_prop=instance
 
 # terminal scratchpad
 bspc rule -a terminal-scratchpad sticky=on state=floating hidden=on rectangle=900x700+0+0 center=true
- [[ ! $(xdotool search --class terminal-scratchpad)  ]] &&  $term $term_wm_set_prop_flag terminal-scratchpad &
+[[ ! $(xdotool search --class terminal-scratchpad)  ]] &&  $term $term_wm_set_prop_flag terminal-scratchpad &
 # alacritty --class dropdown -e "zsh -i" &
 
 # ranger scratchpad

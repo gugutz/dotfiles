@@ -66,12 +66,13 @@ alias cddt='cd ~/dotfiles'
 
 # cd into different projects directories
 alias cdpep='cd ~/code/qualirede/pep'
-alias cdpepadm='cd ~/code/qualirede/pep-admin'
-alias cdpepapi='cd ~/code/qualirede/pep-api'
+alias cdadm='cd ~/code/qualirede/pep-admin'
+alias cdapi='cd ~/code/qualirede/pep-api'
 alias cdsso='cd ~/code/qualirede/pep-sso'
 alias cdres='cd ~/code/qualirede/res'
+alias cdqds='cd ~/code/qualirede/digital-signer'
 
-alias cdwego='cd ~/code/freelas/wego'
+alias cdwego='cd ~/code/out/wego'
 # ---------------------------------------------
 
 # git aliases
@@ -89,6 +90,8 @@ alias gpom='git push origin master'
 alias gplom='git pull origin master'
 alias gpod='git push origin develop'
 alias gplod='git pull origin develop'
+alias gpot='git push origin test'
+alias gplot='git pull origin test'
 alias glg='git log'
 
 alias whichterm='ps -o 'cmd=' -p $(ps -o 'ppid=' -p $$)'
@@ -146,3 +149,8 @@ alias yaysn='yay -S --noconfirm'
 # i can use tools like extract-xiso to extract the xbox isos
 # source: https://github.com/XboxDev/extract-xiso/issues/32#issuecomment-545213567
 extractgamedatafromredumps='dd if=game.iso of=game_data.iso skip=387k bs=1k status=progress'
+
+# youtube-dl aliases
+alias ytdl-audio='youtube-dl -x -f bestaudio'
+alias ytdl-best-video='youtube-dl -x -f bestaudio'
+alias ytdl-audio='youtube-dl -x -f bestaudio'

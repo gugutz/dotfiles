@@ -43,14 +43,13 @@ for monitor in $outputs; do
     # render different bars for different monitors
     if [[ $monitor == $home_primary_monitor ]] || [[ $monitor == $work_secondary_monitor ]]; then
         # if theres also a second monitor, kill all instances first so there wont be two bars loaded
-        killall polybar
         echo "main monitor $monitor detected. loading main bars for it."
-        echo "$outputs"
         tray_output=$monitor
         MONITOR=$monitor polybar $bar_top --reload -l info &
         MONITOR=$monitor polybar $bar_bottom --reload -l info &
         echo "Bars launched for primary monitor..."
     fi
+    # if any of the secondary monitors is connected, load different bars for the small monitors
     if [[ $monitor == $home_secondary_monitor ]] || [[ $monitor == $work_primary_monitor ]]; then
         echo "second monitor $monitor is also connected. loading different bars for it."
         MONITOR=$monitor polybar second_monitor_bar_top --reload -l info &

@@ -6,44 +6,102 @@
 
 ;;; Code:
 
+;;****************************************************************
+;;
+;;; Verifiy emacs version
+
 (when (version< emacs-version "26.1")
   (error "Detected Emacs %s.  This Emacs config only supports Emacs 26.1 and higher"
     emacs-version))
 
-;; some usefull constants used throughout the config
-(defconst EMACS27+   (> emacs-major-version 26))
+
+
+;;****************************************************************
+;;
+;;; Some usefull constants used throughout the config
+
+(defconst IS-EMACS27+   (> emacs-major-version 26))
 (defconst IS-MAC     (eq system-type 'darwin))
 (defconst IS-LINUX   (eq system-type 'gnu/linux))
 (defconst IS-WINDOWS (memq system-type '(cygwin windows-nt ms-dos)))
 (defconst IS-BSD     (or IS-MAC (eq system-type 'berkeley-unix)))
 
-;; prevents bug with emacs starting in floating state on bspwm
-;; yeah, a hack, but...
+
+;;; Directories/files
+(defconst emacs-dir (file-truename user-emacs-directory)
+  "The path to the currently loaded .emacs.d directory.  Must end with a slash.")
+
+(defconst config-dir (concat emacs-dir "config/")
+  "Directory to packages specific configs.  Must end with a slash.")
+
+(defconst packages-config-dir (concat config-dir "packages/"))
+
+(defconst cache-dir (concat emacs-dir "cache/")
+  "Directory for volatile local storage.
+Use this for files that change often, like cache files.  Must end with a slash.")
+
+(defconst env-file (concat config-dir "env")
+  "The location of the envvar file.")
+
+(defconst secrets-dir (concat config-dir "secrets/")
+  "The location of secrets.")
+
+;;****************************************************************
+;;
+;;; Personal information
+
+(setq user-full-name "Gustavo Pereira Borges")
+(setq user-mail-address "gugutz@gmail.com")
+(setq my/gmail-address "gugutz@gmail.com")
+(setq my/nickname "gugutz")
+
+;; my secrets
+;; (let ((secret.el (expand-file-name ".secret.el" user-emacs-directory)))
+;;   (when (file-exists-p secret.el)
+;;     (load secret.el)))
+
+;; (load-library "~/dotfiles/emacs.d/secrets.el.gpg")
+
+;; Emacs stores authinfo in HOME and in plaintext. Let's not do that, mkay? This
+;; file usually stores usernames, passwords, and other such treasures for the
+;; aspiring malicious third party.
+
+
+(setq auth-sources (list (expand-file-name "authinfo.gpg" secrets-dir)
+                     "~/.authinfo.gpg"))
+
+(setq package-gnupghome-dir (expand-file-name "gpg" package-user-dir))
+
+
+;;****************************************************************
+;;
+;;; prevents bug with emacs starting in floating state on bspwm
+;;; yeah, a hack, but...
 (setq frame-resize-pixelwise t)
 
 ;;****************************************************************
 ;;
-;; Garbage Collection GC Settings
+;;; Garbage Collection GC Settings
 
-;; source: https://raw.githubusercontent.com/gilbertw1/emacs-literate-starter/master/emacs.org
+;; `source': https://raw.githubusercontent.com/gilbertw1/emacs-literate-starter/master/emacs.org
 
-(defvar custom-gc-cons-threshold 402653184) ;; 400mb
+(defvar custom-gc-cons-threshold (* gc-cons-threshold 4)) ;; 400mb
 
 ;; increase to defer gc on emacs startup
-(setq gc-cons-threshold most-positive-fixnum ;; 2^61 bytes
+(setq gc-cons-threshold most-positive-fixnum ;; 2^61 bytes (2305843009213693951)
   gc-cons-percentage 0.6
   garbage-collection-messages t)
 
 
 ;; reset gc after emacs loads
 ;; 100mb is the value recommended by lsp github page
-(eval-and-compile
-  (add-hook 'emacs-startup-hook
-    (setq gc-cons-threshold custom-gc-cons-threshold
-      gc-cons-percentage 0.6)))
+(add-hook 'emacs-startup-hook
+  (setq gc-cons-threshold custom-gc-cons-threshold
+    gc-cons-percentage 0.6))
+
 
 ;; automatically GC when emacs is out of focus
-;; source: M-EMACS
+;; `source': M-EMACS
 (add-hook 'emacs-startup-hook
   (lambda ()
     (if (boundp 'after-focus-change-function)
@@ -55,19 +113,20 @@
 
 
 ;; raise gc-cons-threshold while the minibuffer is active, so the GC doesn’t slow down expensive commands (or completion frameworks, like helm and ivy).
-
+;; NOTE: i got this from doom emacs, but appearantly it was preventing me from reseting the GC to a lower valur after emacs started
+;;
 (defun gc-minibuffer-setup-hook ()
   "Set gc consing treshold to the higher possible value."
   (setq gc-cons-threshold most-positive-fixnum))
-
 
 (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
 
 (defun gc-minibuffer-exit-hook ()
   "Set gc consing treshold to the higher possible value."
   ;; Defer it so that commands launched immediately after will enjoy the benefits.
-  (run-at-time
-    1 nil (lambda () (setq gc-cons-threshold custom-gc-cons-threshold))))
+  (setq gc-cons-threshold custom-gc-cons-threshold))
+;; (run-at-time
+;;   1 nil (lambda () (setq gc-cons-threshold custom-gc-cons-threshold))))
 
 (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)
 
@@ -92,7 +151,7 @@
 
 
 ;; put all load-paths into one single big file
-(when EMACS27+
+(when IS-EMACS27+
   (setq package-quickstart t))
 
 
@@ -110,11 +169,13 @@
 ;; -------------------------------------
 
 
+;; NOTE: For emacs < 27 (emacs 27 has package-quickstart which does basicly the same thing)
 ;; Manually Set `load-path'
 ;; This load-path will actually be faster than the one created by `package-initialize' because it appends the elpa packages to the end of the load path.
 
-(eval-and-compile
-  (setq load-path (append load-path (directory-files package-user-dir t "^[^.]" t))))
+(unless IS-EMACS27+
+  (eval-and-compile
+    (setq load-path (append load-path (directory-files package-user-dir t "^[^.]" t)))))
 
 ;; -------------------------------------
 
@@ -125,9 +186,6 @@
 
 ;; Since the code is automatically compiled during runtime, if the configuration hasn't already been previously compiled manually then all of the package initialization will still take place at startup.
 
-;; use-package settings
-(setq use-package-always-defer t)
-(setq use-package-verbose t)
 
 (eval-when-compile
   (require 'package)
@@ -147,6 +205,9 @@
 
   ;; load use-package
   (require 'use-package)
+  ;; use-package settings
+  (setq use-package-always-defer t)
+  (setq use-package-verbose t)
   (setq use-package-always-ensure t)
   (setq use-package-enable-imenu-support t)
   (setq use-package-minimum-reported-time 0)
@@ -158,6 +219,22 @@
   (setq auto-package-update-delete-old-versions t)
   (setq auto-package-update-hide-results t)
   (auto-package-update-maybe))
+
+
+;;****************************************************************
+;;
+;;; Load gcmh
+
+;; (use-package gcmh
+;;   :demand t
+;;   :init
+;;   (setq gcmh-verbose             t
+;;     gcmh-lows-cons-threshold #x800000
+;;     gcmh-high-cons-threshold most-positive-fixnum
+;;     gcmh-idle-delay          3600)
+;;   :config
+;;   (gcmh-mode 1)
+;;   )
 
 ;;****************************************************************
 ;;
@@ -333,6 +410,75 @@
 (add-hook 'term-mode-hook (lambda () (hscroll-margin 0)))
 
 
+
+;; ===============================================================
+;; Pulse previous top and bottom lines after scrolling up and down
+;; source: https://with-emacs.com/posts/ui-hacks/keep-scrollin-scrollin-scrollin/
+;;
+;; The idea is similar to on-screen but you get a better sense of the scrolling direction and the moving parts on your screen. The bottom/top line gets highlighted shortly and after that the new position after the scroll. This way it looks like the line gets pulled up/down
+
+(autoload 'View-scroll-half-page-forward "view")
+(autoload 'View-scroll-half-page-backward "view")
+(global-set-key (kbd "C-v") 'View-scroll-half-page-forward)
+(global-set-key (kbd "M-v") 'View-scroll-half-page-backward)
+
+(global-set-key (kbd "C-M-v")
+  'my-View-scroll-half-page-forward-other-window)
+(global-set-key (kbd "C-M-S-v")
+  'my-View-scroll-half-page-backward-other-window)
+
+(defun my-View-scroll-half-page-forward-other-window ()
+  (interactive)
+  (with-selected-window (next-window)
+    (call-interactively 'View-scroll-half-page-forward)))
+
+(defun my-View-scroll-half-page-backward-other-window ()
+  (interactive)
+  (with-selected-window (next-window)
+    (call-interactively 'View-scroll-half-page-backward)))
+
+(setq scroll-preserve-screen-position 'always)
+
+(advice-add #'View-scroll-half-page-forward :around
+  #'my-indicate-scroll-forward)
+
+(advice-add #'View-scroll-half-page-backward :around
+  #'my-indicate-scroll-backward)
+
+(defun my-indicate-scroll-get-line (pos)
+  (save-excursion
+    (goto-char pos)
+    (string-to-number (format-mode-line "%l"))))
+
+;; (defun my-indicate-scroll (linep f args)
+;;   (let ((linen (my-indicate-scroll-get-line linep))
+;;          (pulse-delay 0.1))
+;;     (save-excursion
+;;       (goto-line linen)
+;;       (pulse-momentary-highlight-one-line (point) 'highlight))
+;;     (sit-for 0.1)
+;;     (apply f args)))
+
+(defun my-indicate-scroll (linep f args)
+  (let ((linen (my-indicate-scroll-get-line linep))
+         (pulse-delay 0.1))
+    (set-transient-map
+      `(keymap (?v . ,real-this-command)))
+    (save-excursion
+      (goto-line linen)
+      (pulse-momentary-highlight-one-line (point) 'highlight))
+    (sit-for 0.1)
+    (apply f args)))
+
+
+(defun my-indicate-scroll-forward (f &rest args)
+  (my-indicate-scroll (1- (window-end)) f args))
+
+(defun my-indicate-scroll-backward (f &rest args)
+  (my-indicate-scroll (window-start) f args))
+
+;; ===============================================================
+
 ;;****************************************************************
 ;;
 ;;; CURSOR SETTINGS
@@ -372,7 +518,7 @@
 ;;; Window and Frames
 
 ;; A simple frame title
-(setq frame-title-format '("%b – Tau Emacs")
+(setq frame-title-format '("%b – emacs")
   icon-title-format frame-title-format)
 
 ;; Don't resize windows & frames in steps; it's prohibitive to prevent the user
@@ -455,6 +601,27 @@
             100)
         '(85 . 50) '(100 . 100)))))
 (global-set-key (kbd "C-c t") 'tau/toggle-transparency)
+
+
+;; *********************************
+;; GnuPG
+
+;; **************************************************
+;; * GPG Encryption
+
+(use-package epa-file
+  :ensure nil
+  :demand t
+  :config
+  (epa-file-enable)
+  (setq epa-file-encrypt-to '("gugutz@gmail.com"))
+
+  ;; Control whether or not to pop up the key selection dialog.
+  (setq epa-file-select-keys 0)
+  ;; Cache passphrase for symmetric encryption.
+  (setq epa-file-cache-passphrase-for-symmetric-encryption t)
+  )
+
 
 ;; *********************************
 ;; Eyebrowse
@@ -548,26 +715,6 @@
   (highlight-indent-guides-method 'character) ; column
   )
 
-
-;; **************************************
-;; show paren mode
-
-;; Highlight (by bolding) the matching parenthesis
-
-(use-package paren
-  :ensure nil
-  :defer 2
-  :custom-face
-  (show-paren-match ((nil (:background "gray" :foreground "steelblue3" :weight bold :box t)))) ;; :box t
-  (show-paren-mismatch ((nil (:background "red" :foreground "black")))) ;; :box t
-  :init
-  (setq show-paren-delay 0)
-  (setq show-paren-highlight-openparen t)
-  (setq show-paren-when-point-inside-paren t)
-  (setq show-paren-when-point-in-periphery t)
-  :config
-  (show-paren-mode +1)
-  )
 
 
 ;; **************************************
@@ -688,20 +835,102 @@
 (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
 
+;; **************************************
+;; show paren mode
+
+;; Highlight (by bolding) the matching parenthesis
+
+(use-package paren
+  :ensure nil
+  :defer 2
+  :custom-face
+  (show-paren-match ((nil (:background nil :foreground "steelblue3" :weight bold :box t)))) ;; :box t
+  (show-paren-mismatch ((nil (:background "red" :foreground "black")))) ;; :box t
+  :preface
+  ;; ======================================================================
+  ;; Display lines matching off-screen parentheses at the top of the window:
+  ;; source: https://with-emacs.com/posts/ui-hacks/show-matching-lines-when-parentheses-go-off-screen/
+  (let ((ov nil)) ; keep track of the overlay
+    (advice-add
+      #'show-paren-function
+      :after
+      (defun show-paren--off-screen+ (&rest _args)
+        "Display matching line for off-screen paren."
+        (when (overlayp ov)
+          (delete-overlay ov))
+        ;; check if it's appropriate to show match info,
+        ;; see `blink-paren-post-self-insert-function'
+        (when (and (overlay-buffer show-paren--overlay)
+                (not (or cursor-in-echo-area
+                       executing-kbd-macro
+                       noninteractive
+                       (minibufferp)
+                       this-command))
+                (and (not (bobp))
+                  (memq (char-syntax (char-before)) '(?\) ?\$)))
+                (= 1 (logand 1 (- (point)
+                                 (save-excursion
+                                   (forward-char -1)
+                                   (skip-syntax-backward "/\\")
+                                   (point))))))
+          ;; rebind `minibuffer-message' called by
+          ;; `blink-matching-open' to handle the overlay display
+          (cl-letf (((symbol-function #'minibuffer-message)
+                      (lambda (msg &rest args)
+                        (let ((msg (apply #'format-message msg args)))
+                          (setq ov (display-line-overlay+
+                                     (window-start) msg ))))))
+            (blink-matching-open))))))
+
+  ;; the overlay used to show the line that matches the offscreen parenthesis
+  (defun display-line-overlay+ (pos str &optional face)
+    "Display line at POS as STR with FACE.
+
+FACE defaults to inheriting from default and highlight."
+    (let ((ol (save-excursion
+                (goto-char pos)
+                (make-overlay (line-beginning-position)
+                  (line-end-position)))))
+      (overlay-put ol 'display str)
+      (overlay-put ol 'face
+        (or face '(:inherit default :inherit highlight)))
+      ol))
+  ;; ======================================================================
+  :init
+  ;; ======================================================================
+  ;; Display lines matching off-screen parentheses at the top of the window:
+  ;; source: https://with-emacs.com/posts/ui-hacks/show-matching-lines-when-parentheses-go-off-screen/
+  ;;
+  ;; PS: DEPENDS ON `;;; -*- lexical-binding: t; -*-' at the top of the file
+  ;; PS: This also uses the function and the var defined in `:preface'
+  ;; we will call `blink-matching-open` ourselves...
+  (remove-hook 'post-self-insert-hook
+    #'blink-paren-post-self-insert-function)
+  ;; this still needs to be set for `blink-matching-open` to work
+  (setq blink-matching-paren 'show)
+  (setq show-paren-style 'paren)
+  (setq show-paren-delay 0.01)
+  (setq show-paren-highlight-openparen t)
+  (setq show-paren-when-point-inside-paren t)
+  (setq show-paren-when-point-in-periphery t)
+  (show-paren-mode +1)
+  ;; ======================================================================
+  )
 
 
 ;; *********************************
 ;; Highlighting parentheses
 
-;; This mode highlights (coloring) the current pair in which the point (cursor) is
+;; This mode highlights (coloring) the current pair in which the point (cursor) is inside
 
 (use-package highlight-parentheses
   :diminish
   :hook
   (prog-mode . highlight-parentheses-mode)
   :init
-  (setq hl-paren-colors '("black" "white" "black" "white"))
-  (setq hl-paren-background-colors '("#44d62c" "#007ad3" "#df0909" "#8233fe"))
+  (setq hl-paren-colors '("black" "white" "black" "black"))
+  (setq hl-paren-background-colors '("yellow" "magenta" "green" "cyan"))
+  (setq hl-paren-highlight-adjacent nil)
   (setq hl-paren-delay 0)
   )
 
@@ -712,8 +941,19 @@
 (use-package rainbow-delimiters
   :hook
   (prog-mode . rainbow-delimiters-mode)
+  :custom-face
+  (rainbow-delimiters-base-error-face ((t (:inherit rainbow-delimiters-base-face :foreground "red"))))
+  (rainbow-delimiters-depth-1-face ((t (:foreground "magenta"))))
+  (rainbow-delimiters-depth-2-face ((t (:foreground "yellow"))))
+  (rainbow-delimiters-depth-3-face ((t (:foreground "green"))))
+  (rainbow-delimiters-depth-4-face ((t (:foreground "cyan"))))
+  (rainbow-delimiters-depth-5-face ((t (:foreground "cyan"))))
+  (rainbow-delimiters-depth-6-face ((t (:foreground "cyan"))))
+  (rainbow-delimiters-depth-7-face ((t (:foreground "cyan"))))
+  (rainbow-delimiters-depth-8-face ((t (:foreground "cyan"))))
+  (rainbow-delimiters-depth-9-face ((t (:foreground "cyan"))))
   :config
-  (setq rainbow-delimiters-max-face-count 3)
+  (setq rainbow-delimiters-max-face-count 9)
   )
 
 ;; *********************************
@@ -977,18 +1217,37 @@ all hooks after it are ignored.")
 
 (use-package evil
   :demand t
-  :config
+  :init
   (evil-mode 1)
-  ;; change cursor color according to mode
+  ;;
+  ;; Change cursor color according to mode
   (setq evil-emacs-state-cursor '("#ff0000" box))
   (setq evil-motion-state-cursor '("#FFFFFF" box))
-  (setq evil-normal-state-cursor '("#00ff00" box))
-  (setq evil-visual-state-cursor '("#abcdef" box))
+  ;; (setq evil-normal-state-cursor '("#00ff00" box))
+  (setq evil-normal-state-cursor '("#b0b1af" box)) ;; vscode cursor color
+  ;; (setq evil-visual-state-cursor '("#abcdef" box))
+  (setq evil-visual-state-cursor '("#007ad3" box))
   (setq evil-insert-state-cursor '("#e2f00f" bar))
   (setq evil-replace-state-cursor '("#ff0000" hbar))
   (setq evil-operator-state-cursor '("#ff0000" hollow))
-  ;; evil in modeline
+
+  ;; Evil in modeline
   (setq evil-mode-line-format '(before . mode-line-front-space)) ;; move evil tag to beginning of modeline
+
+  ;; Changing the mode-line color by evil state
+  ;; `source': https://www.emacswiki.org/emacs/Evil#toc19
+  (let ((default-color (cons (face-background 'mode-line)
+                                 (face-foreground 'mode-line))))
+    (add-hook 'post-command-hook
+      (lambda ()
+        (let ((color (cond ((minibufferp) default-color)
+                       ((evil-insert-state-p) '("#e80000" . "#ffffff"))
+                       ((evil-emacs-state-p)  '("#444488" . "#ffffff"))
+                       ((buffer-modified-p)   '("#006fa0" . "#ffffff"))
+                       (t default-color))))
+          (set-face-background 'mode-line (car color))
+          (set-face-foreground 'mode-line (cdr color))))))
+  :config
   ;;; FOR SOME REASON WHEN I MAP KEYS IN :bind EVIL DOENST LOAD ON STARTUP
   (define-key evil-normal-state-map (kbd "SPC q") 'evil-quit)
   ;; ("SPC q" . kill-buffer-and-window) ;; check if evil quit does this
@@ -996,8 +1255,10 @@ all hooks after it are ignored.")
   (define-key evil-normal-state-map (kbd "SPC d") 'delete-frame)
   (define-key evil-normal-state-map (kbd "SPC k") 'kill-current-buffer)
   (define-key evil-normal-state-map (kbd "SPC 0") 'delete-window)
-  (define-key evil-normal-state-map (kbd "SPC -") 'split-window-bellow)
-  (define-key evil-normal-state-map (kbd "SPC |") 'split-window-right)
+  ;; (define-key evil-normal-state-map (kbd "SPC -") 'split-window-bellow)
+  ;; (define-key evil-normal-state-map (kbd "SPC |") 'split-window-right)
+  (define-key evil-normal-state-map (kbd "SPC -") (lambda () (interactive)(split-window-vertically) (other-window 1)))
+  (define-key evil-normal-state-map (kbd "SPC |") (lambda () (interactive)(split-window-horizontally) (other-window 1)))
   (define-key evil-normal-state-map (kbd "SPC u") 'undo-tree-visualize)
   (define-key evil-normal-state-map (kbd "SPC o") 'other-window)
   (define-key evil-normal-state-map (kbd "h") 'backward-char)
@@ -1015,7 +1276,12 @@ all hooks after it are ignored.")
   (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
   (define-key evil-insert-state-map (kbd "M-w") 'kill-ring-save)
   (define-key evil-insert-state-map (kbd "C-d") 'delete-char)
+  (define-key evil-insert-state-map (kbd "C-y") 'yank)
   (define-key evil-normal-state-map (kbd "C-y") 'yank)
+
+  ;; Improve splittings by already moving to the new windows after splitting
+  (global-set-key "\C-x2" (lambda () (interactive)(split-window-vertically) (other-window 1)))
+  (global-set-key "\C-x3" (lambda () (interactive)(split-window-horizontally) (other-window 1)))
 
   ;; remap native find definition (evil overrides it with some useless function)
   (global-set-key (kbd "M-.") 'xref-find-definitions)
@@ -1026,21 +1292,29 @@ all hooks after it are ignored.")
   (global-set-key (kbd "C-S-L") 'evil-window-right)
   (global-set-key (kbd "C-S-K") 'evil-window-up)
   (global-set-key (kbd "C-S-J") 'evil-window-down)
+
+  ;; treat _ as word constituent so evil doenst see x_y as 2 separate words for operations like selecting and searching
+  ;; `source': https://emacs.stackexchange.com/a/9584
+  (defadvice evil-inner-word (around underscore-as-word activate)
+    (let ((table (copy-syntax-table (syntax-table))))
+      (modify-syntax-entry ?_ "w" table)
+      (with-syntax-table table
+        ad-do-it)))
   )
 
-(use-package vimish-fold
-  :after evil
-  :hook
-  (evil-mode . vimish-mode))
+;; (use-package vimish-fold
+;;   :after evil
+;;   :hook
+;;   (evil-mode . vimish-fold-mode))
 
-(use-package evil-vimish-fold
-  :hook
-  (vimish-mode . global-evil-vimish-fold-mode)
-  :after vimish-fold
-  :init
-  (setq evil-vimish-fold-mode-lighter " ⮒")
-  (setq evil-vimish-fold-target-modes '(prog-mode conf-mode text-mode))
-  )
+;; (use-package evil-vimish-fold
+;;   :hook
+;;   (vimish-fold-mode . global-evil-vimish-fold-mode)
+;;   :after vimish-fold
+;;   :init
+;;   (setq evil-vimish-fold-mode-lighter " ⮒")
+;;   (setq evil-vimish-fold-target-modes '(prog-mode conf-mode text-mode))
+;;   )
 
 
 ;; *********************************
@@ -1076,7 +1350,7 @@ all hooks after it are ignored.")
 
 ;; this package was added to emacs 27
 
-(if EMACS27+
+(if IS-EMACS27+
   (global-so-long-mode 1)
   (use-package so-long
     :config
@@ -1191,18 +1465,6 @@ all hooks after it are ignored.")
   ("C-s" . swiper)
   ("C-c C-r" . ivy-resume)
   ("<f6>" . ivy-resume)
-  ("M-x" . counsel-M-x)
-  ("C-x C-f" . counsel-find-file)
-  ("<f1> f" . counsel-describe-function)
-  ("<f1> v" . counsel-describe-variable)
-  ("<f1> l" . counsel-find-library)
-  ("<f2> i" . counsel-info-lookup-symbol)
-  ("<f2> u" . counsel-unicode-char)
-  ("C-c g t" . counsel-git)
-  ("C-c g g" . counsel-git-grep)
-  ("C-c a g" . counsel-ag)
-  ("C-x l" . counsel-locate)
-  ("C-S-o" . counsel-rhythmbox)
   :config
   (ivy-mode 1)
   ;; Add recent files and bookmarks to the ivy-switch-buffer
@@ -1217,17 +1479,15 @@ all hooks after it are ignored.")
   ;; ;; remove the regex anchor ^ from `counsel-M-x' to match any substring, not only the ones that begin with the input
   ;; (setq ivy-initial-inputs-alist nil)
 
-  (with-eval-after-load 'evil
-    (define-key evil-normal-state-map (kbd "SPC b") 'counsel-switch-buffer)
-    (define-key evil-normal-state-map (kbd "SPC f f") 'counsel-find-file)
-    (define-key evil-normal-state-map (kbd "SPC f z") 'counsel-fzf)
-    (define-key evil-normal-state-map (kbd "SPC p f") 'counsel-projectile-find-file)
-    (define-key evil-normal-state-map (kbd "SPC a g") 'counsel-ag)
-    (define-key evil-normal-state-map (kbd "SPC r g") 'counsel-rg)
-    )
+  ;; define height of ivy windows
+  (setq ivy-height-alist '((t lambda (_caller) (/ (window-height) 4))))
+
+
   ;; Integration with `projectile'
   (with-eval-after-load 'projectile
     (setq projectile-completion-system 'ivy))
+
+
   )
 
 
@@ -1239,9 +1499,112 @@ all hooks after it are ignored.")
   :diminish counsel-mode
   :hook
   (ivy-mode . counsel-mode)
-  :config
-  (eval-when-compile
-    (counsel-mode))
+  :preface
+  ;; find file in parent directory
+  (defun counsel-fzf-find-file-in-parent-dir (&optional dir)
+
+    )
+
+  ;; find file in git project root
+  (defun counsel-fzf-find-file-in-git-project-root (&optional dir)
+    )
+  :bind
+  ("M-x" . counsel-M-x)
+  ;; ("C-x C-f" . counsel-find-file)
+  ("<f1> f" . counsel-describe-function)
+  ("<f1> v" . counsel-describe-variable)
+  ("<f1> l" . counsel-find-library)
+  ("<f2> i" . counsel-info-lookup-symbol)
+  ("<f2> u" . counsel-unicode-char)
+  ("C-c g t" . counsel-git)
+  ("C-c g g" . counsel-git-grep)
+  ("C-c a g" . counsel-ag)
+  ("C-x l" . counsel-locate)
+  ("C-S-o" . counsel-rhythmbox)
+  :init
+  (with-eval-after-load 'evil
+    (define-key evil-normal-state-map (kbd "SPC b") 'counsel-switch-buffer)
+    (define-key evil-normal-state-map (kbd "SPC f f") 'counsel-find-file)
+    ;; grep with counsel
+    (define-key evil-normal-state-map (kbd "SPC a g") 'counsel-ag)
+    (define-key evil-normal-state-map (kbd "SPC r g") 'counsel-rg)
+    ;; counsel-projectile
+    (define-key evil-normal-state-map (kbd "SPC p f") 'counsel-projectile-find-file)
+    (define-key evil-normal-state-map (kbd "SPC p b") 'counsel-projectile-switch-to-buffer)
+    ;; fzf key bindings
+    (define-key evil-normal-state-map (kbd "SPC f z f") 'counsel-fzf)
+    (define-key evil-normal-state-map (kbd "SPC f z p") (lambda () ( counsel-fzf nil (locate-dominating-file default-directory ".git") )))
+    (define-key evil-normal-state-map (kbd "SPC f z g") (lambda () ( counsel-fzf nil (file-name-directory (directory-file-name default-directory) ))))
+    )
+
+
+  ;; Setting fd as the default source for fzf  (to respect gitignore)
+  (setq counsel-fzf-cmd "fd --type f | fzf -f \"%s\"")
+
+  (counsel-mode +1)
+
+
+  ;; protesilaus stuff
+
+  (defun prot/counsel-fzf-rg-files (&optional input dir)
+    "Run `fzf' in tandem with `ripgrep' to find files in the
+present directory.  If invoked from inside a version-controlled
+repository, then the corresponding root is used instead."
+    (interactive)
+    (let* ((process-environment
+             (cons (concat "FZF_DEFAULT_COMMAND=rg -Sn --color never --files --no-follow --hidden")
+               process-environment))
+            (vc (vc-root-dir)))
+      (if dir
+        (counsel-fzf input dir)
+        (if (eq vc nil)
+          (counsel-fzf input default-directory)
+          (counsel-fzf input vc)))))
+
+  (defun prot/counsel-fzf-dir (arg)
+    "Specify root directory for `counsel-fzf'."
+    (prot/counsel-fzf-rg-files ivy-text
+      (read-directory-name
+        (concat (car (split-string counsel-fzf-cmd))
+          " in directory: "))))
+
+  (defun prot/counsel-rg-dir (arg)
+    "Specify root directory for `counsel-rg'."
+    (let ((current-prefix-arg '(4)))
+      (counsel-rg ivy-text nil "")))
+
+  ;; TODO generalise for all relevant file/buffer counsel-*?
+  (defun prot/counsel-fzf-ace-window (arg)
+    "Use `ace-window' on `prot/counsel-fzf-rg-files' candidate."
+    (ace-window t)
+    (let ((default-directory (if (eq (vc-root-dir) nil)
+                               counsel--fzf-dir
+                               (vc-root-dir))))
+      (if (> (length (aw-window-list)) 1)
+        (find-file arg)
+        (find-file-other-window arg))
+      (balance-windows (current-buffer))))
+
+  ;; Pass functions as appropriate Ivy actions (accessed via M-o)
+  (ivy-add-actions
+    'counsel-fzf
+    '(("r" prot/counsel-fzf-dir "change root directory")
+       ("g" prot/counsel-rg-dir "use ripgrep in root directory")
+       ("a" prot/counsel-fzf-ace-window "ace-window switch")))
+
+  (ivy-add-actions
+    'counsel-rg
+    '(("r" prot/counsel-rg-dir "change root directory")
+       ("z" prot/counsel-fzf-dir "find file with fzf in root directory")))
+
+  (ivy-add-actions
+    'counsel-find-file
+    '(("g" prot/counsel-rg-dir "use ripgrep in root directory")
+       ("z" prot/counsel-fzf-dir "find file with fzf in root directory")))
+
+
+
+
   )
 
 ;; ** Counsel integration for Projectile
@@ -1365,46 +1728,44 @@ all hooks after it are ignored.")
   (ivy-posframe ((t (:background "#202020"))))
   (ivy-posframe-border ((t (:background "#9370DB"))))
   (ivy-posframe-cursor ((t (:background "#00ff00"))))
-  :config
-  (eval-when-compile
-    (setq ivy-posframe-width 130)
-    (setq ivy-posframe-internal-border-width 3)
-    (setq ivy-posframe-parameters
-      '(
-         (left-fringe . 8)
-         (right-fringe . 8)
-         (internal-border-width . 1)
-         (alpha . 85)
-         ))
-    ;; define the position of the posframe per function
-    (setq ivy-posframe-display-functions-alist
-      '(
-         (counsel-M-x     . nil)
-         (swiper          . nil)
-         (complete-symbol . ivy-posframe-display-at-point)
-         (t               . ivy-posframe-display-at-frame-center)
-         ))
-    ;; custom define height of post frame per function
-    (setq ivy-posframe-height-alist
-      '(
-         (find-file . 15)
-         (counsel-find-file . 15)
-         (counsel-projectile-find-file . 15)
-         (switch-buffer . 15)
-         (counsel-switch-buffer . 15)
-         (counsel-ag . 15)
-         (counsel-projectile-ag . 30)
-         (counsel-rg . 15)
-         (counsel-projectile-rg . 30)
-         (t . 20)
-         ))
-    (ivy-posframe-mode 1)
-    )
+  ;; troquei do :config pra :init e nao precisou de (eval-after-load nem de :demand t)
+  :init
+  (setq ivy-posframe-width 80)
+  (setq ivy-posframe-internal-border-width 5)
+  (setq ivy-posframe-parameters
+    '(
+       (left-fringe . 8)
+       (right-fringe . 8)
+       (internal-border-width . 5)
+       (alpha . 85)
+       ))
+  ;; define the position of the posframe per function
+  (setq ivy-posframe-display-functions-alist
+    '(
+       (counsel-M-x     . ivy-display-function-fallback)
+       (swiper          . ivy-display-function-fallback)
+       (complete-symbol . ivy-posframe-display-at-point)
+       (t               . ivy-posframe-display-at-frame-center)
+       ))
+  ;; custom define height of post frame per function
+  (setq ivy-posframe-height-alist
+    '(
+       (counsel-find-file . 12)
+       (counsel-projectile-find-file . 15)
+       (counsel-switch-buffer . 15)
+       (counsel-projectile-switch-to-buffer . 15)
+       (counsel-projectile-switch-project . 10)
+       (counsel-ag . 30)
+       (counsel-projectile-ag . 30)
+       (counsel-rg . 30)
+       (counsel-projectile-rg . 30)
+       (t . 20)
+       ))
+  (ivy-posframe-mode 1)
   )
 
 ;; disabled to see if ill miss it
 (use-package ivy-explorer
-  :disabled
   :diminish
   :after ivy
   :config
@@ -1679,9 +2040,14 @@ all hooks after it are ignored.")
 ;; *********************************
 ;;; subword-mode
 
-;; change all cursor movement/edit commands to stop in-between the “camelCase” words.
+;; treats camelCased words like two words
+;; Change all cursor movement/edit commands to stop in-between the “camelCase” words.
 ;; subword-mode and superword-mode are mutally exclusive. Turning one on turns off the other.
 
+;; Nomenclature           Subwords
+;; ===========================================================
+;; GtkWindow          =>  "Gtk" and "Window"
+;; EmacsFrameClass    =>  "Emacs", "Frame" and "Class"
 
 (use-package subword
   :ensure nil
@@ -1693,15 +2059,17 @@ all hooks after it are ignored.")
 ;; *********************************
 ;;; superword-mode
 
-;; treats text like “x_y” as one word. Useful for “snake_case”.
+;; change all cursor movement/edit commands to stop in-between the "camelCase" words.
+;; It treats text like “x_y” as one word. Useful for "snake_case".
+;; In evil-mode it still treats _ as a symbol and stops at it, so a advice is defined in the evil use-package block to solve that
 ;; subword-mode and superword-mode are mutally exclusive. Turning one on turns off the other.
-
 (use-package superword
   :ensure nil
   :hook
   (clojure-mode . superword-mode)
   (ruby-mode . superword-mode)
   (elixir-mode . superword-mode)
+  (emacs-lisp-mode . superword-mode)
   (emacs-lisp-mode . superword-mode)
   )
 
@@ -2021,8 +2389,6 @@ all hooks after it are ignored.")
 
 (use-package company
   :demand t
-  :hook
-  (prog-mode . company-mode)
   :bind
   ("C-SPC" . company-indent-or-complete-common)
   (:map company-active-map
@@ -2050,7 +2416,7 @@ all hooks after it are ignored.")
   (company-selection-wrap-around t) ; loop over candidates
   (company-tooltip-margin 1) ;; width of margin columns to show around the tooltip
   (company--show-numbers 1)
-  :config
+  :init
   (global-company-mode +1)
   (bind-key [remap completion-at-point] #'company-complete company-mode-map)
   ;; show tooltip even for single candidates
@@ -2059,13 +2425,10 @@ all hooks after it are ignored.")
 ;; *********************************
 ;; company posframe
 
-;; took the entire thing from M-EMACS
-(use-package company-posframe
-  :hook
-  ((company-mode global-company-mode) . company-posframe-mode)
-  :config
-  (company-posframe-mode 1)
-  )
+;; (use-package company-posframe
+;;   :hook
+;;   ((company-mode global-company-mode) . company-posframe-mode)
+;;   )
 
 ;; *********************************
 ;; company box
@@ -2161,11 +2524,13 @@ all hooks after it are ignored.")
 (use-package company-quickhelp
   :disabled
   :after company
+  :hook
+  ((company-mode global-company-mode) . company-quickhelp-mode)
   :bind
   (:map company-active-map
     ("M-h" . company-quickhelp-manual-begin)
     )
-  :config
+  :init
   (setq company-quickhelp-delay 1)
   (company-quickhelp-mode)
   )
@@ -2191,6 +2556,7 @@ all hooks after it are ignored.")
     ("C-c l g i" . lsp-goto-implementation)
     ("C-c l f i" . lsp-find-implementation)
     ("C-c l m"   . lsp-ui-imenu)
+    ("M-RET"   . lsp-execute-code-action)
     ("C-c l s"   . lsp-ui-sideline-mode))
   :config
   ;; perfomance settings from lsp official github page
@@ -2930,10 +3296,17 @@ all hooks after it are ignored.")
 ;; WEB DEVELOPMENT TOOLS
 
 (use-package dotenv-mode
+  :demand t
   :mode
-  (("\\.env\\'" . dotenv-mode)
+  (("\\.env*\\'" . dotenv-mode)
     ("\\.env.dev\\'" . dotenv-mode)
-    ("\\.env.prod\\'" . dotenv-mode))
+    ("\\.env.development\\'" . dotenv-mode)
+    ("\\.env.staging\\'" . dotenv-mode)
+    ("\\.env.hml\\'" . dotenv-mode)
+    ("\\.env.test\\'" . dotenv-mode)
+    ("\\.env.tst\\'" . dotenv-mode)
+    ("\\.env.prod\\'" . dotenv-mode)
+    ("\\.env.production\\'" . dotenv-mode))
   )
 
 ;; *********************************
@@ -3007,6 +3380,9 @@ all hooks after it are ignored.")
 (use-package dockerfile-mode
   :mode
   ("\\Dockerfile\\'" . dockerfile-mode)
+  ("\\Dockerfile-prod\\'" . dockerfile-mode)
+  ("\\Dockerfile-tst\\'" . dockerfile-mode)
+  ("\\Dockerfile-hml\\'" . dockerfile-mode)
   )
 
 (use-package docker-compose-mode
@@ -3055,7 +3431,7 @@ all hooks after it are ignored.")
 (use-package go-mode
   :mode
   ("\\.go$" . go-mode)
-  :config
+  :init
   (add-hook 'before-save-hook #'gofmt-before-save)
   )
 
@@ -3183,7 +3559,8 @@ all hooks after it are ignored.")
 ;; diffview
 ;; View diffs side by side
 
-(use-package diffview)
+(use-package diffview
+  :defer 4)
 
 ;; *********************************
 ;; vc-msg
@@ -3197,7 +3574,7 @@ all hooks after it are ignored.")
   (setq git-messenger:show-detail t)
   (setq git-messenger:use-magit-popup t)
   :config
-  (define-key git-messenger-map (kbd "RET") 'git-messenger:popup-close)
+  ;; (define-key git-messenger-map (kbd "RET") 'git-messenger:popup-close)
   (add-hook 'activate-mark-hook '(lambda () (vc-msg-show)))
   (add-hook 'mouse-position-function '(lambda () (vc-msg-show)))
   )
@@ -3467,10 +3844,33 @@ all hooks after it are ignored.")
            'restclient-http-send-current-stay-in-window))))
   )
 
+;; ------------------------------
+;;
+;; * markdown
 
+(use-package markdown-mode
+  )
+
+(use-package grip-mode
+  :defer 2
+  :bind
+  (:map markdown-mode-command-map
+    ;; Make a keybinding: `C-c C-c g'
+    ("g" . grip-mode))
+  ;; :hook
+  ;; (markdown-mode . grip-mode)
+  ;; (org-mode . grip-mode)
+  ;; :init
+  ;; get my user and pass from ~/.authinfo
+  ;; (require 'auth-source)
+  ;; (let ((credential (auth-source-user-and-password "api.github.com")))
+  ;;   (setq grip-github-user (car credential)
+  ;;     grip-github-password (cadr credential)))
+  )
+
+;; ------------------------------
+;;
 ;; * ORG-MODE
-
-;; ** org-mode setup
 
 (use-package org
   :ensure org-plus-contrib
@@ -3583,14 +3983,4 @@ all hooks after it are ignored.")
 
 
 
-
-(use-package gcmh
-  :demand t
-  :init
-  (setq gcmh-verbose             t
-    gcmh-lows-cons-threshold #x800000
-    gcmh-high-cons-threshold most-positive-fixnum
-    gcmh-idle-delay          3600)
-  :config
-  (gcmh-mode 1)
-  )
+;; (setq gc-cons-threshold (* gc-cons-threshold 4))

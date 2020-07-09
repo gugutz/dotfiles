@@ -1,4 +1,33 @@
 #################################################################
+# change monitors layout
+#################################################################
+
+# HOME
+
+# mirrored layout
+super + ctrl + shift + 1
+  xrandr --output DVI-I-2 --mode 1920x1080 --rotate normal --output DVI-I-1 --mode 1280x1024 --same-as $home_primary_monitor; exec notify-send 'using home single monitor layout'
+
+# extended layout
+super + ctrl + shift + 1
+  xrandr --output DVI-I-1 --mode 1280x1024 --pos 0x0 --rotate normal --output DVI-I-2 --primary --mode 1920x1080 --pos 1280x0 --rotate normal; exec notify-send 'using home single monitor layout'
+
+# WORK (qualirede notebook)
+
+# just the notebook screen
+super + ctrl + shift + 8
+  xrandr --output eDP1 --primary --mode 1920x1080 --pos 0x0 --rotate normal --output DP1 --off; exec notify-send 'using work single monitor layout'
+
+# mirrored layout
+super + ctrl + shift + 9
+  xrandr --output eDP1 --mode 1920x1080 --pos 0x0 --rotate normal --output DP1 --primary --mode 1920x1080 --pos 0x0 --rotate normal;  exec notify-send 'using work mirrored monitor layout'
+
+# extended layout
+super + ctrl + shift + 0
+  xrandr --output eDP1 --mode 1920x1080 --pos 0x0 --rotate normal --output DP1 --primary --mode 1920x1080 --pos 1920x0 --rotate normal --output DP2 --off --output HDMI1 --off --output VIRTUAL1 --off;  exec notify-send 'using work dual monitor extended layout'
+
+
+#################################################################
 # wm independent hotkeys
 #################################################################
 
@@ -60,11 +89,11 @@ super + Escape
 # bspwm hotkeys
 #################################################################
 
-# quit / restart bspwm
+# quit bspwm
 super + alt + q
 	bspc quit
 
-# quit / restart bspwm
+# restart bspwm
 super + alt + r
 	bspc wm -r
 
@@ -273,4 +302,3 @@ super + ctrl + shift + Print
 # lockscreen
 super + alt + 9
     betterlockscreen -u ~/wallpapers --lock dimblur
-
