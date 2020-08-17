@@ -26,57 +26,9 @@
 
 # prints message to indicate sourcing of this file
 echo ".profile is being sourced."
-###########################################
-# SYSTEM WIDE ENV VARS
-###########################################
-
-# add ~/bin to PATH
-export PATH=$PATH:$HOME/bin
-
-# add ~/.local/bin to PATH
-export PATH=$PATH:$HOME/.local/bin
-
-# add /usr/local to PATH
-export PATH=$PATH:/usr/local/bin
-
-# add /opt to PATH
-export PATH=$PATH:/opt
-
-#-----------------------------------------
-# DEFAULT PROGRAMS
-
-export EDITOR=/usr/bin/vim
-export QT_QPA_PLATFORMTHEME="qt5ct"
-export GTK2_RC_FILES="$HOME/.gtkrc-2.0"
-# fix "xdg-open fork-bomb" export your preferred browser from here
-export BROWSER=/usr/bin/google-chrome-stable
-
-#-----------------------------------------
-# ssh
-export SSH_KEY_PATH="$HOME/.ssh/id_rsa"
-
-# Setting xterm to use 256 colors
-export TERM=xterm-256color
-
-export PAGER=/usr/bin/less
-
-# NVM
-export NVM_DIR="$HOME/.nvm"
-
-# Yarn
-export YVM_DIR="$HOME/.yvm"
-
-# gradle
-export PATH=$PATH:/opt/gradle/gradle-4.8/bin
-# spring boot
-export PATH=$PATH:/opt/spring
-
-# if bat is installed, use it also for colored man pages
-[ -x "$(command -v bat)" ] && export MANPAGER="sh -c 'col -bx | bat -l man -p'"
-
 
 #########################################
-# XDG Base Directories
+# XDG BASE DIRECTORIES SETUP
 #########################################
 
 # user directories
@@ -89,3 +41,64 @@ export XDG_CONFIG_HOME="$HOME/.config"
 # system directories
 export XDG_DATA_DIRS=/usr/local/share/:/usr/share/
 export XDG_CONFIG_DIRS=/etc/xdg
+
+###########################################
+# PATH SETUP
+###########################################
+
+# add several usefull folders to executable path
+PATH=$PATH:$HOME/bin
+PATH=$PATH:$HOME/.local/bin
+PATH=$PATH:/usr/local/bin
+
+# add /opt to PATH
+PATH=$PATH:/opt
+PATH=$PATH:/opt/bin
+
+export PATH
+
+# Setting xterm to use 256 colors
+export TERM=xterm-256color
+
+###########################################
+# BSPWM RELATED
+###########################################
+
+export BSPWM_SOCKET="/tmp/bspwm-socket"
+
+# add my bspwm scripts folder to path
+export PATH=$PATH:"$XDG_CONFIG_HOME/bspwm/scripts"
+# add my sxhkd scripts folder to path
+export PATH=$PATH:"$XDG_CONFIG_HOME/sxhkd/scripts"
+
+#########################################
+# DEFAULT APPLICATIONS ENVS
+#########################################
+
+export TERMINAL=/usr/bin/alacritty
+export EDITOR=/usr/bin/vim
+export VISUAL=/usr/bin/vim
+export GUI_EDITOR=/usr/bin/micro
+export QT_QPA_PLATFORMTHEME="qt5ct"
+export GTK2_RC_FILES="$HOME/.gtkrc-2.0"
+# fix "xdg-open fork-bomb" export your preferred browser from here
+# export BROWSER=/usr/bin/google-chrome-stable
+export BROWSER=/usr/bin/firefox
+export PAGER=/usr/bin/less
+
+# if bat is installed, use it also for colored man pages
+[ -x "$(command -v bat)" ] && export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+
+#-----------------------------------------
+# ssh
+export SSH_KEY_PATH="$HOME/.ssh/id_rsa"
+
+#########################################
+# OTHER APPLICATIONS ENVS
+#########################################
+
+# NVM
+export NVM_DIR="$HOME/.nvm"
+
+# Yarn
+export YVM_DIR="$HOME/.yvm"

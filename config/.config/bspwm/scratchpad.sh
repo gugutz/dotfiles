@@ -8,5 +8,5 @@ fi
 pids=$(xdotool search --class ${1})
 for pid in $pids; do
 	echo "Toggle $pid"
-	bspc node $pid --flag hidden -f
+	bspc node $pid --flag hidden -d focused -f
 done

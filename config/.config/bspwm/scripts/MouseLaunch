@@ -1,0 +1,30 @@
+#!/bin/bash
+# Get the necessary info
+# Script copied from https://github.com/tatou-tatou, edited to add options for the menu to use
+eval $(xdotool getmouselocation --shell)
+IFS=" " read -a window <<< $(wattr whxy $(bspc query -N -n focused))
+# Distance to each side
+north=$((($Y - ${window[3]}) * 100 / ${window[1]} ))
+south=$(((${window[3]} + ${window[1]} - $Y) * 100 / ${window[1]} ))
+west=$((($X - ${window[2]}) * 100 / ${window[0]} ))
+east=$(((${window[2]} + ${window[0]} - $X) * 100 / ${window[1]} ))
+# Find the minimal distance
+dir_final="north"
+for dir in south west east; do
+if [ "${!dir}" -lt "${!dir_final}" ]; then
+    dir_final=$dir
+fi
+done
+
+# Send the presel signal
+bspc node -p cancel # Necessary if you have set auto_cancel to true
+bspc node -p $dir_final
+
+# Spawn a menu to launch a program
+#mmaker -c mygtkmenu -t urxvt --no-debian --no-legacy > ~/.mygtkmenu.txt && mygtkmenu ~/.mygtkmenu.txt > /dev/null || bspc window -p cancel
+#xfce4-popup-applicationsmenu || bspc window -p cancel
+#mygtkmenu ~/.config/GTKmenu/appmenu
+#dboxmenu
+##Use this if you use xfdesktop. You need to modify the sxhkdrc for it (search for clickpasser).
+#xfdesktop --menu
+## WARNING: The "||" only males sense if you apply my patch to mygtkmenu!

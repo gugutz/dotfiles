@@ -1,22 +1,11 @@
-;==========================================================
-;
-;   ██████╗  ██████╗ ██╗  ██╗   ██╗██████╗  █████╗ ██████╗
-;   ██╔══██╗██╔═══██╗██║  ╚██╗ ██╔╝██╔══██╗██╔══██╗██╔══██╗
-;   ██████╔╝██║   ██║██║   ╚████╔╝ ██████╔╝███████║██████╔╝
-;   ██╔═══╝ ██║   ██║██║    ╚██╔╝  ██╔══██╗██╔══██║██╔══██╗
-;   ██║     ╚██████╔╝███████╗██║   ██████╔╝██║  ██║██║  ██║
-;   ╚═╝      ╚═════╝ ╚══════╝╚═╝   ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
-;
-;==========================================================
+; my polybar config
 
-
-# great list of glyphs and icons for copying and pasting
-# https://fontawesome.com/cheatsheet
+;# great list of glyphs and icons for copying and pasting
+;# https://fontawesome.com/cheatsheet
 
 [separators]
 ; left = 
 ; right = 
-
 left = "%{T3}%{T-}"
 right = "%{T3}%{T-}"
 
@@ -29,16 +18,19 @@ right = "%{T3}%{T-}"
 ; left = 
 ; right = 
 
-########################################################
-# Colors
+;########################################################
+;# Colors
 
 [colors]
 
 ; polybar themes colors to use the color switcher
+; these are altered on the fly by sed when a style is picked
+;; DONT ALIGN BY REGEXP "=" here, or the color-switcher script wont work because the sed commands dont treat whitespace
 bg = #1F1F1F
+module-bg = #1F1F1F
 fg = #FFFFFF
 fg-alt = #A9ABB0
-acolor = #5e35b1
+acolor = #00acc1
 curgent = #e53935
 coccupied = #1e88e5
 primary = #3f3f3f
@@ -47,154 +39,163 @@ alert = #FF0000
 empty = #555555
 vscode-blue = #007ad3
 
+;# separators
+separator1           = #00FF41
+separator2           = #00FF41
+
+; Xresources colors to use with PYWAL
+; bg                 = #1F1F1F
+; fg                 = #FFFFFF
+; fg-alt             = #A9ABB0
+; primary            = ${xrdb:color1:#222}
+; secondary          = ${xrdb:color2:#222}
+; alert              = ${xrdb:color3:#222}
+
 ; matrix colorcheme
 matrix-vampire-black = #0D0208
-matrix-dark-green = #003B00
+matrix-dark-green    = #003B00
 matrix-islamic-black = #008F11
-matrix-malachite = #00FF41
+matrix-malachite     = #00FF41
 
 ; Modules colors
-bspwm = #7FFF00
-bspwm-alert-fg = #FFFFFF
-bspwm-alert-bg = #1F1F1F
-bspwm-background = #3F3F3F
-bspwm-dimmed-fg = #FFFFFF
-bspwm-dimmed-bg = #1F1F1F
+bspwm                = #7FFF00
+bspwm-alert-fg       = #FFFFFF
+bspwm-alert-bg       = #1F1F1F
+bspwm-background     = #3F3F3F
+bspwm-dimmed-fg      = #FFFFFF
+bspwm-dimmed-bg      = #1F1F1F
+user                 = #7DF059
+volume               = #8FF6FF
+xbacklight           = #C8F059
+nvidia               = #7FFF00
+ram                  = #D6AA3F
+cpu                  = #D6AA3F
+temperature          = #DC143C
+bluetooth            = #00BFFF
+wifi                 = #00BFFF
+ethernet             = #27A2FF
+calendar             = #00FF7F
+clock                = #00FF7F
+battery              = #FFFF00
+mocp                 = #FBA922
+mpd-playing          = #53FF56
+mpd-paused           = #FBA922
+mpd-offline          = #69656F
+spotify              = #1DB954
+xwindow              = #FF4500
+weather              = #00BFFF
+uptime               = #9B78F1
+powermenu            = #FFA707
+powermenu-close      = #FF4500
 
-user = #7DF059
-volume = #8FF6FF
-xbacklight = #C8F059
-nvidia = #7FFF00
-ram = #D6AA3F
-cpu = #D6AA3F
-temperature = #DC143C
-bluetooth = #00BFFF
-wifi = #00BFFF
-ethernet = #27A2FF
-calendar = #00FF7F
-clock = #00FF7F
-battery = #FFFF00
-mocp = #FBA922
-mpd-playing = #53FF56
-mpd-paused = #FBA922
-mpd-offline = #69656F
-spotify = #1DB954
-xwindow = #FF4500
-weather = #00BFFF
-uptime = #9B78F1
-powermenu = #FFA707
-powermenu-close = #FF4500
+; Material Colors
+material-white       = #ffffff
+material-red         = #e53935
+material-pink        = #d81b60
+material-purple      = #8e24aa
+material-deep-purple = #5e35b1
+material-indigo      = #3949ab
+material-blue        = #1e88e5
+material-light-blue  = #039be5
+material-cyan        = #00acc1
+material-teal        = #00897b
+material-green       = #43a047
+material-light-green = #7cb342
+material-lime        = #c0ca33
+material-yellow      = #fdd835
+material-amber       = #ffb300
+material-orange      = #fb8c00
+material-deep-orange = #f4511e
+material-brown       = #6d4c41
+material-grey        = #757575
+material-blue-gray   = #546e7a
 
-# separators
-separator1 = #00FF41
-separator2 = #00FF41
-
-## Material Colors
-white = #ffffff
-red = #e53935
-pink = #d81b60
-purple = #8e24aa
-deep-purple = #5e35b1
-indigo = #3949ab
-blue = #1e88e5
-light-blue = #039be5
-cyan = #00acc1
-teal = #00897b
-green = #43a047
-light-green = #7cb342
-lime = #c0ca33
-yellow = #fdd835
-amber = #ffb300
-orange = #fb8c00
-deep-orange = #f4511e
-brown = #6d4c41
-grey = #757575
-blue-gray = #546e7a
-
-##########################################################################
+;##########################################################################
 ; BARS
-##########################################################################
+;##########################################################################
 
-[bar/gugutz_top]
+[bar/main_top]
 
-modules-left = user settings filesystem
-# the bluetooth module was preventing the bar from updating when the colorscheme is choosen
-modules-right = openweathermap-detailed memory cpu temperature uptime network colorswitcher powermenu
+modules-left = user cpu temperature memory settings
+; the bluetooth module was preventing the bar from updating when the colorscheme is choosen
+modules-center = calendar clock openweathermap-detailed
+modules-right = uptime network battery colorswitcher powermenu powermenu2
 
-monitor = ${env:MONITOR:DP1}
-monitor-fallback = ${env:MONITOR:eDP1}
+monitor = ${env:MONITOR:DP-1}
+monitor-fallback = ${env:MONITOR:eDP-1}
 
 cursor-click = pointer
 
 fixed-center = true
 wm-restack = bspwm
 
-; this is required for i3 on polybar, but it i enable this, the top bar somehow lets the windows overflow it
-;override-redirect = true
 
 enable-ipc = true
 
 ; APPEARANCE
 width = 100%
-height = 17
-#offset-x = 1%
-#offset-y = 1%
+height = 30
+offset-x = 0%
+offset-y = 0%
 background = ${colors.bg}
 foreground = ${colors.fg}
-border-size = 4
+border-size = 0
 border-color = ${colors.bg}
 underline-size = 0
-overline-size = 3
+overline-size = 0
 padding-left = 1
 padding-right = 1
-module-margin-left = 1
-module-margin-right = 1
+module-margin-left = 2
+module-margin-right = 2
 
-font-0 = "DejaVu Sans Mono Nerd Font:size=9.5;2"
-font-1 = "Monospace:size=10.5;2"
-; font-2 = "Hack Nerd Font:size=10;2"
-font-2 = "FontAwesome:size=11;2"
-font-3 = "MaterialIcons:size=11;2"
+font-0 = "Fantasque Sans Mono:pixelsize=10;2"
+font-1 = "DejaVu Sans Mono Nerd Font:size=9.5;2"
+font-2 = "MaterialIcons:size=12;2"
+font-3 = "FontAwesome:size=11;2"
 font-4 = "Weather Icons:size=11;2"
-font-5 = "Noto Sans CJK JP:size=11;2"
+font-5 = "Monospace:size=10.5;2"
 
 
-####################################################################
+;###################################################################
 
-[bar/gugutz_bottom]
-
-modules-left = menu bspwm
-modules-center = xwindow
-modules-right = wired-network calendar clock pulseaudio calculator powermenu2
+[bar/main_bottom]
 
 bottom = true
 
-monitor = ${env:MONITOR:DVI-I-2}
-monitor-fallback = ${env:MONITOR:DP1}
+modules-left = menu bspwm xwindow
+modules-right = wired-network wireless-network pulseaudio calculator system-settings
 
-# this makes polybar hide when a window is full screen
+
+monitor = ${env:MONITOR:DP-1}
+monitor-fallback = ${env:MONITOR:eDP-1}
+
+tray-maxsize = 100
+; tray-position = ${env:TRAY_POSITION:right}
+tray-position = right
+tray-padding = 5
+tray-background = ${colors.bg}
+
+; this makes polybar hide when a window is full screen
 wm-restack = bspwm
+
+; this is required for i3 on polybar, but it i enable this, the top bar somehow lets the windows overflow it
+; override-redirect = true
 
 radius = 0.0
 fixed-center = true
 
 enable-ipc = true
 
-tray-maxsize = 25
-;tray-position = ${env:TRAY_POSITION:right}
-tray-position = right
-tray-padding = 5
-tray-background = ${colors.bg}
 
 ; APPEARANCE
 width = 100%
-height = 22
+height = 33
 #offset-x = 1%
 #offset-y = 1%
 cursor-click = pointer
 background = ${colors.bg}
 foreground = ${colors.fg}
-border-size = 2
+border-size = 0
 border-color = ${colors.border}
 line-size = 2
 underline-size = 0
@@ -204,12 +205,13 @@ padding-right = 2
 module-margin-left = 1
 module-margin-right = 1
 
-font-0 = "DejaVu Sans Mono Nerd Font:size=11;2"
-font-1 = "Monospace:size=10.5;2"
-font-2 = "FontAwesome:size=11;2"
-font-3 = "MaterialIcons:size=11;2"
+font-0 = "DejaVu Sans Mono Nerd Font:size=9.5;2"
+font-1 = "Fantasque Sans Mono:pixelsize=12;2"
+font-2 = "MaterialIcons:size=12;2"
+font-3 = "FontAwesome:size=11;2"
 font-4 = "Weather Icons:size=11;2"
-font-5 = "Noto Sans CJK JP:size=11;2"
+; font-5 = "Monospace:size=10.5;2"
+font-5 = "file\-icons:size=10.5;2"
 
 ; mouse scroll-over action
 scroll-up = bspwm-desknext
@@ -217,17 +219,17 @@ scroll-down = bspwm-deskprev
 ; scroll-up = i3wm-wsnext
 ; scroll-down = i3wm-wsprev
 
-#######################################################
+;#######################################################
 ; BOTTOM BARS
 
-[bar/second_monitor_bar_top]
+[bar/secondary_monitor_top]
 
 modules-left = powermenu
 modules-center = xwindow
 modules-right = calendar clock
 
-monitor = ${env:MONITOR:DVI-I-1}
-monitor-fallback = ${env:MONITOR:eDP1}
+monitor = ${env:MONITOR:eDP-1}
+monitor-fallback = ${env:MONITOR:DVI-I-1}
 
 fixed-center = true
 wm-restack = bspwm
@@ -256,17 +258,17 @@ font-3 = "MaterialIcons:size=11;2"
 font-4 = "Weather Icons:size=11;2"
 font-5 = "Noto Sans CJK JP:size=11;2"
 
-############################################################################
+;############################################################################
 
-[bar/second_monitor_bar_bottom]
+[bar/secondary_monitor_bottom]
 
 modules-left = bspwm
 modules-right = wired-network uptime powermenu
 
 bottom = true
 
-monitor = ${env:MONITOR:DVI-I-1}
-monitor-fallback = ${env:MONITOR:eDP1}
+monitor = ${env:MONITOR:eDP-1}
+monitor-fallback= ${env:MONITOR:DVI-I-1}
 
 radius = 0.0
 fixed-center = true
@@ -306,20 +308,10 @@ scroll-down = bspwm-deskprev
 ; scroll-down = i3wm-wsprev
 
 
-###########################################################################
-# MODULES
-###########################################################################
+;###########################################################################
+;# MODULES
+;###########################################################################
 
-[module/xwindow]
-type = internal/xwindow
-label = %title:0:46:...%
-format-underline = ${colors.xwindow}
-format-prefix = ${separators.right}
-format-suffix = ${separators.left}
-format-prefix-foreground = ${self.format-underline}
-format-suffix-foreground = ${self.format-underline}
-
-####################################################
 
 [module/bspwm]
 type = internal/bspwm
@@ -344,19 +336,21 @@ reverse-scroll = false
 fuzzy-match = true
 
 
-ws-icon-0 = 1;
+ws-icon-0 = 1;
 ; ws-icon-0 = 1;
-; ws-icon-0 = 1;
 ws-icon-1 = 2;
 ws-icon-2 = 3;
 ; ws-icon-3 = 4;
-ws-icon-3 = 4;
+ws-icon-3 = 4;
+; ws-icon-3 = 4;
 
 ws-icon-4 = 5;
 ws-icon-5 = 6;
 ws-icon-6 = 7;
 ws-icon-7 = 8;
-ws-icon-8 = 9;
+; ws-icon-8 = 9;
+; ws-icon-8 = 9;
+ws-icon-8 = 9;
 ; ws-icon-9 = 10;
 ws-icon-9 = 10;
 ws-icon-default = ♟
@@ -394,8 +388,11 @@ label-focused-foreground = ${colors.fg}
 label-focused-background = ${colors.acolor}
 label-focused-underline = ${colors.bspwm}
 
+
 label-occupied = %icon%
 label-occupied-underline = ${colors.empty}
+label-occupied-foreground = ${colors.acolor}
+label-occupied-background = ${colors.bg}
 
 label-urgent = %icon% %name%
 label-urgent-foreground = ${colors.bspwm-alert-fg}
@@ -403,6 +400,7 @@ label-urgent-background = ${colors.bg}
 label-urgent-underline = ${colors.bspwm-alert-fg}
 
 label-empty = %icon%
+; label-empty-foreground = ${colors.empty}
 label-empty-foreground = ${colors.empty}
 ; label-empty-background = ${colors.bspwm-background}
 ; label-empty-underline = ${colors.bspwm-alert}
@@ -429,7 +427,723 @@ label-empty-foreground = ${colors.empty}
 label-separator-padding = 0
 label-separator-foreground = ${colors.acolor}
 
-####################################################
+
+;###########################################################################
+
+[module/uptime]
+type = custom/script
+interval = 30
+exec = ~/.config/polybar/scripts/uptime.sh
+label = %output%
+format = <label>
+; format-suffix = "  "
+format-suffix = " uptime"
+format-suffix-foreground =  ${colors.uptime}
+format-underline =  ${colors.uptime}
+
+content-foreground = ${colors.fg}
+content-background = ${colors.module-bg}
+
+;###########################################################################
+
+[module/openweathermap-detailed]
+type = custom/script
+exec = ~/.config/polybar/scripts/openweathermap-detailed.sh
+interval = 600
+format = " <label> "
+format-underline = ${colors.weather}
+format-foreground = ${colors.fg}
+
+;###########################################################################
+
+[module/user]
+type = custom/text
+#content = ${env:USER:Tux}
+content = "tau |  @ "
+; content = "tau 滑" ;
+content-prefix = "   "
+; content-suffix = "  "
+content-prefix-foreground = ${colors.user}
+content-suffix-foreground = ${colors.fg}
+content-foreground = ${colors.fg}
+; content-background = ${colors.bg} ; make it blend with the bar
+content-background = ${colors.module-bg}
+content-underline = ${colors.user}
+;####################################################
+
+[module/cpu]
+type = internal/cpu
+interval = 2
+; Available tags:
+;   <label> (default)
+;   <bar-load>
+;   <ramp-load>
+;   <ramp-coreload>
+format = <label>
+format-underline =  ${colors.cpu}
+; format-suffix = "  "
+format-prefix = "  "
+format-suffix-foreground = ${self.format-underline}
+
+; Available tokens:
+;   %percentage% (default) - total cpu load averaged over all cores
+;   %percentage-sum% - Cumulative load on all cores
+;   %percentage-cores% - load percentage for each core
+;   %percentage-core[1-9]% - load percentage for specific core
+label = CPU %percentage%%
+; label = %percentage%%
+
+; Spacing between individual per-core ramps
+ramp-coreload-spacing = 1
+ramp-coreload-0 = ▁
+ramp-coreload-1 = ▂
+ramp-coreload-2 = ▃
+ramp-coreload-3 = ▄
+ramp-coreload-4 = ▅
+ramp-coreload-5 = ▆
+ramp-coreload-6 = ▇
+ramp-coreload-7 = █
+
+;##########################################################
+
+[module/temperature]
+type = internal/temperature
+thermal-zone = 0
+
+; Base temperature for where to start the ramp (in degrees celsius)
+; Default: 0
+base-temperature = 20
+warn-temperature = 65
+
+format =  <ramp> <label>
+format-underline = ${colors.temperature}
+format-warn = <label-warn> <ramp>
+format-warn-underline = ${self.format-underline}
+
+label = %temperature-c%
+label-warn = %temperature-c%
+label-warn-foreground = ${colors.alert}
+
+; 
+ramp-0 = 
+ramp-1 = 
+ramp-2 = 
+ramp-3 = 
+ramp-4 = 
+ramp-foreground = ${colors.temperature}
+
+;####################################################
+
+[module/memory]
+type = internal/memory
+interval = 2
+
+; Available tags:
+;   <label> (default)
+;   <bar-used>
+;   <bar-free>
+;   <ramp-used>
+;   <ramp-free>
+;   <bar-swap-used>
+;   <bar-swap-free>
+;   <ramp-swap-used>
+;   <ramp-swap-free>
+format = <label>
+format-underline =  ${colors.ram}
+; format-prefix = "  "
+format-prefix = "爛  "
+; format-prefix = "  "
+
+
+format-prefix-foreground = ${self.format-underline}
+
+; Available tokens:
+;   %percentage_used% (default)
+;   %percentage_free%
+;   %gb_used%
+;   %gb_free%
+;   %gb_total%
+;   %mb_used%
+;   %mb_free%
+;   %mb_total%
+;   %percentage_swap_used%
+;   %percentage_swap_free%
+;   %mb_swap_total%
+;   %mb_swap_free%
+;   %mb_swap_used%
+;   %gb_swap_total%
+;   %gb_swap_free%
+;   %gb_swap_used%
+; label = %percentage_used%%
+label = RAM %gb_used%/%gb_free%
+
+; Only applies if <bar-used> is used
+bar-used-indicator =
+bar-used-width = 30
+bar-used-foreground-0 = #55aa55
+bar-used-foreground-1 = #557755
+bar-used-foreground-2 = #f5a70a
+bar-used-foreground-3 = #ff5555
+bar-used-fill = ▐
+bar-used-empty = ▐
+bar-used-empty-foreground = #444444
+
+; Only applies if <ramp-used> is used
+ramp-used-0 = ▁
+ramp-used-1 = ▂
+ramp-used-2 = ▃
+ramp-used-3 = ▄
+ramp-used-4 = ▅
+ramp-used-5 = ▆
+ramp-used-6 = ▇
+ramp-used-7 = █
+
+; Only applies if <ramp-free> is used
+ramp-free-0 = ▁
+ramp-free-1 = ▂
+ramp-free-2 = ▃
+ramp-free-3 = ▄
+ramp-free-4 = ▅
+ramp-free-5 = ▆
+ramp-free-6 = ▇
+ramp-free-7 = █
+
+
+;####################################################
+
+[module/calendar]
+type = custom/script
+exec = "date +%d-%m-%Y"
+interval = 30
+
+format = " <label>"
+format-underline = ${colors.calendar}
+format-prefix = "  "
+format-prefix-foreground = ${self.format-underline}
+format-foreground = ${colors.fg}
+
+click-left = gsimplecal &
+#click-left = notify-send "$(cal)"
+
+;####################################################
+
+[module/clock]
+type = internal/date
+interval = 1
+#date = " %d-%m-%Y "
+#date-alt = " %d-%m-%Y "
+time = %H:%M:%S
+time-alt = %H:%M
+
+format = " <label>"
+format-underline = ${colors.clock}
+format-prefix = "  "
+; format-suffix = "  "
+format-suffix-foreground = ${self.format-underline}
+format-foreground = ${colors.fg}
+
+label = %time%
+label-font = 10
+
+# date module from polybar themes number 1
+[module/date]
+type = internal/date
+interval = 30
+label =  %time%
+time =  %H:%M %p
+time-alt =  %Y-%m-%d
+
+
+
+;##########################################################
+
+[module/battery]
+type = internal/battery
+battery = BAT0
+adapter = ADP0
+full-at = 99
+
+format-charging =  <label-charging> <animation-charging>
+format-charging-underline = ${colors.battery}
+
+format-discharging = <label-discharging> <ramp-capacity>
+format-discharging-underline = ${self.format-charging-underline}
+
+format-full-suffix = "   "
+format-full-suffix-foreground = ${self.format-charging-underline}
+format-full-underline = ${self.format-charging-underline}
+
+ramp-capacity-0 = 
+ramp-capacity-1 = 
+ramp-capacity-2 = 
+ramp-capacity-3 = 
+ramp-capacity-4 = 
+
+ramp-capacity-foreground = ${self.format-charging-underline}
+
+animation-charging-0 = 
+animation-charging-1 = 
+animation-charging-2 = 
+animation-charging-3 = 
+animation-charging-4 = 
+
+animation-charging-foreground = ${self.format-charging-underline}
+animation-charging-framerate = 750
+
+
+
+;####################################################
+
+[module/bluetooth]
+type = custom/script
+interval = 5
+format-foreground = ${colors.bluetooth}
+format-underline = ${self.format-foreground}
+exec = ~/.config/polybar/scripts/bluetooth.sh
+click-left = blueman-manager &
+click-right = blueman-assistant &
+
+;#########################################################
+
+[module/powermenu]
+type = custom/menu
+
+format-spacing = 1
+format-underline =  ${colors.powermenu}
+
+label-open = "%{T3}  %{T-}"
+label-open-foreground = ${colors.powermenu}
+label-close = "  "
+label-close-foreground = ${colors.powermenu-close}
+label-separator = |
+label-separator-foreground = ${colors.fg}
+
+menu-0-0 = "  "
+menu-0-0-exec = menu-open-1
+
+menu-0-1 = "  "
+menu-0-1-exec = menu-open-2
+
+menu-0-2 = "  "
+menu-0-2-exec = menu-open-3
+
+menu-0-3 =  "  "
+menu-0-3-exec = betterlockscreen -l
+
+menu-0-4 = "  |"
+menu-0-4-exec = bspc quit
+
+menu-1-0 = Reiniciar
+# Using elogind
+menu-1-0-exec = loginctl reboot
+
+menu-1-1 =  |
+menu-1-1-exec = menu-open-0
+
+menu-2-0 = Desligar
+# Using elogind
+menu-2-0-exec = loginctl poweroff
+
+menu-2-1 =  |
+menu-2-1-exec = menu-open-0
+
+menu-3-0 = Suspender
+menu-3-0-exec = betterlockscreen -s
+
+menu-3-1 =  |
+menu-3-1-exec = menu-open-0
+
+;####################################################
+
+[module/xwindow]
+type = internal/xwindow
+label = %title:0:46:...%
+format-underline = ${colors.xwindow}
+; format-prefix = ${separators.right}
+; format-suffix = ${separators.left}
+; format-prefix = " "
+; format-suffix = " "
+format-prefix-foreground = ${self.format-underline}
+format-suffix-foreground = ${self.format-underline}
+
+;####################################################
+
+[module/xbacklight]
+type = internal/backlight
+
+; Use the following command to list available cards:
+; $ ls -1 /sys/class/backlight/
+card = intel_backlight
+
+format = <label> <bar> <ramp>
+label = 
+label-foreground = ${colors.xbacklight}
+
+
+; Only applies if <ramp> is used
+ramp-0 = 🌕
+ramp-1 = 🌔
+ramp-2 = 🌓
+ramp-3 = 🌒
+ramp-4 = 🌑
+
+bar-width = 10
+bar-indicator =
+bar-indicator-foreground = ${colors.xbacklight}
+bar-indicator-font = 2
+bar-fill = ""
+bar-fill-font = 1
+bar-fill-foreground = ${colors.xbacklight}
+bar-empty = ""
+bar-empty-font = 1
+bar-empty-foreground = ${colors.empty}
+
+
+;####################################################
+
+[module/wired-network]
+type = internal/network
+;interface = eth0
+
+; qualirede interface
+interface = enp2s0
+; home interface
+; interface = enp3s0
+interval = 2.0
+
+format-connected = <ramp-signal> <label-connected>
+format-connected-underline = ${colors.ethernet}
+format-connected-suffix = "%{T3}  %{T-}"
+format-connected-suffix-foreground = ${self.format-connected-underline}
+
+format-disconnected = <label-disconnected>
+format-packetloss = <animation-packetloss> <label-connected>
+
+label-connected = %local_ip%%downspeed:9%
+label-disconnected = not connected
+
+; Only applies if <ramp-signal> is used
+ramp-signal-0 = 😱
+ramp-signal-1 = 😠
+ramp-signal-2 = 😒
+ramp-signal-3 = 😊
+ramp-signal-4 = 😃
+ramp-signal-5 = 😈
+
+; Only applies if <animation-packetloss> is used
+animation-packetloss-0 = ⚠
+animation-packetloss-0-foreground = #ffa64c
+animation-packetloss-1 = 📶
+animation-packetloss-1-foreground = #000000
+; Framerate in milliseconds
+animation-packetloss-framerate = 500
+
+
+;####################################################
+
+[module/wireless-network]
+type = internal/network
+; interface = wlan0
+
+; qualirede wifi interface
+interface = wlan0
+
+interval = 3.0
+
+format-connected = <label-connected>
+format-connected-suffix = "  "
+format-connected-suffix-foreground = ${self.format-connected-underline}
+format-connected-underline = ${colors.wifi}
+
+label-connected = %essid%
+label-connected-maxlen = 12
+label-disconnected = "Sem Conexão"
+
+format-disconnected-suffix = "  "
+format-disconnected = <label-disconnected>
+format-disconnected-underline = ${self.format-connected-underline}
+format-disconnected-suffix-foreground = ${self.format-disconnected-underline}
+
+;click-left = nm-applet &
+click-left = nm-connection-editor &
+
+;####################################################
+
+[module/pulseaudio]
+type = internal/pulseaudio
+
+; Sink to be used, if it exists (find using `pacmd list-sinks`, name field)
+; If not, uses default sink
+sink = alsa_output.pci-0000_00_1b.0.analog-stereo
+
+; Use PA_VOLUME_UI_MAX (~153%) if true, or PA_VOLUME_NORM (100%) if false
+; Default: true
+use-ui-max = true
+
+; Interval for volume increase/decrease (in percent points)
+; Default: 5
+interval = 5
+; Additional formatting
+; Available tags:
+;   <label-volume> (default)
+;   <ramp-volume>
+;   <bar-volume>
+format-volume = <ramp-volume> <label-volume>
+; format-volume = <label-volume> <bar-volume>
+
+; Available tags:
+;   <label-muted> (default)
+;   <ramp-volume>
+;   <bar-volume>
+;format-muted = <label-muted>
+
+; Available tokens:
+;   %percentage% (default)
+;   %decibels% (unreleased)
+;label-volume = %percentage%%
+label-volume = 
+label-volume-foreground = ${colors.volume}
+
+; Available tokens:
+;   %percentage% (default)
+;   %decibels% (unreleased)
+label-muted = 🔇 muted
+label-muted-foreground = #666
+
+format-muted-underline = ${colors.volume}
+format-muted-suffix = "  "
+format-muted-foreground = ${colors.volume}
+
+; Only applies if <ramp-volume> is used
+ramp-volume-0 = 🔈
+ramp-volume-1 = 🔉
+ramp-volume-2 = 🔊
+
+; Right and Middle click (unreleased)
+click-right = pavucontrol &
+; click-middle =
+
+
+
+
+;###########################################################################
+
+
+[global/wm]
+; Adjust the _NET_WM_STRUT_PARTIAL top value
+;   Used for bottom aligned bars
+margin-top = 1
+
+; Adjust the _NET_WM_STRUT_PARTIAL bottom value
+;   Used for top aligned bars
+margin-bottom = 1
+
+;###########################################################################
+
+[settings]
+; Reload upon receiving XCB_RANDR_SCREEN_CHANGE_NOTIFY events
+screenchange-reload = true
+
+; @see: https://www.cairographics.org/manual/cairo-cairo-t.html#cairo-operator-t
+compositing-background = source
+compositing-foreground = over
+compositing-overline = over
+compositing-underline = over
+compositing-border = over
+
+; Enables pseudo-transparency for the bar
+; If set to true the bar can be transparent without a compositor.
+pseudo-transparency = false
+
+
+;###########################################################################
+;# MODULES TAKEN FROM THE POLYBAR THEMES
+;###########################################################################
+
+;; menu launcher taken from the first polybar theme
+[module/menu]
+type = custom/text
+; content = 
+content = 
+; content = 
+alt-icon = 
+; alt-icon = 
+; alt-icon = 
+; alt-icon = 
+content-padding = 3
+content-background = ${colors.empty}
+content-foreground = ${colors.acolor}
+click-left = $HOME/.config/polybar/scripts/menu.sh
+click-middle = $HOME/.config/polybar/scripts/menu-full.sh
+
+[module/colorswitcher]
+type = custom/text
+; content = 
+content = 
+
+alt-icon = 
+content-padding = 2
+content-background = ${colors.material-purple}
+content-foreground = ${colors.fg}
+click-left = $HOME/.config/polybar/scripts/color-switch.sh
+click-right = lxappearance
+
+[module/powermenu2]
+type = custom/text
+
+content = "%{T3}  %{T-}"
+content-padding = 2
+content-background = ${colors.acolor}
+content-foreground = ${colors.material-purple}
+click-left = $HOME/.config/polybar/scripts/sysmenu.sh
+click-right = $HOME/.config/polybar/scripts/sysmenu.sh
+
+[module/network]
+type = custom/script
+exec = $HOME/.config/polybar/scripts/check-network.sh
+click-left = networkmanager_dmenu &
+click-right = networkmanager_dmenu &
+tail = true
+
+[module/term]
+type = custom/text
+; content = 
+content = 
+content-foreground = ${colors.fg-alt}
+click-left = alacritty &
+click-middle = st &
+click-right = urxvt &
+
+[module/calculator]
+type = custom/text
+; content = 
+content = 
+content-padding = 1
+content-foreground = ${colors.acolor}
+content-background = ${colors.bg}
+click-left = galculator &
+
+[module/system-settings]
+type = custom/text
+content = 
+content-padding = 1
+content-foreground = ${colors.acolor}
+content-background = ${colors.bg}
+; click-left = galculator &
+
+[module/files]
+type = custom/text
+content = 
+content-padding = 1
+content-foreground = ${colors.fg-alt}
+click-left = pcmanfm &
+click-center = nemo &
+click-right = uxrvt -e ranger &
+
+[module/browser]
+type = custom/text
+content = 
+content-padding = 1
+content-foreground = ${colors.fg-alt}
+click-left = firefox &
+click-right = google-chrome-stable &
+
+[module/settings]
+type = custom/text
+content = 
+content-padding = 1
+content-foreground = ${colors.fg-alt}
+click-left = xfce4-settings &
+click-right = lxappearance &
+
+[module/left1]
+type = custom/text
+content-background = ${colors.separator1}
+content-foreground = ${colors.separator2}
+
+
+[module/separator_left]
+type = custom/text
+content-background = ${colors.bg}
+content-foreground = ${colors.separator2}
+content = ${separators.left}
+
+;###########################################################################
+
+[module/separator_right]
+type = custom/text
+content-background = ${colors.bg}
+content-foreground = ${colors.separator2}
+content = ${separators.right}
+
+;###########################################################################
+
+[module/filesystem]
+type = internal/fs
+
+; Mountpoints to display
+mount-0 = /
+mount-1 = /home
+
+; Seconds to sleep between updates
+; Default: 30
+interval = 10
+
+; Display fixed precision values
+; Default: false
+fixed-values = true
+
+; Spacing between entries
+; Default: 2
+spacing = 4
+
+; Available tags:
+;   <label-mounted> (default)
+;   <bar-free>
+;   <bar-used>
+;   <ramp-capacity>
+format-mounted = <label-mounted>
+
+; Available tags:
+;   <label-unmounted> (default)
+format-unmounted = <label-unmounted>
+
+; Available tokens:
+;   %mountpoint%
+;   %type%
+;   %fsname%
+;   %percentage_free%
+;   %percentage_used%
+;   %total%
+;   %free%
+;   %used%
+; Default: %mountpoint% %percentage_free%%
+label-mounted = %mountpoint% %free%
+
+; Available tokens:
+;   %mountpoint%
+; Default: %mountpoint% is not mounted
+label-unmounted = %mountpoint%: not mounted
+label-unmounted-foreground = #55
+
+;###########################################################################
+
+
+; vim:ft=dosini
+
+
+
+;###########################################################################
+;###########################################################################
+; STORING UNUSED MODULES DOWN HERE
+;###########################################################################
+;###########################################################################
+
+
+
+
+
+;####################################################
 
 [module/i3]
 type = internal/i3
@@ -463,7 +1177,8 @@ fuzzy-match = true
 ; NOTE: You cannot skip icons, e.g. to get a ws-icon-6
 ; you must also define a ws-icon-5.
 ws-icon-0 = edit;
-ws-icon-1 = term;
+; ws-icon-1 = term;
+ws-icon-1 = term;
 ws-icon-2 = browser;
 ws-icon-3 = file;
 ws-icon-4 = extra;
@@ -558,18 +1273,7 @@ label-urgent-padding = 2
 ;label-private-foreground = #bd2c40
 
 
-####################################################
-
-[module/bluetooth]
-type = custom/script
-interval = 5
-format-foreground = ${colors.bluetooth}
-format-underline = ${self.format-foreground}
-exec = ~/.config/polybar/scripts/bluetooth.sh
-click-left = blueman-manager &
-click-right = blueman-assistant &
-
-####################################################
+;####################################################
 
 [module/mocp]
 type = custom/script
@@ -588,7 +1292,7 @@ click-left = mocp -f
 click-right = mocp -r
 click-middle = mocp -G
 
-####################################################
+;####################################################
 
 [module/mpd]
 type = internal/mpd
@@ -641,7 +1345,7 @@ bar-progress-width = 10
 bar-progress-fill = ""
 bar-progress-fill-foreground = #1db954
 bar-progress-empty = ""
-####################################################
+;####################################################
 
 ; [module/spotify]
 ; type = custom/script
@@ -658,651 +1362,3 @@ bar-progress-empty = ""
 ; click-middle = playerctl play-pause
 
 ; format-underline = ${colors.spotify}
-
-####################################################
-
-[module/cpu]
-type = internal/cpu
-interval = 2
-; Available tags:
-;   <label> (default)
-;   <bar-load>
-;   <ramp-load>
-;   <ramp-coreload>
-format = <label> <ramp-coreload>
-format-underline =  ${colors.cpu}
-format-suffix = "  "
-format-suffix-foreground = ${self.format-underline}
-
-; Available tokens:
-;   %percentage% (default) - total cpu load averaged over all cores
-;   %percentage-sum% - Cumulative load on all cores
-;   %percentage-cores% - load percentage for each core
-;   %percentage-core[1-9]% - load percentage for specific core
-label = CPU %percentage%%
-; label = %percentage%%
-
-; Spacing between individual per-core ramps
-ramp-coreload-spacing = 1
-ramp-coreload-0 = ▁
-ramp-coreload-1 = ▂
-ramp-coreload-2 = ▃
-ramp-coreload-3 = ▄
-ramp-coreload-4 = ▅
-ramp-coreload-5 = ▆
-ramp-coreload-6 = ▇
-ramp-coreload-7 = █
-
-####################################################
-
-[module/memory]
-type = internal/memory
-interval = 2
-
-; Available tags:
-;   <label> (default)
-;   <bar-used>
-;   <bar-free>
-;   <ramp-used>
-;   <ramp-free>
-;   <bar-swap-used>
-;   <bar-swap-free>
-;   <ramp-swap-used>
-;   <ramp-swap-free>
-format = <label> <bar-used>
-format-underline =  ${colors.ram}
-format-suffix = "  "
-format-suffix-foreground = ${self.format-underline}
-
-; Available tokens:
-;   %percentage_used% (default)
-;   %percentage_free%
-;   %gb_used%
-;   %gb_free%
-;   %gb_total%
-;   %mb_used%
-;   %mb_free%
-;   %mb_total%
-;   %percentage_swap_used%
-;   %percentage_swap_free%
-;   %mb_swap_total%
-;   %mb_swap_free%
-;   %mb_swap_used%
-;   %gb_swap_total%
-;   %gb_swap_free%
-;   %gb_swap_used%
-; label = %percentage_used%%
-label = RAM %gb_used%/%gb_free%
-
-; Only applies if <bar-used> is used
-bar-used-indicator =
-bar-used-width = 30
-bar-used-foreground-0 = #55aa55
-bar-used-foreground-1 = #557755
-bar-used-foreground-2 = #f5a70a
-bar-used-foreground-3 = #ff5555
-bar-used-fill = ▐
-bar-used-empty = ▐
-bar-used-empty-foreground = #444444
-
-; Only applies if <ramp-used> is used
-ramp-used-0 = ▁
-ramp-used-1 = ▂
-ramp-used-2 = ▃
-ramp-used-3 = ▄
-ramp-used-4 = ▅
-ramp-used-5 = ▆
-ramp-used-6 = ▇
-ramp-used-7 = █
-
-; Only applies if <ramp-free> is used
-ramp-free-0 = ▁
-ramp-free-1 = ▂
-ramp-free-2 = ▃
-ramp-free-3 = ▄
-ramp-free-4 = ▅
-ramp-free-5 = ▆
-ramp-free-6 = ▇
-ramp-free-7 = █
-
-####################################################
-
-[module/wired-network]
-type = internal/network
-;interface = eth0
-
-; qualirede interface
-interface = enp2s0
-; home interface
-; interface = enp3s0
-interval = 2.0
-
-format-connected = <ramp-signal> <label-connected>
-format-connected-underline = ${colors.ethernet}
-format-connected-suffix = "%{T3}  %{T-}"
-format-connected-suffix-foreground = ${self.format-connected-underline}
-
-format-disconnected = <label-disconnected>
-format-packetloss = <animation-packetloss> <label-connected>
-
-label-connected = %local_ip%%downspeed:9%
-label-disconnected = not connected
-
-; Only applies if <ramp-signal> is used
-ramp-signal-0 = 😱
-ramp-signal-1 = 😠
-ramp-signal-2 = 😒
-ramp-signal-3 = 😊
-ramp-signal-4 = 😃
-ramp-signal-5 = 😈
-
-; Only applies if <animation-packetloss> is used
-animation-packetloss-0 = ⚠
-animation-packetloss-0-foreground = #ffa64c
-animation-packetloss-1 = 📶
-animation-packetloss-1-foreground = #000000
-; Framerate in milliseconds
-animation-packetloss-framerate = 500
-
-
-####################################################
-
-[module/wireless-network]
-type = internal/network
-; interface = wlan0
-
-; qualirede wifi interface
-interface = wlp3s0
-
-interval = 3.0
-
-format-connected = <label-connected>
-format-connected-suffix = "  "
-format-connected-suffix-foreground = ${self.format-connected-underline}
-format-connected-underline = ${colors.wifi}
-
-label-connected = %essid%
-label-connected-maxlen = 12
-label-disconnected = "Sem Conexão"
-
-format-disconnected-suffix = "  "
-format-disconnected = <label-disconnected>
-format-disconnected-underline = ${self.format-connected-underline}
-format-disconnected-suffix-foreground = ${self.format-disconnected-underline}
-
-;click-left = nm-applet &
-click-left = nm-connection-editor &
-
-####################################################
-
-[module/clock]
-type = internal/date
-interval = 1
-#date = " %d-%m-%Y "
-#date-alt = " %d-%m-%Y "
-time = %H:%M:%S
-time-alt = %H:%M
-
-format = " <label>"
-format-underline = ${colors.clock}
-format-suffix = "  "
-format-suffix-foreground = ${self.format-underline}
-format-foreground = ${colors.fg}
-
-label = %time%
-label-font = 10
-
-# date module from polybar themes number 1
-[module/date]
-type = internal/date
-interval = 30
-label =  %time%
-time =  %H:%M %p
-time-alt =  %Y-%m-%d
-
-####################################################
-
-[module/xbacklight]
-type = internal/backlight
-
-; Use the following command to list available cards:
-; $ ls -1 /sys/class/backlight/
-card = intel_backlight
-
-format = <label> <bar> <ramp>
-label = 
-label-foreground = ${colors.xbacklight}
-
-
-; Only applies if <ramp> is used
-ramp-0 = 🌕
-ramp-1 = 🌔
-ramp-2 = 🌓
-ramp-3 = 🌒
-ramp-4 = 🌑
-
-bar-width = 10
-bar-indicator =
-bar-indicator-foreground = ${colors.xbacklight}
-bar-indicator-font = 2
-bar-fill = ""
-bar-fill-font = 1
-bar-fill-foreground = ${colors.xbacklight}
-bar-empty = ""
-bar-empty-font = 1
-bar-empty-foreground = ${colors.empty}
-
-####################################################
-
-[module/calendar]
-type = custom/script
-exec = "date +%d-%m-%Y"
-interval = 30
-
-format = " <label>"
-format-underline = ${colors.calendar}
-format-suffix = "  "
-format-suffix-foreground = ${self.format-underline}
-format-foreground = ${colors.fg}
-
-click-left = gsimplecal &
-#click-left = notify-send "$(cal)"
-
-
-####################################################
-
-[module/pulseaudio]
-type = internal/pulseaudio
-
-; Sink to be used, if it exists (find using `pacmd list-sinks`, name field)
-; If not, uses default sink
-sink = alsa_output.pci-0000_00_1b.0.analog-stereo
-
-; Use PA_VOLUME_UI_MAX (~153%) if true, or PA_VOLUME_NORM (100%) if false
-; Default: true
-use-ui-max = true
-
-; Interval for volume increase/decrease (in percent points)
-; Default: 5
-interval = 5
-; Additional formatting
-; Available tags:
-;   <label-volume> (default)
-;   <ramp-volume>
-;   <bar-volume>
-format-volume = <ramp-volume> <label-volume>
-; format-volume = <label-volume> <bar-volume>
-
-; Available tags:
-;   <label-muted> (default)
-;   <ramp-volume>
-;   <bar-volume>
-;format-muted = <label-muted>
-
-; Available tokens:
-;   %percentage% (default)
-;   %decibels% (unreleased)
-;label-volume = %percentage%%
-label-volume = 
-label-volume-foreground = ${colors.volume}
-
-; Available tokens:
-;   %percentage% (default)
-;   %decibels% (unreleased)
-label-muted = 🔇 muted
-label-muted-foreground = #666
-
-format-muted-underline = ${colors.volume}
-format-muted-suffix = "  "
-format-muted-foreground = ${colors.volume}
-
-; Only applies if <ramp-volume> is used
-ramp-volume-0 = 🔈
-ramp-volume-1 = 🔉
-ramp-volume-2 = 🔊
-
-; Right and Middle click (unreleased)
-click-right = pavucontrol &
-; click-middle =
-
-
-
-##########################################################
-
-[module/battery]
-type = internal/battery
-battery = BAT0
-adapter = ADP0
-full-at = 99
-
-format-charging =  <label-charging> <animation-charging>
-format-charging-underline = ${colors.battery}
-
-format-discharging = <label-discharging> <ramp-capacity>
-format-discharging-underline = ${self.format-charging-underline}
-
-format-full-suffix = "   "
-format-full-suffix-foreground = ${self.format-charging-underline}
-format-full-underline = ${self.format-charging-underline}
-
-ramp-capacity-0 = 
-ramp-capacity-1 = 
-ramp-capacity-2 = 
-ramp-capacity-3 = 
-ramp-capacity-4 = 
-
-ramp-capacity-foreground = ${self.format-charging-underline}
-
-animation-charging-0 = 
-animation-charging-1 = 
-animation-charging-2 = 
-animation-charging-3 = 
-animation-charging-4 = 
-
-animation-charging-foreground = ${self.format-charging-underline}
-animation-charging-framerate = 750
-
-##########################################################
-
-[module/temperature]
-type = internal/temperature
-thermal-zone = 0
-
-; Base temperature for where to start the ramp (in degrees celsius)
-; Default: 0
-base-temperature = 20
-warn-temperature = 65
-
-format =  <label> <ramp>
-format-underline = ${colors.temperature}
-format-warn = <label-warn> <ramp>
-format-warn-underline = ${self.format-underline}
-
-label = %temperature-c%
-label-warn = %temperature-c%
-label-warn-foreground = ${colors.alert}
-
-; 
-ramp-0 = 
-ramp-1 = 
-ramp-2 = 
-ramp-3 = 
-ramp-4 = 
-ramp-foreground = ${colors.temperature}
-
-#########################################################
-
-[module/powermenu]
-type = custom/menu
-
-format-spacing = 1
-format-underline =  ${colors.powermenu}
-
-label-open = "%{T3}  %{T-}"
-label-open-foreground = ${colors.powermenu}
-label-close = "  "
-label-close-foreground = ${colors.powermenu-close}
-label-separator = |
-label-separator-foreground = ${colors.fg}
-
-menu-0-0 = "  "
-menu-0-0-exec = menu-open-1
-
-menu-0-1 = "  "
-menu-0-1-exec = menu-open-2
-
-menu-0-2 = "  "
-menu-0-2-exec = menu-open-3
-
-menu-0-3 =  "  "
-menu-0-3-exec = betterlockscreen -l
-
-menu-0-4 = "  |"
-menu-0-4-exec = bspc quit
-
-menu-1-0 = Reiniciar
-# Using elogind
-menu-1-0-exec = loginctl reboot
-
-menu-1-1 =  |
-menu-1-1-exec = menu-open-0
-
-menu-2-0 = Desligar
-# Using elogind
-menu-2-0-exec = loginctl poweroff
-
-menu-2-1 =  |
-menu-2-1-exec = menu-open-0
-
-menu-3-0 = Suspender
-menu-3-0-exec = betterlockscreen -s
-
-menu-3-1 =  |
-menu-3-1-exec = menu-open-0
-
-###########################################################################
-
-[module/uptime]
-type = custom/script
-interval = 30
-exec = ~/.config/polybar/scripts/uptime.sh
-label = %output%
-format = <label>
-format-suffix = "  "
-format-suffix-foreground =  ${colors.uptime}
-format-underline =  ${colors.uptime}
-
-###########################################################################
-
-[module/openweathermap-detailed]
-type = custom/script
-exec = ~/.config/polybar/scripts/openweathermap-detailed.sh
-interval = 600
-format = " <label> "
-format-underline = ${colors.weather}
-format-foreground = ${colors.fg}
-
-###########################################################################
-
-[module/user]
-type = custom/text
-#content = ${env:USER:Tux}
-content = "tau | "
-content-prefix = "   "
-; content-suffix = "  "
-content-prefix-foreground = ${colors.user}
-content-suffix-foreground = ${colors.fg}
-content-foreground = ${colors.fg}
-content-background = ${colors.bg}
-content-underline = ${colors.user}
-
-###########################################################################
-
-
-[global/wm]
-; Adjust the _NET_WM_STRUT_PARTIAL top value
-;   Used for bottom aligned bars
-margin-top = 4
-
-; Adjust the _NET_WM_STRUT_PARTIAL bottom value
-;   Used for top aligned bars
-margin-bottom = 4
-
-###########################################################################
-
-[settings]
-; Reload upon receiving XCB_RANDR_SCREEN_CHANGE_NOTIFY events
-screenchange-reload = true
-
-; @see: https://www.cairographics.org/manual/cairo-cairo-t.html#cairo-operator-t
-compositing-background = source
-compositing-foreground = over
-compositing-overline = over
-compositing-underline = over
-compositing-border = over
-
-; Enables pseudo-transparency for the bar
-; If set to true the bar can be transparent without a compositor.
-pseudo-transparency = true
-
-
-###########################################################################
-# MODULES TAKEN FROM THE POLYBAR THEMES
-###########################################################################
-
-;; menu launcher taken from the first polybar theme
-[module/menu]
-type = custom/text
-content = 
-;alt-icon = 
-content-padding = 2
-content-background = ${colors.acolor}
-content-foreground = ${colors.fg}
-click-left = $HOME/.config/polybar/scripts/menu.sh
-click-middle = $HOME/.config/polybar/scripts/menu-full.sh
-
-[module/colorswitcher]
-type = custom/text
-; content = 
-content = 
-
-alt-icon = 
-content-padding = 2
-; content-background = ${colors.acolor}
-content-foreground = ${colors.fg}
-click-left = $HOME/.config/polybar/scripts/color-switch.sh
-click-right = $HOME/.config/polybar/scripts/color-switch.sh
-
-[module/powermenu2]
-type = custom/text
-content = 
-content-padding = 2
-content-background = ${colors.acolor}
-content-foreground = ${colors.fg}
-click-left = $HOME/.config/polybar/scripts/sysmenu.sh
-click-right = $HOME/.config/polybar/scripts/sysmenu.sh
-
-[module/network]
-type = custom/script
-exec = $HOME/.config/polybar/scripts/check-network.sh
-click-left = networkmanager_dmenu &
-click-right = networkmanager_dmenu &
-tail = true
-
-[module/term]
-type = custom/text
-content = 
-content-foreground = ${colors.fg-alt}
-click-left = alacritty &
-click-middle = st &
-click-right = urxvt &
-
-[module/calculator]
-type = custom/text
-content = 
-content-padding = 1
-content-foreground = ${colors.white}
-click-left = xfce4-settings &
-click-right = galculator &
-
-[module/files]
-type = custom/text
-content = 
-content-padding = 1
-content-foreground = ${colors.fg-alt}
-click-left = pcmanfm &
-click-center = nemo &
-click-right = uxrvt -e ranger &
-
-[module/browser]
-type = custom/text
-content = 
-content-padding = 1
-content-foreground = ${colors.fg-alt}
-click-left = firefox &
-click-right = google-chrome-stable &
-
-[module/settings]
-type = custom/text
-content = 
-content-padding = 1
-content-foreground = ${colors.fg-alt}
-click-left = xfce4-settings &
-click-right = lxappearance &
-
-[module/left1]
-type = custom/text
-content-background = ${colors.separator1}
-content-foreground = ${colors.separator2}
-
-
-[module/separator_left]
-type = custom/text
-content-background = ${colors.bg}
-content-foreground = ${colors.separator2}
-content = ${separators.left}
-
-###########################################################################
-
-[module/separator_right]
-type = custom/text
-content-background = ${colors.bg}
-content-foreground = ${colors.separator2}
-content = ${separators.right}
-
-###########################################################################
-
-[module/filesystem]
-type = internal/fs
-
-; Mountpoints to display
-mount-0 = /
-mount-1 = /home
-
-; Seconds to sleep between updates
-; Default: 30
-interval = 10
-
-; Display fixed precision values
-; Default: false
-fixed-values = true
-
-; Spacing between entries
-; Default: 2
-spacing = 4
-
-; Available tags:
-;   <label-mounted> (default)
-;   <bar-free>
-;   <bar-used>
-;   <ramp-capacity>
-format-mounted = <label-mounted>
-
-; Available tags:
-;   <label-unmounted> (default)
-format-unmounted = <label-unmounted>
-
-; Available tokens:
-;   %mountpoint%
-;   %type%
-;   %fsname%
-;   %percentage_free%
-;   %percentage_used%
-;   %total%
-;   %free%
-;   %used%
-; Default: %mountpoint% %percentage_free%%
-label-mounted = %mountpoint%: %percentage_free%% of %total%
-
-; Available tokens:
-;   %mountpoint%
-; Default: %mountpoint% is not mounted
-label-unmounted = %mountpoint%: not mounted
-label-unmounted-foreground = #55
-
-###########################################################################
-
-
-[module/calculator]
-
-vim:ft=dosini

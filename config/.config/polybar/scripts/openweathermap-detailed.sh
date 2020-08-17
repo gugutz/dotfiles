@@ -3,12 +3,13 @@
 get_icon() {
     case $1 in
         01d) icon="";;
-        01n) icon="";;
+        01n) icon="";; # ceu claro? confirmar
         02d) icon="";;
         02n) icon="";;
         03*) icon="";;
-        04*) icon="";;
+        04*) icon="";; # nuvens esparsas
         09d) icon="";;
+        # 09d) icon="";;
         09n) icon="";;
         10d) icon="";;
         10n) icon="";;

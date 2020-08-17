@@ -5600,6 +5600,107 @@ Call this function on a region to capitalize the SQL keywords therein.
 
 
 )
+(let ((load-file-name "/home/tau/.config/emacs/elpa/reformatter-20200426.818/reformatter-autoloads.el"))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory "/home/tau/.config/emacs/elpa/reformatter-20200426.818/reformatter-autoloads.el") (car load-path))))
+
+
+
+(autoload 'reformatter-define "reformatter" "\
+Define a reformatter command with NAME.
+
+When called, the reformatter will use PROGRAM and any ARGS to
+reformat the current buffer.  The contents of the buffer will be
+passed as standard input to the reformatter, which should output
+them to standard output.  A nonzero exit code will be reported as
+failure, and the output of the command to standard error will be
+displayed to the user.
+
+The macro accepts the following keyword arguments:
+
+:program (required)
+
+  Provides a form which should evaluate to a string at runtime,
+  e.g. a literal string, or the name of a variable which holds
+  the program path.
+
+:args
+
+  If provided, this is a form which evaluates to a list of
+  strings at runtime.  Default is the empty list.
+
+:mode
+
+  Unless nil, also generate a minor mode that will call the
+  reformatter command from `before-save-hook' when enabled.
+  Default is t.
+
+:group
+
+  If provided, this is the custom group used for any generated
+  modes or custom variables.  Don't forget to declare this group
+  using a `defgroup' form.
+
+:lighter
+
+  If provided, this is a mode lighter string which will be used
+  for the \"-on-save\" minor mode.  It should have a leading
+  space.  The supplied value will be used as the default for a
+  generated custom variable which specifies the mode lighter.
+  Default is nil, ie. no lighter.
+
+:keymap
+
+  If provided, this is the symbol name of the \"-on-save\" mode's
+  keymap, which you must declare yourself.  Default is no keymap.
+
+:exit-code-success-p
+
+  If provided, this is a function object callable with `funcall'
+  which accepts an integer process exit code, and returns non-nil
+  if that exit code is considered successful.  This could be a
+  lambda, quoted symbol or sharp-quoted symbol.  If not supplied,
+  the code is considered successful if it is `zerop'.
+
+\(fn NAME &key PROGRAM ARGS (MODE t) LIGHTER KEYMAP GROUP (EXIT-CODE-SUCCESS-P \\='zerop))" nil t)
+
+(function-put 'reformatter-define 'lisp-indent-function 'defun)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "reformatter" '("reformatter-replace-buffer-contents-from-file")))
+
+
+
+
+
+)
+(let ((load-file-name "/home/tau/.config/emacs/elpa/sqlformat-20200327.2329/sqlformat-autoloads.el"))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory "/home/tau/.config/emacs/elpa/sqlformat-20200327.2329/sqlformat-autoloads.el") (car load-path))))
+
+
+ (autoload 'sqlformat-buffer "sqlformat" nil t)
+ (autoload 'sqlformat-region "sqlformat" nil t)
+ (autoload 'sqlformat-on-save-mode "sqlformat" nil t)
+
+(autoload 'sqlformat "sqlformat" "\
+Reformat SQL in region from BEG to END using `sqlformat-region'.
+If no region is active, the current statement (paragraph) is reformatted.
+Install the \"sqlparse\" (Python) package to get \"sqlformat\", or
+\"pgformatter\" to get \"pg_format\".
+
+\(fn BEG END)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "sqlformat" '("sqlformat-")))
+
+
+
+
+
+)
 (let ((load-file-name "/home/tau/.config/emacs/elpa/sql-indent-1.5/sql-indent-autoloads.el"))
 
 (add-to-list 'load-path (directory-file-name
@@ -6301,6 +6402,37 @@ Enable `rainbow-delimiters-mode'." nil nil)
 Disable `rainbow-delimiters-mode'." nil nil)
 
 (if (fboundp 'register-definition-prefixes) (register-definition-prefixes "rainbow-delimiters" '("rainbow-delimiters-")))
+
+
+)
+(let ((load-file-name "/home/tau/.config/emacs/elpa/pug-mode-20180513.2126/pug-mode-autoloads.el"))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory "/home/tau/.config/emacs/elpa/pug-mode-20180513.2126/pug-mode-autoloads.el") (car load-path))))
+
+
+
+(autoload 'pug-mode "pug-mode" "\
+Major mode for editing Pug files.
+
+\\{pug-mode-map}
+
+\(fn)" t nil)
+
+(autoload 'pug-compile "pug-mode" "\
+Compile the current pug file into html, using pug-cli.
+
+If the universal argument is supplied, render pretty HTML (non-compressed).
+
+\(fn &optional ARG)" t nil)
+
+(add-to-list 'auto-mode-alist '("\\.\\(?:jade\\|pug\\)\\'" . pug-mode))
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "pug-mode" '("pug-")))
+
+
+
 
 
 )
@@ -11780,6 +11912,336 @@ values used in the user's shell." t nil)
 
 
 )
+(let ((load-file-name "/home/tau/.config/emacs/elpa/ewal-20200305.230/ewal-autoloads.el"))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory "/home/tau/.config/emacs/elpa/ewal-20200305.230/ewal-autoloads.el") (car load-path))))
+
+
+
+(autoload 'ewal-load-colors "ewal" "\
+Read JSON as the most complete of the cached wal files.
+COLOR-NAMES will be associated with the first 8 colors of the
+cached wal colors.  COLOR-NAMES are meant to be used in
+conjunction with `ewal-ansi-color-name-symbols'.  \"Special\" wal
+colors such as \"background\", \"foreground\", and \"cursor\",
+tend to (but do not always) correspond to the remaining colors
+generated by wal. Add those special colors to the returned
+alist. Return nil on failure.
+
+\(fn &optional JSON COLOR-NAMES)" nil nil)
+
+(autoload 'ewal-load-color "ewal" "\
+Same as `ewal-get-color' but call `ewal-load-ewal-colors' first.
+Pass COLOR, SHADE, and SHADE-PERCENT-DIFFERENCE to
+`ewal-get-color'.  Meant to be called from user config.
+
+\(fn COLOR &optional SHADE SHADE-PERCENT-DIFFERENCE)" nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "ewal" '("ewal-")))
+
+
+
+
+
+)
+(let ((load-file-name "/home/tau/.config/emacs/elpa/doom-themes-20200531.1758/doom-themes-autoloads.el"))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory "/home/tau/.config/emacs/elpa/doom-themes-20200531.1758/doom-themes-autoloads.el") (car load-path))))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-Iosvkem-theme" '("doom-Iosvkem")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-acario-dark-theme" '("doom-acario-dark")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-acario-light-theme" '("doom-acario-light")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-challenger-deep-theme" '("doom-challenger-deep")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-city-lights-theme" '("doom-city-lights")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-dark+-theme" '("doom-dark+")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-dracula-theme" '("doom-dracula")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-ephemeral-theme" '("doom-ephemeral")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-fairy-floss-theme" '("doom-fairy-floss")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-gruvbox-light-theme" '("doom-gruvbox-light")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-gruvbox-theme" '("doom-gruvbox")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-henna-theme" '("doom-henna")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-horizon-theme" '("doom-horizon")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-laserwave-theme" '("doom-laserwave")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-manegarm-theme" '("doom-manegarm")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-material-theme" '("doom-material")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-molokai-theme" '("doom-molokai")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-monokai-classic-theme" '("doom-monokai-classic")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-monokai-pro-theme" '("doom-monokai-pro")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-monokai-spectrum-theme" '("doom-monokai-spectrum")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-moonlight-theme" '("doom-moonlight")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-nord-light-theme" '("doom-nord-light")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-nord-theme" '("doom-nord")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-nova-theme" '("doom-nova")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-oceanic-next-theme" '("doom-oceanic-next")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-one-light-theme" '("doom-one-light")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-one-theme" '("doom-one")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-opera-light-theme" '("doom-opera-light")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-opera-theme" '("doom-opera")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-outrun-electric-theme" '("doom-outrun-electric")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-palenight-theme" '("doom-palenight")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-peacock-theme" '("doom-peacock")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-rouge-theme" '("doom-rouge")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-snazzy-theme" '("doom-snazzy")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-solarized-dark-theme" '("doom-solarized-dark")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-solarized-light-theme" '("doom-solarized-light")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-sourcerer-theme" '("doom-sourcerer")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-spacegrey-theme" '("doom-spacegrey")))
+
+
+
+(autoload 'doom-name-to-rgb "doom-themes" "\
+Retrieves the hexidecimal string repesented the named COLOR (e.g. \"red\")
+for FRAME (defaults to the current frame).
+
+\(fn COLOR)" nil nil)
+
+(autoload 'doom-blend "doom-themes" "\
+Blend two colors (hexidecimal strings) together by a coefficient ALPHA (a
+float between 0 and 1)
+
+\(fn COLOR1 COLOR2 ALPHA)" nil nil)
+
+(autoload 'doom-darken "doom-themes" "\
+Darken a COLOR (a hexidecimal string) by a coefficient ALPHA (a float between
+0 and 1).
+
+\(fn COLOR ALPHA)" nil nil)
+
+(autoload 'doom-lighten "doom-themes" "\
+Brighten a COLOR (a hexidecimal string) by a coefficient ALPHA (a float
+between 0 and 1).
+
+\(fn COLOR ALPHA)" nil nil)
+
+(autoload 'doom-color "doom-themes" "\
+Retrieve a specific color named NAME (a symbol) from the current theme.
+
+\(fn NAME &optional TYPE)" nil nil)
+
+(autoload 'doom-ref "doom-themes" "\
+TODO
+
+\(fn FACE PROP &optional CLASS)" nil nil)
+
+(autoload 'doom-themes-set-faces "doom-themes" "\
+Customize THEME (a symbol) with FACES.
+
+If THEME is nil, it applies to all themes you load. FACES is a list of Doom
+theme face specs. These is a simplified spec. For example:
+
+  (doom-themes-set-faces 'user
+    '(default :background red :foreground blue)
+    '(doom-modeline-bar :background (if -modeline-bright modeline-bg highlight))
+    '(doom-modeline-buffer-file :inherit 'mode-line-buffer-id :weight 'bold)
+    '(doom-modeline-buffer-path :inherit 'mode-line-emphasis :weight 'bold)
+    '(doom-modeline-buffer-project-root :foreground green :weight 'bold))
+
+\(fn THEME &rest FACES)" nil nil)
+
+(function-put 'doom-themes-set-faces 'lisp-indent-function 'defun)
+
+(when (and (boundp 'custom-theme-load-path) load-file-name) (let* ((base (file-name-directory load-file-name)) (dir (expand-file-name "themes/" base))) (add-to-list 'custom-theme-load-path (or (and (file-directory-p dir) dir) base))))
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-themes" '("def-doom-theme" "doom-")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-themes-base" '("doom-themes-base-")))
+
+
+
+(autoload 'doom-themes-neotree-config "doom-themes-ext-neotree" "\
+Install doom-themes' neotree configuration.
+
+Includes an Atom-esque icon theme and highlighting based on filetype." nil nil)
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-themes-ext-neotree" '("doom-")))
+
+
+
+(autoload 'doom-themes-org-config "doom-themes-ext-org" "\
+Enable custom fontification & improves theme integration with org-mode." nil nil)
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-themes-ext-org" '("doom-")))
+
+
+
+(autoload 'doom-themes-treemacs-config "doom-themes-ext-treemacs" "\
+Install doom-themes' treemacs configuration.
+
+Includes an Atom-esque icon theme and highlighting based on filetype." nil nil)
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-themes-ext-treemacs" '("doom-themes-")))
+
+
+
+(autoload 'doom-themes-visual-bell-fn "doom-themes-ext-visual-bell" "\
+Blink the mode-line red briefly. Set `ring-bell-function' to this to use it." nil nil)
+
+(autoload 'doom-themes-visual-bell-config "doom-themes-ext-visual-bell" "\
+Enable flashing the mode-line on error." nil nil)
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-tomorrow-day-theme" '("doom-tomorrow-day")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-tomorrow-night-theme" '("doom-tomorrow-night")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-vibrant-theme" '("doom-vibrant")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-wilmersdorf-theme" '("doom-wilmersdorf")))
+
+
+
+
+)
+(let ((load-file-name "/home/tau/.config/emacs/elpa/ewal-doom-themes-20200301.839/ewal-doom-themes-autoloads.el"))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory "/home/tau/.config/emacs/elpa/ewal-doom-themes-20200301.839/ewal-doom-themes-autoloads.el") (car load-path))))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "ewal-doom-one-theme" '("ewal-doom-one")))
+
+
+
+(when (and (boundp 'custom-theme-load-path) load-file-name) (add-to-list 'custom-theme-load-path (file-name-as-directory (file-name-directory load-file-name))))
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "ewal-doom-themes" '("ewal-doom-themes-get-color")))
+
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "ewal-doom-vibrant-theme" '("ewal-doom-")))
+
+
+
+
+)
 (let ((load-file-name "/home/tau/.config/emacs/elpa/evil-vimish-fold-20200122.117/evil-vimish-fold-autoloads.el"))
 
 (add-to-list 'load-path (directory-file-name
@@ -12346,277 +12808,6 @@ Major mode for `.env' files.
 
 (if (fboundp 'register-definition-prefixes) (register-definition-prefixes "dotenv-mode" '("dotenv-")))
 
-
-
-
-
-)
-(let ((load-file-name "/home/tau/.config/emacs/elpa/doom-themes-20200531.1758/doom-themes-autoloads.el"))
-
-(add-to-list 'load-path (directory-file-name
-                         (or (file-name-directory "/home/tau/.config/emacs/elpa/doom-themes-20200531.1758/doom-themes-autoloads.el") (car load-path))))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-Iosvkem-theme" '("doom-Iosvkem")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-acario-dark-theme" '("doom-acario-dark")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-acario-light-theme" '("doom-acario-light")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-challenger-deep-theme" '("doom-challenger-deep")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-city-lights-theme" '("doom-city-lights")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-dark+-theme" '("doom-dark+")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-dracula-theme" '("doom-dracula")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-ephemeral-theme" '("doom-ephemeral")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-fairy-floss-theme" '("doom-fairy-floss")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-gruvbox-light-theme" '("doom-gruvbox-light")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-gruvbox-theme" '("doom-gruvbox")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-henna-theme" '("doom-henna")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-horizon-theme" '("doom-horizon")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-laserwave-theme" '("doom-laserwave")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-manegarm-theme" '("doom-manegarm")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-material-theme" '("doom-material")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-molokai-theme" '("doom-molokai")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-monokai-classic-theme" '("doom-monokai-classic")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-monokai-pro-theme" '("doom-monokai-pro")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-monokai-spectrum-theme" '("doom-monokai-spectrum")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-moonlight-theme" '("doom-moonlight")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-nord-light-theme" '("doom-nord-light")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-nord-theme" '("doom-nord")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-nova-theme" '("doom-nova")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-oceanic-next-theme" '("doom-oceanic-next")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-one-light-theme" '("doom-one-light")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-one-theme" '("doom-one")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-opera-light-theme" '("doom-opera-light")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-opera-theme" '("doom-opera")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-outrun-electric-theme" '("doom-outrun-electric")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-palenight-theme" '("doom-palenight")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-peacock-theme" '("doom-peacock")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-rouge-theme" '("doom-rouge")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-snazzy-theme" '("doom-snazzy")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-solarized-dark-theme" '("doom-solarized-dark")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-solarized-light-theme" '("doom-solarized-light")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-sourcerer-theme" '("doom-sourcerer")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-spacegrey-theme" '("doom-spacegrey")))
-
-
-
-(autoload 'doom-name-to-rgb "doom-themes" "\
-Retrieves the hexidecimal string repesented the named COLOR (e.g. \"red\")
-for FRAME (defaults to the current frame).
-
-\(fn COLOR)" nil nil)
-
-(autoload 'doom-blend "doom-themes" "\
-Blend two colors (hexidecimal strings) together by a coefficient ALPHA (a
-float between 0 and 1)
-
-\(fn COLOR1 COLOR2 ALPHA)" nil nil)
-
-(autoload 'doom-darken "doom-themes" "\
-Darken a COLOR (a hexidecimal string) by a coefficient ALPHA (a float between
-0 and 1).
-
-\(fn COLOR ALPHA)" nil nil)
-
-(autoload 'doom-lighten "doom-themes" "\
-Brighten a COLOR (a hexidecimal string) by a coefficient ALPHA (a float
-between 0 and 1).
-
-\(fn COLOR ALPHA)" nil nil)
-
-(autoload 'doom-color "doom-themes" "\
-Retrieve a specific color named NAME (a symbol) from the current theme.
-
-\(fn NAME &optional TYPE)" nil nil)
-
-(autoload 'doom-ref "doom-themes" "\
-TODO
-
-\(fn FACE PROP &optional CLASS)" nil nil)
-
-(autoload 'doom-themes-set-faces "doom-themes" "\
-Customize THEME (a symbol) with FACES.
-
-If THEME is nil, it applies to all themes you load. FACES is a list of Doom
-theme face specs. These is a simplified spec. For example:
-
-  (doom-themes-set-faces 'user
-    '(default :background red :foreground blue)
-    '(doom-modeline-bar :background (if -modeline-bright modeline-bg highlight))
-    '(doom-modeline-buffer-file :inherit 'mode-line-buffer-id :weight 'bold)
-    '(doom-modeline-buffer-path :inherit 'mode-line-emphasis :weight 'bold)
-    '(doom-modeline-buffer-project-root :foreground green :weight 'bold))
-
-\(fn THEME &rest FACES)" nil nil)
-
-(function-put 'doom-themes-set-faces 'lisp-indent-function 'defun)
-
-(when (and (boundp 'custom-theme-load-path) load-file-name) (let* ((base (file-name-directory load-file-name)) (dir (expand-file-name "themes/" base))) (add-to-list 'custom-theme-load-path (or (and (file-directory-p dir) dir) base))))
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-themes" '("def-doom-theme" "doom-")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-themes-base" '("doom-themes-base-")))
-
-
-
-(autoload 'doom-themes-neotree-config "doom-themes-ext-neotree" "\
-Install doom-themes' neotree configuration.
-
-Includes an Atom-esque icon theme and highlighting based on filetype." nil nil)
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-themes-ext-neotree" '("doom-")))
-
-
-
-(autoload 'doom-themes-org-config "doom-themes-ext-org" "\
-Enable custom fontification & improves theme integration with org-mode." nil nil)
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-themes-ext-org" '("doom-")))
-
-
-
-(autoload 'doom-themes-treemacs-config "doom-themes-ext-treemacs" "\
-Install doom-themes' treemacs configuration.
-
-Includes an Atom-esque icon theme and highlighting based on filetype." nil nil)
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-themes-ext-treemacs" '("doom-themes-")))
-
-
-
-(autoload 'doom-themes-visual-bell-fn "doom-themes-ext-visual-bell" "\
-Blink the mode-line red briefly. Set `ring-bell-function' to this to use it." nil nil)
-
-(autoload 'doom-themes-visual-bell-config "doom-themes-ext-visual-bell" "\
-Enable flashing the mode-line on error." nil nil)
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-tomorrow-day-theme" '("doom-tomorrow-day")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-tomorrow-night-theme" '("doom-tomorrow-night")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-vibrant-theme" '("doom-vibrant")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-wilmersdorf-theme" '("doom-wilmersdorf")))
 
 
 
@@ -14579,7 +14770,7 @@ Any path found is added to the `exec-path'." t nil)
 )
 (setq package-activated-list
   (append
-    '(yasnippet yasnippet-snippets yaml-mode async with-editor which-key web-mode vimrc-mode s dash f vimish-fold vi-tilde-fringe popup vc-msg bind-key use-package undo-tree typescript-mode epl pkg-info projectile avy ace-window pfuture lv hydra ht treemacs treemacs-projectile persp-mode treemacs-persp transient git-commit magit treemacs-magit goto-chg evil treemacs-evil ivy swiper sqlup-mode sql-indent spinner solaire-mode smartparens shrink-path shell-pop scss-mode rotate restclient ranger rainbow-mode rainbow-delimiters prettier-js prescient powerline posframe parent-mode org-plus-contrib memoize markdown-mode dash-functional lsp-mode lsp-ui loop keyfreq json-snatcher json-reformat json-mode js2-mode ivy-rich ivy-prescient ivy-posframe ivy-explorer hl-todo highlight-parentheses highlight-operators highlight-numbers highlight-indent-guides highlight-escape-sequences highlight-defined hide-mode-line elisp-refs helpful haskell-mode grip-mode goto-line-preview go-mode gitignore-mode gitconfig-mode gitattributes-mode git-timemachine gcmh fzf flycheck flycheck-posframe eyebrowse expand-region exec-path-from-shell evil-vimish-fold evil-mu4e evil-magit evil-goggles evil-commentary esup emmet-mode editorconfig dumb-jump drag-stuff dotenv-mode doom-themes all-the-icons doom-modeline dockerfile-mode docker-compose-mode dired-k diminish diffview diff-hl counsel counsel-projectile company company-posframe company-lsp company-box centaur-tabs better-jumper auto-package-update amx all-the-icons-ivy all-the-icons-dired aggressive-indent add-node-modules-path)
+    '(yasnippet yasnippet-snippets yaml-mode async with-editor which-key web-mode vimrc-mode s dash f vimish-fold vi-tilde-fringe popup vc-msg bind-key use-package undo-tree typescript-mode epl pkg-info projectile avy ace-window pfuture lv hydra ht treemacs treemacs-projectile persp-mode treemacs-persp transient git-commit magit treemacs-magit goto-chg evil treemacs-evil ivy swiper sqlup-mode reformatter sqlformat sql-indent spinner solaire-mode smartparens shrink-path shell-pop scss-mode rotate restclient ranger rainbow-mode rainbow-delimiters pug-mode prettier-js prescient powerline posframe parent-mode org-plus-contrib memoize markdown-mode dash-functional lsp-mode lsp-ui loop keyfreq json-snatcher json-reformat json-mode js2-mode ivy-rich ivy-prescient ivy-posframe ivy-explorer hl-todo highlight-parentheses highlight-operators highlight-numbers highlight-indent-guides highlight-escape-sequences highlight-defined hide-mode-line elisp-refs helpful haskell-mode grip-mode goto-line-preview go-mode gitignore-mode gitconfig-mode gitattributes-mode git-timemachine gcmh fzf flycheck flycheck-posframe eyebrowse expand-region exec-path-from-shell ewal doom-themes ewal-doom-themes evil-vimish-fold evil-mu4e evil-magit evil-goggles evil-commentary esup emmet-mode editorconfig dumb-jump drag-stuff dotenv-mode all-the-icons doom-modeline dockerfile-mode docker-compose-mode dired-k diminish diffview diff-hl counsel counsel-projectile company company-posframe company-lsp company-box centaur-tabs better-jumper auto-package-update amx all-the-icons-ivy all-the-icons-dired aggressive-indent add-node-modules-path)
     package-activated-list))
 (progn
   (require 'info)

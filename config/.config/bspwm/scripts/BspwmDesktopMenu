@@ -1,0 +1,60 @@
+#!/bin/sh
+#
+###
+if ! [ -f "$HOME/.dmenurc" ]; then
+	cp /usr/share/dmenu/dmenurc $HOME/.dmenurc
+fi
+. $HOME/.dmenurc
+
+[[  $BROWSER && ${BROWSER-x} ]] && browser=$BROWSER || browser='midori'
+[[  $GUI_EDITOR && ${GUI_EDITOR-x} ]] && gui_editor=$GUI_EDITOR || gui_editor='gedit'
+
+eval $(xdotool getmouselocation --shell)
+menu_widht=300
+monitor_widht=$(wattr w $(lsw -r))
+monitor_height=$(wattr h $(lsw -r))
+lines=14
+menu_height=$(( $lines * 23 ))
+maxx=$(( $monitor_widht - $menu_widht ))
+miny=$PANEL_HEIGHT
+maxy=$(( $monitor_height - $menu_height ))
+XP=$X
+[ $XP -gt $maxx ] && XP=$maxx
+YP=$Y
+[ $YP -lt $miny ] && YP=$miny
+[ $YP -gt $maxy ] && YP=$maxy
+
+#DMENU='dmenu $DMENU_OPTIONS'
+if [[ "$@" == "" ]]; then
+	choice=$(echo -e "Flip\nRotate\nBalance windows\nEqualize windows\nRename desktop\nAdd desktop\nRemove desktop\nSwap desktop\nFocus follows pointer\nPointer follows focus+nShow hidden windows\nEnable autogap" | dmenu -i -l $lines -y $YP -x $XP -w $menu_widht -fn $DMENU_FN -nb $DMENU_NB -nf $DMENU_NF -sf $DMENU_SF -sb $DMENU_SB)
+	else
+	case $@ in
+	Flip)
+		choice=$(echo -e "Vertically\nHorizontally" | dmenu -i -l $lines -y $YP -x $XP -w $menu_widht -fn $DMENU_FN -nb $DMENU_NB -nf $DMENU_NF -sf $DMENU_SF -sb $DMENU_SB)
+		;;
+	Rotate)
+		choice=$(echo -e "Right\nLeft\nFull turn" | dmenu -i -l $lines -y $YP -x $XP -w $menu_widht -fn $DMENU_FN -nb $DMENU_NB -nf $DMENU_NF -sf $DMENU_SF -sb $DMENU_SB)		
+		;;
+	esac
+fi
+
+
+case "$choice" in
+  Flip) $0 Flip & ;;
+  Rotate) $0 Rotate & ;;
+  "Balance windows") bspc node @/ -B & ;;
+  "Equalize windows") bspc node @/ -E & ;;
+  "Rename desktop") bspwm-menu desktop-rename & ;;
+  "Add desktop") bspwm-menu desktop-add & ;;
+  "Remove desktop") bspwm-menu desktop-remove & ;;
+  "Swap desktop") bspwm-menu desktop-swap & ;;
+  "Focus follows pointer") toggle-focus-follows-pointer & ;;
+  "Pointer follows focus") toggle-pointer-follows-focus & ;;
+  "Show hidden windows") whid dmenu & ;;
+  "Enable autogap") autogap & ;;
+  "Left") bspc node @/ -R -90 & ;;
+  "Right") bspc node @/ -R 90 & ;;
+  "Full turn") bspc node @/ -R 180 & ;;
+  "Vertically") bspc node @/ -F vertical & ;;
+  "Horizontally") bspc node @/ -F horizontal & ;;
+esac

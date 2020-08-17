@@ -1,0 +1,56 @@
+# ~/.tmuxinator/sample.yml
+
+name: pepadm
+root: ~/code/qualirede/pep-admin
+
+# Optional. tmux socket
+# socket_name: foo
+
+# Note that the pre and post options have been deprecated and will be replaced by
+# project hooks.
+
+# Project hooks
+
+# Runs on project start, always
+# on_project_start: command
+
+# Run on project start, the first time
+# on_project_first_start: command
+
+# Run on project start, after the first time
+# on_project_restart: command
+
+# Run on project exit ( detaching from tmux session )
+# on_project_exit: command
+
+# Run on project stop
+# on_project_stop: command
+
+# Runs in each window and pane before window/pane specific commands. Useful for setting up interpreter versions.
+# pre_window: rbenv shell 2.0.0-p247
+
+# Pass command line options to tmux. Useful for specifying a different tmux.conf.
+# tmux_options: -f ~/.tmux.mac.conf
+
+# Change the command to call tmux.  This can be used by derivatives/wrappers like byobu.
+# tmux_command: byobu
+
+# Specifies (by name or index) which window will be selected on project startup. If not set, the first window is used.
+# startup_window: logs
+
+windows:
+  - pep:
+      # layout: even-horizontal
+      # layout: 283a,239x64,0,0{119x64,0,0,0,119x64,120,0[119x32,120,0,2,119x31,120,33,3]}
+      layout: 606f,100x55,0,0,10
+      panes:
+        - cdsso && dcud && modd
+        - cdres && dcud && npm start
+        - cdapi && dcud && modd
+        - sleep 7  && cdadm && yarn start
+        - cdadm && git status
+  - info:
+      layout: even-horizontal
+      panes:
+        - cd ~/dotfiles && git status
+        - gotop

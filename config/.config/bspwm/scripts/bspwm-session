@@ -1,0 +1,35 @@
+#! /bin/dash
+#
+# bspwm-session
+# From https://github.com/baskerville/bspwm/blob/master/contrib/freedesktop/bspwm-session , 
+# modified to copy example configs unless user already has some.
+# Later modified to drop multiuser support.
+# This script is a session launcher for bspwm.
+# It is based on similar scripts included with Openbox.
+
+# Trap: make sure everything started in ~/.config/bspwm/autostart is
+# signalled when this script exits or dies. Also clean up $state_path.
+on_exit() {
+	for child in $(jobs -p); do
+		jobs -p | grep -q $child && kill $child
+	done
+	# Extra paranoia
+	[ -d "${state_path}" && -w "${state_path}" ] && rm -rf -- "${state_path}"
+}
+
+trap on_exit EXIT QUIT INT 30
+#Create example configs if configs are not present
+[ ! -f ${HOME}/.config/sxhkd/sxhkdrc ] && cp /etc/skel/.config/sxhkd/sxhkdrc ${HOME}/.config/sxhkd/sxhkdrc
+[ ! -f ${HOME}/.config/bspwm/bspwmrc ] && cp /etc/skel/.config/bspwm/bspwmrc ${HOME}/.config/bspwm/bspwmrc
+[ ! -f ${HOME}/.config/bspwm/autostart ] && touch ${HOME}/.config/bspwm/autostart
+# Environment and autostart:
+
+for file in /etc/profile ${HOME}/.profile ${HOME}/.config/bspwm/autostart ; do
+	[ -r "${file}" ] && . "${file}"
+done
+
+# Launch sxhkd:
+[ -e /bin/dash ] && export SXHKD_SHELL="/bin/dash"
+sxhkd &
+# Launch bspwm:
+bspwm

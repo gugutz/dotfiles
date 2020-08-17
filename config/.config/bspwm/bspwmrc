@@ -3,76 +3,358 @@
 ##############################################################
 ## MONITORS SETUP
 
+# outputs=$(xrandr --query | grep " connected" | cut -d" " -f1)
+# work_dell_monitor=$(xrandr --query | grep -w "DP-1" | cut -d" " -f1)
+# work_laptop_monitor=$(xrandr --query | grep -w "eDP-1" | cut -d" " -f1)
+
+work_dell_monitor=DP-1
+work_laptop_monitor=eDP-1
 ## auto reload monitor config based on whats connected
-autorandr --change &
+autorandr --change --default work_single &
 
-# xrandr --output DVI-I-2 --primary --right-of DVI-I-1
-# xrandr --output DVI-I-1 --left-of DVI-I-2 --primary
+##############################################################
+## WORKSPACES SETUP
 
-outputs=$(xrandr --query | grep " connected" | cut -d" " -f1)
+# check current monitor layout
 current_monitor_config=$(autorandr --current)
 
-## FIXME: fix this auto workspace setup
-# after last format xrandr inverted the names of monitors, dunno why
-# if [[ $(hostname) == 'tau-home-pc' ]]; then
+# source: https://www.reddit.com/r/bspwm/comments/i8c4qp/how_to_only_create_new_desktops_if_they_werent/g17h9cn?utm_source=share&utm_medium=web2x
+# [[ "$1" = 0 ]] &&
+case $(hostname) in
+    tau-home)
+        bspc monitor DVI-I-2 -d 1 2 3 4 5 6 7
+        bspc monitor DVI-I-1 -d 8 9 10
+
+        # bspc monitor DVI-I-1 -s DVI-I-2
+        ;;
+    tau-work) {
+            case $current_monitor_config in
+                work_extended)
+                    bspc monitor DP-1 -d 1 2 3 4 5 6 7
+                    bspc monitor eDP-1 -d 8 9 10
+                    echo "Aplicando layout de workspaces para work extended" &
+                    notify-send "Aplicando layout de workspaces para work extended" &
+                    # bspc monitor DP-1 -s eDP-1
+                    ;;
+                work_single)
+                    bspc monitor "$work_laptop_monitor" -d 1 2 3 4 5 6 7 8 9 10
+                    echo "Aplicando layout de workspaces para work single" &
+                    notify-send "Aplicando layout de workspaces para work single" &
+                    ;;
+                work_mirrored)
+                    bspc monitor eDP-1 -d 1 2 3 4 5 6 7 8 9 10
+                    echo "Aplicando layout de workspaces para work single" &
+                    notify-send "Aplicando layout de workspaces para work single" &
+                    ;;
+                *) echo "none of the registered autorandr profiles are applied"
+                   ;;
+            esac ;}
+              ;;
+    *) echo "this hostname is unknown" ;;
+esac
+
+# make the desktops be on the correct monitors again
+bspc --reorder-monitors DP-1 eDP-1
+
+
+# # after last format xrandr inverted the names of monitors, dunno why
+# if [[ $(hostname) == 'tau-home' ]]; then
 #     bspc monitor DVI-I-2 -d 1 2 3 4 5 6 7
 #     bspc monitor DVI-I-1 -d 8 9 10
-# elif [[ $(hostname) == 'tau-work-pc' ]] && [[ $current_monitor_config == "work_extended" ]]; then
-#     bspc monitor DP1 -d 1 2 3 4 5 6 7
-#     bspc monitor eDP1 -d 8 9 10
-# elif [[ $(hostname) == 'tau-work-pc' ]] && [[ $current_monitor_config == "work_single" ]]; then
-#     bspc monitor eDP1 -d 1 2 3 4 5 6 7 8 9 10
-# elif [[ $(hostname) == 'tau-work-pc' ]] && [[ $current_monitor_config == "work_mirrored" ]]; then
-#     bspc monitor eDP1 -d 1 2 3 4 5 6 7 8 9 10
+#     # bspc monitor DVI-I-1 -s DVI-I-2
+#     notify-send "Aplicando layout de workspaces para home extended" &
+# elif [[ $(hostname) == 'tau-work' ]] && [[ $current_monitor_config == "work_extended" ]]; then
+#     bspc monitor DP-1 -d 1 2 3 4 5 6 7
+#     bspc monitor eDP-1 -d 8 9 10
+#     bspc monitor eDP-1 -s DP-1
+#     notify-send "Aplicando layout de workspaces para work extended" &
+# elif [[ $(hostname) == 'tau-work' ]] && [[ $current_monitor_config == "work_single" ]]; then
+#     bspc monitor $work_laptop_monitor -d 1 2 3 4 5 6 7 8 9 10
+#     notify-send "Aplicando layout de workspaces para work single" &
+# elif [[ $(hostname) == 'tau-work' ]] && [[ $current_monitor_config == "work_mirrored" ]]; then
+#     dunstify "Bem Vindo ${USER^}!" &
+#     bspc monitor eDP-1 -d 1 2 3 4 5 6 7 8 9 10
+#     notify-send "Aplicando layout de workspaces para home mirrored" &
 # fi
-
-bspc monitor DP1 -d 1 2 3 4 5 6 7
-bspc monitor eDP1 -d 8 9 10
 
 # maybe this is only needed when the second monitor is on the left. testing it
 # bspc monitor DVI-I-1 -s DVI-I-2
-bspc monitor eDP1 -s DP1
+
 
 ##############################################################
+## HELPER FUNCTIONS
 
-# start key manager
-[[ ! $(pidof -x sxhkd) ]] && sxhkd &
+# cli logger
+logger () {
+    if [ -x "$(command -v boxes)" ] && [ -x "$(command -v lolcat)" ];then
+        echo $1 | boxes | lolcat
+    fi # if [ -x "$(command -v lolcat)" ];then #   msg="`$1`" | lolcat
+    # fi
+    echo $msg
+}
+
 
 # run function to check for existing instances and avoid duplicates
-function run {
-    if ! pgrep $1 ;
-    then
+run() {
+    # first check if the command is installed
+	  if ! command -v "$1" > /dev/null; then
+        echo "The command $1 wanst found in this system."
+    fi
+    # then check if there isnt already a process with the same name running
+    if ! pidof -x $1 ; then # could also use pgrep instead of pidof -x
+        echo "Running $1"
         $@&
+    else
+        echo "$1 is already running"
     fi
 }
 
-# change the mouse cursor to left pointer
-xsetroot -cursor_name left_ptr &
+#################################################################
+# BSPWM configuration
+#################################################################
 
-# change repeat rate of keyboard
-xset r rate 250 70 &
+bspc config window_gap           20
+
+# --------------------
+# PADDING
+bspc config top_padding          24
+bspc config bottom_padding       30
+bspc config left_padding         0
+bspc config right_padding        0
+
+# --------------------
+# LAYOUTS
+bspc config split_ratio          0.50
+
+# MONOCLE LAYOUT (WHERE EACH WINDOW IS 100% OF THE SCREEN)
+bspc config single_monocle       true
+bspc config gapless_monocle      true # equivalent of i3 smart gaps, which only applies gaps if theres more than 1 window
+bspc config borderless_monocle   true # border for when there is only 1 window (monocle)
+
+# --------------------
+#bspc config focus_by_distance    true
+bspc config focus_follows_pointer true
+#bspc config history_aware_focus  true
+
+# this option make the swapping of workspaces betwwn monitors fail
+# this option is necessary for dual monitors layout
+# it moves the current desktops that are on the unplugged monitor to the single monitor
+# it was happening that i unplugged the big monitor, and counldnt acess the desktops and windows that were on that monitor anylonger
+bspc config remove_disabled_monitors true
+bspc config remove_unplugged_monitors true
+
+# --------------------
+# mouse related settings
+bspc config pointer_modifier mod4
+bspc config pointer_action1 move
+bspc config pointer_action2 resize_side
+bspc config pointer_action3 resize_corner
+
+# window borders configuration
+bspc config border_width           2
+bspc config normal_border_color    "#4c566a"
+bspc config active_border_color    "#1e1e1e"
+# bspc config focused_border_color   "#007a3d"
+bspc config focused_border_color   "#007ad3"
+# bspc config focused_border_color "#1ABB9B"
+bspc config presel_feedback_color  "#5e81ac"
+# bspc config presel_feedback_color "#1ABB9B"
+# bspc config urgent_border_color    "#dd2727"
+
+
+#################################################################
+# Fullscreen applications
+#################################################################
+
+bspc rule -a Emacs state=fullscreen
+bspc rule -a VirtualBox Manager state=fullscreen
+bspc rule -a VirtualBox Machine state=fullscreen
+
+
+#################################################################
+# Monocle applications
+#################################################################
+
+# add an atom in monoble windows for picom to be able to apply rules to it
+# source: https://www.reddit.com/r/bspwm/comments/hqt1r3/is_there_a_way_to_disable_picom_rounded_borders/?utm_source=share&utm_medium=web2x
+bspc subscribe desktop_layout | while read -r Event
+do
+    Monitor=$(echo "$Event" | awk '{print $2}')
+    Desktop=$(echo "$Event" | awk '{print $3}')
+    Layout=$(echo "$Event" | awk '{print $4}')
+    if [ "$Layout" = "monocle" ]; then
+        xprop -id $(bspc query -N -n focused) -f _BSPWM_MONOCLE 32c -set _BSPWM_MONOCLE 1
+    fi
+done &
+
+
+#################################################################
+# Floating applications
+#################################################################
+
+run ~/.config/bspwm/scripts/add-border-to-floating-windows.sh &
+
+# in BSPWM, the first string of WM_CLASS is called instance_name and the second is called class_name.
+# If you want to match using the first string, pavucontrol, you need to use:
+# bspc rule -a '*:pavucontrol' state=floating
+# If you want to match using the second string, Pavucontrol, you need to use:
+# bspc rule -a Pavucontrol state=floating
+
+bspc rule -a io-gatling-recorder-GatlingRecorder state=floating
+bspc rule -a TeamViewer state=floating
+bspc rule -a Pavucontrol:pavucontrol state=floating
+bspc rule -a org.remmina.Remmina:pavucontrol state=floating
+bspc rule -a Arandr state=floating
+bspc rule -a feh state=floating
+bspc rule -a Font-manager state=floating
+bspc rule -a Nitrogen state=floating center=true
+bspc rule -a TelegramDesktop state=floating center=true rectangle=1600x800+0+0
+bspc rule -a '*:alsamixer' state=floating center=true
+bspc rule -a Pavucontrol state=floating sticky=on center=true
+bspc rule -a '*:lxappearance' state=floating center=true
+bspc rule -a '*:blueman-manager' state=floating center=true
+bspc rule -a File-roller state=floating center=true
+bspc rule -a '*:peek' state=floating
+bspc rule -a rofi state=floating sticky=on
+
+
+#################################################################
+# Tiled applications
+#################################################################
+
+bspc rule -a Emacs state=tiled
+bspc rule -a Gnome-disks state=tiled
+bspc rule -a Xfce4-settings-manager state=tiled
+
+#################################################################
+# Open applications on specific workspaces
+#################################################################
+
+bspc rule -a Firefox desktop='^3' follow=on
+bspc rule -a Google-chrome desktop='^3' follow=on
+bspc rule -a Transmission-gtk desktop='^7' follow=on
+bspc rule -a discord desktop='^10' follow=on
+
+#################################################################
+# games
+#################################################################
+
+# steam
+bspc rule -a Steam state=floating
+
+# lutris
+bspc rule -a Lutris state=floating
+
+# wine and wine games
+bspc rule -a wine state=floating
+bspc rule -a Diablo state=floating
+bspc rule -a Wine:diablo.exe state=floating
+bspc rule -a Wine:Diablo_Copy.exe state=floating
+
+# rockstar social club
+# bspc rule -a steam_app_271590 state=floating
+bspc rule -a '*:socialclubhelper.exe' state=floating desktop='^8' center=true rectangle=800x600+0+0
+
+# gta 5
+bspc rule -a '*:gta5.exe' desktop='^7' state=floating center=true
+
+#################################################################
+# SCRATCHPADS
+#################################################################
+
+#-----------------------------------------
+# AUTO START SCRATCHPADS
+# left this here because in the new scratchpad im using, it opens the app it its not open yet, but i have to press it twice. By starting them here they are already available when i toggle the scratchpad
+
+term=st
+term_wm_set_prop_flag=-c # st set WM_CLASS flag
+# term_wm_set_prop_flag=--class # alacritty flag
+# term_wm_set_prop_flag=-name # uxrvt flag
+
+# [[ ! $(xdotool search --class terminal-scratchpad)  ]] &&  $term $term_wm_set_prop_flag terminal-scratchpad &
+bspc rule -a terminal-scratchpad follow=on state=floating hidden=on rectangle=900x700+0+0 center=true
+
+# sxhkd fzf keys help
+# source: https://www.reddit.com/r/bspwm/comments/aejyze/tip_show_sxhkd_keybindings_with_fuzzy_search/
+# [[ ! $(xdotool search --class sxhkd-keys-help-scratchpad)  ]] && $term $term_wm_set_prop_flag sxhkd-keys-help-scratchpad -e show-keybindings-help-fzf &
+bspc rule -a sxhkd-keys-help-scratchpad state=floating follow=on hidden=on rectangle=1200x800+0+0 center=true
+
+# nmtui
+# [[ ! $(xdotool search --class nmtui-scratchpad)  ]] && $term $term_wm_set_prop_flag nmtui-scratchpad -e 'nmtui' &
+bspc rule -a nmtui-scratchpad sticky=on state=floating hidden=on rectangle=600x700+0+0 center=true
+
+# pacfzf and yayfzf from manjaro bspwm. awesome
+# [[ ! $(xdotool search --class pacfzf-scratchpad)  ]] && $term $term_wm_set_prop_flag pacfzf-scratchpad -e 'pacfzf' &
+bspc rule -a pacfzf-scratchpad sticky=on state=floating hidden=on rectangle=1200x900+0+0 center=true
+
+# [[ ! $(xdotool search --class yayfzf-scratchpad)  ]] && $term $term_wm_set_prop_flag yayfzf-scratchpad -e 'yayfzf' &
+bspc rule -a yayfzf-scratchpad sticky=on state=floating hidden=on rectangle=1200x900+0+0 center=true
+
+# [[ ! $(xdotool search --class ranger-scratchpad)  ]] && $term $term_wm_set_prop_flag ranger-scratchpad -e 'ranger' &
+bspc rule -a ranger-scratchpad sticky=on state=floating hidden=on rectangle=1200x900+0+0 center=true
+
+# [[ ! $(pidof -x galculator) ]] && galculator &
+bspc rule -a Galculator sticky=on state=floating hidden=on center=true
+
+bspc rule -a Pavucontrol sticky=on state=floating hidden=on rectangle=600x500+0+0 center=true
+# [[ ! $(pidof -x pavucontrol) ]] && pavucontrol &
+
+# some scratchpads i want them to really open only when i call them
+# leaving this here commented to remember that
+bspc rule -a openfortiGUI sticky=on state=floating hidden=on center=true
+# [[ ! $(pidof -x openfortigui) ]] && openfortigui &
+
+
+#################################################################
+# START APPLICATIONS
+#################################################################
+
+# start key manager
+run sxhkd &
+
+# change the mouse cursor to left pointer
+# controled by GTK3 themes now
+# is_installed xsetroot && xsetroot -cursor_name left_ptr &
+
+echo "Increasing keyboard repeating rate" &
+run xset r rate 250 60 &
 
 #change your keyboard if you need it
-setxkbmap -layout br &
+run setxkbmap -layout br &
 
-# swap caps for esc
-setxkbmap -option caps:swapescape &
+echo "Swapping Esc <-> Caps Lock" &
+# swap capslock key with Escape, map menu key (when pressed shows right menu) to super, and ctrl+alt+backspace to restart X
+setxkbmap -option "caps:escape" -option "altwin:menu_win" -option "terminate:ctrl_alt_bksp"
+
+# run setxkbmap -option caps:swapescape &
+
+
 # xmodmap ~/.Xmodmap &
 
 
-# launch polybar
-# [[ ! $(pidof -x polybar) ]] && $HOME/.config/polybar/launch.sh &
-$HOME/.config/polybar/launch.sh &
 
-[[ ! $(pidof -x picom) ]] && picom &
+# ibgawan fork with rounded corners and kawase blur
+# -b daemonizes the application
+# this fork supports the flag --experimental-backends on the config, thus not needing to pass it via argument
+pkill picom && run picom -b
+notify-send 'Running picom with rounded corners and blur!'
+
+
+# launch lxpolkit - polkit's  X11 graphical session agent
+# this is needed to build the picom with animations because it doenst redirect to the terminal agent, it requires a graphical agent
+run /usr/bin/lxpolkit &
 
 # sound
-pulseaudio --start
+echo "starting pulseaudio"
+pulseaudio --start &
 
 # applets and utilities
+echo "numlockx"
 run numlockx on &
+echo "nm-applet"
 run nm-applet &
 run volumeicon &
+run blueman-applet &
 
 
 #################################################################
@@ -87,7 +369,8 @@ nitrogen --restore &
 
 # wal --theme base16-eighties
 # restore last pywall colorscheme
-wal -R
+# echo "Restaurando ultimo tema do  pywal" &
+# wal -R &
 
 
 # Run ./pacwall.sh -W to use colors set by pywal.
@@ -98,155 +381,36 @@ wal -R
     #   --output-height=980 \
 
 # Set random lockscreen image
-betterlockscreen -u ~/wallpapers &
+# betterlockscreen -u ~/wallpapers &
 
 # Auto lockscreen with betterlockscreen using dim and blur effects and turning screen off after 600 seconds
 xautolock -time 5 -locker "betterlockscreen -u ~/wallpapers --lock dimblur --off 600" &
+# xautolock -time 5 -locker "./matrixlock.py" &
 
 
-#################################################################
-# BSPWM configuration
-#################################################################
-
-#bspc config border_radius       8
-bspc config border_width         2
-bspc config window_gap           10
-# padding
-bspc config top_padding          30
-bspc config bottom_padding       30
-bspc config left_padding         10
-bspc config right_padding        10
-# layouts
-bspc config single_monocle       false
-#bspc config click_to_focus       true
-bspc config split_ratio          0.50
-bspc config borderless_monocle   true
-bspc config gapless_monocle      true
-#bspc config focus_by_distance    true
-bspc config focus_follows_pointer true
-#bspc config history_aware_focus  true
-bspc config pointer_modifier mod4
-bspc config pointer_action1 move
-bspc config pointer_action2 resize_side
-bspc config pointer_action3 resize_corner
-# bspc config remove_disabled_monitors true
-# bspc config merge_overlapping_monitors true
-
-# Window border colors
-bspc config normal_border_color		"#4c566a"
-bspc config active_border_color		"#1e1e1e"
-# bspc config focused_border_color	"#007a3d"
-bspc config focused_border_color	"#007ad3"
-bspc config presel_feedback_color	"#5e81ac"
-bspc config urgent_border_color 	"#dd2727"
-
+# launch polybar
+# this way it doenst refresh the bar when i reload bspwm
+[[ ! $(pidof -x polybar) ]] && run $HOME/.config/polybar/launch.sh > /dev/null &
 
 #################################################################
-# Fullscreen applications
+###External rules
 #################################################################
+# from manjaro bspw
 
-bspc rule -a inkscape state=fullscreen
-bspc rule -a Spotify state=fullscreen
-bspc rule -a Vlc state=fullscreen
-bspc rule -a VirtualBox Manager state=fullscreen
-bspc rule -a VirtualBox Machine state=fullscreen
-#bspc rule -a Gimp state=fullscreen
+##Pseudo automatic mode: always splits focused window when opening new window
+bspc config external_rules_command ~/.config/bspwm/scripts/pseudo_automatic_mode
 
 #################################################################
-# Floating applications
-#################################################################
-
-bspc rule -a Arandr state=floating
-bspc rule -a Lutris state=floating
-bspc rule -a Diablo state=floating
-bspc rule -a feh state=floating
-#bspc rule -a mpv state=floating sticky=on
-bspc rule -a Font-manager state=floating
-#bspc rule -a Gpick state=floating sticky=on
-bspc rule -a Nitrogen state=floating center=true
-bspc rule -a Oblogout state=floating
-bspc rule -a Pavucontrol state=floating sticky=on
-bspc rule -a Peek state=floating
-bspc rule -a rofi state=floating sticky=on
-#bspc rule -a Skype state=floating
-
-# wine games (rules applied using instances instead of class)
-bspc rule -a wine state=floating
-bspc rule -a Wine:diablo.exe state=floating
-bspc rule -a Wine:Diablo_Copy.exe state=floating
-#################################################################
-# Tiled applications
-#################################################################
-
-bspc rule -a Gnome-disks state=tiled
-bspc rule -a Xfce4-settings-manager state=tiled
-bspc rule -a Emacs state=tiled
-
-#################################################################
-# Open applications on specific workspaces
-#################################################################
-
-bspc rule -a Firefox desktop='^3' follow=on
-bspc rule -a Google-chrome desktop='^3' follow=on
-#bspc rule -a Chromium desktop='^1'  follow=on
-#bspc rule -a Subl3 desktop='^2' follow=on
-#bspc rule -a Atom desktop='^2' follow=on
-bspc rule -a Steam desktop='^5'
-#bspc rule -a vlc desktop='^6'  follow=on
-#bspc rule -a mpv desktop='^6'  follow=on
-#bspc rule -a Vivaldi-stable desktop='^6' follow=on
-#bspc rule -a Vivaldi-snapshot desktop='^6' follow=on
-bspc rule -a Transmission-gtk desktop='^7' follow=on
-#bspc rule -a Thunar desktop='^8' follow=on
-bspc rule -a discord desktop='^10' follow=on
-#bspc rule -a Spotify desktop='^10' follow=on
-
-#Spotify fix  --move desktop 10
-#sleep 1
-#wmctrl -r Spotify -t 10
-#exit
-
-#polybar hidden when fullscreen for vlc, youtube, mpv ...
-#find out the name of your monitor with xrandr
-#xdo below -t $(xdo id -n root) $(xdo id -a polybar-main_DP-1)
-#xdo below -t $(xdo id -n root) $(xdo id -a polybar-main_HDMI1)
-#xdo below -t $(xdo id -n root) $(xdo id -a polybar-main_HDMI2)
-
-
-#################################################################
-# SCRATCHPADS
-#################################################################
-
-term=st
-# alacritty class flag
-# term_wm_set_prop_flag=--class
-# st class flag
-term_wm_set_prop_flag=-c
-term_wm_prop=instance
-
-# st
-# term_wm_set_prop_flag=-c
-# term_wm_prop=instance
-
-# uxrvt
-# term_wm_set_prop_flag=-T
-# term_wm_prop=title
-
-# terminal scratchpad
-bspc rule -a terminal-scratchpad sticky=on state=floating hidden=on rectangle=900x700+0+0 center=true
-[[ ! $(xdotool search --class terminal-scratchpad)  ]] &&  $term $term_wm_set_prop_flag terminal-scratchpad &
-# alacritty --class dropdown -e "zsh -i" &
-
-# ranger scratchpad
-bspc rule -a ranger-scratchpad sticky=on state=floating hidden=on rectangle=1200x900+0+0 center=true
-[[ ! $(xdotool search --class ranger-scratchpad)  ]] && $term $term_wm_set_prop_flag ranger-scratchpad -e 'ranger' &
-
-
-# galculator scratchpad
-bspc rule -a Galculator sticky=on state=floating hidden=on center=true
-[[ ! $(pidof -x galculator) ]] && galculator &
-
-
 # Welcome message
+#################################################################
+
 # this also helps me to check if bspwm got to the end of the config file
-dunstify "Bem Vindo ${USER^}!" &
+# dunstify "Bem Vindo ${USER^}!" &
+notify-send "Bem Vindo ${USER^}!" &
+echo "got to the end of the config"
+
+#################################################################
+# SWALLOW BY PID (DOENST NEED TO PASS THE APPLICATION AS AN ARGUMENT LIKE OTHER SOLUTIONS)
+#################################################################
+# source: https://github.com/Liupold/pidswallow
+~/.config/bspwm/scripts/pidswallow --loop &

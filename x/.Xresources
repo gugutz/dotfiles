@@ -97,8 +97,8 @@ URxvt.font:                       xft:Hack Nerd Font Mono:pixelsize=14
 ! URxvt.bold.font: -xos4-terminus-bold-r-normal--16-160-72-72-c-80-iso10646-1
 !! terminus names see end of file!
 
-# value inside brackets [] is opacity level
-# needs compositor manager
+! value inside brackets [] is opacity level
+! needs compositor manager
 URxvt.background:                 [100]#222D31
 
 URxvt.depth:                      32

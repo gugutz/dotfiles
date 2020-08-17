@@ -1,16 +1,21 @@
 configuration {
-  theme: "solid-blue-green";
-  width: 100;
+  /* # Pywal Dark theme. */
+  /* theme: "~/.cache/wal/colors-rofi-dark"; */
+  /* # Pywal Light theme. */
+  theme: "~/.cache/wal/colors-rofi-light";
+  /* theme: "Pop-Dark"; */
+  width: 50;
   lines: 15;
   columns: 1;
   line-margin: 2;
   line-padding: 1;
   modi: "window,drun,ssh,combi";
-  font: "hack 10";
+  font: "hack 13";
   combi-modi: "window,drun,ssh";
   show-icons: true;
   sidebar-mode: true;
-	display-drun:   "Activate";
-	display-run:    "Execute";
-	display-window: "Window";
+  display-drun:   "Activate";
+  display-run:    "Execute";
+  display-window: "Window";
 }
+@import "/usr/share/rofi/themes/Pop-Dark.rasi"

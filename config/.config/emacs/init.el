@@ -1,5 +1,4 @@
-;;; Package --- Summary  -*- lexical-binding: t; -*-
-
+;; Package --- Summary  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Personal and highly customized configuration, with optmization based on doom-emacs and other stuff i found on the internet
@@ -13,7 +12,6 @@
 (when (version< emacs-version "26.1")
   (error "Detected Emacs %s.  This Emacs config only supports Emacs 26.1 and higher"
     emacs-version))
-
 
 
 ;;****************************************************************
@@ -76,7 +74,7 @@ Use this for files that change often, like cache files.  Must end with a slash."
 ;;****************************************************************
 ;;
 ;;; prevents bug with emacs starting in floating state on bspwm
-;;; yeah, a hack, but...
+; yeah, a hack, but...
 (setq frame-resize-pixelwise t)
 
 ;;****************************************************************
@@ -328,32 +326,6 @@ Use this for files that change often, like cache files.  Must end with a slash."
 ;; (add-hook 'window-setup-hook (lambda () (load-theme my-theme t)))
 ;; (load-theme my-theme t)
 
-;; *****************************
-;; kaolin-themes
-;; Or if you have use-package installed
-(use-package kaolin-themes
-  :disabled
-  :config
-  (load-theme 'kaolin-dark t)
-  (kaolin-treemacs-theme)
-  )
-
-
-;; base-16 themes
-;; (use-package base16-theme
-;;   :disabled
-;;   :ensure t
-;;   :config
-;;   ;; Set the cursor color based on the evil state
-;;   (defvar my/base16-colors base16-default-dark-colors)
-;;   (setq evil-emacs-state-cursor   `(,(plist-get my/base16-colors :base0D) box)
-;;     evil-insert-state-cursor  `(,(plist-get my/base16-colors :base0D) bar)
-;;     evil-motion-state-cursor  `(,(plist-get my/base16-colors :base0E) box)
-;;     evil-normal-state-cursor  `(,(plist-get my/base16-colors :base0B) box)
-;;     evil-replace-state-cursor `(,(plist-get my/base16-colors :base08) bar)
-;;     evil-visual-state-cursor  `(,(plist-get my/base16-colors :base09) box))
-;;   (load-theme 'base16-default-dark t)
-;;   )
 
 ;; doom themes
 (use-package doom-themes
@@ -362,7 +334,8 @@ Use this for files that change often, like cache files.  Must end with a slash."
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
     doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-dark+ t)
+  ;; (load-theme 'doom-dark+ t)
+  (load-theme 'vscode-dark-plus t)
 
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
@@ -370,7 +343,7 @@ Use this for files that change often, like cache files.  Must end with a slash."
   ;; Enable custom neotree theme (all-the-icons must be installed!)
   ;; (doom-themes-neotree-config)
   ;; or for treemacs users
-  (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
+  ;; (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
   ;; (doom-themes-treemacs-config)
 
   ;; Corrects (and improves) org-mode's native fontification.
@@ -437,7 +410,6 @@ Use this for files that change often, like cache files.  Must end with a slash."
   (with-selected-window (next-window)
     (call-interactively 'View-scroll-half-page-backward)))
 
-(setq scroll-preserve-screen-position 'always)
 
 (advice-add #'View-scroll-half-page-forward :around
   #'my-indicate-scroll-forward)
@@ -1237,7 +1209,7 @@ all hooks after it are ignored.")
   ;; Changing the mode-line color by evil state
   ;; `source': https://www.emacswiki.org/emacs/Evil#toc19
   (let ((default-color (cons (face-background 'mode-line)
-                                 (face-foreground 'mode-line))))
+                         (face-foreground 'mode-line))))
     (add-hook 'post-command-hook
       (lambda ()
         (let ((color (cond ((minibufferp) default-color)
@@ -1486,8 +1458,6 @@ all hooks after it are ignored.")
   ;; Integration with `projectile'
   (with-eval-after-load 'projectile
     (setq projectile-completion-system 'ivy))
-
-
   )
 
 
@@ -1523,14 +1493,11 @@ all hooks after it are ignored.")
   ("C-S-o" . counsel-rhythmbox)
   :init
   (with-eval-after-load 'evil
+    ;; file related bindings (switch, find, grep)
     (define-key evil-normal-state-map (kbd "SPC b") 'counsel-switch-buffer)
     (define-key evil-normal-state-map (kbd "SPC f f") 'counsel-find-file)
-    ;; grep with counsel
-    (define-key evil-normal-state-map (kbd "SPC a g") 'counsel-ag)
-    (define-key evil-normal-state-map (kbd "SPC r g") 'counsel-rg)
-    ;; counsel-projectile
-    (define-key evil-normal-state-map (kbd "SPC p f") 'counsel-projectile-find-file)
-    (define-key evil-normal-state-map (kbd "SPC p b") 'counsel-projectile-switch-to-buffer)
+    (define-key evil-normal-state-map (kbd "SPC f a g") 'counsel-ag)
+    (define-key evil-normal-state-map (kbd "SPC f r g") 'counsel-rg)
     ;; fzf key bindings
     (define-key evil-normal-state-map (kbd "SPC f z f") 'counsel-fzf)
     (define-key evil-normal-state-map (kbd "SPC f z p") (lambda () ( counsel-fzf nil (locate-dominating-file default-directory ".git") )))
@@ -1614,6 +1581,11 @@ repository, then the corresponding root is used instead."
   :config
   (eval-when-compile
     (counsel-projectile-mode 1))
+  (with-eval-after-load 'evil
+    (define-key evil-normal-state-map (kbd "SPC p f") 'counsel-projectile-find-file)
+    (define-key evil-normal-state-map (kbd "SPC p b") 'counsel-projectile-switch-to-buffer)
+    (define-key evil-normal-state-map (kbd "SPC p s") 'counsel-projectile-switch-project)
+    (define-key evil-normal-state-map (kbd "SPC p g") 'counsel-projectile-rg))
   )
 
 ;; *********************************
@@ -1725,7 +1697,7 @@ repository, then the corresponding root is used instead."
   :after ivy counsel
   :diminish ivy-posframe-mode
   :custom-face
-  (ivy-posframe ((t (:background "#202020"))))
+  ;; (ivy-posframe ((t (:background "#202020"))))
   (ivy-posframe-border ((t (:background "#9370DB"))))
   (ivy-posframe-cursor ((t (:background "#00ff00"))))
   ;; troquei do :config pra :init e nao precisou de (eval-after-load nem de :demand t)
@@ -1905,6 +1877,10 @@ repository, then the corresponding root is used instead."
   (setq treemacs-show-cursor nil)
   (setq treemacs-persist-file (expand-file-name "cache/treemacs-persist" user-emacs-directory))
   (treemacs-resize-icons 21)
+  (with-eval-after-load 'evil
+    (define-key evil-normal-state-map (kbd "SPC t p p") 'treemacs-projectile)
+    (define-key evil-normal-state-map (kbd "SPC t p a") 'treemacs-add-project-to-workspace)
+    (define-key evil-normal-state-map (kbd "SPC t p d") 'treemacs-remove-project-from-workspace))
   )
 
 (use-package treemacs-evil
@@ -1913,13 +1889,16 @@ repository, then the corresponding root is used instead."
   :config
   (evil-define-key 'treemacs treemacs-mode-map (kbd "h") #'treemacs-TAB-action)
   (evil-define-key 'treemacs treemacs-mode-map (kbd "l") #'treemacs-TAB-action)
+
   )
 
 (use-package treemacs-projectile
+  :demand t
   :after treemacs projectile
   )
 
 (use-package treemacs-magit
+  :demand t
   :after treemacs magit
   )
 
@@ -2076,12 +2055,21 @@ repository, then the corresponding root is used instead."
 ;; *********************************
 ;;; drag stuff / move text
 
+
+;; *********************************
+;;; drag stuff / move text
+
 (use-package drag-stuff
   :bind
   ("M-k" . drag-stuff-up)
   ("M-j" . drag-stuff-down)
   ("M-h" . drag-stuff-left)
   ("M-l" . drag-stuff-right)
+  ("C-M-S-h" . transpose-words)
+  :init
+  ;; have to unset this key first because drag-stuff natively uses it
+  (global-unset-key (kbd "M-S-h"))
+  (global-set-key (kbd "M-S-h") 'transpose-chars)
   :config
   (drag-stuff-mode t)
   )
@@ -2356,13 +2344,11 @@ repository, then the corresponding root is used instead."
 ;;;  Projectile
 
 (use-package projectile
+  :demand t
   :diminish projectile-mode
   :bind
   (:map projectile-mode-map
-    ("s-p" . projectile-command-map)
-    ("C-c p" . projectile-command-map)
-    ("M-S-O p" . counsel-projectile-switch-project)
-    )
+    ("C-c p" . projectile-command-map))
   :init
   (setq projectile-completion-system 'ivy)
   (setq projectile-mode-line-prefix "Project -> ")
@@ -2371,13 +2357,15 @@ repository, then the corresponding root is used instead."
   ;; workaround for `projectile-find-file' not working because of `tmux-plugin-manager' (tpm) having a .git_modules file
   ;; when this issue is fixed remove this
   (setq projectile-git-submodule-command "")
-  :config
-  (with-eval-after-load 'evil
-    (define-key evil-normal-state-map (kbd "SPC p s") 'projectile-switch-project)
-    (define-key evil-normal-state-map (kbd "SPC p a g") 'projectile-ag)
-    (define-key evil-normal-state-map (kbd "SPC p r g") 'projectile-ripgrep))
   (projectile-mode +1)
+  (with-eval-after-load 'evil
+    (define-key evil-normal-state-map (kbd "SPC p a") 'projectile-add-known-project)
+    (define-key evil-normal-state-map (kbd "SPC p r") 'projectile-remove-known-project)
+    (define-key evil-normal-state-map (kbd "SPC p p") 'projectile-command-map)
+    ;; NOTE: commented > using counsel-projectile-switch-project now
+    ;; (define-key evil-normal-state-map (kbd "SPC p s") 'projectile-switch-project))
   )
+)
 
 
 ;;****************************************************************
@@ -2407,7 +2395,22 @@ repository, then the corresponding root is used instead."
   (company-tooltip-align-annotations t) ;; align annotations to the right tooltip border.
   (company-begin-commands '(self-insert-command))
   (company-require-match 'never)
-  (company-backends '(company-capf))
+  (company-backends
+    '(company-cap
+       company-eclim    ; completion for eclim
+       company-semantic ; CEDET semantic
+       company-clang    ; clang
+       company-xcode    ; Xcode
+       company-cmake    ; CMake
+       company-capf     ; Emacs' completion-at-point-functions
+       company-files    ; files (absolute and relative)
+       (company-dabbrev-code
+         company-gtags
+         company-etags
+         company-keywords)
+       company-abbrev
+       company-dabbrev)
+    )
   (company-frontends '(company-pseudo-tooltip-frontend
                         company-echo-metadata-frontend))
   ;; Trigger completion immediately.
@@ -2795,7 +2798,7 @@ repository, then the corresponding root is used instead."
 
 (defun tau/elisp-function-or-variable-quickhelp (symbol)
   "Display summary of SYMBOL at point.
-                             Adapted from `describe-function-or-variable'."
+                                      Adapted from `describe-function-or-variable'."
   (interactive
     (let* ((v-or-f (variable-at-point))
             (found (symbolp v-or-f))
@@ -2867,16 +2870,13 @@ repository, then the corresponding root is used instead."
   ;;   ("<tab>" . hippie-expand)
   ;;   )
   :init
-  (add-hook 'web-mode-hook
-    (lambda () (local-set-key (kbd "<tab>") 'emmet-expand-line)))
+  ;; (add-hook 'web-mode-hook
+  ;;   (lambda () (local-set-key (kbd "<tab>") 'emmet-expand-line)))
 
   (setq-default hippie-expand-try-functions-list
     '(
        company-indent-or-complete-common
        yas-hippie-try-expand
-       emmet-expand-yas
-       emmet-expand-line
-       indent-according-to-mode
        ;; original value
        try-complete-file-name-partially
        try-complete-file-name
@@ -2888,6 +2888,9 @@ repository, then the corresponding root is used instead."
        try-expand-dabbrev-from-kill
        try-complete-lisp-symbol-partially
        try-complete-lisp-symbol
+       emmet-expand-yas
+       emmet-expand-line
+       indent-according-to-mode
        ))
   )
 
@@ -2897,7 +2900,6 @@ repository, then the corresponding root is used instead."
 
 (use-package autorevert
   :ensure nil
-  :defer 2
   :preface
   (defun revert-buffer-no-confirm ()
     "Revert buffer without confirmation."
@@ -2905,9 +2907,9 @@ repository, then the corresponding root is used instead."
 
   (defun revert-buffer-maybe (&optional force-reverting)
     "Interactive call to revert-buffer. Ignoring the auto-save
-                             file and not requesting for confirmation. When the current buffer
-                             is modified, the command refuses to revert it, unless you specify
-                             the optional argument: force-reverting to true."
+                                      file and not requesting for confirmation. When the current buffer
+                                      is modified, the command refuses to revert it, unless you specify
+                                      the optional argument: force-reverting to true."
     (interactive "P")
     ;;(message "force-reverting value is %s" force-reverting)
     (if (or force-reverting (not (buffer-modified-p)))
@@ -2919,7 +2921,7 @@ repository, then the corresponding root is used instead."
   ;; ;;(after-save . revert-buffer-maybe)
   ;; (switch-buffer . revert-buffer-maybe)
   ;; (switch-window . revert-buffer-maybe)
-  :config
+  :init
   (global-auto-revert-mode)
   (setq auto-revert-verbose t) ; let us know when it happens
   (setq auto-revert-use-notify nil)
@@ -2938,7 +2940,9 @@ repository, then the corresponding root is used instead."
 (use-package aggressive-indent
   :hook
   (emacs-lisp-mode . aggressive-indent-mode)
-  (prog-mode . aggressive-indent-mode)
+  ;; (prog-mode . aggressive-indent-mode)
+  (js2-mode . aggressive-indent-mode)
+  (typescript-mode . aggressive-indent-mode)
   (css-mode . aggressive-indent-mode)
   :config
   (setq aggressive-indent-comments-too t)
@@ -3335,7 +3339,8 @@ repository, then the corresponding root is used instead."
     (if (locate-dominating-file default-directory ".prettierrc")
       (prettier-js-mode +1)))
   :hook
-  (typescript-mode . maybe-use-prettier)
+  ;; (typescript-mode . maybe-use-prettier)
+  (typescript-mode . prettier-js-mode)
   (web-mode . maybe-use-prettier)
   (css-mode . maybe-use-prettier)
   :custom
@@ -3682,7 +3687,7 @@ repository, then the corresponding root is used instead."
   )
 
 (use-package mu4e
-  :ensure nil
+  :disabled
   :load-path "/usr/share/emacs/site-lisp/mu4e"
   :demand t
   ;; :ensure-system-package (mu isync)

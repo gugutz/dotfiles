@@ -1,93 +1,21 @@
-#################################################################
-# change monitors layout
-#################################################################
-
-# HOME
-
-# mirrored layout
-super + ctrl + shift + 1
-  xrandr --output DVI-I-2 --mode 1920x1080 --rotate normal --output DVI-I-1 --mode 1280x1024 --same-as $home_primary_monitor; exec notify-send 'using home single monitor layout'
-
-# extended layout
-super + ctrl + shift + 1
-  xrandr --output DVI-I-1 --mode 1280x1024 --pos 0x0 --rotate normal --output DVI-I-2 --primary --mode 1920x1080 --pos 1280x0 --rotate normal; exec notify-send 'using home single monitor layout'
-
-# WORK (qualirede notebook)
-
-# just the notebook screen
-super + ctrl + shift + 8
-  xrandr --output eDP1 --primary --mode 1920x1080 --pos 0x0 --rotate normal --output DP1 --off; exec notify-send 'using work single monitor layout'
-
-# mirrored layout
-super + ctrl + shift + 9
-  xrandr --output eDP1 --mode 1920x1080 --pos 0x0 --rotate normal --output DP1 --primary --mode 1920x1080 --pos 0x0 --rotate normal;  exec notify-send 'using work mirrored monitor layout'
-
-# extended layout
-super + ctrl + shift + 0
-  xrandr --output eDP1 --mode 1920x1080 --pos 0x0 --rotate normal --output DP1 --primary --mode 1920x1080 --pos 1920x0 --rotate normal --output DP2 --off --output HDMI1 --off --output VIRTUAL1 --off;  exec notify-send 'using work dual monitor extended layout'
-
-
-#################################################################
-# wm independent hotkeys
-#################################################################
-
-# terminal emulator
-super + Return
-	alacritty
-
-super + shift + Return
-	st
-
-super + ctrl + shift + Return
-	urxvt
-
-# program launcher
-super + d
-	dmenu_run -l 25 -F
-  # dmenu_run -i -nb '#191919' -nf '#fea63c' -sb '#fea63c' -sf '#191919' -fn 'NotoMonoRegular:bold:pixelsize=14'
-
-# program launcher
-super + shift + d
-	rofi -show run
-
-
-# Launch Rofi
-super + shift + d
-rofi -no-lazy-grab -show drun \
-       -display-drun "Applications :" -drun-display-format "{name}" \
-       -hide-scrollbar true \
-       -bw 0 \
-       -lines 10 \
-       -line-padding 10 \
-       -padding 20 \
-       -width 30 \
-       -xoffset 68 -yoffset -70 \
-       -location 7 \
-       -columns 2 \
-       -show-icons -icon-theme "Papirus" \
-       -font "Fantasque Sans Mono 10" \
-       -color-enabled true \
-       -color-window "$BACKGROUND,$BORDER,$SEPARATOR" \
-       -color-normal "$BACKGROUND_ALT,$FOREGROUND,$BACKGROUND_ALT,$HIGHLIGHT_BACKGROUND,$HIGHLIGHT_FOREGROUND" \
-       -color-active "$BACKGROUND,$MAGENTA,$BACKGROUND_ALT,$HIGHLIGHT_BACKGROUND,$HIGHLIGHT_FOREGROUND" \
-       -color-urgent "$BACKGROUND,$YELLOW,$BACKGROUND_ALT,$HIGHLIGHT_BACKGROUND,$HIGHLIGHT_FOREGROUND"
-       -show-icons -icon-theme "Papirus" \
-
-# program launcher
-# super + @space
-	#dmenu_run
-
-#################################################################
+##########################################################
 # sxhkd hotkeys
-#################################################################
+##########################################################
 
 # make sxhkd reload its configuration files:
 super + Escape
-	pkill -USR1 -x sxhkd
+  pkill -USR1 -x sxhkd
 
-#################################################################
-# bspwm hotkeys
-#################################################################
+supet + alt + F12
+  setxkbmap -layout br -option caps:swapescape
+
+##########################################################
+# BSPWM HOTKEYS
+##########################################################
+
+# In case bspwmrc fails to execute/you wish have plugged in a new monitor
+super + ctrl + r
+	~/.config/bspwm/bspwmrc
 
 # quit bspwm
 super + alt + q
@@ -101,9 +29,10 @@ super + alt + r
 super + {_,shift + }q
 	bspc node -{c,k}
 
-# alternate between the tiled and monocle layout
-super + m
-	bspc desktop -l next
+
+
+##########################################################
+# nodes (windows)
 
 # send the newest marked node to the newest preselected node
 super + y
@@ -113,34 +42,99 @@ super + y
 super + g
 	bspc node -s biggest
 
-#################################################################
-# state/flags
-#################################################################
-
 # set the window state
-super + {t,shift + t,s,f}
-	bspc node -t {tiled,pseudo_tiled,floating,fullscreen}
+# super + {t,shift + t,f}
+# 	bspc node -t {tiled,pseudo_tiled,fullscreen}
+
+# toggle (back and forth) window state
+super + {t, s, f}
+  bspc node -t \~{tiled,floating,fullscreen}
+
+# super + s
+#     bspc node -t floating
 
 # set the node flags
 super + ctrl + {m,x,y,z}
 	bspc node -g {marked,locked,sticky,private}
 
-#################################################################
-# focus/swap
-#################################################################
+### Map or unmap windows (functional equivalent of "minimize")
+# from manjaro bspwm
+super + \\
+    ~/.config/bspwm/scripts/whid dmenu.sh
+
+super + shift + \\
+    ~/.config/bspwm/scripts/whid hide.sh
+
+super + ctrl + \\
+    ~/.config/bspwm/scripts/whid last.sh
+
+##########################################################
+# workspaces
+
+# alternate between the tiled and monocle layout
+super + m
+	bspc desktop -l next
+
+# Rotate all windows in current workspace clockwise
+super + ctrl + shift + r
+  bspc desktop -R 90
 
 # workspace back and forth
-super + {1-9,0}
-  desktop='^{1-9,10}'; \
-  bspc query -D -d "$desktop.focused" && bspc desktop -f last || bspc desktop -f "$desktop"
+# testing if this was resulting in selecting incorrect workspaces on different monitors
+# super + {1-9,0}
+#   desktop='^{1-9,10}'; \
+#   bspc query -D -d "$desktop.focused" && bspc desktop -f last || bspc desktop -f "$desktop"
+
+super + {_,shift + }{1-9,0}
+  bspc {desktop -f,node -d} ^{1-9,10}
+  # bspc query -D -d "$desktop.focused" && bspc desktop -f last || bspc desktop -f "$desktop"
+
+# Cycle through active (occupied) workspaces
+super + \'
+  bspc desktop -f {prev,next}.occupied.local
+
+# move workspace to another monitor
+super + ctrl + shift + {h,l}
+  desk=`bspc query -D -d focused`; \
+  bspc desktop -m {prev,next}; \
+  bspc monitor -f {prev,next}; \
+  bspc desktop -f $desk
+
+##########################################################
+# windows
 
 # focus the node in the given direction
+# super + {h,j,k,l}
+# 	bspc node {west,south,north,east}
+# focus the node in the given direction AND ALSO MOVE FOCUS
 super + {h,j,k,l}
 	bspc node -f {west,south,north,east}
 
 # swap windows
 super + shift + {h,j,k,l}
 	bspc node -s {west,south,north,east}
+
+
+# move focused window to the next workspace and then switch to that workspace
+# source:
+super + alt + shift + {h,l}
+    id=$(bspc query --nodes --node); bspc node --to-desktop {prev,next}; bspc desktop --focus next; bspc node --focus ${id}
+# TODO: test alternative solution from manjaro-bspwm
+# go (Shift=move) to desktop (and focus the monitor that the desktop is located on. Bspwm style)
+# super + {_,shift + }{1-9,0}
+#     bspc {desktop -f,node -d} ^{1-9,10}
+
+# Go to specific window
+super + Tab
+	~/.config/bspwm/scripts/window-selector.sh
+
+# toggle focus between current and last node/desktop
+super + grave
+	bspc node -f last
+
+# toggle focus between current and last node/desktop
+super + shift + Tab
+	bspc desktop -f last
 
 # focus the node for the given path jump
 super + {p,b,comma,period}
@@ -154,9 +148,6 @@ super + {_,shift + }c
 super + bracket{left,right}
 	bspc desktop -f {prev,next}.local
 
-# focus the last node/desktop
-super + {grave,Tab}
-	bspc {node,desktop} -f last
 
 # focus the older or newer node in the focus history
 super + {o,i}
@@ -168,9 +159,18 @@ super + {o,i}
 super + {_,shift + }{1-9,0}
 	bspc {desktop -f,node -d} '^{1-9,10}'
 
-#################################################################
+# resize windows like i3 resize-mode
+# super + r : {Left, Down, Up, Right}
+# 	bspc node -z {left -20 0,bottom 0 20,top 0 -20,right 20 0}
+
+
+# Create a new "master area", splitting the whole desktop instead of just windows.
+# from bspwm manjaro
+alt + Return
+	bspc node -n @/
+
+##########################################################
 # preselect
-#################################################################
 
 # preselect the direction
 super + ctrl + {h,j,k,l}
@@ -188,9 +188,8 @@ super + ctrl + space
 super + ctrl + shift + space
 	bspc query -N -d | xargs -I id -n 1 bspc node id -p cancel
 
-#################################################################
+##########################################################
 # move/resize
-#################################################################
 
 # expand a window by moving one of its side outward
 super + alt + {h,j,k,l}
@@ -204,78 +203,344 @@ super + alt + shift + {h,j,k,l}
 super + {Left,Down,Up,Right}
 	bspc node -v {-20 0,0 20,0 -20,20 0}
 
-# Balance the size of all nodes in the current desktop
+# Balance tree
 super + b
-  bspc desktop -B
+	bspc node @/ -B
+	# bspc desktop -B
 
-#################################################################
+# Undo balancing (equalize windows)
+super + ctrl + b
+	bspc node @/ -E
+	# bspc desktop -E
+
+# Mirror and flip leaves of tree
+super + {comma,period}
+	bspc desktop -F {horizontal,vertical}
+
+# Rotate leaves of tree
+super + shift + {comma,period}
+	bspc desktop -R {90,270}
+
+# Change window gap
+ctrl + space
+    bspc config -d focused window_gap {15,30,65}
+##########################################################
 # gaps
-#################################################################
 
-# adjust gap size on a focused desktop
+# reset gap size on a focused desktop
 super + ctrl + 0
   	bspc config -d focused window_gap $((`bspc config -d focused window_gap` 0 ))
 
-# adjust gap size on a focused desktop
+# resize gap size on a focused desktop
 super + {minus,equal}
   	bspc config -d focused window_gap $((`bspc config -d focused window_gap` {-,+} 5 ))
 
-# Global window gaps
+##########################################################
+# MOUSE BINDINGS
+##########################################################
+
+# ajust window sizes on a desktop by clicking and draggin on a gap
+~button1
+	~/.config/bspwm/scripts/did-i-click-the-desktop.sh && gapgrab
+
+# mouse middle click
+# show bspwm control gtk menu
+~button2
+	~/.config/bspwm/scripts/did-i-click-the-desktop.sh && mygtkmenui --  ~/.config/GTKmenu/BspwmDesktopMenui
+#DidIClickDesktop.sh && mygtkmenui --  ~/.config/GTKmenu/BspwmWindowMenui
+
+# launch menu
+~button3
+	~/.config/bspwm/scripts/did-i-click-the-desktop.sh && mygtkmenui --  ~/.config/GTKmenu/LaunchMenu
+
+# Switch workspace by scrolling on the desktop. Causes scrolling issues on some systems.
+#~button4
+#	DidIClickDesktop.sh && bspc desktop -f next
+#~button5
+#	DidIClickDesktop.sh && bspc desktop -f prev
+
+### Add or remove desktops by scrolling
+super + ctrl + button5
+    bspcp dsktp rm
+
+super + ctrl + button4
+    bspcp dsktp add
+
+# Spawn applications popup menu and manually tile selected
+# app where your mouse was when you opened the menu. Smartsplit only chooses
+# biggest dimension of the window, MouseLaunch only cares which edge is closer.
+# mod5 is alt_gr (first key right from space) on most keyboards.
+mod5 + @button1
+    MouseLaunch ; mygtkmenui -- .config/GTKmenu/LaunchMenu
+#	smartsplit ; dboxmenu
+
+# Spawn window manipulation menuq
+# Mod1 is alt
+#    BspwmWindowMenu
+mod1 + @button1
+    mygtkmenui -- .config/GTKmenu/BspwmWindowMenui
+
+# resize global window gaps
 super + ctrl + button{minus,equal}
     bspc config window_gap $(( $(bspc config window_gap) {-,+} 2 ))
 
-## super & mouse scroll
-
-# Focused desktop window gap
+# resize focused desktop window gap with mouse wheel
 super + button{4,5}
 	bspc config -d focused window_gap $((`bspc config -d focused window_gap` {-,+} 5 ))
 
-# Global window gaps
+# resize global window gaps with mouse wheel
 super + ctrl + button{4,5}
     bspc config window_gap $(( $(bspc config window_gap) {-,+} 5 ))
 
-#################################################################
-#################################################################
+##########################################################
+# PICOM / COMPOSITOR BINDINGS
+##########################################################
+
+# Toggle compositing
+super + alt + c
+	{pkill picom ,\
+	picom -b }
+
+# Toggle polybar
+super + alt + p
+	{killall polybar ,\
+	~/.config/polybar/launch.sh }
+
+##########################################################
+# NOTIFICATIONS
+##########################################################
+
+# Toggle between hidden and shown state of the notification center:
+super + alt + n
+  kill -s USR1 $(pidof deadd-notification-center)
+
+# Increase and decrease volume and show using deadd
+super + shift + {minus,equal}
+  ~/.config/deadd/volume-indicator.sh {dec,inc}
+  # pactl -- set-sink-volume 0 {-,+}10%
+
+# turn highlighting on
+super + shift + comma
+  notify-send.py a --hint boolean:deadd-notification-center:true \
+               int:id:0 boolean:state:true type:string:buttons
+
+# turn highlighting off
+super + shift + period
+  notify-send.py a --hint boolean:deadd-notification-center:true \
+               int:id:0 boolean:state:false type:string:buttons
+
+##########################################################
+# change monitors layout
+##########################################################
+
+# HOME
+
+# # mirrored layout
+# super + ctrl + shift + 1
+#   xrandr --output DVI-I-2 --mode 1920x1080 --rotate normal --output DVI-I-1 --mode 1280x1024 --same-as $home_primary_monitor; exec notify-send 'using home single monitor layout'
+
+# # extended layout
+# super + ctrl + shift + 2
+#   xrandr --output DVI-I-1 --mode 1280x1024 --pos 0x0 --rotate normal --output DVI-I-2 --primary --mode 1920x1080 --pos 1280x0 --rotate normal; exec notify-send 'using home single monitor layout'
+
+# WORK (qualirede notebook)
+
+# just the notebook screen
+super + ctrl + shift + 8
+  xrandr --output eDP1 --primary --mode 1920x1080 --pos 0x0 --rotate normal --output DP1 --off; exec notify-send 'using work single monitor layout'
+
+# mirrored layout
+super + ctrl + shift + 9
+  xrandr --output eDP1 --mode 1920x1080 --pos 0x0 --rotate normal --output DP1 --primary --mode 1920x1080 --pos 0x0 --rotate normal;  exec notify-send 'using work mirrored monitor layout'
+
+# extended layout
+super + ctrl + shift + 0
+  xrandr --output eDP1 --mode 1920x1080 --pos 0x0 --rotate normal --output DP1 --primary --mode 1920x1080 --pos 1920x0 --rotate normal --output DP2 --off --output HDMI1 --off --output VIRTUAL1 --off;  exec notify-send 'using work dual monitor extended layout'
+
+
+##########################################################
+#
+# APPLICATIONS KEYBINDINGS
+#
+##########################################################
+
+#####################################
+# terminal emulators
+
+super + Return
+	alacritty
+
+super + shift + Return
+	st
+
+super + ctrl + shift + Return
+	urxvt
+
+#####################################
+# application launchers
+
+# @super
+#   dmenu_run -i -nb '#191919' -nf '#fea63c' -sb '#fea63c' -sf '#191919' -fn 'NotoMonoRegular:bold:pixelsize=14'
+
+# dmenu
+super + d
+  dmenu_run -i -nb '#191919' -nf '#fea63c' -sb '#fea63c' -sf '#191919' -fn 'NotoMonoRegular:bold:pixelsize=14'
+	# dmenu_run
+	# dmenu_run -l 25 -F
+
+# program launcher
+# from voidlinux dotfiles
+super + @space
+	rofi -show run -hide-scrollbar -width 25 -lines 1 -columns 2 -separator-style solid -yoffset 30 -location 2
+
+# rofi program launcher
+super + shift + d
+	rofi -show run
+
+super + shift + f
+  ~/.config/bspwm/scratchpad.sh fzf-menu-scratchpad
+  # st -c fzf-menu -e i3-dmenu-desktop --dmenu=fzf
+
+super + tab
+  rofi \
+    -theme slate \
+    -show window -terminal st -hide-scrollbar true  \
+    -line-margin 0 -lines 20 -eh 1 -width 35 -bw 3 \
+    -kb-mode-next      Alt+Tab \
+    -kb-mode-previous  Alt+Control+Tab \
+    -bg        "#222222"  -fg        "#2ECC71" \
+    -hlbg      "#2ECC71"  -hlfg      "#222222" \
+    -bg-active "#222222"  -fg-active "#2288DD" \
+    -font      "Roboto Slab 11"   -opactiy 80
+
+# rofi taskswitcher
+# Launch Rofi
+super + ctrl + shift + d
+  rofi -no-lazy-grab -show drun \
+        -display-drun "Applications :" -drun-display-format "{name}" \
+        -hide-scrollbar true \
+        -bw 0 \
+        -lines 10 \
+        -line-padding 10 \
+        -padding 20 \
+        -width 30 \
+        -xoffset 68 -yoffset -70 \
+        -location 7 \
+        -columns 2 \
+        -show-icons -icon-theme "Papirus" \
+        -font "Fantasque Sans Mono 10" \
+        -color-enabled true \
+        -color-window "$BACKGROUND,$BORDER,$SEPARATOR" \
+        -color-normal "$BACKGROUND_ALT,$FOREGROUND,$BACKGROUND_ALT,$HIGHLIGHT_BACKGROUND,$HIGHLIGHT_FOREGROUND" \
+        -color-active "$BACKGROUND,$MAGENTA,$BACKGROUND_ALT,$HIGHLIGHT_BACKGROUND,$HIGHLIGHT_FOREGROUND" \
+        -color-urgent "$BACKGROUND,$YELLOW,$BACKGROUND_ALT,$HIGHLIGHT_BACKGROUND,$HIGHLIGHT_FOREGROUND"
+        -show-icons -icon-theme "Papirus" \
+
+# program launcher
+# super + @space
+	#dmenu_run
+
+##########################################################
+##########################################################
 #
 # MY MODIFICATIONS
 #
-#################################################################
-#################################################################
+##########################################################
+##########################################################
 
 
 #Pulse Audio Control
 super + alt + a
-     urxvt 'alsa-mixer' -e alsamixer
+  urxvt -name 'alsamixer' -e alsamixer
 
-#Pulse Audio Control
-super + alt + p
-     pavucontrol
-#################################################################
+
+# pcmanfm
+super + F4
+  pcmanfm
+
+# simulate windows file exlorer keybinding for when my friends use the pc
+super + e
+  pcmanfm
+
+##########################################################
 # SCRIPTS
-#################################################################
+##########################################################
 
 # find window criteria
 super + ctrl + f
   st -e '~/scripts/find-window-criteria.sh'
-#################################################################
+##########################################################
 # SCRATCHPADS
-#################################################################
+##########################################################
+# source: https://my-take-on.tech/2020/07/03/some-tricks-for-sxhkd-and-bspwm/#my-take-on-creating-a-scratchpad
 
-# terminal scratchpad
+# keybindings helplt
+super + F1
+  bspwm-toggle-visibility sxhkd-keys-help-scratchpad "st -c sxhkd-keys-help-scratchpad -e show-keybindings-help-fzf"
+
+# pacfzf
+super + F2
+  bspwm-toggle-visibility pacfzf-scratchpad "st -c pacfzf-scratchpad -e pacfzf"
+
+# yayfzf
+super + F3
+  bspwm-toggle-visibility yayfzf-scratchpad "st -c yayfzf-scratchpad -e yayfzf"
+
+# telegram
+super + shift + t
+  bspwm-toggle-visibility TelegramDesktop telegram-desktop
+
 super + z
-  ~/.config/bspwm/scratchpad.sh terminal-scratchpad
+  bspwm-toggle-visibility terminal-scratchpad "st -c terminal-scratchpad"
 
-# ranger scratchpad
-super + r
-  ~/.config/bspwm/scratchpad.sh ranger-scratchpad
+super + shift + y
+  bspwm-toggle-visibility yayfzf-scratchpad "st -c yayfzf-scratchpad -e yayfzf"
+
+super + a
+  bspwm-toggle-visibility ranger-scratchpad "st -c ranger-scratchpad -e ranger"
+
+# nmrui
+super + shift + n
+  bspwm-toggle-visibility nmtui-scratchpad "st -c nmtui-scratchpad -e nmtui"
+
+# pavucontrol
+super + shift + p
+  bspwm-toggle-visibility pavucontrol
+
+# bluetooth-manager
+super + shift + b
+  bspwm-toggle-visibility blueman-manager
 
 # galculator scratchpad
 super + x
-  ~/.config/bspwm/scratchpad.sh Galculator
+  bspwm-toggle-visibility Galculator galculator
 
-#################################################################
+# openfortigui scratchpad
+super + v
+  bspwm-toggle-visibility openfortiGUI openfortigui
+
+#------------------------------
+# simulate a scratchpad with only sxhkd
+# source: https://www.reddit.com/r/bspwm/comments/hojore/scratchpad_with_2_sxhkd_shortcuts/?utm_source=share&utm_medium=web2x
+
+# hide window
+super + shift + a
+	bspc node -g hidden
+
+# unhide window
+super + shift + s
+	bspc node {,$(bspc query -N -n .hidden |tail -n 1)} -g hidden=off -d $(bspc query -D -d focused --names) -t floating -f
+
+#------------------------------
+# PREVIOUS WAY OF DOING SCRATCHPAD
+# # terminal scratchpad
+# super + z
+#   ~/.config/bspwm/scratchpad.sh terminal-scratchpad
+
+
+##########################################################
 # screenshots
-#################################################################
+##########################################################
 
 # take screenshot of the active window
 Print
@@ -296,9 +561,21 @@ super + shift + Print
 super + ctrl + shift + Print
   scrot -s -e 'mv $f /tmp/ && pinta /tmp/$f'
 
-#################################################################
+##########################################################
 # wallpeper, lockscreen and screensavers
-#################################################################
+##########################################################
 # lockscreen
 super + alt + 9
     betterlockscreen -u ~/wallpapers --lock dimblur
+
+
+##########################################################
+# MOUSE KEYBINDINGS
+##########################################################
+# On mouse button 1 press Alt_R+F1
+# button1
+#     xte "keydown Alt_R" "keydown F1" "keyup Alt_R" "keyup F1"
+
+# On mouse button 2 pause 3 seconds then press Alt_R+F2
+# button2
+#     xte "sleep 3" "keydown Alt_R" "keydown F2" "keyup Alt_R" "keyup F2"

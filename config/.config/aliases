@@ -1,3 +1,35 @@
+echo "~/.aliases is being sourced"
+
+#################################################
+# BSPWM ALIASES
+#################################################
+
+# define a specific alias for bspwm to query the current desktop layout
+alias querydesktoplayout="bspc query -T -d | jq -r .layout"
+
+#################################################
+# Improvements of native commands
+#################################################
+
+
+alias mkdir='mkdir -pv' # create parent directories on demand with mkdir
+alias ll='ls -lAbhc'
+alias l='ls -lBbhc'
+
+#Add extra protection against mistakes
+alias rm='rm -I'
+
+
+alias cp='cp -i' # confirmation when copying, linking, or deleting
+alias ln='ln -i' # confirmation when linking, or deleting
+alias mv='mv -i' # confirmation when deleting
+
+# unrar alias
+# alias unrar='rar e'
+
+alias ls='ls --color=auto'       ## colorize the ls output ##
+alias ll='ls -la --color=auto'   ## Use a long listing format ##
+alias l.='ls -ld .* --color=auto' ## Show hidden files ##
 #################################################
 # MY ALIASES
 #################################################
@@ -7,53 +39,40 @@ alias df='df -h'                          # human-readable sizes
 alias free='free -m'                      # show sizes in MB
 alias np='nano -w PKGBUILD'
 alias more=less
+
+#Sudo vim
+alias svim='sudo vim'
+
+#History search (use: hs sometext)
+alias hs='history | grep $1'
+
+# power options
 alias reboot='sudo reboot now'            # reboot / halt / poweroff
 alias shutdown='sudo shutdown now'
 alias suspend='systemctl suspend'
 
 # systemd aliases. use like servstat httpd
-alias servstat='systemctl status $1'
-alias servenab='systemctl enable $1'
-alias servstart='systemctl start $1'
+alias servstat='systemctl status $@'
+alias servenab='systemctl enable $@'
+alias servstart='systemctl start $@'
 
-
-alias mkdir='mkdir -pv'                   # create parent directories on demand with mkdir
-alias ll='ls -lAbhc'
-alias l='ls -lBohc'
-#History search (use: hs sometext)
-alias hs='history | grep $1'
-
+# file permissions
+alias cmx='chmod +x'
+alias cho='chown -R $USER'
 alias wget='wget -c'                      # resume wget downloads by default
 
-#Sudo vim
-alias svim='sudo vim'
-
-#Add extra protection against mistakes
-alias rm='rm -I'
-
-# Confirmation When Copying, Linking, or Deleting
-alias cp='cp -i'
-alias ln='ln -i'
-alias mv='mv -i'
-
-# unrar alias
-# alias unrar='rar e'
-
-
-## colorize the ls output ##
-alias ls='ls --color=auto'
-
-## Use a long listing format ##
-alias ll='ls -la --color=auto'
-
-## Show hidden files ##
-alias l.='ls -d .* --color=auto'
 
 ## Date / Time aliases
 alias path='echo -e ${PATH//:/\\n}'
 alias nowtime='date +"%T"'
 # alias nowtime=now
 alias nowdate='date +"%d-%m-%Y"'
+
+#################################################
+# FILE SYSTEM ALIASES
+#################################################
+
+
 # ---------------------------------------------
 
 # DIRECTORY ALIASES
@@ -68,7 +87,7 @@ alias cddt='cd ~/dotfiles'
 alias cdpep='cd ~/code/qualirede/pep'
 alias cdadm='cd ~/code/qualirede/pep-admin'
 alias cdapi='cd ~/code/qualirede/pep-api'
-alias cdsso='cd ~/code/qualirede/pep-sso'
+alias cdsso='cd ~/code/qualirede/sso'
 alias cdres='cd ~/code/qualirede/res'
 alias cdqds='cd ~/code/qualirede/digital-signer'
 
@@ -81,18 +100,30 @@ alias cdwego='cd ~/code/out/wego'
 alias gpushdt='cd ~/dotfiles && git status && git add . && git commit -am && git push origin master'
 
 alias gst='git status'
+
 alias gsts='git stash'
 alias gstp='git stash pop'
+
 alias ga='git add'
+
 alias gcm='git commit -m'
 alias gcam='git commit -m'
-alias gpom='git push origin master'
-alias gplom='git pull origin master'
-alias gpod='git push origin develop'
-alias gplod='git pull origin develop'
-alias gpot='git push origin test'
-alias gplot='git pull origin test'
 alias glg='git log'
+
+alias gpso='git push origin'
+alias gplo='git pull origin'
+
+alias gpsom='git push origin master'
+alias gpsod='git push origin develop'
+alias gpsot='git push origin test'
+
+alias gplom='git pull origin master'
+alias gplod='git pull origin develop'
+alias gplot='git pull origin test'
+
+
+# ---------------------------------------------
+# alias utilities
 
 alias whichterm='ps -o 'cmd=' -p $(ps -o 'ppid=' -p $$)'
 alias whichshell='ps -p $$ -o args'
@@ -109,6 +140,10 @@ alias kernelinfo='uname -a'
 alias kernelversion='uname -v'
 alias kernelrelease='uname -r'
 
+
+#################################################
+# FILE SYSTEM ALIASES
+#################################################
 
 # list open ports (flags: tcp, udp, listening, ports, name?)
 # use it with sudo to also show PID entries
@@ -127,6 +162,10 @@ alias noreadonly='sudo hdparm -r0 /dev/sdb'
 
 # pretty print path (separate each entry by lines)
 alias pppath='echo $PATH | tr -s ':' '\n''
+
+#################################################
+# SEARCH RELATED ALIASES
+#################################################
 
 # find only executables
 alias findexecutable='find / -type f -executable -name'
@@ -154,3 +193,16 @@ extractgamedatafromredumps='dd if=game.iso of=game_data.iso skip=387k bs=1k stat
 alias ytdl-audio='youtube-dl -x -f bestaudio'
 alias ytdl-best-video='youtube-dl -x -f bestaudio'
 alias ytdl-audio='youtube-dl -x -f bestaudio'
+
+# ---------------------------------------------
+# JS projets aliases
+
+alias dcu="docker-compose up"
+alias dcd="docker-compose down"
+alias dcud="docker-compose up -d"
+alias npms="npm start"
+alias npmb="npm build"
+
+alias ionic_gen_debug_apk="ionic capacitor copy android && cd android && ./gradlew assembleDebug && cd .."
+alias ionic_run_debug_apk="ionic capacitor copy android && cd android && ./gradlew assembleDebug && ./gradlew installDebug && cd .."
+alias ionic_gen_prod_apk="cd android && ./gradlew assembleRelease && cd app/build/outputs/apk/release && jarsigner -keystore YOUR_KEYSTORE_PATH -storepass YOUR_KEYSTORE_PASS app-release-unsigned.apk YOUR_KEYSTORE_ALIAS && zipalign 4 app-release-unsigned.apk app-release.apk"
