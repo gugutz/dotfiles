@@ -26,11 +26,11 @@ right = "%{T3}%{T-}"
 ; polybar themes colors to use the color switcher
 ; these are altered on the fly by sed when a style is picked
 ;; DONT ALIGN BY REGEXP "=" here, or the color-switcher script wont work because the sed commands dont treat whitespace
-bg = #1F1F1F
-module-bg = #1F1F1F
-fg = #FFFFFF
-fg-alt = #A9ABB0
-acolor = #00acc1
+bg = #e0e0e0
+module-bg = #e0e0e0
+fg = #2E2E2E
+fg-alt = #e0e0
+acolor = #1e88e5
 curgent = #e53935
 coccupied = #1e88e5
 primary = #3f3f3f
@@ -59,8 +59,10 @@ matrix-malachite     = #00FF41
 
 ; Modules colors
 bspwm                = #7FFF00
-bspwm-alert-fg       = #FFFFFF
-bspwm-alert-bg       = #1F1F1F
+bspwm-alert-fg       = #e53935
+bspwm-alert-bg       = #fdd835
+bspwm-occupied-bg    = #A9ABB0
+bspwm-occupied-fg    = #A9ABB0
 bspwm-background     = #3F3F3F
 bspwm-dimmed-fg      = #FFFFFF
 bspwm-dimmed-bg      = #1F1F1F
@@ -116,10 +118,10 @@ material-blue-gray   = #546e7a
 
 [bar/main_top]
 
-modules-left = user cpu temperature memory settings
+modules-left = user xwindow settings openweathermap-detailed
 ; the bluetooth module was preventing the bar from updating when the colorscheme is choosen
-modules-center = calendar clock openweathermap-detailed
-modules-right = uptime network battery colorswitcher powermenu powermenu2
+modules-center = cpu temperature memory uptime
+modules-right = bluetooth wireless-network pulseaudio battery calendar clock colorswitcher powermenu2
 
 monitor = ${env:MONITOR:DP-1}
 monitor-fallback = ${env:MONITOR:eDP-1}
@@ -148,8 +150,8 @@ padding-right = 1
 module-margin-left = 2
 module-margin-right = 2
 
-font-0 = "Fantasque Sans Mono:pixelsize=10;2"
-font-1 = "DejaVu Sans Mono Nerd Font:size=9.5;2"
+font-0 = "Fantasque Sans Mono:pixelsize=13;2"
+font-1 = "DejaVu Sans Mono Nerd Font:size=11;2"
 font-2 = "MaterialIcons:size=12;2"
 font-3 = "FontAwesome:size=11;2"
 font-4 = "Weather Icons:size=11;2"
@@ -162,14 +164,15 @@ font-5 = "Monospace:size=10.5;2"
 
 bottom = true
 
-modules-left = menu bspwm xwindow
-modules-right = wired-network wireless-network pulseaudio calculator system-settings
+modules-left = menu bspwm
+modules-center = calculator system-settings
+modules-right = wired-network
 
 
 monitor = ${env:MONITOR:DP-1}
 monitor-fallback = ${env:MONITOR:eDP-1}
 
-tray-maxsize = 100
+tray-maxsize = 130
 ; tray-position = ${env:TRAY_POSITION:right}
 tray-position = right
 tray-padding = 5
@@ -205,7 +208,7 @@ padding-right = 2
 module-margin-left = 1
 module-margin-right = 1
 
-font-0 = "DejaVu Sans Mono Nerd Font:size=9.5;2"
+font-0 = "DejaVu Sans Mono Nerd Font:size=14;2"
 font-1 = "Fantasque Sans Mono:pixelsize=12;2"
 font-2 = "MaterialIcons:size=12;2"
 font-3 = "FontAwesome:size=11;2"
@@ -335,23 +338,16 @@ reverse-scroll = false
 ; Example: code;♚ will apply the icon to all workspaces containing 'code' in the label
 fuzzy-match = true
 
-
 ws-icon-0 = 1;
-; ws-icon-0 = 1;
 ws-icon-1 = 2;
 ws-icon-2 = 3;
-; ws-icon-3 = 4;
 ws-icon-3 = 4;
-; ws-icon-3 = 4;
-
 ws-icon-4 = 5;
 ws-icon-5 = 6;
-ws-icon-6 = 7;
-ws-icon-7 = 8;
-; ws-icon-8 = 9;
-; ws-icon-8 = 9;
+ws-icon-6 = 7;
+ws-icon-7 = 8;
 ws-icon-8 = 9;
-; ws-icon-9 = 10;
+; ws-icon-9 = 10;
 ws-icon-9 = 10;
 ws-icon-default = ♟
 
@@ -392,11 +388,11 @@ label-focused-underline = ${colors.bspwm}
 label-occupied = %icon%
 label-occupied-underline = ${colors.empty}
 label-occupied-foreground = ${colors.acolor}
-label-occupied-background = ${colors.bg}
+label-occupied-background = ${colors.bspwm-occupied-bg}
 
-label-urgent = %icon% %name%
+label-urgent = %icon%
 label-urgent-foreground = ${colors.bspwm-alert-fg}
-label-urgent-background = ${colors.bg}
+label-urgent-background = ${colors.bspwm-alert-bg}
 label-urgent-underline = ${colors.bspwm-alert-fg}
 
 label-empty = %icon%
@@ -436,8 +432,7 @@ interval = 30
 exec = ~/.config/polybar/scripts/uptime.sh
 label = %output%
 format = <label>
-; format-suffix = "  "
-format-suffix = " uptime"
+format-prefix = "   "
 format-suffix-foreground =  ${colors.uptime}
 format-underline =  ${colors.uptime}
 
@@ -458,17 +453,19 @@ format-foreground = ${colors.fg}
 
 [module/user]
 type = custom/text
-#content = ${env:USER:Tux}
-content = "tau |  @ "
+; content = ${env:USER:Tux}
+content-prefix = "  "
 ; content = "tau 滑" ;
-content-prefix = "   "
+content = "    "
 ; content-suffix = "  "
-content-prefix-foreground = ${colors.user}
-content-suffix-foreground = ${colors.fg}
+content-prefix-foreground = ${colors.fg}
+content-suffix-foreground = ${colors.black}
 content-foreground = ${colors.fg}
 ; content-background = ${colors.bg} ; make it blend with the bar
 content-background = ${colors.module-bg}
 content-underline = ${colors.user}
+click-left = "st -e neofetch" &
+click-right = lxappearance &
 ;####################################################
 
 [module/cpu]
@@ -479,10 +476,11 @@ interval = 2
 ;   <bar-load>
 ;   <ramp-load>
 ;   <ramp-coreload>
-format = <label>
+format = <ramp-coreload>
 format-underline =  ${colors.cpu}
-; format-suffix = "  "
-format-prefix = "  "
+; format-prefix = "  "
+; format-prefix = "爛  "
+format-prefix = "CPU  "
 format-suffix-foreground = ${self.format-underline}
 
 ; Available tokens:
@@ -516,7 +514,7 @@ base-temperature = 20
 warn-temperature = 65
 
 format =  <ramp> <label>
-format-underline = ${colors.temperature}
+format-underline = ${colors.fg}
 format-warn = <label-warn> <ramp>
 format-warn-underline = ${self.format-underline}
 
@@ -549,9 +547,10 @@ interval = 2
 ;   <ramp-swap-used>
 ;   <ramp-swap-free>
 format = <label>
-format-underline =  ${colors.ram}
-; format-prefix = "  "
-format-prefix = "爛  "
+format-underline =  ${colors.fg
+format-prefix = "  "
+; format-prefix = "爛  "
+; format-prefix = "  "
 ; format-prefix = "  "
 
 
@@ -575,7 +574,7 @@ format-prefix-foreground = ${self.format-underline}
 ;   %gb_swap_free%
 ;   %gb_swap_used%
 ; label = %percentage_used%%
-label = RAM %gb_used%/%gb_free%
+label = RAM %gb_used%
 
 ; Only applies if <bar-used> is used
 bar-used-indicator =
@@ -617,7 +616,7 @@ exec = "date +%d-%m-%Y"
 interval = 30
 
 format = " <label>"
-format-underline = ${colors.calendar}
+format-underline = ${colors.fg}
 format-prefix = "  "
 format-prefix-foreground = ${self.format-underline}
 format-foreground = ${colors.fg}
@@ -645,7 +644,9 @@ format-foreground = ${colors.fg}
 label = %time%
 label-font = 10
 
-# date module from polybar themes number 1
+;####################################################
+
+; # date module from polybar themes number 1
 [module/date]
 type = internal/date
 interval = 30
@@ -664,12 +665,12 @@ adapter = ADP0
 full-at = 99
 
 format-charging =  <label-charging> <animation-charging>
-format-charging-underline = ${colors.battery}
+format-charging-underline = ${colors.fg}
 
 format-discharging = <label-discharging> <ramp-capacity>
 format-discharging-underline = ${self.format-charging-underline}
 
-format-full-suffix = "   "
+format-full-suffix = "     "
 format-full-suffix-foreground = ${self.format-charging-underline}
 format-full-underline = ${self.format-charging-underline}
 
@@ -711,6 +712,7 @@ type = custom/menu
 format-spacing = 1
 format-underline =  ${colors.powermenu}
 
+; label-open = " "
 label-open = "%{T3}  %{T-}"
 label-open-foreground = ${colors.powermenu}
 label-close = "  "
@@ -820,7 +822,7 @@ format-disconnected = <label-disconnected>
 format-packetloss = <animation-packetloss> <label-connected>
 
 label-connected = %local_ip%%downspeed:9%
-label-disconnected = not connected
+label-disconnected = cable disconected
 
 ; Only applies if <ramp-signal> is used
 ramp-signal-0 = 😱
@@ -851,21 +853,22 @@ interface = wlan0
 interval = 3.0
 
 format-connected = <label-connected>
-format-connected-suffix = "  "
-format-connected-suffix-foreground = ${self.format-connected-underline}
+format-connected-prefix = "   "
+
+format-connected-prefix-foreground = ${colors.fg}
 format-connected-underline = ${colors.wifi}
 
 label-connected = %essid%
+; label-connected = "%{A1:nm-connection-editor:}%essid%%{A}"
 label-connected-maxlen = 12
-label-disconnected = "Sem Conexão"
-
-format-disconnected-suffix = "  "
+label-disconnected = "not connected"
 format-disconnected = <label-disconnected>
+format-disconnected-prefix = "睊   "
 format-disconnected-underline = ${self.format-connected-underline}
 format-disconnected-suffix-foreground = ${self.format-disconnected-underline}
 
-;click-left = nm-applet &
-click-left = nm-connection-editor &
+click-left = nm-connection-editor
+click-right = nm-connection-editor
 
 ;####################################################
 
@@ -901,17 +904,16 @@ format-volume = <ramp-volume> <label-volume>
 ;   %percentage% (default)
 ;   %decibels% (unreleased)
 ;label-volume = %percentage%%
-label-volume = 
-label-volume-foreground = ${colors.volume}
+label-volume = 
+label-volume-foreground = ${colors.fg}
 
 ; Available tokens:
 ;   %percentage% (default)
 ;   %decibels% (unreleased)
-label-muted = 🔇 muted
-label-muted-foreground = #666
+label-muted = ﱝ
+label-muted-foreground = ${colors.material-red}
 
 format-muted-underline = ${colors.volume}
-format-muted-suffix = "  "
 format-muted-foreground = ${colors.volume}
 
 ; Only applies if <ramp-volume> is used
@@ -979,12 +981,14 @@ click-middle = $HOME/.config/polybar/scripts/menu-full.sh
 [module/colorswitcher]
 type = custom/text
 ; content = 
+; content = 
+
 content = 
 
-alt-icon = 
-content-padding = 2
-content-background = ${colors.material-purple}
-content-foreground = ${colors.fg}
+alt-icon = 
+content-padding = 1
+content-background = ${colors.bg}
+content-foreground = ${colors.material-blue}
 click-left = $HOME/.config/polybar/scripts/color-switch.sh
 click-right = lxappearance
 
@@ -993,8 +997,8 @@ type = custom/text
 
 content = "%{T3}  %{T-}"
 content-padding = 2
-content-background = ${colors.acolor}
-content-foreground = ${colors.material-purple}
+content-background = ${colors.bg}
+content-foreground = ${colors.material-red}
 click-left = $HOME/.config/polybar/scripts/sysmenu.sh
 click-right = $HOME/.config/polybar/scripts/sysmenu.sh
 

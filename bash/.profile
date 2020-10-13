@@ -71,6 +71,10 @@ export PATH=$PATH:"$XDG_CONFIG_HOME/bspwm/scripts"
 # add my sxhkd scripts folder to path
 export PATH=$PATH:"$XDG_CONFIG_HOME/sxhkd/scripts"
 
+# fix idea opening stuck on grey screen in arch + bspwm
+# source: https://stackoverflow.com/questions/33424736/intellij-idea-14-on-arch-linux-opening-to-grey-screen/34419927
+export _JAVA_AWT_WM_NONREPARENTING=1
+
 #########################################
 # DEFAULT APPLICATIONS ENVS
 #########################################

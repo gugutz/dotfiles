@@ -90,6 +90,7 @@ alias cdapi='cd ~/code/qualirede/pep-api'
 alias cdsso='cd ~/code/qualirede/sso'
 alias cdres='cd ~/code/qualirede/res'
 alias cdqds='cd ~/code/qualirede/digital-signer'
+alias cdpaa='cd ~/code/qualirede/planserv_app_api'
 
 alias cdwego='cd ~/code/out/wego'
 # ---------------------------------------------
@@ -206,3 +207,13 @@ alias npmb="npm build"
 alias ionic_gen_debug_apk="ionic capacitor copy android && cd android && ./gradlew assembleDebug && cd .."
 alias ionic_run_debug_apk="ionic capacitor copy android && cd android && ./gradlew assembleDebug && ./gradlew installDebug && cd .."
 alias ionic_gen_prod_apk="cd android && ./gradlew assembleRelease && cd app/build/outputs/apk/release && jarsigner -keystore YOUR_KEYSTORE_PATH -storepass YOUR_KEYSTORE_PASS app-release-unsigned.apk YOUR_KEYSTORE_ALIAS && zipalign 4 app-release-unsigned.apk app-release.apk"
+
+
+# wine aliases
+alias launchuo='WINEPREFIX=${HOME}/.uo WINEARCH=win32 wine  ~/.uo/drive_c/Program\ Files/UOS/UOS.exe'
+alias wine32='WINEPREFIX=${HOME}/.wine32 WINEARCH=win32 wine'
+alias wineuo32='WINEPREFIX=/mnt/1tb/games/uo32 WINEARCH=win32 wine'
+
+# virtualbox vm control
+alias vmlist="VBoxManage list runningvms"
+alias vmpoweroff="VBoxManage controlvm $1 poweroff"

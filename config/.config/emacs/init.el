@@ -13,7 +13,6 @@
   (error "Detected Emacs %s.  This Emacs config only supports Emacs 26.1 and higher"
     emacs-version))
 
-
 ;;****************************************************************
 ;;
 ;;; Some usefull constants used throughout the config
@@ -83,7 +82,7 @@ Use this for files that change often, like cache files.  Must end with a slash."
 
 ;; `source': https://raw.githubusercontent.com/gilbertw1/emacs-literate-starter/master/emacs.org
 
-(defvar custom-gc-cons-threshold (* gc-cons-threshold 4)) ;; 400mb
+(defvar custom-gc-cons-threshold (* gc-cons-threshold 3)) ;; 400mb
 
 ;; increase to defer gc on emacs startup
 (setq gc-cons-threshold most-positive-fixnum ;; 2^61 bytes (2305843009213693951)
@@ -194,7 +193,7 @@ Use this for files that change often, like cache files.  Must end with a slash."
     (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
 
   ;; emacs 27 calls package initialize automatically so `package-initilize' is only required on older versions
-  (package-initialize)
+  ;; (package-initialize)
 
   ;; install use-package if not already installed
   (unless (package-installed-p 'use-package)
@@ -335,7 +334,9 @@ Use this for files that change often, like cache files.  Must end with a slash."
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
     doom-themes-enable-italic t) ; if nil, italics is universally disabled
   ;; (load-theme 'doom-dark+ t)
+  ;; (load-theme 'doom-acario-light t)
   (load-theme 'vscode-dark-plus t)
+  ;; (load-theme 'doom-one-light t)
 
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
@@ -456,7 +457,11 @@ Use this for files that change often, like cache files.  Must end with a slash."
 ;;; CURSOR SETTINGS
 
 ;; Don't blink the cursor, it's too distracting.
-(blink-cursor-mode -1)
+;; (blink-cursor-mode -1)
+;; lets try blinking the cursor
+(blink-cursor-mode 1)
+(setq blink-cursor-interval 0.4) ;; 0.5 is the default
+
 
 ;; Don't blink the paren matching the one at point, it's too distracting.
 (setq blink-matching-paren nil)
@@ -817,56 +822,56 @@ Use this for files that change often, like cache files.  Must end with a slash."
   :defer 2
   :custom-face
   (show-paren-match ((nil (:background nil :foreground "steelblue3" :weight bold :box t)))) ;; :box t
-  (show-paren-mismatch ((nil (:background "red" :foreground "black")))) ;; :box t
+  (show-paren-mismatch ((nil (:background "red" :foreground "white")))) ;; :box t
   :preface
   ;; ======================================================================
   ;; Display lines matching off-screen parentheses at the top of the window:
   ;; source: https://with-emacs.com/posts/ui-hacks/show-matching-lines-when-parentheses-go-off-screen/
-  (let ((ov nil)) ; keep track of the overlay
-    (advice-add
-      #'show-paren-function
-      :after
-      (defun show-paren--off-screen+ (&rest _args)
-        "Display matching line for off-screen paren."
-        (when (overlayp ov)
-          (delete-overlay ov))
-        ;; check if it's appropriate to show match info,
-        ;; see `blink-paren-post-self-insert-function'
-        (when (and (overlay-buffer show-paren--overlay)
-                (not (or cursor-in-echo-area
-                       executing-kbd-macro
-                       noninteractive
-                       (minibufferp)
-                       this-command))
-                (and (not (bobp))
-                  (memq (char-syntax (char-before)) '(?\) ?\$)))
-                (= 1 (logand 1 (- (point)
-                                 (save-excursion
-                                   (forward-char -1)
-                                   (skip-syntax-backward "/\\")
-                                   (point))))))
-          ;; rebind `minibuffer-message' called by
-          ;; `blink-matching-open' to handle the overlay display
-          (cl-letf (((symbol-function #'minibuffer-message)
-                      (lambda (msg &rest args)
-                        (let ((msg (apply #'format-message msg args)))
-                          (setq ov (display-line-overlay+
-                                     (window-start) msg ))))))
-            (blink-matching-open))))))
+  ;; (let ((ov nil)) ; keep track of the overlay
+  ;;   (advice-add
+  ;;     #'show-paren-function
+  ;;     :after
+  ;;     (defun show-paren--off-screen+ (&rest _args)
+  ;;       "Display matching line for off-screen paren."
+  ;;       (when (overlayp ov)
+  ;;         (delete-overlay ov))
+  ;;       ;; check if it's appropriate to show match info,
+  ;;       ;; see `blink-paren-post-self-insert-function'
+  ;;       (when (and (overlay-buffer show-paren--overlay)
+  ;;               (not (or cursor-in-echo-area
+  ;;                      executing-kbd-macro
+  ;;                      noninteractive
+  ;;                      (minibufferp)
+  ;;                      this-command))
+  ;;               (and (not (bobp))
+  ;;                 (memq (char-syntax (char-before)) '(?\) ?\$)))
+  ;;               (= 1 (logand 1 (- (point)
+  ;;                                (save-excursion
+  ;;                                  (forward-char -1)
+  ;;                                  (skip-syntax-backward "/\\")
+  ;;                                  (point))))))
+  ;;         ;; rebind `minibuffer-message' called by
+  ;;         ;; `blink-matching-open' to handle the overlay display
+  ;;         (cl-letf (((symbol-function #'minibuffer-message)
+  ;;                     (lambda (msg &rest args)
+  ;;                       (let ((msg (apply #'format-message msg args)))
+  ;;                         (setq ov (display-line-overlay+
+  ;;                                    (window-start) msg ))))))
+  ;;           (blink-matching-open))))))
 
   ;; the overlay used to show the line that matches the offscreen parenthesis
-  (defun display-line-overlay+ (pos str &optional face)
-    "Display line at POS as STR with FACE.
+  ;;   (defun display-line-overlay+ (pos str &optional face)
+  ;;     "Display line at POS as STR with FACE.
 
-FACE defaults to inheriting from default and highlight."
-    (let ((ol (save-excursion
-                (goto-char pos)
-                (make-overlay (line-beginning-position)
-                  (line-end-position)))))
-      (overlay-put ol 'display str)
-      (overlay-put ol 'face
-        (or face '(:inherit default :inherit highlight)))
-      ol))
+  ;; FACE defaults to inheriting from default and highlight."
+  ;;     (let ((ol (save-excursion
+  ;;                 (goto-char pos)
+  ;;                 (make-overlay (line-beginning-position)
+  ;;                   (line-end-position)))))
+  ;;       (overlay-put ol 'display str)
+  ;;       (overlay-put ol 'face
+  ;;         (or face '(:inherit default :inherit highlight)))
+  ;;       ol))
   ;; ======================================================================
   :init
   ;; ======================================================================
@@ -876,8 +881,8 @@ FACE defaults to inheriting from default and highlight."
   ;; PS: DEPENDS ON `;;; -*- lexical-binding: t; -*-' at the top of the file
   ;; PS: This also uses the function and the var defined in `:preface'
   ;; we will call `blink-matching-open` ourselves...
-  (remove-hook 'post-self-insert-hook
-    #'blink-paren-post-self-insert-function)
+  ;; (remove-hook 'post-self-insert-hook
+  ;;   #'blink-paren-post-self-insert-function)
   ;; this still needs to be set for `blink-matching-open` to work
   (setq blink-matching-paren 'show)
   (setq show-paren-style 'paren)
@@ -911,22 +916,22 @@ FACE defaults to inheriting from default and highlight."
 
 
 (use-package rainbow-delimiters
-  :hook
-  (prog-mode . rainbow-delimiters-mode)
-  :custom-face
-  (rainbow-delimiters-base-error-face ((t (:inherit rainbow-delimiters-base-face :foreground "red"))))
-  (rainbow-delimiters-depth-1-face ((t (:foreground "magenta"))))
-  (rainbow-delimiters-depth-2-face ((t (:foreground "yellow"))))
-  (rainbow-delimiters-depth-3-face ((t (:foreground "green"))))
-  (rainbow-delimiters-depth-4-face ((t (:foreground "cyan"))))
-  (rainbow-delimiters-depth-5-face ((t (:foreground "cyan"))))
-  (rainbow-delimiters-depth-6-face ((t (:foreground "cyan"))))
-  (rainbow-delimiters-depth-7-face ((t (:foreground "cyan"))))
-  (rainbow-delimiters-depth-8-face ((t (:foreground "cyan"))))
-  (rainbow-delimiters-depth-9-face ((t (:foreground "cyan"))))
-  :config
-  (setq rainbow-delimiters-max-face-count 9)
-  )
+:hook
+(prog-mode . rainbow-delimiters-mode)
+:custom-face
+  (rainbow-delimiters-base-error-face ((t (:background "red" :foreground "white"))))
+(rainbow-delimiters-depth-1-face ((t (:foreground "magenta"))))
+(rainbow-delimiters-depth-2-face ((t (:foreground "yellow"))))
+(rainbow-delimiters-depth-3-face ((t (:foreground "green"))))
+(rainbow-delimiters-depth-4-face ((t (:foreground "cyan"))))
+(rainbow-delimiters-depth-5-face ((t (:foreground "cyan"))))
+(rainbow-delimiters-depth-6-face ((t (:foreground "cyan"))))
+(rainbow-delimiters-depth-7-face ((t (:foreground "cyan"))))
+(rainbow-delimiters-depth-8-face ((t (:foreground "cyan"))))
+(rainbow-delimiters-depth-9-face ((t (:foreground "cyan"))))
+:config
+(setq rainbow-delimiters-max-face-count 9)
+)
 
 ;; *********************************
 ;; Rainbow Blocks
@@ -1266,12 +1271,12 @@ all hooks after it are ignored.")
   (global-set-key (kbd "C-S-J") 'evil-window-down)
 
   ;; treat _ as word constituent so evil doenst see x_y as 2 separate words for operations like selecting and searching
-  ;; `source': https://emacs.stackexchange.com/a/9584
-  (defadvice evil-inner-word (around underscore-as-word activate)
-    (let ((table (copy-syntax-table (syntax-table))))
-      (modify-syntax-entry ?_ "w" table)
-      (with-syntax-table table
-        ad-do-it)))
+  ;; ;; `source': https://emacs.stackexchange.com/a/9584
+  ;; (defadvice evil-inner-word (around underscore-as-word activate)
+  ;;   (let ((table (copy-syntax-table (syntax-table))))
+  ;;     (modify-syntax-entry ?_ "w" table)
+  ;;     (with-syntax-table table
+  ;;       ad-do-it)))
   )
 
 ;; (use-package vimish-fold
@@ -1344,7 +1349,6 @@ all hooks after it are ignored.")
 ;; *********************************
 ;; evil-surround
 (use-package evil-matchit
-  :disabled
   :after evil
   :config
   (global-evil-matchit-mode 1)
@@ -1354,7 +1358,6 @@ all hooks after it are ignored.")
 ;; evil-surround
 
 (use-package evil-surround
-  :disabled
   :preface
   (defun evil-surround-prog-mode-hook-setup ()
     "Add more pairs to prog mode"
@@ -1697,7 +1700,7 @@ repository, then the corresponding root is used instead."
   :after ivy counsel
   :diminish ivy-posframe-mode
   :custom-face
-  ;; (ivy-posframe ((t (:background "#202020"))))
+  (ivy-posframe ((t (:background "#404040" :foreground "white"))))
   (ivy-posframe-border ((t (:background "#9370DB"))))
   (ivy-posframe-cursor ((t (:background "#00ff00"))))
   ;; troquei do :config pra :init e nao precisou de (eval-after-load nem de :demand t)
@@ -1706,10 +1709,18 @@ repository, then the corresponding root is used instead."
   (setq ivy-posframe-internal-border-width 5)
   (setq ivy-posframe-parameters
     '(
-       (left-fringe . 8)
-       (right-fringe . 8)
-       (internal-border-width . 5)
-       (alpha . 85)
+       (left-fringe . 5) ;; simulate margins
+       (right-fringe . 5) ;; simulate margins
+       (border-width . 5)
+       (internal-border-width . 2)
+       (alpha . 75)
+       (vertical-scroll-bar . "right")
+       (scroll-bar-width . 10)
+       (scroll-bar-foreground . "black")
+       (scroll-bar-background . "white")
+       (line-spacing . 2)
+       (mouse-color . "red")
+       (cursor-type . "hollow")
        ))
   ;; define the position of the posframe per function
   (setq ivy-posframe-display-functions-alist
@@ -2364,8 +2375,8 @@ repository, then the corresponding root is used instead."
     (define-key evil-normal-state-map (kbd "SPC p p") 'projectile-command-map)
     ;; NOTE: commented > using counsel-projectile-switch-project now
     ;; (define-key evil-normal-state-map (kbd "SPC p s") 'projectile-switch-project))
+    )
   )
-)
 
 
 ;;****************************************************************
@@ -2967,7 +2978,10 @@ repository, then the corresponding root is used instead."
 
     ;; general
     ("conf\\(ig\\)?$"   . conf-mode)
-    ("rc$"              . conf-mode))
+    ("rc$"              . conf-mode)
+
+    ;; uosteam macros
+    ("\\.uos\\'"       . conf-unix-mode))
   )
 
 
@@ -3380,6 +3394,50 @@ repository, then the corresponding root is used instead."
 ;; BACKEND TOOLS
 
 ;; *********************************
+
+;; Python
+(use-package python-mode
+  :mode
+  ("\\.py\\'" . python-mode)
+  :hook
+  (python-mode . flycheck-mode)
+  (python-mode . flycheck-mode)
+  )
+
+(use-package elpy
+  :defer t
+  :init
+  (advice-add 'python-mode :before 'elpy-enable))
+
+(use-package lsp-python-ms
+  :init (setq lsp-python-ms-auto-install-server t)
+  :hook (python-mode . (lambda ()
+                         (require 'lsp-python-ms)
+                         (lsp))))  ; or lsp-deferred
+
+;; auto format python code on PEP8 standard
+;;  needs pip install autopep8
+(use-package py-autopep8
+  :defer t
+  :config
+  (add-hook 'python-mode-hook 'py-autopep8-enable-on-save)
+  )
+
+;; Use the python black package to reformat your python buffers.
+
+;; The following options change the behavior of black when reformatting buffers.
+;; blacken-allow-py36 Allow using Python 3.6-only syntax on all input files.
+;; blacken-skip-string-normalization Don't normalize string quotes or prefixes.
+;; blacken-fast-unsafe Skips temporary sanity checks.
+;; blacken-line-length Max line length enforced by blacken.
+
+(use-package blacken
+  :defer t
+  :config
+  (add-hook 'python-mode-hook 'blacken-mode)
+  )
+
+;; *********************************
 ;; Docker
 
 (use-package dockerfile-mode
@@ -3784,6 +3842,7 @@ repository, then the corresponding root is used instead."
   (downcase-word (- arg))
   )
 (global-set-key (kbd "C-M-l")	 'downcase-backward-WORD)
+(global-set-key (kbd "C-l")	 'downcase-word)
 
 (defun capitalize-backward-word (arg)
   (interactive "p")

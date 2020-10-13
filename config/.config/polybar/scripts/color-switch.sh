@@ -9,7 +9,7 @@ SEPARATOR="#1F1F1F"
 FOREGROUND="#FFFFFF"
 BACKGROUND="#1F1F1F"
 BACKGROUND_ALT="#252525"
-HIGHLIGHT_BACKGROUND="#00acc1"
+HIGHLIGHT_BACKGROUND="#e0e0e0"
 HIGHLIGHT_FOREGROUND="#1F1F1F"
 
 BLACK="#000000"
@@ -46,7 +46,7 @@ MENU="$(rofi -no-lazy-grab -sep "|" -dmenu -i -p 'Style :' \
   -line-padding 10 \
   -padding 20 \
   -width 30 \
-  -xoffset 0 -yoffset -18 \
+  -xoffset 3 -yoffset 30 \
   -location 3 \
   -columns 2 \
   -show-icons -icon-theme "Papirus" \
@@ -56,13 +56,16 @@ MENU="$(rofi -no-lazy-grab -sep "|" -dmenu -i -p 'Style :' \
   -color-normal "$BACKGROUND_ALT,$FOREGROUND,$BACKGROUND_ALT,$HIGHLIGHT_BACKGROUND,$HIGHLIGHT_FOREGROUND" \
   -color-active "$BACKGROUND,$MAGENTA,$BACKGROUND_ALT,$HIGHLIGHT_BACKGROUND,$HIGHLIGHT_FOREGROUND" \
   -color-urgent "$BACKGROUND,$YELLOW,$BACKGROUND_ALT,$HIGHLIGHT_BACKGROUND,$HIGHLIGHT_FOREGROUND" \
-  <<< "♥ matrix|♥ amber|♥ blue|♥ blue-grey|♥ brown|♥ cyan|♥ deep-orange|♥ deep-purple|♥ green|♥ grey|♥ indigo|♥ blue-light|♥ green-light|♥ lime|♥ orange|♥ pink|♥ purple|♥ red|♥ teal|♥ yellow|♥ amber-dark|♥ blue-dark|♥ blue-grey-dark|♥ brown-dark|♥ cyan-dark|♥ deep-orange-dark|♥ deep-purple-dark|♥ green-dark|♥ grey-dark|♥ indigo-dark|♥ blue-light-dark|♥ green-light-dark|♥ lime-dark|♥ orange-dark|♥ pink-dark|♥ purple-dark|♥ red-dark|♥ teal-dark|♥ yellow-dark")"
-  case "$MENU" in
+  <<< " macos-light| macos-dark|♥ matrix|♥ amber|♥ blue|♥ blue-grey|♥ brown|♥ cyan|♥ deep-orange|♥ deep-purple|♥ green|♥ grey|♥ indigo|♥ blue-light|♥ green-light|♥ lime|♥ orange|♥ pink|♥ purple|♥ red|♥ teal|♥ yellow|♥ amber-dark|♥ blue-dark|♥ blue-grey-dark|♥ brown-dark|♥ cyan-dark|♥ deep-orange-dark|♥ deep-purple-dark|♥ green-dark|♥ grey-dark|♥ indigo-dark|♥ blue-light-dark|♥ green-light-dark|♥ lime-dark|♥ orange-dark|♥ pink-dark|♥ purple-dark|♥ red-dark|♥ teal-dark|♥ yellow-dark")"
+case "$MENU" in
     #
     ## my personal colors
+    *macos-light) $SDIR/colors-light.sh -macos ;;
+    *macos-dark) $SDIR/colors-dark.sh -macos ;;
     *matrix) $SDIR/colors-dark.sh -matrix ;;
     #
     ## Light Colors
+    *macos) $SDIR/colors-light.sh -macos ;;
     *amber) $SDIR/colors-light.sh -amber ;;
     *blue) $SDIR/colors-light.sh -blue ;;
     *blue-grey) $SDIR/colors-light.sh -blue-grey ;;
@@ -82,6 +85,7 @@ MENU="$(rofi -no-lazy-grab -sep "|" -dmenu -i -p 'Style :' \
     *red) $SDIR/colors-light.sh -red ;;
     *teal) $SDIR/colors-light.sh -teal ;;
     *yellow) $SDIR/colors-light.sh -yellow ;;
+    #
     ## Dark Colors
     *amber-dark) $SDIR/colors-dark.sh -amber ;;
     *blue-dark) $SDIR/colors-dark.sh -blue ;;

@@ -6405,6 +6405,257 @@ Disable `rainbow-delimiters-mode'." nil nil)
 
 
 )
+(let ((load-file-name "/home/tau/.config/emacs/elpa/pyvenv-20191202.1039/pyvenv-autoloads.el"))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory "/home/tau/.config/emacs/elpa/pyvenv-20191202.1039/pyvenv-autoloads.el") (car load-path))))
+
+
+
+
+(autoload 'pyvenv-activate "pyvenv" "\
+Activate the virtual environment in DIRECTORY.
+
+\(fn DIRECTORY)" t nil)
+
+(autoload 'pyvenv-deactivate "pyvenv" "\
+Deactivate any current virtual environment." t nil)
+
+(autoload 'pyvenv-workon "pyvenv" "\
+Activate a virtual environment from $WORKON_HOME.
+
+If the virtual environment NAME is already active, this function
+does not try to reactivate the environment.
+
+\(fn NAME)" t nil)
+
+(defvar pyvenv-mode nil "\
+Non-nil if Pyvenv mode is enabled.
+See the `pyvenv-mode' command
+for a description of this minor mode.
+Setting this variable directly does not take effect;
+either customize it (see the info node `Easy Customization')
+or call the function `pyvenv-mode'.")
+
+(custom-autoload 'pyvenv-mode "pyvenv" nil)
+
+(autoload 'pyvenv-mode "pyvenv" "\
+Global minor mode for pyvenv.
+
+If called interactively, enable Pyvenv mode if ARG is positive,
+and disable it if ARG is zero or negative.  If called from Lisp,
+also enable the mode if ARG is omitted or nil, and toggle it if
+ARG is `toggle'; disable the mode otherwise.
+
+Will show the current virtualenv in the mode line, and respect a
+`pyvenv-workon' setting in files.
+
+\(fn &optional ARG)" t nil)
+
+(defvar pyvenv-tracking-mode nil "\
+Non-nil if Pyvenv-Tracking mode is enabled.
+See the `pyvenv-tracking-mode' command
+for a description of this minor mode.
+Setting this variable directly does not take effect;
+either customize it (see the info node `Easy Customization')
+or call the function `pyvenv-tracking-mode'.")
+
+(custom-autoload 'pyvenv-tracking-mode "pyvenv" nil)
+
+(autoload 'pyvenv-tracking-mode "pyvenv" "\
+Global minor mode to track the current virtualenv.
+
+If called interactively, enable Pyvenv-Tracking mode if ARG is
+positive, and disable it if ARG is zero or negative.  If called
+from Lisp, also enable the mode if ARG is omitted or nil, and
+toggle it if ARG is `toggle'; disable the mode otherwise.
+
+When this mode is active, pyvenv will activate a buffer-specific
+virtualenv whenever the user switches to a buffer with a
+buffer-local `pyvenv-workon' or `pyvenv-activate' variable.
+
+\(fn &optional ARG)" t nil)
+
+(autoload 'pyvenv-restart-python "pyvenv" "\
+Restart Python inferior processes." t nil)
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "pyvenv" '("pyvenv-")))
+
+
+
+
+)
+(let ((load-file-name "/home/tau/.config/emacs/elpa/python-mode-20200608.737/python-mode-autoloads.el"))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory "/home/tau/.config/emacs/elpa/python-mode-20200608.737/python-mode-autoloads.el") (car load-path))))
+
+
+
+(autoload 'py-backward-class "python-mode" "\
+Go to beginning of ‘class’.
+
+If already at beginning, go one ‘class’ backward.
+Return beginning of form if successful, nil otherwise" t nil)
+
+(autoload 'py-backward-def "python-mode" "\
+Go to beginning of ‘def’.
+
+If already at beginning, go one ‘def’ backward.
+Return beginning of form if successful, nil otherwise" t nil)
+
+(autoload 'py-backward-def-or-class "python-mode" "\
+Go to beginning of ‘def-or-class’.
+
+If already at beginning, go one ‘def-or-class’ backward.
+Return beginning of form if successful, nil otherwise" t nil)
+
+(autoload 'py-backward-class-bol "python-mode" "\
+Go to beginning of ‘class’, go to BOL.
+If already at beginning, go one ‘class’ backward.
+Return beginning of ‘class’ if successful, nil otherwise" t nil)
+
+(autoload 'py-backward-def-bol "python-mode" "\
+Go to beginning of ‘def’, go to BOL.
+If already at beginning, go one ‘def’ backward.
+Return beginning of ‘def’ if successful, nil otherwise" t nil)
+
+(autoload 'py-backward-def-or-class-bol "python-mode" "\
+Go to beginning of ‘def-or-class’, go to BOL.
+If already at beginning, go one ‘def-or-class’ backward.
+Return beginning of ‘def-or-class’ if successful, nil otherwise" t nil)
+
+(autoload 'py-forward-class "python-mode" "\
+Go to end of class.
+
+Return end of ‘class’ if successful, nil otherwise
+Optional ORIG: start position
+Optional BOL: go to beginning of line following end-position
+
+\(fn &optional ORIG BOL)" t nil)
+
+(autoload 'py-forward-def "python-mode" "\
+Go to end of def.
+
+Return end of ‘def’ if successful, nil otherwise
+Optional ORIG: start position
+Optional BOL: go to beginning of line following end-position
+
+\(fn &optional ORIG BOL)" t nil)
+
+(autoload 'py-forward-def-or-class "python-mode" "\
+Go to end of def-or-class.
+
+Return end of ‘def-or-class’ if successful, nil otherwise
+Optional ORIG: start position
+Optional BOL: go to beginning of line following end-position
+
+\(fn &optional ORIG BOL)" t nil)
+
+(autoload 'py-auto-completion-mode "python-mode" "\
+Run auto-completion
+
+\(fn)" t nil)
+
+(autoload 'python-mode "python-mode" "\
+Major mode for editing Python files.
+
+To submit a problem report, enter `\\[py-submit-bug-report]' from a
+`python-mode' buffer.  Do `\\[py-describe-mode]' for detailed
+documentation.  To see what version of `python-mode' you are running,
+enter `\\[py-version]'.
+
+This mode knows about Python indentation, tokens, comments and
+continuation lines.  Paragraphs are separated by blank lines only.
+
+COMMANDS
+
+`py-shell'	Start an interactive Python interpreter in another window
+`py-execute-statement'	Send statement at point to Python default interpreter
+`py-backward-statement'	Go to the initial line of a simple statement
+
+etc.
+
+See available commands listed in files commands-python-mode at directory doc
+
+VARIABLES
+
+`py-indent-offset'	indentation increment
+`py-shell-name'		shell command to invoke Python interpreter
+`py-split-window-on-execute'		When non-nil split windows
+`py-switch-buffers-on-execute-p'	When non-nil switch to the Python output buffer
+
+See available customizations listed in files variables-python-mode at directory doc
+
+\\{python-mode-map}
+
+\(fn)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "python-mode" '("IPython" "Ipython" "Python" "all-mode-setting" "autopair-mode" "eva" "flake8" "force-py-shell-name-p-o" "highlight-indent-active" "hs-hide-comments-when-hiding-all" "info-lookup-mode" "ios" "ipy" "iyp" "jython" "pdb-track-stack-from-shell-p" "pep8" "pios" "pps-emacs-version" "pst-here" "strip-chars-" "toggle-" "turn-o" "virtualenv-" "with-buffer-prepared-for-jit-lock")))
+
+
+
+
+
+)
+(let ((load-file-name "/home/tau/.config/emacs/elpa/python-black-20200324.930/python-black-autoloads.el"))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory "/home/tau/.config/emacs/elpa/python-black-20200324.930/python-black-autoloads.el") (car load-path))))
+
+
+ (autoload 'python-black-buffer "python-black" nil t)
+ (autoload 'python-black-region "python-black" nil t)
+ (autoload 'python-black-on-save-mode "python-black" nil t)
+
+(autoload 'python-black-statement "python-black" "\
+Reformats the current statement.
+
+When called interactively with a prefix argument, or when
+DISPLAY-ERRORS is non-nil, shows a buffer if the formatting fails.
+
+\(fn &optional DISPLAY-ERRORS)" t nil)
+
+(autoload 'python-black-partial-dwim "python-black" "\
+Reformats the active region or the current statement.
+
+This runs ‘python-black-region’ or ‘python-black-statement’ depending
+on whether the region is currently active.
+
+When called interactively with a prefix argument, or when
+DISPLAY-ERRORS is non-nil, shows a buffer if the formatting fails.
+
+\(fn &optional DISPLAY-ERRORS)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "python-black" '("python-black-")))
+
+
+
+
+
+)
+(let ((load-file-name "/home/tau/.config/emacs/elpa/py-autopep8-20160925.1052/py-autopep8-autoloads.el"))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory "/home/tau/.config/emacs/elpa/py-autopep8-20160925.1052/py-autopep8-autoloads.el") (car load-path))))
+
+
+
+(autoload 'py-autopep8 "py-autopep8" "\
+Deprecated! Use py-autopep8-buffer instead." t nil)
+
+(autoload 'py-autopep8-buffer "py-autopep8" "\
+Uses the \"autopep8\" tool to reformat the current buffer." t nil)
+
+(autoload 'py-autopep8-enable-on-save "py-autopep8" "\
+Pre-save hook to be used before running autopep8." t nil)
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "py-autopep8" '("py-autopep8-")))
+
+
+)
 (let ((load-file-name "/home/tau/.config/emacs/elpa/pug-mode-20180513.2126/pug-mode-autoloads.el"))
 
 (add-to-list 'load-path (directory-file-name
@@ -9165,6 +9416,27 @@ omitted or nil, and toggle it if ARG is ‘toggle’.
 
 
 )
+(let ((load-file-name "/home/tau/.config/emacs/elpa/lsp-python-ms-20200903.1431/lsp-python-ms-autoloads.el"))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory "/home/tau/.config/emacs/elpa/lsp-python-ms-20200903.1431/lsp-python-ms-autoloads.el") (car load-path))))
+
+
+
+(autoload 'lsp-python-ms-update-server "lsp-python-ms" "\
+Update Microsoft Python Language Server.
+
+  On Windows, if the server is running, the updating will fail.
+  After stopping or killing the process, retry to update." t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "lsp-python-ms" '("lsp-python-ms-")))
+
+
+
+
+
+)
 (let ((load-file-name "/home/tau/.config/emacs/elpa/loop-20160813.1407/loop-autoloads.el"))
 
 (add-to-list 'load-path (directory-file-name
@@ -9751,6 +10023,49 @@ the mode if ARG is omitted or nil, and toggle it if ARG is `toggle'.
 \(fn &optional ARG)" t nil)
 
 (if (fboundp 'register-definition-prefixes) (register-definition-prefixes "highlight-numbers" '("highlight-numbers-")))
+
+
+)
+(let ((load-file-name "/home/tau/.config/emacs/elpa/highlight-indentation-20181204.839/highlight-indentation-autoloads.el"))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory "/home/tau/.config/emacs/elpa/highlight-indentation-20181204.839/highlight-indentation-autoloads.el") (car load-path))))
+
+
+
+
+(autoload 'highlight-indentation-mode "highlight-indentation" "\
+Highlight indentation minor mode highlights indentation based on spaces
+
+If called interactively, enable Highlight-Indentation mode if ARG
+is positive, and disable it if ARG is zero or negative.  If
+called from Lisp, also enable the mode if ARG is omitted or nil,
+and toggle it if ARG is `toggle'; disable the mode otherwise.
+
+\(fn &optional ARG)" t nil)
+
+(autoload 'highlight-indentation-set-offset "highlight-indentation" "\
+Set indentation offset localy in buffer, will prevent
+highlight-indentation from trying to guess indentation offset
+from major mode
+
+\(fn OFFSET)" t nil)
+
+(autoload 'highlight-indentation-current-column-mode "highlight-indentation" "\
+Hilight Indentation minor mode displays a vertical bar
+corresponding to the indentation of the current line
+
+If called interactively, enable
+Highlight-Indentation-Current-Column mode if ARG is positive, and
+disable it if ARG is zero or negative.  If called from Lisp, also
+enable the mode if ARG is omitted or nil, and toggle it if ARG is
+`toggle'; disable the mode otherwise.
+
+\(fn &optional ARG)" t nil)
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "highlight-indentation" '("highlight-indentation-")))
+
+
 
 
 )
@@ -12296,6 +12611,77 @@ Turn off `evil-vimish-fold-mode'." t nil)
 
 
 )
+(let ((load-file-name "/home/tau/.config/emacs/elpa/evil-surround-20200603.2216/evil-surround-autoloads.el"))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory "/home/tau/.config/emacs/elpa/evil-surround-20200603.2216/evil-surround-autoloads.el") (car load-path))))
+
+
+
+(autoload 'evil-surround-delete "evil-surround" "\
+Delete the surrounding delimiters represented by CHAR.
+Alternatively, the text to delete can be represented with
+the overlays OUTER and INNER, where OUTER includes the delimiters
+and INNER excludes them. The intersection (i.e., difference)
+between these overlays is what is deleted.
+
+\(fn CHAR &optional OUTER INNER)" t nil)
+
+(autoload 'evil-surround-change "evil-surround" "\
+Change the surrounding delimiters represented by CHAR.
+Alternatively, the text to delete can be represented with the
+overlays OUTER and INNER, which are passed to `evil-surround-delete'.
+
+\(fn CHAR &optional OUTER INNER)" t nil)
+
+(autoload 'evil-surround-mode "evil-surround" "\
+Buffer-local minor mode to emulate surround.vim.
+
+If called interactively, enable Evil-Surround mode if ARG is
+positive, and disable it if ARG is zero or negative.  If called
+from Lisp, also enable the mode if ARG is omitted or nil, and
+toggle it if ARG is `toggle'; disable the mode otherwise.
+
+\(fn &optional ARG)" t nil)
+
+(autoload 'turn-on-evil-surround-mode "evil-surround" "\
+Enable evil-surround-mode in the current buffer." nil nil)
+
+(autoload 'turn-off-evil-surround-mode "evil-surround" "\
+Disable evil-surround-mode in the current buffer." nil nil)
+
+(put 'global-evil-surround-mode 'globalized-minor-mode t)
+
+(defvar global-evil-surround-mode nil "\
+Non-nil if Global Evil-Surround mode is enabled.
+See the `global-evil-surround-mode' command
+for a description of this minor mode.
+Setting this variable directly does not take effect;
+either customize it (see the info node `Easy Customization')
+or call the function `global-evil-surround-mode'.")
+
+(custom-autoload 'global-evil-surround-mode "evil-surround" nil)
+
+(autoload 'global-evil-surround-mode "evil-surround" "\
+Toggle Evil-Surround mode in all buffers.
+With prefix ARG, enable Global Evil-Surround mode if ARG is positive;
+otherwise, disable it.  If called from Lisp, enable the mode if
+ARG is omitted or nil.
+
+Evil-Surround mode is enabled in all buffers where
+`turn-on-evil-surround-mode' would do it.
+See `evil-surround-mode' for more information on Evil-Surround mode.
+
+\(fn &optional ARG)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-surround" '("evil-surround-")))
+
+
+
+
+
+)
 (let ((load-file-name "/home/tau/.config/emacs/elpa/evil-mu4e-20180613.1039/evil-mu4e-autoloads.el"))
 
 (add-to-list 'load-path (directory-file-name
@@ -12304,6 +12690,402 @@ Turn off `evil-vimish-fold-mode'." t nil)
 
 
 (if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-mu4e" '("evil-mu4e-")))
+
+
+
+
+)
+(let ((load-file-name "/home/tau/.config/emacs/elpa/evil-matchit-20200906.255/evil-matchit-autoloads.el"))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory "/home/tau/.config/emacs/elpa/evil-matchit-20200906.255/evil-matchit-autoloads.el") (car load-path))))
+
+
+
+(autoload 'evilmi-load-plugin-rules "evil-matchit" "\
+Load MODES's plugin RULES.
+
+\(fn MODES RULES)" nil nil)
+
+(autoload 'evilmi-init-plugins "evil-matchit" "\
+Load plugins." t nil)
+
+(autoload 'evilmi-select-items "evil-matchit" "\
+Select NUM items/tags and the region between them.
+
+\(fn &optional NUM)" t nil)
+
+(autoload 'evilmi-delete-items "evil-matchit" "\
+Delete NUM items/tags and the region between them.
+
+\(fn &optional NUM)" t nil)
+
+(autoload 'evilmi-jump-to-percentage "evil-matchit" "\
+Like Vim %, NUM is the percentage of location.
+
+\(fn NUM)" t nil)
+ (autoload 'evilmi-jump-items "evil-matchit" nil t)
+
+(autoload 'evilmi-version "evil-matchit" "\
+Print version." t nil)
+
+(autoload 'evil-matchit-mode "evil-matchit" "\
+Buffer-local minor mode to emulate matchit.vim.
+
+If called interactively, enable Evil-Matchit mode if ARG is
+positive, and disable it if ARG is zero or negative.  If called
+from Lisp, also enable the mode if ARG is omitted or nil, and
+toggle it if ARG is `toggle'; disable the mode otherwise.
+
+\(fn &optional ARG)" t nil)
+
+(autoload 'turn-on-evil-matchit-mode "evil-matchit" "\
+Enable the minor mode in the current buffer." nil nil)
+
+(autoload 'turn-off-evil-matchit-mode "evil-matchit" "\
+Disable the minor mode in the current buffer." nil nil)
+
+(put 'global-evil-matchit-mode 'globalized-minor-mode t)
+
+(defvar global-evil-matchit-mode nil "\
+Non-nil if Global Evil-Matchit mode is enabled.
+See the `global-evil-matchit-mode' command
+for a description of this minor mode.
+Setting this variable directly does not take effect;
+either customize it (see the info node `Easy Customization')
+or call the function `global-evil-matchit-mode'.")
+
+(custom-autoload 'global-evil-matchit-mode "evil-matchit" nil)
+
+(autoload 'global-evil-matchit-mode "evil-matchit" "\
+Toggle Evil-Matchit mode in all buffers.
+With prefix ARG, enable Global Evil-Matchit mode if ARG is positive;
+otherwise, disable it.  If called from Lisp, enable the mode if
+ARG is omitted or nil.
+
+Evil-Matchit mode is enabled in all buffers where
+`turn-on-evil-matchit-mode' would do it.
+See `evil-matchit-mode' for more information on Evil-Matchit mode.
+
+\(fn &optional ARG)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-matchit" '("evil")))
+
+
+
+
+(autoload 'evilmi-c-get-tag "evil-matchit-c" "\
+Get tag at point." nil nil)
+
+(autoload 'evilmi-c-jump "evil-matchit-c" "\
+Use INFO to jump NUM times.
+
+\(fn INFO NUM)" nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-matchit-c" '("evilmi-c-")))
+
+
+
+
+(autoload 'evilmi-cmake-get-tag "evil-matchit-cmake" nil nil nil)
+
+(autoload 'evilmi-cmake-jump "evil-matchit-cmake" "\
+
+
+\(fn INFO NUM)" nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-matchit-cmake" '("evilmi-cmake-")))
+
+
+
+
+(autoload 'evilmi-diff-get-tag "evil-matchit-diff" "\
+Get tag at point." nil nil)
+
+(autoload 'evilmi-diff-jump "evil-matchit-diff" "\
+Jump to the matching tag using INFO and NUM.
+
+\(fn INFO NUM)" nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-matchit-diff" '("evilmi-diff-")))
+
+
+
+
+(autoload 'evilmi-elixir-get-tag "evil-matchit-elixir" nil nil nil)
+
+(autoload 'evilmi-elixir-jump "evil-matchit-elixir" "\
+
+
+\(fn RLT NUM)" nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-matchit-elixir" '("evilmi-elixir-")))
+
+
+
+
+(autoload 'evilmi-fortran-get-tag "evil-matchit-fortran" nil nil nil)
+
+(autoload 'evilmi-fortran-jump "evil-matchit-fortran" "\
+
+
+\(fn INFO NUM)" nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-matchit-fortran" '("evilmi-fortran-")))
+
+
+
+
+(autoload 'evilmi-html-get-tag "evil-matchit-html" "\
+Get current tag." nil nil)
+
+(autoload 'evilmi-html-jump "evil-matchit-html" "\
+Use INFO from current tag to jump NUM times.
+
+\(fn INFO NUM)" nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-matchit-html" '("evilmi-html--")))
+
+
+
+
+(autoload 'evilmi-javascript-get-tag "evil-matchit-javascript" "\
+Get tag at point." nil nil)
+
+(autoload 'evilmi-javascript-jump "evil-matchit-javascript" "\
+Jump to the matching tag using INFO and NUM.
+
+\(fn INFO NUM)" nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-matchit-javascript" '("evilmi-")))
+
+
+
+
+(autoload 'evilmi-latex-get-tag "evil-matchit-latex" nil nil nil)
+
+(autoload 'evilmi-latex-jump "evil-matchit-latex" "\
+
+
+\(fn RLT NUM)" nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-matchit-latex" '("evilmi-latex-")))
+
+
+
+
+(autoload 'evilmi-markdown-get-tag "evil-matchit-markdown" "\
+Get current tag.  Return (list start-position tag)." nil nil)
+
+(autoload 'evilmi-markdown-jump "evil-matchit-markdown" "\
+Jump to the next tag using INFO and NUM.
+
+\(fn INFO NUM)" nil nil)
+
+
+
+(autoload 'evilmi-ocaml-get-tag "evil-matchit-ocaml" "\
+Return information of current tag: (list position-of-word word)." nil nil)
+
+(autoload 'evilmi-ocaml-jump "evil-matchit-ocaml" "\
+
+
+\(fn RLT NUM)" nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-matchit-ocaml" '("evilmi-ocaml-")))
+
+
+
+
+(autoload 'evilmi-org-get-tag "evil-matchit-org" "\
+Get current tag in org file." nil nil)
+
+(autoload 'evilmi-org-jump "evil-matchit-org" "\
+
+
+\(fn RLT NUM)" nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-matchit-org" '("evilmi-")))
+
+
+
+
+(autoload 'evilmi-python-get-tag "evil-matchit-python" "\
+Return '(start-position tag-type keyword)." nil nil)
+
+(autoload 'evilmi-python-jump "evil-matchit-python" "\
+Use INFO returned by `evilmi-python-get-tag' and NUM to jump to matched tag.
+
+\(fn INFO NUM)" nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-matchit-python" '("evilmi--python-")))
+
+
+
+
+(autoload 'evilmi-ruby-get-tag "evil-matchit-ruby" "\
+Get tag at point." nil nil)
+
+(autoload 'evilmi-ruby-jump "evil-matchit-ruby" "\
+Use INFO to jump NUM times.
+
+\(fn INFO NUM)" nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-matchit-ruby" '("evilmi-ruby-")))
+
+
+
+
+(autoload 'evilmi-script-get-tag "evil-matchit-script" "\
+Get tag at point." nil nil)
+
+(autoload 'evilmi-script-jump "evil-matchit-script" "\
+Use INFO returned by `evilmi-script-get-tag' and NUM to jump to matched tag.
+
+\(fn INFO NUM)" nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-matchit-script" '("evilmi-script-")))
+
+
+
+
+(autoload 'evilmi-sdk-curline "evil-matchit-sdk" "\
+Get current line text." nil nil)
+
+(autoload 'evilmi-sdk-member "evil-matchit-sdk" "\
+Check if KEYWORD exist in KEYWORD-LIST.
+
+\(fn KEYWORD KEYWORD-LIST)" nil nil)
+
+(autoload 'evilmi-sdk-get-tag-info "evil-matchit-sdk" "\
+Return (row column is-function-exit-point keyword).
+The row and column mark the position in `evilmi-mylang-match-tags'
+is-function-exit-point could be unknown status
+
+\(fn KEYWORD MATCH-TAGS)" nil nil)
+
+(autoload 'evilmi-sdk-get-tag "evil-matchit-sdk" "\
+Return '(start-point ((row column is-function-exit-point keyword)).
+
+\(fn MATCH-TAGS HOWTOS)" nil nil)
+
+(autoload 'evilmi-sdk-jump "evil-matchit-sdk" "\
+Use RLT, NUM, MATCH-TAGS and HOWTOS to jump.
+Return nil if no matching tag found.  Please note (point) is changed
+after calling this function.
+
+\(fn RLT NUM MATCH-TAGS HOWTOS)" nil nil)
+
+(autoload 'evilmi-among-fonts-p "evil-matchit-sdk" "\
+If current font at POS is among FONTS.
+
+\(fn POS FONTS)" nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-matchit-sdk" '("evilmi-")))
+
+
+
+
+(autoload 'evilmi-sh-get-tag "evil-matchit-sh" nil nil nil)
+
+(autoload 'evilmi-sh-jump "evil-matchit-sh" "\
+
+
+\(fn INFO NUM)" nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-matchit-sh" '("evilmi-sh-")))
+
+
+
+
+(autoload 'evilmi-simple-get-tag "evil-matchit-simple" "\
+Get current tag in simple language." nil nil)
+
+(autoload 'evilmi-simple-jump "evil-matchit-simple" "\
+Use INFO of current tag to jump to matching tag.  NUM is ignored.
+
+\(fn INFO NUM)" nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-matchit-simple" '("evilmi-")))
+
+
+
+
+(autoload 'evilmi-sql-get-tag "evil-matchit-sql" "\
+Get tag at point." nil nil)
+
+(autoload 'evilmi-sql-jump "evil-matchit-sql" "\
+Use INFO returned by `evilmi-sql-get-tag' and NUM to jump to matched tag.
+
+\(fn INFO NUM)" nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-matchit-sql" '("evilmi-sql-")))
+
+
+
+
+(autoload 'evilmi-template-get-tag "evil-matchit-template" "\
+Get tag at point." nil nil)
+
+(autoload 'evilmi-template-jump "evil-matchit-template" "\
+Jump to the matching tag using INFO and NUM.
+
+\(fn INFO NUM)" nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-matchit-template" '("evilmi-template-")))
+
+
+
+
+(autoload 'evilmi-prompt-line-p "evil-matchit-terminal" "\
+If line at POSITION has prompt at the beginning.
+
+\(fn &optional POSITION)" nil nil)
+
+(autoload 'evilmi-terminal-get-tag "evil-matchit-terminal" "\
+Get tag at point." nil nil)
+
+(autoload 'evilmi-terminal-jump "evil-matchit-terminal" "\
+Use INFO to jump NUM times.
+
+\(fn INFO NUM)" nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-matchit-terminal" '("evilmi-terminal-p")))
+
+
+
+
+(autoload 'evilmi-verilog-get-tag "evil-matchit-verilog" "\
+Get tag at point." nil nil)
+
+(autoload 'evilmi-verilog-jump "evil-matchit-verilog" "\
+Use INFO returned by `evilmi-verlog-get-tag' and NUM to jump to matched tag.
+
+\(fn INFO NUM)" nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "evil-matchit-verilog" '("evilmi-verilog-")))
+
 
 
 
@@ -12510,6 +13292,401 @@ Wrap region with markup.
 
 (if (fboundp 'register-definition-prefixes) (register-definition-prefixes "emmet-mode" '("emmet-")))
 
+
+
+
+
+)
+(let ((load-file-name "/home/tau/.config/emacs/elpa/company-20200525.101/company-autoloads.el"))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory "/home/tau/.config/emacs/elpa/company-20200525.101/company-autoloads.el") (car load-path))))
+
+
+
+(autoload 'company-mode "company" "\
+\"complete anything\"; is an in-buffer completion framework.
+Completion starts automatically, depending on the values
+`company-idle-delay' and `company-minimum-prefix-length'.
+
+If called interactively, enable Company mode if ARG is positive,
+and disable it if ARG is zero or negative.  If called from Lisp,
+also enable the mode if ARG is omitted or nil, and toggle it if
+ARG is `toggle'; disable the mode otherwise.
+
+Completion can be controlled with the commands:
+`company-complete-common', `company-complete-selection', `company-complete',
+`company-select-next', `company-select-previous'.  If these commands are
+called before `company-idle-delay', completion will also start.
+
+Completions can be searched with `company-search-candidates' or
+`company-filter-candidates'.  These can be used while completion is
+inactive, as well.
+
+The completion data is retrieved using `company-backends' and displayed
+using `company-frontends'.  If you want to start a specific backend, call
+it interactively or use `company-begin-backend'.
+
+By default, the completions list is sorted alphabetically, unless the
+backend chooses otherwise, or `company-transformers' changes it later.
+
+regular keymap (`company-mode-map'):
+
+\\{company-mode-map}
+keymap during active completions (`company-active-map'):
+
+\\{company-active-map}
+
+\(fn &optional ARG)" t nil)
+
+(put 'global-company-mode 'globalized-minor-mode t)
+
+(defvar global-company-mode nil "\
+Non-nil if Global Company mode is enabled.
+See the `global-company-mode' command
+for a description of this minor mode.
+Setting this variable directly does not take effect;
+either customize it (see the info node `Easy Customization')
+or call the function `global-company-mode'.")
+
+(custom-autoload 'global-company-mode "company" nil)
+
+(autoload 'global-company-mode "company" "\
+Toggle Company mode in all buffers.
+With prefix ARG, enable Global Company mode if ARG is positive;
+otherwise, disable it.  If called from Lisp, enable the mode if
+ARG is omitted or nil.
+
+Company mode is enabled in all buffers where
+`company-mode-on' would do it.
+See `company-mode' for more information on Company mode.
+
+\(fn &optional ARG)" t nil)
+
+(autoload 'company-manual-begin "company" nil t nil)
+
+(autoload 'company-complete "company" "\
+Insert the common part of all candidates or the current selection.
+The first time this is called, the common part is inserted, the second
+time, or when the selection has been changed, the selected candidate is
+inserted." t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company" '("company-")))
+
+
+
+
+(autoload 'company-abbrev "company-abbrev" "\
+`company-mode' completion backend for abbrev.
+
+\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-abbrev" '("company-abbrev-insert")))
+
+
+
+
+(autoload 'company-bbdb "company-bbdb" "\
+`company-mode' completion backend for BBDB.
+
+\(fn COMMAND &optional ARG &rest IGNORE)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-bbdb" '("company-bbdb-")))
+
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-capf" '("company-")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-clang" '("company-clang")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-cmake" '("company-cmake")))
+
+
+
+(autoload 'company-css "company-css" "\
+`company-mode' completion backend for `css-mode'.
+
+\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-css" '("company-css-")))
+
+
+
+
+(autoload 'company-dabbrev "company-dabbrev" "\
+dabbrev-like `company-mode' completion backend.
+
+\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-dabbrev" '("company-dabbrev-")))
+
+
+
+
+(autoload 'company-dabbrev-code "company-dabbrev-code" "\
+dabbrev-like `company-mode' backend for code.
+The backend looks for all symbols in the current buffer that aren't in
+comments or strings.
+
+\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-dabbrev-code" '("company-dabbrev-code-")))
+
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-eclim" '("company-eclim")))
+
+
+
+(autoload 'company-elisp "company-elisp" "\
+`company-mode' completion backend for Emacs Lisp.
+
+\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-elisp" '("company-elisp-")))
+
+
+
+
+(autoload 'company-etags "company-etags" "\
+`company-mode' completion backend for etags.
+
+\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-etags" '("company-etags-")))
+
+
+
+
+(autoload 'company-files "company-files" "\
+`company-mode' completion backend existing file names.
+Completions works for proper absolute and relative files paths.
+File paths with spaces are only supported inside strings.
+
+\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-files" '("company-file")))
+
+
+
+
+(autoload 'company-gtags "company-gtags" "\
+`company-mode' completion backend for GNU Global.
+
+\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-gtags" '("company-gtags-")))
+
+
+
+
+(autoload 'company-ispell "company-ispell" "\
+`company-mode' completion backend using Ispell.
+
+\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-ispell" '("company-ispell-")))
+
+
+
+
+(autoload 'company-keywords "company-keywords" "\
+`company-mode' backend for programming language keywords.
+
+\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-keywords" '("company-keywords-")))
+
+
+
+
+(autoload 'company-nxml "company-nxml" "\
+`company-mode' completion backend for `nxml-mode'.
+
+\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-nxml" '("company-nxml-")))
+
+
+
+
+(autoload 'company-oddmuse "company-oddmuse" "\
+`company-mode' completion backend for `oddmuse-mode'.
+
+\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-oddmuse" '("company-oddmuse-")))
+
+
+
+
+(autoload 'company-semantic "company-semantic" "\
+`company-mode' completion backend using CEDET Semantic.
+
+\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-semantic" '("company-semantic-")))
+
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-template" '("company-template-")))
+
+
+
+(autoload 'company-tempo "company-tempo" "\
+`company-mode' completion backend for tempo.
+
+\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-tempo" '("company-tempo-")))
+
+
+
+
+(autoload 'company-tng-frontend "company-tng" "\
+When the user changes the selection at least once, this
+frontend will display the candidate in the buffer as if it's
+already there and any key outside of `company-active-map' will
+confirm the selection and finish the completion.
+
+\(fn COMMAND)" nil nil)
+
+(autoload 'company-tng-configure-default "company-tng" "\
+Applies the default configuration to enable company-tng." nil nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-tng" '("company-tng--")))
+
+
+
+
+(autoload 'company-xcode "company-xcode" "\
+`company-mode' completion backend for Xcode projects.
+
+\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-xcode" '("company-xcode-")))
+
+
+
+
+(autoload 'company-yasnippet "company-yasnippet" "\
+`company-mode' backend for `yasnippet'.
+
+This backend should be used with care, because as long as there are
+snippets defined for the current major mode, this backend will always
+shadow backends that come after it.  Recommended usages:
+
+* In a buffer-local value of `company-backends', grouped with a backend or
+  several that provide actual text completions.
+
+  (add-hook 'js-mode-hook
+            (lambda ()
+              (set (make-local-variable 'company-backends)
+                   '((company-dabbrev-code company-yasnippet)))))
+
+* After keyword `:with', grouped with other backends.
+
+  (push '(company-semantic :with company-yasnippet) company-backends)
+
+* Not in `company-backends', just bound to a key.
+
+  (global-set-key (kbd \"C-c y\") 'company-yasnippet)
+
+\(fn COMMAND &optional ARG &rest IGNORE)" t nil)
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-yasnippet" '("company-yasnippet-")))
+
+
+
+
+
+)
+(let ((load-file-name "/home/tau/.config/emacs/elpa/elpy-20200805.1736/elpy-autoloads.el"))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory "/home/tau/.config/emacs/elpa/elpy-20200805.1736/elpy-autoloads.el") (car load-path))))
+
+
+
+
+(autoload 'elpy-enable "elpy" "\
+Enable Elpy in all future Python buffers.
+
+\(fn &optional IGNORED)" t nil)
+
+(autoload 'elpy-mode "elpy" "\
+Minor mode in Python buffers for the Emacs Lisp Python Environment.
+
+If called interactively, enable Elpy mode if ARG is positive, and
+disable it if ARG is zero or negative.  If called from Lisp, also
+enable the mode if ARG is omitted or nil, and toggle it if ARG is
+`toggle'; disable the mode otherwise.
+
+This mode fully supports virtualenvs. Once you switch a
+virtualenv using \\[pyvenv-workon], you can use
+\\[elpy-rpc-restart] to make the elpy Python process use your
+virtualenv.
+
+\\{elpy-mode-map}
+
+\(fn &optional ARG)" t nil)
+
+(autoload 'elpy-config "elpy" "\
+Configure Elpy.
+
+This function will pop up a configuration buffer, which is mostly
+a customize buffer, but has some more options." t nil)
+
+(autoload 'elpy-version "elpy" "\
+Display the version of Elpy." t nil)
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "elpy" '("elpy-")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "elpy-django" '("elpy-")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "elpy-profile" '("elpy-profile-")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "elpy-refactor" '("elpy-refactor")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "elpy-rpc" '("elpy-" "with-elpy-rpc-virtualenv-activated")))
+
+
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "elpy-shell" '("elpy-")))
 
 
 
@@ -13963,336 +15140,6 @@ counterparts.
 
 
 )
-(let ((load-file-name "/home/tau/.config/emacs/elpa/company-20200525.101/company-autoloads.el"))
-
-(add-to-list 'load-path (directory-file-name
-                         (or (file-name-directory "/home/tau/.config/emacs/elpa/company-20200525.101/company-autoloads.el") (car load-path))))
-
-
-
-(autoload 'company-mode "company" "\
-\"complete anything\"; is an in-buffer completion framework.
-Completion starts automatically, depending on the values
-`company-idle-delay' and `company-minimum-prefix-length'.
-
-If called interactively, enable Company mode if ARG is positive,
-and disable it if ARG is zero or negative.  If called from Lisp,
-also enable the mode if ARG is omitted or nil, and toggle it if
-ARG is `toggle'; disable the mode otherwise.
-
-Completion can be controlled with the commands:
-`company-complete-common', `company-complete-selection', `company-complete',
-`company-select-next', `company-select-previous'.  If these commands are
-called before `company-idle-delay', completion will also start.
-
-Completions can be searched with `company-search-candidates' or
-`company-filter-candidates'.  These can be used while completion is
-inactive, as well.
-
-The completion data is retrieved using `company-backends' and displayed
-using `company-frontends'.  If you want to start a specific backend, call
-it interactively or use `company-begin-backend'.
-
-By default, the completions list is sorted alphabetically, unless the
-backend chooses otherwise, or `company-transformers' changes it later.
-
-regular keymap (`company-mode-map'):
-
-\\{company-mode-map}
-keymap during active completions (`company-active-map'):
-
-\\{company-active-map}
-
-\(fn &optional ARG)" t nil)
-
-(put 'global-company-mode 'globalized-minor-mode t)
-
-(defvar global-company-mode nil "\
-Non-nil if Global Company mode is enabled.
-See the `global-company-mode' command
-for a description of this minor mode.
-Setting this variable directly does not take effect;
-either customize it (see the info node `Easy Customization')
-or call the function `global-company-mode'.")
-
-(custom-autoload 'global-company-mode "company" nil)
-
-(autoload 'global-company-mode "company" "\
-Toggle Company mode in all buffers.
-With prefix ARG, enable Global Company mode if ARG is positive;
-otherwise, disable it.  If called from Lisp, enable the mode if
-ARG is omitted or nil.
-
-Company mode is enabled in all buffers where
-`company-mode-on' would do it.
-See `company-mode' for more information on Company mode.
-
-\(fn &optional ARG)" t nil)
-
-(autoload 'company-manual-begin "company" nil t nil)
-
-(autoload 'company-complete "company" "\
-Insert the common part of all candidates or the current selection.
-The first time this is called, the common part is inserted, the second
-time, or when the selection has been changed, the selected candidate is
-inserted." t nil)
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company" '("company-")))
-
-
-
-
-(autoload 'company-abbrev "company-abbrev" "\
-`company-mode' completion backend for abbrev.
-
-\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-abbrev" '("company-abbrev-insert")))
-
-
-
-
-(autoload 'company-bbdb "company-bbdb" "\
-`company-mode' completion backend for BBDB.
-
-\(fn COMMAND &optional ARG &rest IGNORE)" t nil)
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-bbdb" '("company-bbdb-")))
-
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-capf" '("company-")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-clang" '("company-clang")))
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-cmake" '("company-cmake")))
-
-
-
-(autoload 'company-css "company-css" "\
-`company-mode' completion backend for `css-mode'.
-
-\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-css" '("company-css-")))
-
-
-
-
-(autoload 'company-dabbrev "company-dabbrev" "\
-dabbrev-like `company-mode' completion backend.
-
-\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-dabbrev" '("company-dabbrev-")))
-
-
-
-
-(autoload 'company-dabbrev-code "company-dabbrev-code" "\
-dabbrev-like `company-mode' backend for code.
-The backend looks for all symbols in the current buffer that aren't in
-comments or strings.
-
-\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-dabbrev-code" '("company-dabbrev-code-")))
-
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-eclim" '("company-eclim")))
-
-
-
-(autoload 'company-elisp "company-elisp" "\
-`company-mode' completion backend for Emacs Lisp.
-
-\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-elisp" '("company-elisp-")))
-
-
-
-
-(autoload 'company-etags "company-etags" "\
-`company-mode' completion backend for etags.
-
-\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-etags" '("company-etags-")))
-
-
-
-
-(autoload 'company-files "company-files" "\
-`company-mode' completion backend existing file names.
-Completions works for proper absolute and relative files paths.
-File paths with spaces are only supported inside strings.
-
-\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-files" '("company-file")))
-
-
-
-
-(autoload 'company-gtags "company-gtags" "\
-`company-mode' completion backend for GNU Global.
-
-\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-gtags" '("company-gtags-")))
-
-
-
-
-(autoload 'company-ispell "company-ispell" "\
-`company-mode' completion backend using Ispell.
-
-\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-ispell" '("company-ispell-")))
-
-
-
-
-(autoload 'company-keywords "company-keywords" "\
-`company-mode' backend for programming language keywords.
-
-\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-keywords" '("company-keywords-")))
-
-
-
-
-(autoload 'company-nxml "company-nxml" "\
-`company-mode' completion backend for `nxml-mode'.
-
-\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-nxml" '("company-nxml-")))
-
-
-
-
-(autoload 'company-oddmuse "company-oddmuse" "\
-`company-mode' completion backend for `oddmuse-mode'.
-
-\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-oddmuse" '("company-oddmuse-")))
-
-
-
-
-(autoload 'company-semantic "company-semantic" "\
-`company-mode' completion backend using CEDET Semantic.
-
-\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-semantic" '("company-semantic-")))
-
-
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-template" '("company-template-")))
-
-
-
-(autoload 'company-tempo "company-tempo" "\
-`company-mode' completion backend for tempo.
-
-\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-tempo" '("company-tempo-")))
-
-
-
-
-(autoload 'company-tng-frontend "company-tng" "\
-When the user changes the selection at least once, this
-frontend will display the candidate in the buffer as if it's
-already there and any key outside of `company-active-map' will
-confirm the selection and finish the completion.
-
-\(fn COMMAND)" nil nil)
-
-(autoload 'company-tng-configure-default "company-tng" "\
-Applies the default configuration to enable company-tng." nil nil)
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-tng" '("company-tng--")))
-
-
-
-
-(autoload 'company-xcode "company-xcode" "\
-`company-mode' completion backend for Xcode projects.
-
-\(fn COMMAND &optional ARG &rest IGNORED)" t nil)
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-xcode" '("company-xcode-")))
-
-
-
-
-(autoload 'company-yasnippet "company-yasnippet" "\
-`company-mode' backend for `yasnippet'.
-
-This backend should be used with care, because as long as there are
-snippets defined for the current major mode, this backend will always
-shadow backends that come after it.  Recommended usages:
-
-* In a buffer-local value of `company-backends', grouped with a backend or
-  several that provide actual text completions.
-
-  (add-hook 'js-mode-hook
-            (lambda ()
-              (set (make-local-variable 'company-backends)
-                   '((company-dabbrev-code company-yasnippet)))))
-
-* After keyword `:with', grouped with other backends.
-
-  (push '(company-semantic :with company-yasnippet) company-backends)
-
-* Not in `company-backends', just bound to a key.
-
-  (global-set-key (kbd \"C-c y\") 'company-yasnippet)
-
-\(fn COMMAND &optional ARG &rest IGNORE)" t nil)
-
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "company-yasnippet" '("company-yasnippet-")))
-
-
-
-
-
-)
 (let ((load-file-name "/home/tau/.config/emacs/elpa/company-posframe-20200514.2116/company-posframe-autoloads.el"))
 
 (add-to-list 'load-path (directory-file-name
@@ -14464,6 +15311,34 @@ Display a list of current buffer groups using Counsel." t nil)
 
 
 
+
+
+)
+(let ((load-file-name "/home/tau/.config/emacs/elpa/blacken-20200626.2018/blacken-autoloads.el"))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory "/home/tau/.config/emacs/elpa/blacken-20200626.2018/blacken-autoloads.el") (car load-path))))
+
+
+
+(autoload 'blacken-buffer "blacken" "\
+Try to blacken the current buffer.
+
+Show black output, if black exit abnormally and DISPLAY is t.
+
+\(fn &optional DISPLAY)" t nil)
+
+(autoload 'blacken-mode "blacken" "\
+Automatically run black before saving.
+
+If called interactively, enable Blacken mode if ARG is positive,
+and disable it if ARG is zero or negative.  If called from Lisp,
+also enable the mode if ARG is omitted or nil, and toggle it if
+ARG is `toggle'; disable the mode otherwise.
+
+\(fn &optional ARG)" t nil)
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "blacken" '("blacken-")))
 
 
 )
@@ -14769,16 +15644,16 @@ Any path found is added to the `exec-path'." t nil)
 
 )
 (setq package-activated-list
-  (append
-    '(yasnippet yasnippet-snippets yaml-mode async with-editor which-key web-mode vimrc-mode s dash f vimish-fold vi-tilde-fringe popup vc-msg bind-key use-package undo-tree typescript-mode epl pkg-info projectile avy ace-window pfuture lv hydra ht treemacs treemacs-projectile persp-mode treemacs-persp transient git-commit magit treemacs-magit goto-chg evil treemacs-evil ivy swiper sqlup-mode reformatter sqlformat sql-indent spinner solaire-mode smartparens shrink-path shell-pop scss-mode rotate restclient ranger rainbow-mode rainbow-delimiters pug-mode prettier-js prescient powerline posframe parent-mode org-plus-contrib memoize markdown-mode dash-functional lsp-mode lsp-ui loop keyfreq json-snatcher json-reformat json-mode js2-mode ivy-rich ivy-prescient ivy-posframe ivy-explorer hl-todo highlight-parentheses highlight-operators highlight-numbers highlight-indent-guides highlight-escape-sequences highlight-defined hide-mode-line elisp-refs helpful haskell-mode grip-mode goto-line-preview go-mode gitignore-mode gitconfig-mode gitattributes-mode git-timemachine gcmh fzf flycheck flycheck-posframe eyebrowse expand-region exec-path-from-shell ewal doom-themes ewal-doom-themes evil-vimish-fold evil-mu4e evil-magit evil-goggles evil-commentary esup emmet-mode editorconfig dumb-jump drag-stuff dotenv-mode all-the-icons doom-modeline dockerfile-mode docker-compose-mode dired-k diminish diffview diff-hl counsel counsel-projectile company company-posframe company-lsp company-box centaur-tabs better-jumper auto-package-update amx all-the-icons-ivy all-the-icons-dired aggressive-indent add-node-modules-path)
-    package-activated-list))
+      (append
+       '(yasnippet yasnippet-snippets yaml-mode async with-editor which-key web-mode vimrc-mode s dash f vimish-fold vi-tilde-fringe popup vc-msg bind-key use-package undo-tree typescript-mode epl pkg-info projectile avy ace-window pfuture lv hydra ht treemacs treemacs-projectile persp-mode treemacs-persp transient git-commit magit treemacs-magit goto-chg evil treemacs-evil ivy swiper sqlup-mode reformatter sqlformat sql-indent spinner solaire-mode smartparens shrink-path shell-pop scss-mode rotate restclient ranger rainbow-mode rainbow-delimiters pyvenv python-mode python-black py-autopep8 pug-mode prettier-js prescient powerline posframe parent-mode org-plus-contrib memoize markdown-mode dash-functional lsp-mode lsp-ui lsp-python-ms loop keyfreq json-snatcher json-reformat json-mode js2-mode ivy-rich ivy-prescient ivy-posframe ivy-explorer hl-todo highlight-parentheses highlight-operators highlight-numbers highlight-indentation highlight-indent-guides highlight-escape-sequences highlight-defined hide-mode-line elisp-refs helpful haskell-mode grip-mode goto-line-preview go-mode gitignore-mode gitconfig-mode gitattributes-mode git-timemachine gcmh fzf flycheck flycheck-posframe eyebrowse expand-region exec-path-from-shell ewal doom-themes ewal-doom-themes evil-vimish-fold evil-surround evil-mu4e evil-matchit evil-magit evil-goggles evil-commentary esup emmet-mode company elpy editorconfig dumb-jump drag-stuff dotenv-mode all-the-icons doom-modeline dockerfile-mode docker-compose-mode dired-k diminish diffview diff-hl counsel counsel-projectile company-posframe company-lsp company-box centaur-tabs blacken better-jumper auto-package-update amx all-the-icons-ivy all-the-icons-dired aggressive-indent add-node-modules-path)
+       package-activated-list))
 (progn
   (require 'info)
   (info-initialize)
   (setq Info-directory-list
-    (append
-      '("/home/tau/.config/emacs/elpa/editorconfig-20200519.1128" "/home/tau/.config/emacs/elpa/haskell-mode-20200531.2255" "/home/tau/.config/emacs/elpa/org-plus-contrib-20200615" "/home/tau/.config/emacs/elpa/ivy-20200601.1105" "/home/tau/.config/emacs/elpa/evil-20200530.659" "/home/tau/.config/emacs/elpa/magit-20200601.1812" "/home/tau/.config/emacs/elpa/transient-20200601.1749" "/home/tau/.config/emacs/elpa/use-package-20200520.2305" "/home/tau/.config/emacs/elpa/dash-20200524.1947" "/home/tau/.config/emacs/elpa/with-editor-20200522.1112")
-      Info-directory-list)))
+        (append
+         '("/home/tau/.config/emacs/elpa/editorconfig-20200519.1128" "/home/tau/.config/emacs/elpa/haskell-mode-20200531.2255" "/home/tau/.config/emacs/elpa/org-plus-contrib-20200615" "/home/tau/.config/emacs/elpa/ivy-20200601.1105" "/home/tau/.config/emacs/elpa/evil-20200530.659" "/home/tau/.config/emacs/elpa/magit-20200601.1812" "/home/tau/.config/emacs/elpa/transient-20200601.1749" "/home/tau/.config/emacs/elpa/use-package-20200520.2305" "/home/tau/.config/emacs/elpa/dash-20200524.1947" "/home/tau/.config/emacs/elpa/with-editor-20200522.1112")
+         Info-directory-list)))
 
 ;; Local Variables:
 ;; version-control: never
