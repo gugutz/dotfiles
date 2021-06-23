@@ -4,8 +4,8 @@
 #
 [user]
 	name = Gustavo P Borges
-	email = gustavo.borges@qualirede.com.br
-  username = gugutz
+	email = gustavo.borges@neoway.com.br
+  username = gustavo.borges
 [core]
 	editor = vim
 	whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol

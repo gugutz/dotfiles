@@ -13,6 +13,9 @@ export PATH=$PATH
 [[ -e $HOME/.config/aliases ]] && source $HOME/.config/aliases
 [[ -e $HOME/.profile ]] && source $HOME/.profile
 
+# import neoway aliases 
+[[ -e $HOME/.neoway-aliases ]] && source $HOME/.neoway-aliases
+
 #########################################
 # COMPLETION SYSTEM
 
@@ -213,8 +216,10 @@ fi
 
 # first the NVM_DIR env var is exported in .profile
 # export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"  # This loads nvm
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
 
 # Calling nvm use automatically in a directory with a .nvmrc file
 # place this after nvm initialization!
@@ -294,6 +299,12 @@ bindkey '^P' history-search-backward
 bindkey '^N' history-search-forward
 bindkey '\e[A' history-search-backward
 bindkey '\e[B' history-search-forward
+
+autoload -U history-search-end
+zle -N history-beginning-search-backward-end history-search-end
+zle -N history-beginning-search-forward-end history-search-end
+bindkey "^[[A" history-beginning-search-backward-end
+bindkey "^[[B" history-beginning-search-forward-end
 # The others should work already
 
 

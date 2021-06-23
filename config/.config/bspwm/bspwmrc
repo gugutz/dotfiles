@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ##############################################################
 ## MONITORS SETUP
@@ -27,21 +27,21 @@ case $(hostname) in
 
         # bspc monitor DVI-I-1 -s DVI-I-2
         ;;
-    tau-work) {
+    PC-002727) {
             case $current_monitor_config in
-                work_extended)
-                    bspc monitor DP-1 -d 1 2 3 4 5 6 7
-                    bspc monitor eDP-1 -d 8 9 10
+                work-extended)
+                    bspc monitor HDMI-1 -d 1 2 3 4 5 6
+                    bspc monitor eDP-1 -d 7 8 9 10
                     echo "Aplicando layout de workspaces para work extended" &
                     notify-send "Aplicando layout de workspaces para work extended" &
                     # bspc monitor DP-1 -s eDP-1
                     ;;
-                work_single)
+                work-single)
                     bspc monitor "$work_laptop_monitor" -d 1 2 3 4 5 6 7 8 9 10
                     echo "Aplicando layout de workspaces para work single" &
                     notify-send "Aplicando layout de workspaces para work single" &
                     ;;
-                work_mirrored)
+                work-mirrored)
                     bspc monitor eDP-1 -d 1 2 3 4 5 6 7 8 9 10
                     echo "Aplicando layout de workspaces para work single" &
                     notify-send "Aplicando layout de workspaces para work single" &
@@ -128,8 +128,8 @@ bspc config split_ratio          0.50
 
 # MONOCLE LAYOUT (WHERE EACH WINDOW IS 100% OF THE SCREEN)
 bspc config single_monocle       true
-bspc config gapless_monocle      true # equivalent of i3 smart gaps, which only applies gaps if theres more than 1 window
-bspc config borderless_monocle   true # border for when there is only 1 window (monocle)
+bspc config gapless_monocle      false # equivalent of i3 smart gaps, which only applies gaps if theres more than 1 window
+bspc config borderless_monocle   false # border for when there is only 1 window (monocle)
 
 # --------------------
 #bspc config focus_by_distance    true
@@ -146,20 +146,20 @@ bspc config remove_unplugged_monitors true
 # --------------------
 # mouse related settings
 bspc config pointer_modifier mod4
+# bspc config pointer_modifier mod1
 bspc config pointer_action1 move
 bspc config pointer_action2 resize_side
 bspc config pointer_action3 resize_corner
 
 # window borders configuration
 bspc config border_width           2
-bspc config normal_border_color    "#4c566a"
+bspc config normal_border_color    "#007ad3"
 bspc config active_border_color    "#1e1e1e"
 # bspc config focused_border_color   "#007a3d"
-bspc config focused_border_color   "#007ad3"
+bspc config focused_border_color   "#faed27"
 # bspc config focused_border_color "#1ABB9B"
-bspc config presel_feedback_color  "#5e81ac"
-# bspc config presel_feedback_color "#1ABB9B"
-# bspc config urgent_border_color    "#dd2727"
+bspc config presel_feedback_color "#1ABB9B"
+bspc config urgent_border_color    "#dd2727"
 
 
 #################################################################
@@ -200,6 +200,8 @@ run ~/.config/bspwm/scripts/add-border-to-floating-windows.sh &
 # If you want to match using the second string, Pavucontrol, you need to use:
 # bspc rule -a Pavucontrol state=floating
 
+bspc rule -a nm-applet state=floating center=true
+bspc rule -a zoom state=floating
 bspc rule -a io-gatling-recorder-GatlingRecorder state=floating
 bspc rule -a TeamViewer state=floating
 bspc rule -a Pavucontrol:pavucontrol state=floating
@@ -216,6 +218,12 @@ bspc rule -a File-roller state=floating center=true
 bspc rule -a '*:peek' state=floating
 bspc rule -a rofi state=floating sticky=on
 bspc rule -a Woeusbgui state=floating sticky=on
+bspc rule -a Nm-connection-editor state=floating
+bspc rule -a xfce4-settings-manager state=floating
+bspc rule -a Xfce4-taskmanager state=floating
+bspc rule -a '*:xfce4-settings-manager' state=floating center=true
+bspc rule -a '*:win0' state=floating center=true # datagrip has this wierd WM_NAME when opening
+
 
 
 #################################################################
@@ -233,20 +241,35 @@ bspc rule -a Xfce4-settings-manager state=tiled
 bspc rule -a Firefox desktop='^3' follow=on
 bspc rule -a Google-chrome desktop='^3' follow=on
 bspc rule -a Transmission-gtk desktop='^7' follow=on
-bspc rule -a discord desktop='^10' follow=on
+bspc rule -a Slack desktop='^7' state=tiled follow=on
+bspc rule -a whatsdesk state=tiled  desktop='^9'
 bspc rule -a TelegramDesktop state=tiled  desktop='^9'
+bspc rule -a discord desktop='^10' state=tiled follow=on
 
 #################################################################
 # games
 #################################################################
 
 # UO!!!!!
-bspc rule -a client.exe state=floating
-bspc rule -a uos.exe state=floating
-bspc rule -a battleping.exe state=floating
-bspc rule -a stealth.exe state=floating # stealth win
+
+bspc rule -a ClassicUOLauncher state=floating # classicuo launcher linux
+bspc rule -a OrionLauncher64 state=floating # classicuo launcher linux
+bspc rule -a OrionUO64 state=floating # classicuo launcher linux
+
+# new razor that works with CUO in linux
+# Razor Splash Screen
+bspc rule -a 'Razor Splash Screen' state=floating center=true
+bspc rule -a '*:Enter a Name' state=floating rectangle=200x200+0+0
+bspc rule -a '*:UO Positioning System' state=floating
+bspc rule -a 'UOS - Launcher' state=floating
+
+
+bspc rule -a ClassicUO.bin.x86_64 state=floating # classic uo client linux
 bspc rule -a UOStealth state=floating # stealth linux
-bspc rule -a ClassicUOLauncher state=floating # classicuo linux
+bspc rule -a stealth.exe state=floating # stealth win
+bspc rule -a uos.exe state=floating # uosteam wine
+bspc rule -a client.exe state=floating # original uo client
+bspc rule -a battleping.exe state=floating # bettleping lag reducer
 
 # diablo wine
 bspc rule -a Diablo state=floating
@@ -348,11 +371,15 @@ notify-send 'Running picom with rounded corners and blur!'
 
 # launch lxpolkit - polkit's  X11 graphical session agent
 # this is needed to build the picom with animations because it doenst redirect to the terminal agent, it requires a graphical agent
-run /usr/bin/lxpolkit &
+# run /usr/bin/lxpolkit &
+# for ubuntu
+/usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 &
 
 # sound
-echo "starting pulseaudio"
-pulseaudio --start &
+# echo "starting pulseaudio"
+# pulseaudio --start &
+# for ubuntu 20
+# systemctl --user restart pulseaudio
 
 # applets and utilities
 echo "numlockx"
@@ -360,12 +387,14 @@ run numlockx on &
 echo "nm-applet"
 run nm-applet &
 run volumeicon &
-run blueman-applet &
+# run blueman-applet &
 
 
 #################################################################
 # WALLPAPER, LOCKSCREEN AND SCREENSAVER
 #################################################################
+
+run deadd-notification-center
 
 # set the Energy Star feature to On and sets it to wait 10 minutes of inactivity to turn off the screens.
 # xset dpms 600 &
@@ -396,6 +425,7 @@ nitrogen --restore &
 
 # launch polybar
 # this way it doenst refresh the bar when i reload bspwm
+echo "checking polybar status..."
 [[ ! $(pidof -x polybar) ]] && run $HOME/.config/polybar/launch.sh > /dev/null &
 
 #################################################################
@@ -418,12 +448,27 @@ echo "got to the end of the config"
 #change your keyboard if you need it
 setxkbmap -layout br &
 
-echo "Swapping Esc <-> Caps Lock" &
+echo "Making caps-lock another esc" &
 # swap capslock key with Escape, map menu key (when pressed shows right menu) to super, and ctrl+alt+backspace to restart X
-setxkbmap -option "caps:swapescape" -option "altwin:menu_win" -option "terminate:ctrl_alt_bksp"
+setxkbmap -option "caps:escape" 
+# setxkbmap -option "caps:swapescape" -option "altwin:menu_win" -option "terminate:ctrl_alt_bksp"
 
 #################################################################
 # SWALLOW BY PID (DOENST NEED TO PASS THE APPLICATION AS AN ARGUMENT LIKE OTHER SOLUTIONS)
 #################################################################
 # source: https://github.com/Liupold/pidswallow
-~/.config/bspwm/scripts/pidswallow --loop &
+# ~/.config/bspwm/scripts/pidswallow --loop &
+
+
+run telegram-desktop 
+run whatsdesk
+run slack 
+run discord
+
+# this is a sym link to  discover-overlay, a discord overlay that installs in
+# ~/.local/bin/discover-overlay
+# run discord-overlay 
+
+# keybase
+run_keybase
+

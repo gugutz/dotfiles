@@ -50,10 +50,13 @@ export XDG_CONFIG_DIRS=/etc/xdg
 PATH=$PATH:$HOME/bin
 PATH=$PATH:$HOME/.local/bin
 PATH=$PATH:/usr/local/bin
+PATH=$PATH:$HOME/.dotnet/tools
+PATH=$PATH:$HOME/.asdf/shims
 
 # add /opt to PATH
 PATH=$PATH:/opt
 PATH=$PATH:/opt/bin
+PATH=$PATH:/opt/dotnet
 
 export PATH
 
@@ -71,6 +74,9 @@ export PATH=$PATH:"$XDG_CONFIG_HOME/bspwm/scripts"
 # add my sxhkd scripts folder to path
 export PATH=$PATH:"$XDG_CONFIG_HOME/sxhkd/scripts"
 
+export PATH=$PATH:"$XDG_CONFIG_HOME/nvm/versions/node/v14.15.1/lib/node_modules"
+
+
 # fix idea opening stuck on grey screen in arch + bspwm
 # source: https://stackoverflow.com/questions/33424736/intellij-idea-14-on-arch-linux-opening-to-grey-screen/34419927
 export _JAVA_AWT_WM_NONREPARENTING=1
@@ -87,7 +93,8 @@ export QT_QPA_PLATFORMTHEME="qt5ct"
 export GTK2_RC_FILES="$HOME/.gtkrc-2.0"
 # fix "xdg-open fork-bomb" export your preferred browser from here
 # export BROWSER=/usr/bin/google-chrome-stable
-export BROWSER=/usr/bin/firefox
+# export BROWSER=/usr/bin/firefox
+export BROWSER=/usr/bin/google-chrome-stable
 export PAGER=/usr/bin/less
 
 # if bat is installed, use it also for colored man pages

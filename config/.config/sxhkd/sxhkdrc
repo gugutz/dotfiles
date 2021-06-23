@@ -18,7 +18,7 @@ super + ctrl + r
 	~/.config/bspwm/bspwmrc
 
 # quit bspwm
-super + alt + q
+super + alt + shift + q
 	bspc quit
 
 # restart bspwm
@@ -235,62 +235,6 @@ super + ctrl + 0
 super + {minus,equal}
   	bspc config -d focused window_gap $((`bspc config -d focused window_gap` {-,+} 5 ))
 
-##########################################################
-# MOUSE BINDINGS
-##########################################################
-
-# ajust window sizes on a desktop by clicking and draggin on a gap
-~button1
-	~/.config/bspwm/scripts/did-i-click-the-desktop.sh && gapgrab
-
-# mouse middle click
-# show bspwm control gtk menu
-~button2
-	~/.config/bspwm/scripts/did-i-click-the-desktop.sh && mygtkmenui --  ~/.config/GTKmenu/BspwmDesktopMenui
-#DidIClickDesktop.sh && mygtkmenui --  ~/.config/GTKmenu/BspwmWindowMenui
-
-# launch menu
-~button3
-	~/.config/bspwm/scripts/did-i-click-the-desktop.sh && mygtkmenui --  ~/.config/GTKmenu/LaunchMenu
-
-# Switch workspace by scrolling on the desktop. Causes scrolling issues on some systems.
-#~button4
-#	DidIClickDesktop.sh && bspc desktop -f next
-#~button5
-#	DidIClickDesktop.sh && bspc desktop -f prev
-
-### Add or remove desktops by scrolling
-super + ctrl + button5
-    bspcp dsktp rm
-
-super + ctrl + button4
-    bspcp dsktp add
-
-# Spawn applications popup menu and manually tile selected
-# app where your mouse was when you opened the menu. Smartsplit only chooses
-# biggest dimension of the window, MouseLaunch only cares which edge is closer.
-# mod5 is alt_gr (first key right from space) on most keyboards.
-mod5 + @button1
-    MouseLaunch ; mygtkmenui -- .config/GTKmenu/LaunchMenu
-#	smartsplit ; dboxmenu
-
-# Spawn window manipulation menuq
-# Mod1 is alt
-#    BspwmWindowMenu
-mod1 + @button1
-    mygtkmenui -- .config/GTKmenu/BspwmWindowMenui
-
-# resize global window gaps
-super + ctrl + button{minus,equal}
-    bspc config window_gap $(( $(bspc config window_gap) {-,+} 2 ))
-
-# resize focused desktop window gap with mouse wheel
-super + button{4,5}
-	bspc config -d focused window_gap $((`bspc config -d focused window_gap` {-,+} 5 ))
-
-# resize global window gaps with mouse wheel
-super + ctrl + button{4,5}
-    bspc config window_gap $(( $(bspc config window_gap) {-,+} 5 ))
 
 ##########################################################
 # PICOM / COMPOSITOR BINDINGS
@@ -546,7 +490,7 @@ super + shift + s
 
 # take screenshot of the active window
 Print
-  import -window root ~/img/screenshots/last-fullscreen-screenshot.png; \
+  import -window root ~/img/screenshots/last-fullscreen-screenshot.png; xclip -selection clipboard -target image/png -i < ~/img/screenshots/last-full-screenshot.png; \
   notify-send "taken screenshot of the entire screen"
 
 # take screenshot of the active window
@@ -554,8 +498,10 @@ super + Print
   scrot --focused ~/img/screenshots/last-window-scrot.png; \
   notify-send "taken screenshot of the currently focused window"
 
+# TODO: add copy to cliplboard to make life a lot easier
+# import png:- | xclip -selection clipboard -t image/png \
 super + shift + Print
-  import ~/img/screenshots/last-selection-screenshot.png; \
+  import ~/img/screenshots/last-selection-screenshot.png | xclip -selection clipboard -target image/png -i < ~/img/screenshots/last-selection-screenshot.png; \
   notify-send "selection screenshot captured!"
 
 # take screenshot in /tmp and open it with pinta
@@ -581,3 +527,61 @@ super + alt + 9
 # On mouse button 2 pause 3 seconds then press Alt_R+F2
 # button2
 #     xte "sleep 3" "keydown Alt_R" "keydown F2" "keyup Alt_R" "keyup F2"
+
+
+# find mouse cursor (with xfce4-find-cursor)
+super + alt + ~button1
+  xfce4-find-cursor &
+
+# ajust window sizes on a desktop by clicking and draggin on a gap
+# ~button1
+# 	~/.config/bspwm/scripts/did-i-click-the-desktop.sh && gapgrab
+
+# mouse middle click
+# show bspwm control gtk menu
+# ~button2
+# 	~/.config/bspwm/scripts/did-i-click-the-desktop.sh && mygtkmenui --  ~/.config/GTKmenu/BspwmDesktopMenui
+#DidIClickDesktop.sh && mygtkmenui --  ~/.config/GTKmenu/BspwmWindowMenui
+
+# launch menu
+# ~button3
+# 	~/.config/bspwm/scripts/did-i-click-the-desktop.sh && mygtkmenui --  ~/.config/GTKmenu/LaunchMenu
+
+# Switch workspace by scrolling on the desktop. Causes scrolling issues on some systems.
+#~button4
+#	DidIClickDesktop.sh && bspc desktop -f next
+#~button5
+#	DidIClickDesktop.sh && bspc desktop -f prev
+
+### Add or remove desktops by scrolling
+super + ctrl + button5
+    bspcp dsktp rm
+
+super + ctrl + button4
+    bspcp dsktp add
+
+# Spawn applications popup menu and manually tile selected
+# app where your mouse was when you opened the menu. Smartsplit only chooses
+# biggest dimension of the window, MouseLaunch only cares which edge is closer.
+# mod5 is alt_gr (first key right from space) on most keyboards.
+mod5 + @button1
+    MouseLaunch ; mygtkmenui -- .config/GTKmenu/LaunchMenu
+#	smartsplit ; dboxmenu
+
+# Spawn window manipulation menuq
+# Mod1 is alt
+#    BspwmWindowMenu
+control + mod1 + @button1
+    mygtkmenui -- .config/GTKmenu/BspwmWindowMenui
+
+# resize global window gaps
+super + ctrl + button{minus,equal}
+    bspc config window_gap $(( $(bspc config window_gap) {-,+} 2 ))
+
+# resize focused desktop window gap with mouse wheel
+super + button{4,5}
+	bspc config -d focused window_gap $((`bspc config -d focused window_gap` {-,+} 5 ))
+
+# resize global window gaps with mouse wheel
+super + ctrl + button{4,5}
+    bspc config window_gap $(( $(bspc config window_gap) {-,+} 5 ))

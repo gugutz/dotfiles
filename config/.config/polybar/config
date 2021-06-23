@@ -118,10 +118,10 @@ material-blue-gray   = #546e7a
 
 [bar/main_top]
 
-modules-left = user xwindow settings openweathermap-detailed
+modules-left = user xwindow openweathermap-detailed
 ; the bluetooth module was preventing the bar from updating when the colorscheme is choosen
-modules-center = cpu temperature memory uptime
-modules-right = bluetooth wireless-network pulseaudio battery calendar clock colorswitcher powermenu2
+modules-center =
+modules-right = cpu temperature memory uptime bluetooth wireless-network pulseaudio battery colorswitcher powermenu2
 
 monitor = ${env:MONITOR:DP-1}
 monitor-fallback = ${env:MONITOR:eDP-1}
@@ -130,7 +130,6 @@ cursor-click = pointer
 
 fixed-center = true
 wm-restack = bspwm
-
 
 enable-ipc = true
 
@@ -150,7 +149,7 @@ padding-right = 1
 module-margin-left = 2
 module-margin-right = 2
 
-font-0 = "Fantasque Sans Mono:pixelsize=13;2"
+font-0 = "Fantasque Sans Mono:pixelsize=11;2"
 font-1 = "DejaVu Sans Mono Nerd Font:size=11;2"
 font-2 = "MaterialIcons:size=12;2"
 font-3 = "FontAwesome:size=11;2"
@@ -165,8 +164,8 @@ font-5 = "Monospace:size=10.5;2"
 bottom = true
 
 modules-left = menu bspwm
-modules-center = calculator system-settings
-modules-right = wired-network
+modules-center = calculator files browser config display-settings  appearance-settings processes
+modules-right = wired-network calendar clock
 
 
 monitor = ${env:MONITOR:DP-1}
@@ -208,7 +207,7 @@ padding-right = 2
 module-margin-left = 1
 module-margin-right = 1
 
-font-0 = "DejaVu Sans Mono Nerd Font:size=14;2"
+font-0 = "DejaVu Sans Mono Nerd Font:size=13;2"
 font-1 = "Fantasque Sans Mono:pixelsize=12;2"
 font-2 = "MaterialIcons:size=12;2"
 font-3 = "FontAwesome:size=11;2"
@@ -228,7 +227,7 @@ scroll-down = bspwm-deskprev
 [bar/secondary_monitor_top]
 
 modules-left = powermenu
-modules-center = xwindow
+; modules-center = clock
 modules-right = calendar clock
 
 monitor = ${env:MONITOR:eDP-1}
@@ -266,6 +265,7 @@ font-5 = "Noto Sans CJK JP:size=11;2"
 [bar/secondary_monitor_bottom]
 
 modules-left = bspwm
+modules-center = clock
 modules-right = wired-network uptime powermenu
 
 bottom = true
@@ -476,11 +476,11 @@ interval = 2
 ;   <bar-load>
 ;   <ramp-load>
 ;   <ramp-coreload>
-format = <ramp-coreload>
+format = <label> <ramp-coreload>
 format-underline =  ${colors.cpu}
 ; format-prefix = "  "
 ; format-prefix = "爛  "
-format-prefix = "CPU  "
+; format-prefix = "CPU  "
 format-suffix-foreground = ${self.format-underline}
 
 ; Available tokens:
@@ -808,7 +808,7 @@ type = internal/network
 ;interface = eth0
 
 ; qualirede interface
-interface = enp2s0
+interface = enp1s0
 ; home interface
 ; interface = enp3s0
 interval = 2.0
@@ -822,7 +822,7 @@ format-disconnected = <label-disconnected>
 format-packetloss = <animation-packetloss> <label-connected>
 
 label-connected = %local_ip%%downspeed:9%
-label-disconnected = cable disconected
+label-disconnected = ethernet off
 
 ; Only applies if <ramp-signal> is used
 ramp-signal-0 = 😱
@@ -840,6 +840,8 @@ animation-packetloss-1-foreground = #000000
 ; Framerate in milliseconds
 animation-packetloss-framerate = 500
 
+click-left = nm-connection-editor &
+click-right = nm-connection-editor &
 
 ;####################################################
 
@@ -847,8 +849,8 @@ animation-packetloss-framerate = 500
 type = internal/network
 ; interface = wlan0
 
-; qualirede wifi interface
-interface = wlan0
+; neoway wifi interface
+interface = wlp2s0
 
 interval = 3.0
 
@@ -861,14 +863,14 @@ format-connected-underline = ${colors.wifi}
 label-connected = %essid%
 ; label-connected = "%{A1:nm-connection-editor:}%essid%%{A}"
 label-connected-maxlen = 12
-label-disconnected = "not connected"
+label-disconnected = "no wifi"
 format-disconnected = <label-disconnected>
 format-disconnected-prefix = "睊   "
 format-disconnected-underline = ${self.format-connected-underline}
 format-disconnected-suffix-foreground = ${self.format-disconnected-underline}
 
-click-left = nm-connection-editor
-click-right = nm-connection-editor
+click-left = nm-connection-editor &
+click-right = nm-connection-editor &
 
 ;####################################################
 
@@ -966,8 +968,8 @@ pseudo-transparency = false
 [module/menu]
 type = custom/text
 ; content = 
-content = 
-; content = 
+; content = 
+content = 
 alt-icon = 
 ; alt-icon = 
 ; alt-icon = 
@@ -982,9 +984,7 @@ click-middle = $HOME/.config/polybar/scripts/menu-full.sh
 type = custom/text
 ; content = 
 ; content = 
-
 content = 
-
 alt-icon = 
 content-padding = 1
 content-background = ${colors.bg}
@@ -1022,43 +1022,67 @@ click-right = urxvt &
 type = custom/text
 ; content = 
 content = 
-content-padding = 1
+content-padding = 0.5
 content-foreground = ${colors.acolor}
 content-background = ${colors.bg}
 click-left = galculator &
 
-[module/system-settings]
-type = custom/text
-content = 
-content-padding = 1
-content-foreground = ${colors.acolor}
-content-background = ${colors.bg}
-; click-left = galculator &
 
 [module/files]
 type = custom/text
 content = 
-content-padding = 1
-content-foreground = ${colors.fg-alt}
+content-padding = 0.5
+content-foreground = ${colors.acolor}
+content-background = ${colors.bg}
 click-left = pcmanfm &
 click-center = nemo &
 click-right = uxrvt -e ranger &
 
 [module/browser]
 type = custom/text
-content = 
-content-padding = 1
-content-foreground = ${colors.fg-alt}
+content = 
+content-padding = 0.5
+content-foreground = ${colors.acolor}
+content-background = ${colors.bg}
 click-left = firefox &
 click-right = google-chrome-stable &
 
-[module/settings]
+[module/config]
 type = custom/text
 content = 
-content-padding = 1
-content-foreground = ${colors.fg-alt}
-click-left = xfce4-settings &
+content-padding = 0.5
+content-foreground = ${colors.acolor}
+content-background = ${colors.bg}
+click-left = xfce4-system-settings &
 click-right = lxappearance &
+click-center = nitrogen &
+
+[module/display-settings]
+type = custom/text
+content = 
+content-padding = 0.5
+content-foreground = ${colors.acolor}
+content-background = ${colors.bg}
+click-left = xfce4-display-settings &
+click-right = arandr &
+
+[module/appearance-settings]
+type = custom/text
+content = 
+content-padding = 0.5
+content-foreground = ${colors.acolor}
+content-background = ${colors.bg}
+click-left = xfce4-appearance-settings &
+click-right = lxappearance &
+
+[module/processes]
+type = custom/text
+content = 
+content-padding = 0.5
+content-foreground = ${colors.acolor}
+content-background = ${colors.bg}
+click-left = xfce4-taskmanager&
+click-right = "st -e htop"
 
 [module/left1]
 type = custom/text

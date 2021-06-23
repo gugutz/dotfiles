@@ -7,6 +7,8 @@ echo "~/.aliases is being sourced"
 # define a specific alias for bspwm to query the current desktop layout
 alias querydesktoplayout="bspc query -T -d | jq -r .layout"
 
+alias setkb='setxkbmap -option caps:escape -layout br && xset r rate 260 70'
+
 #################################################
 # Improvements of native commands
 #################################################
@@ -83,16 +85,7 @@ alias cd..='cd ..'
 # cd into dotfiles dir
 alias cddt='cd ~/dotfiles'
 
-# cd into different projects directories
-alias cdpep='cd ~/code/qualirede/pep'
-alias cdadm='cd ~/code/qualirede/pep-admin'
-alias cdapi='cd ~/code/qualirede/pep-api'
-alias cdsso='cd ~/code/qualirede/sso'
-alias cdres='cd ~/code/qualirede/res'
-alias cdqds='cd ~/code/qualirede/digital-signer'
-alias cdpaa='cd ~/code/qualirede/planserv_app_api'
 
-alias cdwego='cd ~/code/out/wego'
 # ---------------------------------------------
 
 # git aliases
@@ -149,7 +142,7 @@ alias kernelrelease='uname -r'
 # list open ports (flags: tcp, udp, listening, ports, name?)
 # use it with sudo to also show PID entries
 alias openports='sudo netstat -tulpn '
-alias listopenports='ss -tuna | grep LISTEN'
+alias checkopenports='ss -tuna | grep LISTEN'
 alias checkports='ss -tuna'
 
 
@@ -201,12 +194,19 @@ alias ytdl-audio='youtube-dl -x -f bestaudio'
 alias dcu="docker-compose up"
 alias dcd="docker-compose down"
 alias dcud="docker-compose up -d"
+alias docker-delete-containers='docker rm -f $(docker ps -a -q)'
+alias docker-delete-volumes='docker volume rm $(docker volume ls -q)'
 alias npms="npm start"
 alias npmb="npm build"
 
 alias ionic_gen_debug_apk="ionic capacitor copy android && cd android && ./gradlew assembleDebug && cd .."
 alias ionic_run_debug_apk="ionic capacitor copy android && cd android && ./gradlew assembleDebug && ./gradlew installDebug && cd .."
 alias ionic_gen_prod_apk="cd android && ./gradlew assembleRelease && cd app/build/outputs/apk/release && jarsigner -keystore YOUR_KEYSTORE_PATH -storepass YOUR_KEYSTORE_PASS app-release-unsigned.apk YOUR_KEYSTORE_ALIAS && zipalign 4 app-release-unsigned.apk app-release.apk"
+
+alias cduo='cd /mnt/1tb/uo'
+alias cdstealth='cd /mnt/1tb/uo/stealth'
+alias cdcuo='cd /mnt/1tb/uo/clients/classicuo'
+alias setkbuo='setxkbmap -option caps:escape -layout br && xset r rate 150 5'
 
 
 # wine aliases
@@ -217,3 +217,24 @@ alias wineuo32='WINEPREFIX=/mnt/1tb/games/uo32 WINEARCH=win32 wine'
 # virtualbox vm control
 alias vmlist="VBoxManage list runningvms"
 alias vmpoweroff="VBoxManage controlvm $1 poweroff"
+
+# my cloud vms
+alias sshaws1="ssh -D 8888 -i ~/cloud-vms/aws-ubuntu-1/aws-ubuntu.pem ubuntu@18.216.225.197"
+alias sshoracle1="ssh -D 8888 -i ~/cloud-vms/oracle-ubuntu-1/ssh-key-2020-10-13.key ubuntu@132.145.168.40"
+
+# heroku stuff
+alias herokulogs="heroku logs --tail"
+alias herokuscale='heroku ps:scale web=1'
+alias herokurunlocal='heroku local web'
+
+# use xclip to copy contents of a text file
+alias cptext='xclip -sel clip < '
+
+alias salacam='ssh tau@192.168.1.16 ffmpeg -an -f video4linux2 -s 640x480 -i /dev/video0 -r 10 -b:v 500k -f matroska - | mplayer - -idle -demuxer matroska'
+
+alias grepsyslog='dmesg -T| grep -E -i -B100 $1'
+
+alias checkactivesshconnections='ss | grep -i ssh'
+
+alias countfiles='ls | wc -l'
+alias filezile="du -h $1"

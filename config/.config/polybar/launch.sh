@@ -14,18 +14,13 @@
 home_primary_monitor=DVI-I-2
 home_secondary_monitor=DVI-I-1
 work_laptop_monitor=eDP-1
-work_dell_monitor=DP-1
+work_aoc_monitor=HDMI-1
 outputs=$(xrandr --query | grep " connected" | cut -d" " -f1)
 
 bar_top=main_top
 bar_bottom=main_bottom
-outputsArray=($outputs)
-
-connectedOutputs=$(xrandr | grep " connected" | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/")
-activeOutput=$(xrandr | grep -E " connected (primary )?[1-9]+" | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/")
 
 tray_output=eDP-1
-
 # Terminate already running bar instances
 killall -v polybar
 
@@ -36,27 +31,25 @@ while pgrep -u $UID -x polybar > /dev/null; do sleep 0.5; done
 
 current_monitor_config=$(autorandr --current)
 
+
 for monitor in $outputs; do
 
     export MONITOR=$monitor
     export TRAY_POSITION=none
 
-    echo "current montior config"
-    echo $current_monitor_config
-
-    if [[ $current_monitor_config == "work_extended" ]]; then
+    if [[ $current_monitor_config == "work-extended" ]]; then
         # if theres also a second monitor, kill all instances first so there wont be two bars loaded
         export MONITOR_PRIMARY=$monitor
         tray_output=$monitor
-        MONITOR=$work_dell_monitor polybar $bar_top --reload -l info &
-        MONITOR=$work_dell_monitor polybar $bar_bottom --reload -l info &
+        MONITOR=$work_aoc_monitor polybar $bar_top --reload -l info &
+        MONITOR=$work_aoc_monitor polybar $bar_bottom --reload -l info &
         echo "Bars launched for the big monitor..."
         MONITOR=$work_laptop_monitor polybar secondary_monitor_top --reload -l info &
         MONITOR=$work_laptop_monitor polybar secondary_monitor_bottom --reload -l info &
         echo "Bars launched for the small monitor..."
     fi
     # if any of the secondary monitors is connected, load different bars for the small monitors
-    if [[ $current_monitor_config == "work_single" ]] || [[ $current_monitor_config == "work_mirrored" ]]; then
+    if [[ $current_monitor_config == "work-single" ]] || [[ $current_monitor_config == "work_mirrored" ]]; then
         echo "only one monitor detected"
         echo "Launching bars for the single monitor..."
         echo $work_laptop_monitor
