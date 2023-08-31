@@ -7,7 +7,8 @@ echo "~/.aliases is being sourced"
 # define a specific alias for bspwm to query the current desktop layout
 alias querydesktoplayout="bspc query -T -d | jq -r .layout"
 
-alias setkb='setxkbmap -option caps:escape -layout br && xset r rate 260 70'
+alias setkb='setxkbmap -option caps:swapescape -layout br && xset r rate 260 70'
+# alias setkb='setxkbmap -option tab:escape -layout br && xset r rate 260 70'
 
 #################################################
 # Improvements of native commands
@@ -35,6 +36,35 @@ alias l.='ls -ld .* --color=auto' ## Show hidden files ##
 #################################################
 # MY ALIASES
 #################################################
+
+# convert delimiter symbol on csv file
+alias csvconvertseparator="sed -i 's/\([0-9]\)\$1/\1\$2/g' $3"
+# count number of fields (columns) on a csv (pass the separator as second argument)
+alias csvcountrows="wc -l $1"
+alias csvcountcolumns="cat $1 | awk -F$2 '{ print NF }'"
+
+# Original command
+# sed -i 's/\([0-9]\),/\1./g' your_file.csv
+# source: https://stackoverflow.com/questions/38593855/replacing-commas-in-a-csv-file-with-sed-for-mongoimport
+
+
+# search for strings in CSVs (very fast even with large csvs!)
+# usage example:
+# $ grep_csvs_in_folder "Joazinho da Silva"
+grep_csvs_in_folder(){
+    REGEX_TERM=$1
+
+    for f in *.csv; do
+        echo "Searching term in $f"
+        filename="${f##*/}"
+
+        # LC_ALL=C grep -Ff queryids.txt "$f" > "${filename%.*}_goi.csv"
+        if LC_ALL=C grep -Fe $REGEX_TERM "$f" ; then
+          LC_ALL=C grep -Fe $REGEX_TERM "$f" > "${filename%.*}.csv.found"
+        fi
+    done
+}
+
 
 alias rsync="rsync -a --stats --progress" # confirm before overwriting something
 alias df='df -h'                          # human-readable sizes
@@ -105,6 +135,8 @@ alias gcam='git commit -m'
 alias glg='git log'
 
 alias gpso='git push origin'
+# push current active branch
+alias gpb="git push origin $(git rev-parse --abbrev-ref HEAD)"
 alias gplo='git pull origin'
 
 alias gpsom='git push origin master'
@@ -143,7 +175,13 @@ alias kernelrelease='uname -r'
 # use it with sudo to also show PID entries
 alias openports='sudo netstat -tulpn '
 alias checkopenports='ss -tuna | grep LISTEN'
+alias checkport='ss -tuna | grep $1'
 alias checkports='ss -tuna'
+alias checkportsandconnections="ss -tuna | grep ESTAB && echo '#######' && ss -tuna | grep ESTAB | wc -l"
+alias checkallportsconnections='ss -tuna | grep ESTAB | wc -l'
+alias list_http_connected_clients="ss -o state established '( sport = :http or sport = :https )'"
+alias list_http_connected_ports="ss -tn src :80 or src :443"
+
 
 
 alias procinfo='ps aux | grep'
@@ -198,15 +236,59 @@ alias docker-delete-containers='docker rm -f $(docker ps -a -q)'
 alias docker-delete-volumes='docker volume rm $(docker volume ls -q)'
 alias npms="npm start"
 alias npmb="npm build"
+alias dkrmallimages="docker rmi $(docker images -a -q)"
+alias dkrmallcontainers="docker rm -f $(docker ps -a -q)"
+alias dockerkillall="docker rmi $(docker images -a -q) && docker rm -f $(docker ps -a -q)"
+
+# this lists all containers and their ips and ports
+# source: https://gist.github.com/ipedrazas/2c93f6e74737d1f8a791?permalink_comment_id=3704504#gistcomment-3704504
+function docker_ips() {
+        _print_container_info() {
+            local container_id
+            local container_ports
+            local container_ip
+            local container_name
+            container_id="${1}"
+
+            container_ports=( $(docker port "$container_id" | grep -o "0.0.0.0:.*" | cut -f2 -d:) )
+            container_name="$(docker inspect --format "{{ .Name }}" "$container_id" | sed 's/\///')"
+
+            # changed to handle the situation when a containers have several IPs
+            # container_ip="$(docker inspect --format "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" "$container_id")"
+            # source: https://gist.github.com/ipedrazas/2c93f6e74737d1f8a791?permalink_comment_id=3914989#gistcomment-3914989
+            container_ip="$(docker inspect --format "{{range .NetworkSettings.Networks}}{{.IPAddress}}  {{end}}" "$container_id")"
+
+            printf "%-13s %-40s %-20s %-80s\n" "$container_id" "$container_name" "$container_ip" "${container_ports[*]}"
+        }
+
+        local container_id
+        container_id="$1"
+        printf "%-13s %-40s %-20s %-80s\n" 'Container Id' 'Container Name' 'Container IP' 'Container Ports'
+        if [ -z "$container_id" ]; then
+            local container_id
+            docker ps -a --format "{{.ID}}" | while read -r container_id ; do
+                _print_container_info  "$container_id"
+            done
+        else
+            _print_container_info  "$container_id"
+        fi
+}
+
+alias docker_active_containers_ips="docker ps -q | xargs -n 1 docker inspect --format '{{ .Name }} {{range .NetworkSettings.Networks}} {{.IPAddress}}{{end}}' | sed 's#^/##';"
+
 
 alias ionic_gen_debug_apk="ionic capacitor copy android && cd android && ./gradlew assembleDebug && cd .."
 alias ionic_run_debug_apk="ionic capacitor copy android && cd android && ./gradlew assembleDebug && ./gradlew installDebug && cd .."
 alias ionic_gen_prod_apk="cd android && ./gradlew assembleRelease && cd app/build/outputs/apk/release && jarsigner -keystore YOUR_KEYSTORE_PATH -storepass YOUR_KEYSTORE_PASS app-release-unsigned.apk YOUR_KEYSTORE_ALIAS && zipalign 4 app-release-unsigned.apk app-release.apk"
 
+############################################
+# GCP RELATED ALIASES
+
 alias cduo='cd /mnt/1tb/uo'
 alias cdstealth='cd /mnt/1tb/uo/stealth'
 alias cdcuo='cd /mnt/1tb/uo/clients/classicuo'
 alias setkbuo='setxkbmap -option caps:escape -layout br && xset r rate 150 5'
+alias outlandsrazorscripts='cd "/home/gustavo-borges/wine/outlands/drive_c/Program Files (x86)/Ultima Online Outlands/ClassicUO/Data/Plugins/Assistant/Scripts"'
 
 
 # wine aliases
@@ -214,10 +296,12 @@ alias launchuo='WINEPREFIX=${HOME}/.uo WINEARCH=win32 wine  ~/.uo/drive_c/Progra
 alias wine32='WINEPREFIX=${HOME}/.wine32 WINEARCH=win32 wine'
 alias wineuo32='WINEPREFIX=/mnt/1tb/games/uo32 WINEARCH=win32 wine'
 
+############################################
 # virtualbox vm control
 alias vmlist="VBoxManage list runningvms"
 alias vmpoweroff="VBoxManage controlvm $1 poweroff"
 
+############################################
 # my cloud vms
 alias sshaws1="ssh -D 8888 -i ~/cloud-vms/aws-ubuntu-1/aws-ubuntu.pem ubuntu@18.216.225.197"
 alias sshoracle1="ssh -D 8888 -i ~/cloud-vms/oracle-ubuntu-1/ssh-key-2020-10-13.key ubuntu@132.145.168.40"
@@ -238,3 +322,131 @@ alias checkactivesshconnections='ss | grep -i ssh'
 
 alias countfiles='ls | wc -l'
 alias filezile="du -h $1"
+
+
+############################################
+# GCP RELATED ALIASES
+
+GCP_ACCOUNT=gugutz
+GCP_USER_PROJECT="axiomatic-folio-266818"
+GCP_BUCKET_CURSO="gs://storage-lab-console-temps"
+
+# gcloud
+alias gcconfig="gcloud config $1"
+alias gcconfigs="gcloud config configurations $1"
+alias gcpactivateauth='gcloud auth activate-service-account --key-file=/path/to/key/file.json'
+
+
+# gsutil (same as gcloud storage)
+
+alias gsu='gsutil -u ${DATALAKE_USER_PROJECT}'
+alias gsuls="gsu ls $1"
+alias gsucp='gsu cp -r $1 $2'
+alias gsucptosd='gsu cp -v $1 '
+alias cpallparquet='gsu cp -r $1 ./'
+
+
+############################################
+# JOVIS RELATED ALIASES
+
+# NEEDS TO INSTAL JUPYTER TO USE JOVIS
+# pip install jupyter_enterprise_gateway
+alias cdjovis='cd ~/neoway/jovis'
+alias tuneljovis='ssh -v -nNT -L 8888:10.251.64.200:80  gustavo.borges@10.240.0.10 -i ~/.ssh/id_rsa'
+alias openjovis='jupyter notebook --gateway-url=http://localhost:8888 --GatewayClient.http_user=${USER} --GatewayClient.http_pwd=${USER}-password'
+#alias openjovis='jupyter lab --gateway-url=http://localhost:8888 --GatewayClient.http_user=${USER} --GatewayClient.http_pwd=${USER}-password'
+
+# foreground
+alias tputfgcolors="printf '\e[%sm▒' {30..37} 0; echo"
+# background
+alias tputfgcolors="printf '\e[%sm ' {40..47} 0; echo"
+
+
+change_file_encoding(){
+    FILE=$1
+
+    printf "Converting file $FILE to UTF-8..."
+
+    FROM_ENCODING="iso-8859-1"
+    #output encoding(UTF-8)
+    TO_ENCODING="utf-8"
+    #convert
+    CONVERT="iconv -f $FROM_ENCODING -t $TO_ENCODING"
+    #loop to convert multiple files
+    # for  file  in  *.txt; do
+    iconv -f $FROM_ENCODING -t $TO_ENCODING $FILE -o "${FILE}.utf8.converted"
+
+    printf "done!\n"
+}
+
+alias latin_to_utf8="change_file_encoding $1"
+
+# use apache AB to send multiple concurrent requests against an api
+# usage: apitest 10 5 data.json http://localhost:5001/v1/user/new
+alias apitest="ab -n $1 -c $2 -p $3 $4"
+
+
+# decode jwts!
+# usage: jwtd XXXXXX.YYYYYYY.ZZZZZZZ
+
+# source: https://prefetch.net/blog/2020/07/14/decoding-json-web-tokens-jwts-from-the-linux-command-line/
+jwtd() {
+    if [[ -x $(command -v jq) ]]; then
+         jq -R 'split(".") | .[0],.[1] | @base64d | fromjson' <<< "${1}"
+         echo "Signature: $(echo "${1}" | awk -F'.' '{print $3}')"
+    fi
+}
+
+
+# youtube-dl alias
+mp3 () {
+    # youtube-dl --ignore-errors -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0 -o '%(title)s.%(ext)s' "$1"
+    youtube-dl --ignore-errors --extract-audio --audio-format mp3 -o ~/test.mp3 "$1"
+}
+
+mp3p () {
+    youtube-dl --ignore-errors --sleep-interval 30 -i -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0 -o '%(playlist)s/%(playlist_index)s - %(title)s.%(ext)s' "$1"
+}
+
+dlv () {
+    youtube-dl --ignore-errors -o '%(title)s.%(ext)s' "$1"
+}
+
+dlp () {
+    youtube-dl --yes-playlist --ignore-errors --sleep-interval 30 -o '%(playlist)s/%(title)s.%(ext)s' "$1"
+}
+
+
+#################################################################
+# PYTHON RELATED
+#################################################################
+
+pyvenv_new(){
+    python -m venv .venv
+    source .venv/bin/activate
+}
+
+check_makefile_separators(){
+    cat -e -t -v $1
+}
+
+alias printduplicatelines="uniq -cd $1"
+alias printuniquelines="uniq -cu $1"
+
+install_emacs_go_modules(){
+    go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+    go install golang.org/x/tools/cmd/goimports@latest
+    go install golang.org/x/tools/gopls@latest
+
+}
+
+alias list_large_cache_files_older_than_1_year='find ~/.cache/ -depth -type f -atime +365'
+alias delete_large_cache_files_older_than_1_year='find ~/.cache/ -type f -atime +365 -delete'
+
+alias list_largest_dirs='du -a | sort -n -r | head -n 5'
+alias list_largest_files='find -type f -exec du -Sh {} + | sort -rh | head -n 5'
+alias list_large_cache_files='find ~/.cache/ -depth -type f'
+alias delete_large_cache_files='find ~/.cache/ -type f -delete'
+
+# golang aliases
+alias gmt='go mod tidy'

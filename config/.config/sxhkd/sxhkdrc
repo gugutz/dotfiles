@@ -2,12 +2,15 @@
 # sxhkd hotkeys
 ##########################################################
 
+# The '@' is needed so that the command is run on the key release event (sxhkd defaults to running commands on the key press event).
+
+
 # make sxhkd reload its configuration files:
 super + Escape
   pkill -USR1 -x sxhkd
 
-supet + alt + F12
-  setxkbmap -layout br -option caps:swapescape
+super + alt + k
+  setxkbmap -option caps:escape -layout br && xset r rate 260 70
 
 ##########################################################
 # BSPWM HOTKEYS
@@ -39,7 +42,7 @@ super + y
 	bspc node newest.marked.local -n newest.!automatic.local
 
 # swap the current node and the biggest node
-super + g
+super + alt + g
 	bspc node -s biggest
 
 # set the window state
@@ -140,9 +143,19 @@ super + shift + Tab
 super + {p,b,comma,period}
 	bspc node -f @{parent,brother,first,second}
 
+
 # focus the next/previous node in the current desktop
+super + c
+	bspc node -f {next,prev}.local.window
+super + w
+	bspc node -f {next,prev}.local.window
+
+# fixed but where would not cycle because of hidden windows in the desktop
+# source of the fix: https://github.com/baskerville/bspwm/issues/1168#issuecomment-670940094
 super + {_,shift + }c
-	bspc node -f {next,prev}.local
+	bspc node -f {next,prev}.local.!hidden.window
+super + {_,shift + }w
+	bspc node -f {next,prev}.local.!hidden.window
 
 # focus the next/previous desktop in the current monitor
 super + bracket{left,right}
@@ -222,7 +235,7 @@ super + shift + {comma,period}
 	bspc desktop -R {90,270}
 
 # Change window gap
-ctrl + space
+super + space
     bspc config -d focused window_gap {15,30,65}
 ##########################################################
 # gaps
@@ -334,8 +347,8 @@ super + d
 
 # program launcher
 # from voidlinux dotfiles
-super + @space
-	rofi -show run -hide-scrollbar -width 25 -lines 1 -columns 2 -separator-style solid -yoffset 30 -location 2
+# super + @space
+# 	rofi -show run -hide-scrollbar -width 25 -lines 1 -columns 2 -separator-style solid -yoffset 30 -location 2
 
 # rofi program launcher
 super + shift + d
@@ -398,10 +411,6 @@ super + alt + a
   urxvt -name 'alsamixer' -e alsamixer
 
 
-# pcmanfm
-super + F4
-  pcmanfm
-
 # simulate windows file exlorer keybinding for when my friends use the pc
 super + e
   pcmanfm
@@ -435,8 +444,16 @@ super + shift + t
   # bspwm-toggle-visibility TelegramDesktop telegram-desktop
   telegram-desktop
 
+# super + z
+#   bspwm-toggle-visibility terminal-scratchpad "st -c terminal-scratchpad"
+
 super + z
-  bspwm-toggle-visibility terminal-scratchpad "st -c terminal-scratchpad"
+  bspwm-toggle-visibility terminal-scratchpad "alacritty --class terminal-scratchpad"
+
+# second scratchpad terminal to open work vpn
+super + v
+  bspwm-toggle-visibility vpn-terminal-scratchpad "st -c vpn-terminal-scratchpad"
+  # bspwm-toggle-visibility openfortiGUI openfortigui
 
 super + shift + y
   bspwm-toggle-visibility yayfzf-scratchpad "st -c yayfzf-scratchpad -e yayfzf"
@@ -461,9 +478,13 @@ super + shift + b
 super + x
   bspwm-toggle-visibility Galculator galculator
 
-# openfortigui scratchpad
-super + v
-  bspwm-toggle-visibility openfortiGUI openfortigui
+# outlands launcher scratchpad
+super + g
+  bspwm-toggle-visibility outlands.exe outlands
+
+# postman scratchpad
+# super + r
+#   bspwm-toggle-visibility postman-scratchpad postman
 
 #------------------------------
 # simulate a scratchpad with only sxhkd
@@ -488,7 +509,7 @@ super + shift + s
 # screenshots
 ##########################################################
 
-# take screenshot of the active window
+# take screenshot of the root window
 Print
   import -window root ~/img/screenshots/last-fullscreen-screenshot.png; xclip -selection clipboard -target image/png -i < ~/img/screenshots/last-full-screenshot.png; \
   notify-send "taken screenshot of the entire screen"
@@ -501,13 +522,25 @@ super + Print
 # TODO: add copy to cliplboard to make life a lot easier
 # import png:- | xclip -selection clipboard -t image/png \
 super + shift + Print
-  import ~/img/screenshots/last-selection-screenshot.png | xclip -selection clipboard -target image/png -i < ~/img/screenshots/last-selection-screenshot.png; \
-  notify-send "selection screenshot captured!"
+    /usr/bin/flameshot gui; \
+    notify-send "selection screenshot captured!"
+
+super + shift + x
+    /usr/bin/flameshot gui; \
+    notify-send "selection screenshot captured!"
+
+super + \'
+    /usr/bin/flameshot gui; \
+  # import ~/img/screenshots/last-selection-screenshot.png | xclip -selection clipboard -target image/png -i < ~/img/screenshots/last-selection-screenshot.png; \
+  # flameshot gui -p ~/img/screenshots/last-selection-screenshot.png | xclip -selection clipboard -target image/png -i < ~/img/screenshots/last-selection-screenshot.png; \
+  # flameshot &
+  # flameshot gui &
+    notify-send "selection screenshot captured!"
 
 # take screenshot in /tmp and open it with pinta
 # not specifying name here because if i do scrot passes the full file path as the name in argument $f to the mv and pinta commands
 super + ctrl + shift + Print
-  scrot -s -e 'mv $f /tmp/ && pinta /tmp/$f'
+    scrot -s -e 'mv $f /tmp/ && pinta /tmp/$f'
 
 ##########################################################
 # wallpeper, lockscreen and screensavers
@@ -554,6 +587,11 @@ super + alt + ~button1
 #	DidIClickDesktop.sh && bspc desktop -f prev
 
 ### Add or remove desktops by scrolling
+super + shift + button1
+    /usr/bin/flameshot gui \
+    notify-send "selection screenshot captured!"
+
+### Add or remove desktops by scrolling
 super + ctrl + button5
     bspcp dsktp rm
 
@@ -571,7 +609,7 @@ mod5 + @button1
 # Spawn window manipulation menuq
 # Mod1 is alt
 #    BspwmWindowMenu
-control + mod1 + @button1
+control + super + @button1
     mygtkmenui -- .config/GTKmenu/BspwmWindowMenui
 
 # resize global window gaps

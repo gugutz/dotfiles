@@ -13,7 +13,7 @@ export PATH=$PATH
 [[ -e $HOME/.config/aliases ]] && source $HOME/.config/aliases
 [[ -e $HOME/.profile ]] && source $HOME/.profile
 
-# import neoway aliases 
+# import neoway aliases
 [[ -e $HOME/.neoway-aliases ]] && source $HOME/.neoway-aliases
 
 #########################################
@@ -36,6 +36,9 @@ bashcompinit
 # testes
 autoload -U +X bashcompinit && bashcompinit
 autoload -U +X compinit && compinit
+
+
+
 ############################################
 # THEME AND UI
 ############################################
@@ -63,8 +66,52 @@ fi
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
+
+
+
+# first check if the command is installed
+if ! command -v "fuck" >/dev/null; then
+    echo "Installing fuck..."
+    pip3 install thefuck --user
+fi
+
+# first check if the command is installed
+if ! command -v "bat" >/dev/null; then
+    echo "Installing bat..."
+    sudo apt install bat
+    mkdir -p ~/.local/bin
+    ln -s /usr/bin/batcat ~/.local/bin/bat
+fi
+
+
+# first check if the command is installed
+if ! command -v "jdupes" >/dev/null; then
+    echo "Installing jdupes..."
+    sudo apt install jdupes
+fi
+
+# first check if the command is installed
+if ! command -v "tldr" >/dev/null; then
+    echo "Installing tldr..."
+    sudo apt install tldr
+fi
+
+
+# # first check if the command is installed
+# if ! command -v "exa" >/dev/null; then
+#     echo "Installing exa..."
+#     sudo apt install exa
+# fi
+
+# # first check if the command is installed
+# if ! command -v "duf" >/dev/null; then
+#     echo "Installing duf..."
+#     sudo apt install duf
+# fi
+
+
 
 
 # pure prompt
@@ -90,9 +137,9 @@ fi
 # To add support for TTYs this line can be optionally added.
 [[ -f ~/.cache/wal/colors-tty ]] && source ~/.cache/wal/colors-tty.sh
 
-############################################
+####################################################
 # Functions
-############################################
+####################################################
 
 # Fancy cd that can cd into parent directory, if trying to cd into file.
 # useful with ^F fuzzy searcher.
@@ -134,8 +181,9 @@ autoload -U edit-command-line
 zle -N edit-command-line
 bindkey '^x^e' edit-command-line
 
-#########################################
+####################################################
 # PLUGINS SETTINGS
+####################################################
 
 # vim mode plugin settings
 
@@ -144,8 +192,10 @@ MODE_CURSOR_VIINS="#20d08a blinking bar"
 MODE_CURSOR_SEARCH="#ff00ff steady underline"
 
 
-#########################################
+
+####################################################
 # ZSH settings
+####################################################
 
 # wait only 10ms for key sequences
 KEYTIMEOUT=1
@@ -171,10 +221,130 @@ HISTFILE=$HOME/.cache/zsh/zsh_history
 setopt hist_ignore_dups
 
 
-#########################################
 
+####################################################
 # fzf
+####################################################
+
+# Source for most functions and bindings:  http://owen.cymru/fzf-ripgrep-navigate-with-bash-faster-than-ever-before/
+
+# Bindings:
+# Ctrl + r - search through bash history with fzf
+# Ctrl + p - edit a file in vim from fzf
+# mv dir/** - expand a directory with (**) and select from fzf
+# Alt + c - change directory from fzf - see the update at the bottom for faster search with bfs.
+# Ctrl + t - insert file from fzf into command
+
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2> /dev/null'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+# export FZF_ALT_C_COMMAND="bfs -type d -nohidden"
+export FZF_ALT_C_COMMAND="cd ~/; bfs -type d -nohidden | sed s/^\./~/"
+export FZF_DEFAULT_OPTS='--bind J:down,K:up --reverse --ansi --multi'
+
 [ -f $HOME/.fzf.zsh ] && source $HOME/.fzf.zsh
+
+
+# install fzf if its not installed
+if [ ! -x "$(command -v fzf)"  ]; then
+    sudo apt install fzf
+fi
+
+# enable fzf keybindings and fuzzy auto-completion for zsh
+# default keybindings>: (CTRL-T / CTRL-R / ALT-C)
+if [ -x "$(command -v fzf)"  ]; then
+    source /usr/share/doc/fzf/examples/key-bindings.zsh
+    source /usr/share/doc/fzf/examples/completion.zsh
+fi
+
+
+# calls the fzf_log functions bellow
+alias log="fzf_log"
+
+
+sf() {
+  if [ "$#" -lt 1 ]; then echo "Supply string to search for!"; return 1; fi
+  printf -v search "%q" "$*"
+  include="tsx,vim,ts,yml,yaml,js,json,php,md,styl,pug,jade,html,config,py,cpp,c,go,hs,rb,conf,fa,lst,graphql"
+  exclude=".config,.git,node_modules,vendor,build/,yarn.lock,*.sty,*.bst,*.coffee,dist"
+  rg_command='rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --color "always" -g "*.{'$include'}" -g "!{'$exclude'}/*"'
+  files=`eval $rg_command $search | fzf --ansi --multi --reverse | awk -F ':' '{print $1":"$2":"$3}'`
+  [[ -n "$files" ]] && ${EDITOR:-vim} $files
+}
+
+sfu() {
+  if [ "$#" -lt 1 ]; then echo "Supply string to search for!"; return 1; fi
+  printf -v search "%q" "$*"
+  include="ts,yml,yaml,js,json,php,md,styl,pug,jade,html,config,py,cpp,c,go,hs,rb,conf,fa,lst"
+  exclude=".config,.git,node_modules,vendor,build,yarn.lock,*.sty,*.bst,*.coffee,dist"
+  rg_command='rg -m1 --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --color "always" -g "*.{'$include'}" -g "!{'$exclude'}/*"'
+  files=`eval $rg_command $search | fzf --ansi --multi --reverse | awk -F ':' '{print $1":"$2":"$3}'`
+  [[ -n "$files" ]] && ${EDITOR:-vim} $files
+}
+
+
+fc() {
+  hash=$(git log --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |  fzf | awk '{print $1}')
+  git checkout $hash
+}
+
+gc() {
+  hash=$(git log --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |  fzf | awk '{print $1}')
+  gopen $hash
+}
+
+fzf_log() {
+  hash=$(git log --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |  fzf | awk '{print $1}')
+  echo $hash | xclip
+  git showtool $hash
+}
+
+tm() {
+  [[ -n "$TMUX" ]] && change="switch-client" || change="attach-session"
+  if [ $1 ]; then
+    tmux $change -t "$1" 2>/dev/null || (tmux new-session -d -s $1 && tmux $change -t "$1"); return
+  fi
+  session=$(tmux list-sessions -F "#{session_name}" 2>/dev/null | fzf --exit-0) &&  tmux $change -t "$session" || echo "No sessions found."
+}
+
+branch() {
+  local branches branch
+  branches=$(git for-each-ref --count=30 --sort=-committerdate refs/heads/ --format="%(refname:short)") &&
+  branch=$(echo "$branches" |
+           fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
+  git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
+}
+
+fvim() {
+  local IFS=$'\n'
+  local files=($(fzf-tmux --query="$1" --multi --select-1 --exit-0))
+  [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
+}
+
+c() {
+  local cols sep google_history open
+  cols=$(( COLUMNS / 3 ))
+  sep='{::}'
+
+  if [ "$(uname)" = "Darwin" ]; then
+    google_history="$HOME/Library/Application Support/Google/Chrome/Default/History"
+    open=open
+  else
+    google_history="$HOME/.config/google-chrome/Profile 1/History"
+    open=xdg-open
+  fi
+  cp -f "$google_history" /tmp/h
+  sqlite3 -separator $sep /tmp/h \
+    "select substr(title, 1, $cols), url
+     from urls order by last_visit_time desc" |
+  awk -F $sep '{printf "%-'$cols's  \x1b[36m%s\x1b[m\n", $1, $2}' |
+  fzf --ansi --multi | sed 's#.*\(https*://\)#\1#' | xargs $open > /dev/null 2> /dev/null
+}
+
+gopen() {
+    project=$(git config --local remote.origin.url | sed s/git@github.com\:// | sed s/\.git//)
+    url="http://github.com/$project/commit/$1"
+    xdg-open $url
+}
 
 #########################################
 # bind home/end keys
@@ -202,9 +372,6 @@ fi
 #   [[ -z "$TMUX" ]] && tmux -e zsh
 # fi
 
-#########################################
-# FZF
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 #########################################
 # asdf
@@ -290,7 +457,11 @@ zle -N zle-keymap-select
 #
 # My Binding and Macros
 
-# zjsh does not use readline, instead it uses its own and more powerful zle. It does not read /etc/inputrc or ~/.inputrc. Zle has an emacs mode and a vi mode. By default, it tries to guess whether emacs or vi keys from the $EDITOR environment variable are desired. If it is empty, it will default to emacs. Change this with bindkey -e or bindkey -v respectively for emacs mode or vi mode.
+# zsh does not use readline, instead it uses its own and more powerful zle.
+# It does not read /etc/inputrc or ~/.inputrc. Zle has an emacs mode and a vi mode.
+# By default, it tries to guess whether emacs or vi keys from the $EDITOR environment variable are desired.
+# If it is empty, it will default to emacs.
+# Change this with bindkey -e or bindkey -v respectively for emacs mode or vi mode.
 
 # For a complete list of codes to use for each key, visit: http://zshwiki.org/home/zle/bindkeys
 # You may want to call different history search commands, e.g.
@@ -358,3 +529,26 @@ source $ZSH_PLUGINS/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 install_plugin zsh-syntax-highlighting zsh-users/zsh-syntax-highlighting.git
 source $ZSH_PLUGINS/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+
+
+
+alias ls='ls --color=auto'
+alias grep='grep --colour=auto'
+alias egrep='egrep --colour=auto'
+alias fgrep='fgrep --colour=auto'
+
+# alias cat='batcat'
+alias df='duf'
+# alias ls='exa'
+
+
+
+
+# set autoload path
+fpath=(~/.config/zsh/functions "${fpath[@]}")
+# autoload all files in fpath
+# autoload -U $fpath[1]/*(.:t)
+
+# move cursor to end of line after history search completion
+autoload -Uz  kp fp ll

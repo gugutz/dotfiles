@@ -26,11 +26,11 @@ right = "%{T3}%{T-}"
 ; polybar themes colors to use the color switcher
 ; these are altered on the fly by sed when a style is picked
 ;; DONT ALIGN BY REGEXP "=" here, or the color-switcher script wont work because the sed commands dont treat whitespace
-bg = #e0e0e0
-module-bg = #e0e0e0
-fg = #2E2E2E
-fg-alt = #e0e0
-acolor = #1e88e5
+bg = #1F1F1F
+module-bg = #1F1F1F
+fg = #FFFFFF
+fg-alt = #A9ABB0
+acolor = #ffb300
 curgent = #e53935
 coccupied = #1e88e5
 primary = #3f3f3f
@@ -164,7 +164,8 @@ font-5 = "Monospace:size=10.5;2"
 bottom = true
 
 modules-left = menu bspwm
-modules-center = calculator files browser config display-settings  appearance-settings processes
+; modules-center = calculator files browser config display-settings  appearance-settings processes
+modules-center =
 modules-right = wired-network calendar clock
 
 

@@ -2,6 +2,14 @@
 # .gitconfig file
 # a '#' or ';' character indicates a comment
 #
+# add this to resolve LSP errors while writing golang
+# taken this from the docs @
+# https://golang.org/doc/faq#git_https
+[url "ssh://git@gitlab.neoway.com.br:10022"]
+  insteadOf = https://gitlab.neoway.com.br:10022
+# [url "ssh://git@gitlab.neoway.com.br:10022"]
+#   insteadOf = https://gitlab.neoway.com.br
+
 [user]
 	name = Gustavo P Borges
 	email = gustavo.borges@neoway.com.br
@@ -10,6 +18,7 @@
 	editor = vim
 	whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
 	excludesfile = ~/.gitignore
+	excudefiles = /home/gustavo-borges/.gitignore_global
 [web]
 	browser = firefox
 [color]
@@ -32,9 +41,6 @@
 	tool = vimdiff
 [difftool]
 	prompt = false
-[github]
-	user = pksunkara
-	token = token
 [alias]
 	a = add --all
 	ai = add -i

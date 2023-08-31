@@ -12,3 +12,5 @@ export NVM_DIR="$HOME/.nvm"
 
 export YVM_DIR=/home/tau/.yvm
 [ -r $YVM_DIR/yvm.sh ] && . $YVM_DIR/yvm.sh
+
+export PATH="$HOME/.poetry/bin:$PATH"

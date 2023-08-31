@@ -76,7 +76,6 @@ export PATH=$PATH:"$XDG_CONFIG_HOME/sxhkd/scripts"
 
 export PATH=$PATH:"$XDG_CONFIG_HOME/nvm/versions/node/v14.15.1/lib/node_modules"
 
-
 # fix idea opening stuck on grey screen in arch + bspwm
 # source: https://stackoverflow.com/questions/33424736/intellij-idea-14-on-arch-linux-opening-to-grey-screen/34419927
 export _JAVA_AWT_WM_NONREPARENTING=1
@@ -86,15 +85,16 @@ export _JAVA_AWT_WM_NONREPARENTING=1
 #########################################
 
 export TERMINAL=/usr/bin/alacritty
-export EDITOR=/usr/bin/vim
+# export EDITOR=/usr/bin/vim
+export EDITOR=/usr/bin/emacs
 export VISUAL=/usr/bin/vim
 export GUI_EDITOR=/usr/bin/micro
-export QT_QPA_PLATFORMTHEME="qt5ct"
-export GTK2_RC_FILES="$HOME/.gtkrc-2.0"
+export QT_QPA_PLATFORMTHEME="qt5ct" export GTK2_RC_FILES="$HOME/.gtkrc-2.0"
 # fix "xdg-open fork-bomb" export your preferred browser from here
 # export BROWSER=/usr/bin/google-chrome-stable
 # export BROWSER=/usr/bin/firefox
 export BROWSER=/usr/bin/google-chrome-stable
+# export BROWSER=/usr/bin/opera
 export PAGER=/usr/bin/less
 
 # if bat is installed, use it also for colored man pages
@@ -113,3 +113,8 @@ export NVM_DIR="$HOME/.nvm"
 
 # Yarn
 export YVM_DIR="$HOME/.yvm"
+
+# FZF default options for all terminals
+export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
+
+export PATH="$HOME/.poetry/bin:$PATH"
